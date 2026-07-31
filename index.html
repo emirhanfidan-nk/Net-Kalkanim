@@ -1,0 +1,2239 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YKS Sistem</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <!-- Firebase Bağlantı Kütüphaneleri -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <style>
+        body { background-color: #f8fafc; color: #1e293b; font-family: 'Inter', sans-serif; }
+        
+        .tab-content { display: none; opacity: 0; }
+        .tab-content.active { display: block; animation: smoothFade 0.3s ease-out forwards; }
+        
+        @keyframes smoothFade {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes modalEnter {
+            0% { opacity: 0; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        
+        .modal-animate:not(.hidden) { animation: modalEnter 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+        .btn-cyber { transition: all 0.2s ease-out; position: relative; font-weight: 700; letter-spacing: 0.025em; }
+        .btn-cyber:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.25); }
+        .btn-cyber:active { transform: translateY(0); }
+        
+        .btn-cyber-red:hover { box-shadow: 0 10px 15px -3px rgba(225, 29, 72, 0.25); }
+        .btn-cyber-purple:hover { box-shadow: 0 10px 15px -3px rgba(147, 51, 234, 0.25); }
+        .btn-cyber-yellow:hover { box-shadow: 0 10px 15px -3px rgba(217, 119, 6, 0.25); }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        
+        canvas { touch-action: none; }
+    </style>
+    <link rel="manifest" href="manifest.json">
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js');
+  }
+</script>
+</head>
+<body class="flex justify-center min-h-screen">
+<!-- ŞİFRE EKRANI (Üstte Duran ve Giriş Yapınca Tamamen Yok Olan Perde) -->
+<div id="login-screen" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #ffffff; z-index: 999999; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: sans-serif; box-sizing: border-box; padding: 20px; text-align: center;">
+  <h2>YKS Uygulaması Giriş</h2>
+  <p>Lütfen size verilen tek kullanımlık şifreyi girin:</p>
+  <input type="text" id="otp-input" placeholder="Şifreniz..." style="padding: 12px; width: 250px; font-size: 16px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"><br>
+  <button onclick="checkPassword()" style="padding: 12px 30px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px;">Giriş Yap</button>
+  <!-- Hata mesajları burada görünecek -->
+  <p id="error-msg" style="color: red; font-weight: bold; margin-top: 20px;"></p>
+</div>
+    <div class="w-full max-w-md bg-slate-50 h-screen flex flex-col relative border-x border-slate-200 shadow-xl overflow-hidden">
+        
+        <!-- HEADER -->
+        <header class="bg-white p-4 flex justify-end items-center border-b border-slate-200 shadow-sm relative z-10 rounded-b-2xl shrink-0">
+            <button onclick="switchTab('profile')" id="nav-profile" title="Ayarlar" class="p-2 text-slate-400 hover:text-indigo-600 transition-colors rounded-xl">
+                <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
+                    <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+                </svg>
+            </button>
+        </header>
+
+        <main class="flex-1 p-5 overflow-y-auto pb-6">
+            
+            <div id="home" class="tab-content space-y-6">
+                <!-- Ev İkonu ve Ana Sayfa Metni -->
+                <div class="border-l-4 border-indigo-600 bg-white p-4 rounded-r-2xl border border-slate-200 shadow-sm flex items-center gap-2 text-indigo-900">
+                    <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                    <h2 class="text-lg font-bold uppercase">Ana Sayfa</h2>
+                </div>
+
+                <!-- Günlük İlerleme Çubuğu -->
+                <div class="space-y-2 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                    <div class="flex justify-between text-xs font-bold text-slate-500 uppercase tracking-wider">
+                        <span>Günlük İlerleme</span>
+                        <span id="progress-text" class="text-indigo-600 font-extrabold">0/0</span>
+                    </div>
+                    <div class="w-full h-2.5 bg-slate-100 overflow-hidden rounded-full border border-slate-200">
+                        <div id="progress-bar" class="h-full bg-indigo-600 w-0 transition-all duration-500 ease-out rounded-full shadow-sm"></div>
+                    </div>
+                </div>
+
+                <!-- Filtre Butonu ve Açılır Filtre Alanı -->
+                <div class="space-y-3">
+                    <button onclick="toggleHomeFilters()" type="button" class="w-full bg-white border border-slate-200 p-3.5 rounded-2xl flex justify-between items-center text-xs font-bold text-slate-700 uppercase tracking-wider shadow-sm hover:bg-slate-50 transition-colors">
+                        <span class="flex items-center gap-2">
+                            <svg class="w-4 h-4 fill-current text-indigo-600" viewBox="0 0 24 24"><path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/></svg>
+                            Filtre
+                        </span>
+                        <span id="filter-chevron" class="text-slate-400 transition-transform duration-200">▼</span>
+                    </button>
+                    <div id="home-subject-filters" class="hidden flex flex-col gap-2.5 text-xs"></div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="startReview('questions')" class="btn-cyber rounded-2xl w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 font-bold text-sm flex flex-col items-center justify-center gap-1 shadow-md">
+                        <span>SORULARI BAŞLAT</span>
+                        <span class="text-xs opacity-80">[ <span id="queue-count-questions">0</span> ]</span>
+                    </button>
+                    <button onclick="startReview('notes')" class="btn-cyber btn-cyber-yellow rounded-2xl w-full bg-amber-500 hover:bg-amber-600 text-white py-4 font-bold text-sm flex flex-col items-center justify-center gap-1 shadow-md">
+                        <span>NOTLARI BAŞLAT</span>
+                        <span class="text-xs opacity-80">[ <span id="queue-count-notes">0</span> ]</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="add" class="tab-content active space-y-6">
+                <div class="flex gap-3 mb-4 bg-slate-200 p-1.5 rounded-2xl">
+                    <button type="button" onclick="setEntryType('question')" id="btn-entry-question" class="flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold uppercase transition-all rounded-xl">Soru Ekle</button>
+                    <button type="button" onclick="setEntryType('note')" id="btn-entry-note" class="flex-1 text-slate-600 py-2 text-xs font-bold uppercase transition-all hover:text-amber-600 rounded-xl">Not Ekle</button>
+                </div>
+
+                <div id="question-type-toggle-area" class="flex gap-3 mb-4 bg-slate-200 p-1.5 rounded-2xl">
+                    <button type="button" onclick="setQuestionInputType('image')" id="btn-qinput-image" class="flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold uppercase transition-all rounded-xl">Görsel</button>
+                    <button type="button" onclick="setQuestionInputType('text')" id="btn-qinput-text" class="flex-1 text-slate-600 py-2 text-xs font-bold uppercase transition-all hover:text-indigo-600 rounded-xl">Yazı</button>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Ders Seçimi</label>
+                        <select id="q-course" onchange="updateTopicDropdown()" class="w-full bg-white p-3.5 border border-slate-300 outline-none focus:border-indigo-600 text-slate-800 transition-colors uppercase text-sm font-semibold cursor-pointer rounded-xl shadow-sm"></select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Konu Seçimi</label>
+                        <select id="q-topic" class="w-full bg-white p-3.5 border border-slate-300 outline-none focus:border-indigo-600 text-slate-800 transition-colors uppercase text-sm font-semibold cursor-pointer rounded-xl shadow-sm"></select>
+                    </div>
+
+                    <div id="image-input-container">
+                        <div class="relative w-full">
+                            <div id="upload-placeholder" class="w-full min-h-[11rem] bg-white border-2 border-dashed border-slate-300 p-4 flex flex-col items-center justify-center transition-colors rounded-2xl shadow-sm">
+                                <p class="text-xs uppercase font-bold tracking-wider text-slate-400 mb-4">Görsel Kaynağı</p>
+                                <div class="flex gap-3 w-full max-w-[200px]">
+                                    <label id="label-q-image-upload" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3 flex justify-center items-center text-xs font-bold uppercase cursor-pointer transition-colors border border-indigo-600 rounded-xl shadow-sm">
+                                        GÖRSEL EKLE
+                                        <input type="file" id="q-image-input" accept="image/*" capture="environment" class="hidden">
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div id="editor-area" class="hidden flex flex-col items-center bg-white border border-slate-300 mt-2 p-3 relative w-full rounded-2xl shadow-sm">
+                                <div id="cropper-container" class="w-full flex justify-center max-h-64 rounded-xl overflow-hidden">
+                                    <img id="image-to-crop" class="max-w-full block">
+                                </div>
+                                
+                                <div id="canvas-container" class="w-full hidden relative overflow-auto bg-slate-100 max-h-64 p-2 text-center rounded-xl">
+                                    <div id="upload-zoom-wrapper" class="relative inline-block max-w-full transition-transform duration-200 origin-top">
+                                        <img id="upload-final-img" class="max-w-full max-h-64 object-contain block pointer-events-none rounded-lg">
+                                        <canvas id="upload-canvas" class="absolute top-0 left-0 w-full h-full cursor-crosshair"></canvas>
+                                    </div>
+                                </div>
+
+                                <div class="flex gap-2 w-full mt-3 justify-center flex-wrap">
+                                    <button type="button" id="btn-crop-ok" onclick="finishCrop()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 text-xs font-bold uppercase rounded-xl shadow-sm">Kırpmayı Onayla</button>
+                                    
+                                    <div id="upload-zoom-ui" class="hidden flex-col items-center gap-2 w-full">
+                                        <div class="flex items-center gap-2 w-full justify-center mb-2">
+                                            <button type="button" onclick="stepZoom('upload', -0.5)" class="px-4 py-1.5 text-xs font-bold bg-slate-200 text-slate-700 border border-slate-300 rounded-xl hover:bg-slate-300">KÜÇÜLT</button>
+                                            <button type="button" onclick="stepZoom('upload', 0.5)" class="px-4 py-1.5 text-xs font-bold bg-amber-500 text-white border border-amber-500 rounded-xl hover:bg-amber-600">BÜYÜT</button>
+                                        </div>
+                                        <div class="flex gap-2 justify-center flex-wrap">
+                                            <button type="button" id="btn-up-move" onclick="setUploadDrawMode('move')" class="bg-amber-500 text-white px-4 py-2 text-xs font-bold uppercase rounded-xl border border-amber-500">Kaydır</button>
+                                            <button type="button" id="btn-up-pen" onclick="setUploadDrawMode('pen')" class="bg-indigo-600 text-white px-4 py-2 text-xs font-bold uppercase rounded-xl border border-indigo-600">
+                                                <svg class="w-4 h-4 fill-current inline-block" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                                            </button>
+                                            <button type="button" id="btn-up-eraser" onclick="setUploadDrawMode('eraser')" class="bg-slate-200 text-slate-700 px-4 py-2 text-xs font-bold uppercase rounded-xl border border-slate-300">
+                                                <svg class="w-4 h-4 fill-current inline-block" viewBox="0 0 24 24"><path d="M15.14 3c-.39 0-.75.15-1.03.42L2.34 15.19c-.58.58-.58 1.52 0 2.1l4.37 4.37c.28.28.64.44 1.03.44h11.26c.55 0 1-.45 1-1s-.45-1-1-1h-6.26l7.88-7.88c.58-.58.58-1.52 0-2.1l-4.37-4.37C15.89 3.15 15.53 3 15.14 3zM7.74 20l-3.3-3.3 8.7-8.7 3.3 3.3L7.74 20z"/></svg>
+                                            </button>
+                                            <button type="button" id="btn-up-undo" onclick="undoCanvas('upload-canvas')" class="bg-slate-700 text-white px-4 py-2 text-xs font-bold uppercase rounded-xl border border-slate-700">
+                                                <svg class="w-4 h-4 fill-current inline-block" viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="upload-pen-sizes" class="hidden flex gap-1 mt-2 justify-center">
+                                    <button type="button" onclick="setUploadPenSize(2)" id="btn-up-size-2" class="px-2.5 py-1.5 inline-flex items-center justify-center bg-indigo-600 text-white border border-indigo-600 rounded-lg"><span class="rounded-full bg-current w-[2px] h-[2px]"></span></button>
+                                    <button type="button" onclick="setUploadPenSize(4)" id="btn-up-size-4" class="px-2.5 py-1.5 inline-flex items-center justify-center bg-slate-200 text-slate-600 border border-slate-300 rounded-lg"><span class="rounded-full bg-current w-[4px] h-[4px]"></span></button>
+                                    <button type="button" onclick="setUploadPenSize(7)" id="btn-up-size-7" class="px-2.5 py-1.5 inline-flex items-center justify-center bg-slate-200 text-slate-600 border border-slate-300 rounded-lg"><span class="rounded-full bg-current w-[7px] h-[7px]"></span></button>
+                                    <button type="button" onclick="setUploadPenSize(12)" id="btn-up-size-12" class="px-2.5 py-1.5 inline-flex items-center justify-center bg-slate-200 text-slate-600 border border-slate-300 rounded-lg"><span class="rounded-full bg-current w-[12px] h-[12px]"></span></button>
+                                </div>
+                                <button type="button" id="clear-image-btn" onclick="clearSelectedImage()" class="absolute top-2 right-2 bg-rose-600 hover:bg-rose-700 text-white w-8 h-8 flex items-center justify-center text-xs font-bold rounded-full z-10 shadow-md">X</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Yazılı Soru Kutusu -->
+                    <div id="q-text-question-container" class="hidden">
+                        <label class="block text-xs font-bold text-indigo-700 uppercase mb-2">Yazılı Soru Kutusu</label>
+                        <textarea id="q-text-question" placeholder="SORU METNİNİ BURAYA YAZINIZ..." class="w-full bg-white p-3.5 border border-slate-300 outline-none focus:border-indigo-600 text-slate-800 text-xs font-semibold h-20 rounded-xl resize-none uppercase tracking-wide shadow-sm"></textarea>
+                    </div>
+
+                    <div>
+                        <label id="label-note-text" class="block text-xs font-bold text-slate-600 uppercase mb-2">Not</label>
+                        <textarea id="q-note" placeholder="METİN GİRİNİZ..." class="w-full bg-white p-3.5 border border-slate-300 outline-none focus:border-indigo-600 text-slate-800 text-xs font-semibold h-20 rounded-xl resize-none uppercase tracking-wide shadow-sm"></textarea>
+                    </div>
+
+                    <div id="question-specific-area" class="space-y-4">
+                        <div>
+                            <div class="flex gap-3 bg-slate-200 p-1.5 rounded-2xl">
+                                <button type="button" onclick="setAnsType('choice')" id="btn-type-choice" class="flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold uppercase transition-all rounded-xl">Seçenek</button>
+                                <button type="button" onclick="setAnsType('text')" id="btn-type-text" class="flex-1 text-slate-600 py-2 text-xs font-bold uppercase transition-all hover:text-indigo-600 rounded-xl">Metin</button>
+                            </div>
+                        </div>
+
+                        <div id="ans-choice-area">
+                            <label class="block text-xs font-bold text-indigo-700 uppercase mb-2">Doğru Cevap</label>
+                            <div class="flex justify-between gap-2">
+                                <button type="button" onclick="selectChoice('A')" class="choice-btn w-12 h-12 bg-white border border-slate-300 font-bold text-slate-600 hover:border-indigo-600 hover:text-indigo-600 flex items-center justify-center transition-all rounded-xl shadow-sm">A</button>
+                                <button type="button" onclick="selectChoice('B')" class="choice-btn w-12 h-12 bg-white border border-slate-300 font-bold text-slate-600 hover:border-indigo-600 hover:text-indigo-600 flex items-center justify-center transition-all rounded-xl shadow-sm">B</button>
+                                <button type="button" onclick="selectChoice('C')" class="choice-btn w-12 h-12 bg-white border border-slate-300 font-bold text-slate-600 hover:border-indigo-600 hover:text-indigo-600 flex items-center justify-center transition-all rounded-xl shadow-sm">C</button>
+                                <button type="button" onclick="selectChoice('D')" class="choice-btn w-12 h-12 bg-white border border-slate-300 font-bold text-slate-600 hover:border-indigo-600 hover:text-indigo-600 flex items-center justify-center transition-all rounded-xl shadow-sm">D</button>
+                                <button type="button" onclick="selectChoice('E')" class="choice-btn w-12 h-12 bg-white border border-slate-300 font-bold text-slate-600 hover:border-indigo-600 hover:text-indigo-600 flex items-center justify-center transition-all rounded-xl shadow-sm">E</button>
+                            </div>
+                        </div>
+
+                        <div id="ans-text-area" class="hidden">
+                            <label class="block text-xs font-bold text-indigo-700 uppercase mb-2">Doğru Cevap (Metin)</label>
+                            <input type="text" id="q-text-answer" placeholder="METİN GİRİN..." class="w-full bg-white p-3.5 border border-slate-300 outline-none focus:border-indigo-600 text-slate-800 uppercase font-bold placeholder-slate-400 transition-colors rounded-xl shadow-sm">
+                        </div>
+                    </div>
+
+                    <button onclick="saveData()" id="btn-save-data" class="btn-cyber btn-cyber-purple w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 font-bold uppercase mt-6 rounded-2xl shadow-md">Soruyu Kaydet</button>
+                </div>
+            </div>
+
+            <div id="library" class="tab-content space-y-4">
+                <div class="flex justify-between items-center border-b border-slate-200 pb-2">
+                    <h2 class="text-xl font-bold text-slate-800 uppercase flex items-center gap-2">
+                        <svg class="w-6 h-6 fill-current text-indigo-600" viewBox="0 0 24 24"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM6.24 5h11.52l.83 1H5.41l.83-1zM5 19V8h14v11H5zm11-5.5H8v-2h8v2z"/></svg>
+                        Arşiv & Kamp
+                    </h2>
+                </div>
+                
+                <div class="mb-2">
+                    <button onclick="openCampSetup('questions')" class="w-full btn-cyber-yellow bg-amber-50 border border-amber-200 text-amber-600 hover:bg-amber-500 hover:text-white py-2.5 font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2 rounded-xl shadow-sm">
+                        Rastgele Kamp
+                    </button>
+                </div>
+
+                <div class="flex gap-2 bg-slate-200 p-1.5 rounded-2xl">
+                    <button type="button" onclick="setArchiveDataType('question')" id="btn-arch-type-q" class="flex-1 bg-white text-indigo-600 py-2 text-xs font-bold uppercase shadow-sm transition-all rounded-xl">Sorular</button>
+                    <button type="button" onclick="setArchiveDataType('note')" id="btn-arch-type-n" class="flex-1 text-slate-600 py-2 text-xs font-bold uppercase transition-all hover:text-amber-600 rounded-xl">Notlar</button>
+                </div>
+
+                <!-- Açılır Filtre Alanı -->
+                <div class="space-y-3 mb-2">
+                    <button onclick="toggleArchiveFilters()" type="button" class="w-full bg-white border border-slate-200 p-3.5 rounded-2xl flex justify-between items-center text-xs font-bold text-slate-700 uppercase tracking-wider shadow-sm hover:bg-slate-50 transition-colors">
+                        <span class="flex items-center gap-2">
+                            <svg class="w-4 h-4 fill-current text-indigo-600" viewBox="0 0 24 24"><path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/></svg>
+                            Filtre
+                        </span>
+                        <span id="arch-filter-chevron" class="text-slate-400 transition-transform duration-200">▼</span>
+                    </button>
+                    
+                    <div id="arch-filters-container" class="hidden bg-white border border-slate-200 p-4 rounded-2xl space-y-3 shadow-sm">
+                        <div class="text-xs font-bold text-indigo-600 uppercase tracking-wider border-b border-slate-100 pb-1">Ders Filtresi (Çoklu)</div>
+                        <div class="flex flex-wrap gap-1.5" id="arch-course-filters"></div>
+                        <div class="text-xs font-bold text-amber-600 uppercase tracking-wider border-b border-slate-100 pb-1 mt-2">Konu Filtresi (Çoklu)</div>
+                        <div class="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto pr-1" id="arch-topic-filters"></div>
+                    </div>
+                </div>
+
+                <div id="library-list" class="space-y-3"></div>
+            </div>
+
+            <div id="profile" class="tab-content space-y-6">
+                
+                <div class="bg-white border border-slate-200 p-5 space-y-4 relative overflow-hidden rounded-2xl shadow-sm">
+                    <div class="absolute top-0 left-0 w-1.5 h-full bg-indigo-600"></div>
+                    <h3 class="font-bold text-xs text-indigo-600 uppercase tracking-wider">Uygulama Rehberi</h3>
+                    <button onclick="showOnboarding()" class="w-full bg-indigo-50 border border-indigo-200 text-indigo-600 hover:bg-indigo-600 hover:text-white py-3 font-bold text-xs uppercase rounded-xl transition-colors shadow-sm">
+                        Uygulama Tanıtımını Tekrar Gör
+                    </button>
+                </div>
+
+                <div class="bg-white border border-slate-200 p-5 space-y-4 relative overflow-hidden rounded-2xl shadow-sm">
+                    <div class="absolute top-0 left-0 w-1.5 h-full bg-blue-500"></div>
+                    <h3 class="font-bold text-xs text-blue-600 uppercase tracking-wider">Ders Yönetimi</h3>
+                    <div class="flex gap-2">
+                        <input type="text" id="new-course-input" placeholder="YENİ DERS (ÖRN: BİYOLOJİ)" class="flex-1 bg-slate-50 p-3 border border-slate-300 outline-none focus:border-blue-500 text-xs font-bold uppercase tracking-wider rounded-xl text-slate-800">
+                        <button onclick="addCourse()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 font-bold uppercase text-xs rounded-xl transition-colors shadow-sm">EKLE</button>
+                    </div>
+                    <div id="course-manage-list" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
+                </div>
+
+                <div class="bg-white border border-slate-200 p-5 space-y-4 relative overflow-hidden rounded-2xl shadow-sm">
+                    <div class="absolute top-0 left-0 w-1.5 h-full bg-emerald-500"></div>
+                    <h3 class="font-bold text-xs text-emerald-600 uppercase tracking-wider">Konu Yönetimi</h3>
+                    <select id="topic-manage-course-select" onchange="renderTopicManagement()" class="w-full bg-slate-50 p-3 border border-slate-300 outline-none focus:border-emerald-500 text-slate-800 transition-colors uppercase text-xs font-semibold cursor-pointer rounded-xl"></select>
+                    <div class="flex gap-2">
+                        <input type="text" id="new-topic-input" placeholder="YENİ KONU (ÖRN: HÜCRE)" class="flex-1 bg-slate-50 p-3 border border-slate-300 outline-none focus:border-emerald-500 text-xs font-bold uppercase tracking-wider rounded-xl text-slate-800">
+                        <button onclick="addTopic()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 font-bold uppercase text-xs rounded-xl transition-colors shadow-sm">EKLE</button>
+                    </div>
+                    <div id="topic-manage-list" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
+                </div>
+
+                <div class="bg-white border border-slate-200 p-5 space-y-4 relative overflow-hidden rounded-2xl shadow-sm">
+                    <div class="absolute top-0 left-0 w-1.5 h-full bg-purple-600"></div>
+                    <h3 class="font-bold text-xs text-purple-600 uppercase tracking-wider">Algoritma Döngüsü (Sorular)</h3>
+                    <input type="text" id="setting-intervals" class="w-full bg-slate-50 p-3 border border-slate-300 font-mono text-center text-purple-700 font-bold outline-none focus:border-purple-500 transition-colors rounded-xl">
+                    <button onclick="saveIntervals()" class="btn-cyber btn-cyber-purple w-full bg-purple-600 hover:bg-purple-700 text-white py-3 text-xs font-bold uppercase rounded-xl shadow-sm">Geriye Dönük Güncelle</button>
+                </div>
+
+                <div class="bg-white border border-slate-200 p-5 space-y-4 relative overflow-hidden rounded-2xl shadow-sm">
+                    <div class="absolute top-0 left-0 w-1.5 h-full bg-amber-500"></div>
+                    <h3 class="font-bold text-xs text-amber-600 uppercase tracking-wider">Algoritma Döngüsü (Notlar)</h3>
+                    <input type="text" id="setting-note-intervals" class="w-full bg-slate-50 p-3 border border-slate-300 font-mono text-center text-amber-700 font-bold outline-none focus:border-amber-500 transition-colors rounded-xl">
+                    <button onclick="saveNoteIntervals()" class="btn-cyber btn-cyber-yellow w-full bg-slate-800 hover:bg-slate-900 text-white py-3 text-xs font-bold uppercase rounded-xl shadow-sm">Geriye Dönük Güncelle</button>
+                </div>
+
+                <div class="bg-white border border-slate-200 p-5 space-y-4 relative overflow-hidden rounded-2xl shadow-sm">
+                    <div class="absolute top-0 left-0 w-1.5 h-full bg-amber-500"></div>
+                    <h3 class="font-bold text-xs text-amber-600 uppercase tracking-wider">Veri Güvenliği</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="exportData()" class="bg-slate-100 hover:bg-slate-200 border border-slate-300 py-3 text-xs font-bold text-slate-700 uppercase rounded-xl transition-colors shadow-sm">Yedekle</button>
+                        <label class="bg-slate-100 hover:bg-slate-200 border border-slate-300 py-3 text-xs font-bold text-slate-700 uppercase rounded-xl text-center cursor-pointer transition-colors block shadow-sm">
+                            Yükle <input type="file" id="import-file" accept=".json" class="hidden" onchange="importData(this)">
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Soru Modalı -->
+        <div id="review-modal" class="modal-animate absolute inset-0 bg-slate-50 z-50 hidden flex flex-col rounded-none h-full overflow-hidden transition-colors duration-300">
+            <div class="flex justify-between items-center bg-white px-4 py-3 border-b border-indigo-100 shadow-sm shrink-0" id="review-header">
+                <div class="flex items-center gap-3">
+                    <div class="w-2.5 h-2.5 bg-rose-500 rounded-full animate-pulse"></div>
+                    <span id="review-progress" class="text-xs font-extrabold text-indigo-600 tracking-wider uppercase">TEST 1/5</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button onclick="closeReview()" class="text-slate-500 hover:text-indigo-600 transition-colors"><span class="text-xs font-bold">KAPAT</span></button>
+                </div>
+            </div>
+            
+            <div class="flex-1 flex flex-col justify-start items-center p-3 bg-slate-100/50 overflow-y-auto gap-2 min-h-0">
+                <div class="text-[11px] text-slate-500 font-bold uppercase tracking-wider text-center" id="review-breadcrumbs">MATEMATİK > TÜREV</div>
+                
+                <div id="review-question-text" class="w-full bg-white border border-slate-200 p-2.5 text-xs text-slate-800 font-bold uppercase hidden tracking-wide text-center max-h-20 overflow-y-auto rounded-xl shadow-sm shrink-0"></div>
+                
+                <div id="review-frame-box" class="relative max-w-full flex-1 min-h-[120px] max-h-[48vh] border border-slate-200 shadow-md bg-white overflow-auto w-full p-1.5 text-center rounded-xl flex items-center justify-center transition-all">
+                    <div id="review-zoom-wrapper" class="relative inline-block max-w-full max-h-full transition-transform duration-200 origin-center">
+                        <img id="review-img" src="" onclick="openLightbox(this.src)" class="max-w-full max-h-[45vh] object-contain cursor-zoom-in block pointer-events-auto rounded-lg">
+                        <canvas id="review-draw-canvas" class="absolute top-0 left-0 w-full h-full pointer-events-none"></canvas>
+                    </div>
+                </div>
+
+                <!-- Manuel İlerleme İçin Ok Tuşları -->
+                <div id="review-nav-arrows" class="flex justify-between items-center w-full px-1 py-1 gap-3 shrink-0">
+                    <button onclick="navigateReview(-1)" id="btn-rev-prev" class="flex-1 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 py-2.5 px-3 text-xs font-extrabold rounded-xl shadow-sm transition-colors flex items-center justify-center gap-2">
+                        <span>◄</span> <span>Önceki Soru</span>
+                    </button>
+                    <button onclick="navigateReview(1)" id="btn-rev-next" class="flex-1 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 py-2.5 px-3 text-xs font-extrabold rounded-xl shadow-sm transition-colors flex items-center justify-center gap-2">
+                        <span>Sonraki Soru</span> <span>►</span>
+                    </button>
+                </div>
+
+                <!-- Doğru/Yanlış Arka Plan Geribildirim Alanı -->
+                <div id="review-feedback-box" class="w-full p-3 text-xs font-extrabold text-center rounded-xl hidden transition-colors shadow-sm shrink-0"></div>
+
+                <div id="review-draw-tools" class="flex flex-col gap-1.5 hidden items-center w-full shrink-0">
+                    <div class="flex gap-1.5 justify-center flex-wrap">
+                        <button onclick="setReviewDrawMode('move')" id="rev-btn-move" class="bg-amber-500 text-white px-3 py-1 text-xs font-bold uppercase rounded-xl border border-amber-500 shadow-sm">Kaydır</button>
+                        <button onclick="setReviewDrawMode('pen')" id="rev-btn-pen" class="bg-indigo-600 text-white px-3 py-1 text-xs font-bold uppercase rounded-xl border border-indigo-600 shadow-sm">
+                            <svg class="w-3.5 h-3.5 fill-current inline-block" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                        </button>
+                        <button onclick="setReviewDrawMode('eraser')" id="rev-btn-eraser" class="bg-slate-200 text-slate-700 px-3 py-1 text-xs font-bold uppercase rounded-xl border border-slate-300 shadow-sm">
+                            <svg class="w-3.5 h-3.5 fill-current inline-block" viewBox="0 0 24 24"><path d="M15.14 3c-.39 0-.75.15-1.03.42L2.34 15.19c-.58.58-.58 1.52 0 2.1l4.37 4.37c.28.28.64.44 1.03.44h11.26c.55 0 1-.45 1-1s-.45-1-1-1h-6.26l7.88-7.88c.58-.58.58-1.52 0-2.1l-4.37-4.37C15.89 3.15 15.53 3 15.14 3zM7.74 20l-3.3-3.3 8.7-8.7 3.3 3.3L7.74 20z"/></svg>
+                        </button>
+                        <button onclick="undoCanvas('review-draw-canvas')" class="bg-slate-700 text-white px-3 py-1 text-xs font-bold uppercase rounded-xl border border-slate-700 shadow-sm">
+                            <svg class="w-3.5 h-3.5 fill-current inline-block" viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg>
+                        </button>
+                        <button onclick="clearReviewCanvas()" class="bg-rose-500 text-white px-3 py-1 text-xs font-bold uppercase rounded-xl border border-rose-500 shadow-sm">Temizle</button>
+                    </div>
+                    <div id="review-pen-sizes" class="hidden flex gap-1 justify-center">
+                        <button type="button" onclick="setReviewPenSize(2)" id="btn-rev-size-2" class="px-2 py-0.5 inline-flex items-center justify-center bg-indigo-600 text-white border border-indigo-600 rounded-lg"><span class="rounded-full bg-current w-[2px] h-[2px]"></span></button>
+                        <button type="button" onclick="setReviewPenSize(4)" id="btn-rev-size-4" class="px-2 py-0.5 inline-flex items-center justify-center bg-slate-200 text-slate-600 border border-slate-300 rounded-lg"><span class="rounded-full bg-current w-[4px] h-[4px]"></span></button>
+                        <button type="button" onclick="setReviewPenSize(7)" id="btn-rev-size-7" class="px-2 py-0.5 inline-flex items-center justify-center bg-slate-200 text-slate-600 border border-slate-300 rounded-lg"><span class="rounded-full bg-current w-[7px] h-[7px]"></span></button>
+                        <button type="button" onclick="setReviewPenSize(12)" id="btn-rev-size-12" class="px-2 py-0.5 inline-flex items-center justify-center bg-slate-200 text-slate-600 border border-slate-300 rounded-lg"><span class="rounded-full bg-current w-[12px] h-[12px]"></span></button>
+                    </div>
+                </div>
+
+                <div id="review-note-box" class="w-full bg-amber-50 border border-amber-200 p-2.5 text-xs text-amber-800 font-semibold uppercase hidden tracking-wide overflow-y-auto max-h-20 rounded-xl text-center shadow-sm shrink-0"></div>
+            </div>
+
+            <div class="bg-white p-3 border-t border-slate-200 shrink-0">
+                <div id="review-choice-input" class="flex justify-center gap-2 hidden">
+                    <button onclick="submitQuestionAnswer('A')" class="w-11 h-11 bg-slate-50 border border-slate-300 hover:bg-indigo-600 hover:border-indigo-600 hover:text-white font-extrabold text-base transition-all rounded-xl shadow-sm">A</button>
+                    <button onclick="submitQuestionAnswer('B')" class="w-11 h-11 bg-slate-50 border border-slate-300 hover:bg-indigo-600 hover:border-indigo-600 hover:text-white font-extrabold text-base transition-all rounded-xl shadow-sm">B</button>
+                    <button onclick="submitQuestionAnswer('C')" class="w-11 h-11 bg-slate-50 border border-slate-300 hover:bg-indigo-600 hover:border-indigo-600 hover:text-white font-extrabold text-base transition-all rounded-xl shadow-sm">C</button>
+                    <button onclick="submitQuestionAnswer('D')" class="w-11 h-11 bg-slate-50 border border-slate-300 hover:bg-indigo-600 hover:border-indigo-600 hover:text-white font-extrabold text-base transition-all rounded-xl shadow-sm">D</button>
+                    <button onclick="submitQuestionAnswer('E')" class="w-11 h-11 bg-slate-50 border border-slate-300 hover:bg-indigo-600 hover:border-indigo-600 hover:text-white font-extrabold text-base transition-all rounded-xl shadow-sm">E</button>
+                </div>
+                <div id="review-text-input" class="flex gap-2 hidden">
+                    <input type="text" id="review-text-val" placeholder="METİN GİRİN..." class="flex-1 bg-slate-50 p-3 border border-slate-300 outline-none focus:border-indigo-600 text-slate-800 font-bold uppercase tracking-wider transition-colors rounded-xl shadow-sm text-xs">
+                    <button onclick="submitQuestionAnswer(document.getElementById('review-text-val').value)" class="bg-indigo-600 text-white px-5 font-bold uppercase hover:bg-indigo-700 transition-colors rounded-xl shadow-sm text-xs">İlet</button>
+                </div>
+                <div id="review-note-input" class="flex gap-3 hidden w-full justify-center">
+                    <button onclick="submitNoteReview(false)" class="flex-1 bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-600 hover:text-white py-3 font-bold uppercase text-xs transition-colors rounded-xl shadow-sm">Unuttum</button>
+                    <button onclick="submitNoteReview(true)" class="flex-1 bg-amber-500 text-white py-3 font-bold uppercase text-xs hover:bg-amber-600 transition-colors rounded-xl shadow-sm">Hatırladım</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="camp-setup-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[70] hidden flex justify-center items-center p-4">
+            <div class="modal-animate bg-white border border-slate-200 w-full max-w-sm p-6 space-y-5 shadow-2xl rounded-3xl" id="camp-modal-box">
+                <h3 id="camp-title" class="text-indigo-600 font-bold text-base uppercase text-center border-b border-indigo-100 pb-3 tracking-wider">Camp Ayarı</h3>
+                <div class="text-center space-y-3">
+                    <p class="text-slate-500 text-xs uppercase tracking-wide">Mevcut <span id="camp-total-count" class="font-bold text-indigo-600">0</span> soru bulundu.</p>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Kaç Soru Çözmek İstersin?</label>
+                    <input type="number" id="camp-count-input" min="1" value="5" class="w-full bg-slate-50 p-3.5 border border-slate-300 text-center outline-none focus:border-indigo-600 text-slate-800 font-bold text-xl transition-colors rounded-2xl shadow-sm">
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="closeCampSetup()" class="flex-1 bg-slate-100 border border-slate-300 text-slate-600 py-3 font-bold uppercase hover:bg-slate-200 transition-colors rounded-xl shadow-sm">İptal</button>
+                    <button id="camp-start-btn" onclick="startCamp()" class="flex-1 bg-indigo-600 text-white py-3 font-bold uppercase hover:bg-indigo-700 transition-colors rounded-xl shadow-sm">Başlat</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="camp-review-modal" class="modal-animate absolute inset-0 bg-slate-50 z-50 hidden flex flex-col rounded-none">
+            <div class="flex justify-between items-center bg-white p-4 border-b border-indigo-100 shadow-sm" id="camp-header">
+                <div class="flex items-center gap-3">
+                    <span id="camp-review-progress" class="text-xs font-extrabold text-indigo-600 tracking-wider uppercase">KAMP 1/5</span>
+                </div>
+                <button onclick="closeCamp()" class="text-slate-500 hover:text-indigo-600 transition-colors"><span class="text-xs font-bold">KAPAT</span></button>
+            </div>
+            
+            <div class="flex-1 flex flex-col justify-center items-center p-4 bg-slate-100/50 overflow-hidden">
+                <div class="text-xs text-slate-500 mb-2 font-bold uppercase tracking-wider" id="camp-breadcrumbs">MATEMATİK > TÜREV</div>
+                
+                <div id="camp-review-question-text" class="w-full bg-white border border-slate-200 p-3 mb-3 text-sm text-slate-800 font-bold uppercase hidden tracking-wide text-center max-h-24 overflow-y-auto rounded-2xl shadow-sm"></div>
+                
+                <div class="relative max-w-full max-h-[60%] border border-slate-200 shadow-xl bg-white overflow-auto w-full p-2 text-center rounded-2xl">
+                    <div id="camp-zoom-wrapper" class="relative inline-block max-w-full max-h-full transition-transform duration-200 origin-top">
+                        <img id="camp-review-img" src="" onclick="openLightbox(this.src)" class="max-w-full max-h-full object-contain cursor-zoom-in block pointer-events-auto rounded-xl">
+                        <canvas id="camp-review-draw-canvas" class="absolute top-0 left-0 w-full h-full pointer-events-none"></canvas>
+                    </div>
+                </div>
+
+                <div id="camp-review-draw-tools" class="flex flex-col gap-2 mt-3 items-center w-full">
+                    <div class="flex items-center gap-2 w-full justify-center mb-1">
+                        <button type="button" onclick="stepZoom('camp', -0.5)" class="px-3.5 py-1 text-xs font-bold bg-white text-slate-700 border border-slate-300 rounded-xl shadow-sm hover:bg-slate-50">KÜÇÜLT</button>
+                        <button type="button" onclick="stepZoom('camp', 0.5)" class="px-3.5 py-1 text-xs font-bold bg-amber-500 text-white border border-amber-500 rounded-xl shadow-sm hover:bg-amber-600">BÜYÜT</button>
+                    </div>
+                    <div class="flex gap-1.5 justify-center flex-wrap">
+                        <button onclick="setCampReviewDrawMode('move')" id="camp-rev-btn-move" class="bg-amber-500 text-white px-3 py-1.5 text-xs font-bold uppercase rounded-xl border border-amber-500 shadow-sm">Kaydır</button>
+                        <button onclick="setCampReviewDrawMode('pen')" id="camp-rev-btn-pen" class="bg-slate-200 text-slate-700 px-3 py-1.5 text-xs font-bold uppercase rounded-xl border border-slate-300 shadow-sm">
+                            <svg class="w-4 h-4 fill-current inline-block" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                        </button>
+                        <button onclick="setCampReviewDrawMode('eraser')" id="camp-rev-btn-eraser" class="bg-slate-200 text-slate-700 px-3 py-1.5 text-xs font-bold uppercase rounded-xl border border-slate-300 shadow-sm">
+                            <svg class="w-4 h-4 fill-current inline-block" viewBox="0 0 24 24"><path d="M15.14 3c-.39 0-.75.15-1.03.42L2.34 15.19c-.58.58-.58 1.52 0 2.1l4.37 4.37c.28.28.64.44 1.03.44h11.26c.55 0 1-.45 1-1s-.45-1-1-1h-6.26l7.88-7.88c.58-.58.58-1.52 0-2.1l-4.37-4.37C15.89 3.15 15.53 3 15.14 3zM7.74 20l-3.3-3.3 8.7-8.7 3.3 3.3L7.74 20z"/></svg>
+                        </button>
+                        <button onclick="undoCanvas('camp-review-draw-canvas')" class="bg-slate-700 text-white px-3 py-1.5 text-xs font-bold uppercase rounded-xl border border-slate-700 shadow-sm">
+                            <svg class="w-4 h-4 fill-current inline-block" viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg>
+                        </button>
+                        <button onclick="clearCampReviewCanvas()" class="bg-rose-500 text-white px-3 py-1.5 text-xs font-bold uppercase rounded-xl border border-rose-500 shadow-sm">Temizle</button>
+                    </div>
+                    <div id="camp-pen-sizes" class="hidden flex gap-1 justify-center mt-1">
+                        <button type="button" onclick="setCampPenSize(2)" id="btn-camp-size-2" class="px-2.5 py-1 inline-flex items-center justify-center bg-indigo-600 text-white border border-indigo-600 rounded-lg"><span class="rounded-full bg-current w-[2px] h-[2px]"></span></button>
+                        <button type="button" onclick="setCampPenSize(4)" id="btn-camp-size-4" class="px-2.5 py-1 inline-flex items-center justify-center bg-slate-200 text-slate-600 border border-slate-300 rounded-lg"><span class="rounded-full bg-current w-[4px] h-[4px]"></span></button>
+                        <button type="button" onclick="setCampPenSize(7)" id="btn-camp-size-7" class="px-2.5 py-1 inline-flex items-center justify-center bg-slate-200 text-slate-600 border border-slate-300 rounded-lg"><span class="rounded-full bg-current w-[7px] h-[7px]"></span></button>
+                        <button type="button" onclick="setCampPenSize(12)" id="btn-camp-size-12" class="px-2.5 py-1 inline-flex items-center justify-center bg-slate-200 text-slate-600 border border-slate-300 rounded-lg"><span class="rounded-full bg-current w-[12px] h-[12px]"></span></button>
+                    </div>
+                </div>
+                
+                <div id="camp-review-answer-box" class="w-full bg-indigo-50 border border-indigo-100 p-3.5 mt-3 text-xs font-semibold uppercase hidden tracking-wide overflow-y-auto max-h-32 rounded-2xl text-center text-indigo-900 shadow-sm"></div>
+            </div>
+
+            <div class="bg-white p-5 border-t border-slate-200 flex justify-center gap-4">
+                <button id="camp-reveal-btn" onclick="revealCampAnswer()" class="w-full max-w-xs btn-cyber bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 font-bold text-sm uppercase tracking-wider rounded-2xl shadow-md">Cevabı Gör</button>
+                <button id="camp-next-btn" onclick="nextCampQuestion()" class="w-full max-w-xs btn-cyber hidden bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 font-bold text-sm uppercase tracking-wider rounded-2xl shadow-md">Anladım, Geç</button>
+            </div>
+        </div>
+
+        <div id="lightbox" class="fixed inset-0 bg-slate-900/90 z-[80] hidden flex justify-center items-center p-4" onclick="closeLightbox()">
+            <button class="absolute top-4 right-4 text-white hover:text-indigo-300 text-xs font-bold transition-colors bg-slate-800/80 px-4 py-2 rounded-full">KAPAT</button>
+            <img id="lightbox-img" src="" class="max-w-full max-h-full object-contain border border-slate-700 rounded-2xl shadow-2xl">
+        </div>
+
+        <!-- İLK GİRİŞ TANITIM (ONBOARDING) MODAL -->
+        <div id="onboarding-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[100] hidden flex justify-center items-center p-4">
+            <div class="modal-animate bg-white border border-slate-200 w-full max-w-sm p-6 rounded-3xl shadow-2xl flex flex-col items-center text-center relative overflow-hidden">
+                
+                <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mb-4 shadow-inner">
+                    <svg id="onboarding-icon" class="w-8 h-8 fill-current" viewBox="0 0 24 24"></svg>
+                </div>
+
+                <div class="flex gap-2 mb-4">
+                    <div id="dot-step-1" class="w-4 h-1.5 rounded-full bg-indigo-600 transition-all"></div>
+                    <div id="dot-step-2" class="w-1.5 h-1.5 rounded-full bg-slate-300 transition-all"></div>
+                    <div id="dot-step-3" class="w-1.5 h-1.5 rounded-full bg-slate-300 transition-all"></div>
+                </div>
+
+                <h3 id="onboarding-title" class="text-indigo-950 font-extrabold text-lg uppercase tracking-tight mb-2"></h3>
+                <p id="onboarding-desc" class="text-slate-600 text-xs leading-relaxed font-medium mb-5"></p>
+
+                <div id="onboarding-preview" class="w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl mb-6 text-left"></div>
+
+                <div class="w-full flex gap-3">
+                    <button onclick="finishOnboarding()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-500 py-3.5 font-bold text-xs uppercase rounded-xl transition-colors">Atla</button>
+                    <button id="btn-onboarding-next" onclick="nextOnboardingStep()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 font-bold text-xs uppercase rounded-xl shadow-md transition-all">Devam Et</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SABİT ALT NAVİGASYON -->
+        <nav id="bottom-nav" class="bg-white border-t border-slate-200 h-[76px] flex items-center justify-around z-20 rounded-t-2xl shadow-lg shrink-0 relative">
+            <button onclick="switchTab('home')" class="nav-btn flex-1 h-full flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all duration-300 ease-in-out hover:scale-105 rounded-tl-2xl" id="nav-home" title="Ana Sayfa">
+                <svg class="w-9 h-9 fill-current" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            </button>
+
+            <button onclick="switchTab('add')" class="nav-btn flex items-center justify-center text-white bg-indigo-600 hover:bg-indigo-700 w-20 h-20 rounded-full shadow-2xl transition-all duration-300 ease-in-out scale-110 active:scale-95 -translate-y-6 border-4 border-indigo-600 ring-4 ring-indigo-100 shrink-0 z-30" id="nav-add" title="Veri Ekle">
+                <svg class="w-12 h-12 fill-current" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            </button>
+
+            <button onclick="switchTab('library')" class="nav-btn flex-1 h-full flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all duration-300 ease-in-out rounded-tr-2xl" id="nav-library" title="Arşiv & Kamp">
+                <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM6.24 5h11.52l.83 1H5.41l.83-1zM5 19V8h14v11H5zm11-5.5H8v-2h8v2z"/></svg>
+            </button>
+        </nav>
+
+    </div>
+
+    <script>
+        // GMT+3 Zaman Hesaplayıcıları
+        function getNowTR() {
+            const d = new Date();
+            const utc = d.getTime() + (d.getTimezoneOffset() * 60000);
+            return new Date(utc + (3600000 * 3)); 
+        }
+        function formatDate(d) {
+            return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        }
+
+        // IndexedDB Ayarları
+        let db;
+        const DB_NAME = 'YKS_Sistem';
+        const DB_VERSION = 1;
+        const STORE_NAME = 'app_state';
+
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                let request = indexedDB.open(DB_NAME, DB_VERSION);
+                request.onupgradeneeded = (e) => {
+                    db = e.target.result;
+                    if (!db.objectStoreNames.contains(STORE_NAME)) {
+                        db.createObjectStore(STORE_NAME);
+                    }
+                };
+                request.onsuccess = (e) => {
+                    db = e.target.result;
+                    resolve(db);
+                };
+                request.onerror = (e) => reject(e);
+            });
+        }
+
+        function loadStateFromDB() {
+            return new Promise((resolve, reject) => {
+                let tx = db.transaction(STORE_NAME, 'readonly');
+                let store = tx.objectStore(STORE_NAME);
+                let req = store.get('yks_sr_state');
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => resolve(null);
+            });
+        }
+
+        function saveStateToDB(state) {
+            return new Promise((resolve, reject) => {
+                let tx = db.transaction(STORE_NAME, 'readwrite');
+                let store = tx.objectStore(STORE_NAME);
+                let req = store.put(state, 'yks_sr_state');
+                req.onsuccess = () => resolve();
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        let appState = {
+            categories: {
+                "TYT MATEMATİK": ["TEMEL KAVRAMLAR", "ÜSLÜ SAYILAR"],
+                "TYT FİZİK": ["DALGALAR", "OPTİK", "ISI SICAKLIK"],
+                "TYT TÜRKÇE": ["DİL BİLGİSİ", "PARAGRAF"]
+            },
+            questions: [],
+            notes: [],
+            intervals: [1, 3, 7, 20, 30],
+            noteIntervals: [1, 3, 7, 21, 45, 90, 180],
+            selectedCourses: [], 
+            selectedTopics: [],
+            autoDestroyThreshold: 5,
+            hasSeenOnboarding: false
+        };
+
+        let currentEntryType = 'question'; 
+        let currentQuestionInputType = 'image';
+        let currentAnswerType = 'choice';
+        let selectedChoiceAnswer = '';
+        let currentReviewMode = 'questions'; 
+        let currentReviewQueue = [];
+        let currentReviewIndex = 0;
+        let activeArchiveType = 'question'; 
+        let campMode = ''; 
+        let campQueue = [];
+        let campIndex = 0;
+
+        let cropperInstance = null;
+        let uploadDrawMode = 'pen'; 
+        let reviewDrawMode = 'pen'; 
+        let campReviewDrawMode = 'pen';
+        
+        let uploadPenSize = 3;
+        let reviewPenSize = 3;
+        let campPenSize = 3;
+
+        let archSelectedCourses = [];
+        let archSelectedTopics = [];
+
+        let zoomLevels = { upload: 1, review: 1, camp: 1 };
+        let currentOnboardingStep = 1;
+
+        window.onload = async function() {
+            try {
+                await initDB();
+                let savedData = await loadStateFromDB();
+
+                if (!savedData && localStorage.getItem('yks_sr_state')) {
+                    savedData = JSON.parse(localStorage.getItem('yks_sr_state'));
+                    await saveStateToDB(savedData);
+                }
+
+                if (savedData) {
+                    if (savedData.subjects && Array.isArray(savedData.subjects)) {
+                        savedData.categories = {}; savedData.subjects.forEach(s => savedData.categories[s] = ["GENEL"]); delete savedData.subjects;
+                    }
+                    if (!savedData.notes) savedData.notes = [];
+                    if (!savedData.noteIntervals) savedData.noteIntervals = [1, 3, 7, 21, 45, 90, 180];
+                    savedData.questions.forEach(q => { if(!q.topic) q.topic = "GENEL"; if(!q.text_question) q.text_question = ""; });
+                    appState = { ...appState, ...savedData };
+                }
+                
+                if(Object.keys(appState.categories).length > 0 && appState.selectedCourses.length === 0) {
+                    appState.selectedCourses = Object.keys(appState.categories);
+                }
+                
+                if(!appState.selectedTopics || appState.selectedTopics.length === 0) {
+                    appState.selectedTopics = [];
+                    appState.selectedCourses.forEach(c => {
+                        if(appState.categories[c]) {
+                            appState.categories[c].forEach(t => appState.selectedTopics.push(c + '::' + t));
+                        }
+                    });
+                }
+
+                if (archSelectedCourses.length === 0 && Object.keys(appState.categories).length > 0) {
+                    archSelectedCourses = Object.keys(appState.categories);
+                }
+                if (archSelectedTopics.length === 0) {
+                    archSelectedCourses.forEach(c => {
+                        if(appState.categories[c]) {
+                            appState.categories[c].forEach(t => archSelectedTopics.push(c + '::' + t));
+                        }
+                    });
+                }
+                
+                applyTimelineShift();
+                syncSystemUI();
+                updateQuestionInputVisibility();
+                
+                function handleImageUpload(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            document.getElementById('upload-placeholder').classList.add('hidden');
+            document.getElementById('editor-area').classList.remove('hidden');
+            document.getElementById('cropper-container').classList.remove('hidden');
+            document.getElementById('canvas-container').classList.add('hidden');
+            document.getElementById('btn-crop-ok').classList.remove('hidden');
+            document.getElementById('upload-zoom-ui').classList.add('hidden');
+            document.getElementById('upload-zoom-ui').classList.remove('flex');
+            document.getElementById('upload-pen-sizes').classList.add('hidden');
+            
+            let image = document.getElementById('image-to-crop');
+
+            // Var olan kırpıcıyı temizle
+            if (cropperInstance) {
+                cropperInstance.destroy();
+                cropperInstance = null;
+            }
+
+            // Kamera fotoğrafının boyutu büyük olduğu için tarayıcıya tamamen yüklenmesini bekle
+            image.onload = function() {
+                cropperInstance = new Cropper(image, { viewMode: 1, autoCropArea: 1 });
+            };
+
+            image.src = event.target.result;
+        }
+        reader.readAsDataURL(file);
+
+        // İkinci kez kamera açıldığında değişim (change) olayının tekrar tetiklenmesi için sıfırla
+        e.target.value = '';
+    }
+}
+
+                const imgInput = document.getElementById('q-image-input');
+                if (imgInput) imgInput.addEventListener('change', handleImageUpload);
+
+                initCanvasDrawing('upload-canvas', () => uploadDrawMode, () => uploadPenSize);
+
+                if (!appState.hasSeenOnboarding) {
+                    showOnboarding();
+                } else {
+                    switchTab('add');
+                }
+
+            } catch (error) {
+                console.error("Veritabanı başlatma hatası:", error);
+                alert("Sistem kritik bir hata ile karşılaştı. Veritabanı başlatılamadı.");
+            }
+        };
+
+        function showOnboarding() {
+            currentOnboardingStep = 1;
+            renderOnboardingStep();
+            document.getElementById('onboarding-modal').classList.remove('hidden');
+        }
+
+        function renderOnboardingStep() {
+            const iconEl = document.getElementById('onboarding-icon');
+            const titleEl = document.getElementById('onboarding-title');
+            const descEl = document.getElementById('onboarding-desc');
+            const previewEl = document.getElementById('onboarding-preview');
+            const btnNext = document.getElementById('btn-onboarding-next');
+
+            const dot1 = document.getElementById('dot-step-1');
+            const dot2 = document.getElementById('dot-step-2');
+            const dot3 = document.getElementById('dot-step-3');
+
+            dot1.className = currentOnboardingStep === 1 ? "w-4 h-1.5 rounded-full bg-indigo-600 transition-all" : "w-1.5 h-1.5 rounded-full bg-slate-300 transition-all";
+            dot2.className = currentOnboardingStep === 2 ? "w-4 h-1.5 rounded-full bg-indigo-600 transition-all" : "w-1.5 h-1.5 rounded-full bg-slate-300 transition-all";
+            dot3.className = currentOnboardingStep === 3 ? "w-4 h-1.5 rounded-full bg-indigo-600 transition-all" : "w-1.5 h-1.5 rounded-full bg-slate-300 transition-all";
+
+            if (currentOnboardingStep === 1) {
+                iconEl.innerHTML = `<path d="M12 2L1 21h22L12 2zm0 3.45l8.15 14.1H3.85L12 5.45zM11 10h2v4h-2zm0 5h2v2h-2z"/>`;
+                titleEl.innerText = "Net Kalkanım'a Hoş Geldin!";
+                descEl.innerText = "Sınav hazırlığında öğrendiklerini unutmayı engelleyen akıllı aralıklı tekrar sistemine ilk adımını attın.";
+                previewEl.innerHTML = `
+                    <div class="space-y-2 text-[11px] font-bold text-slate-700">
+                        <div class="flex items-center gap-2.5 p-2.5 bg-indigo-50 text-indigo-700 rounded-xl border border-indigo-100">
+                            <span class="text-base">🧠</span> <span>Akıllı Aralıklı Tekrar Algoritması</span>
+                        </div>
+                        <div class="flex items-center gap-2.5 p-2.5 bg-amber-50 text-amber-700 rounded-xl border border-amber-100">
+                            <span class="text-base">✏️</span> <span>Görsel Yükleme, Çizim ve Not Alma</span>
+                        </div>
+                        <div class="flex items-center gap-2.5 p-2.5 bg-emerald-50 text-emerald-700 rounded-xl border border-emerald-100">
+                            <span class="text-base">🎯</span> <span>Özel Kamp ve Arşiv</span>
+                        </div>
+                    </div>
+                `;
+                btnNext.innerText = "Devam Et";
+            } else if (currentOnboardingStep === 2) {
+                iconEl.innerHTML = `<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>`;
+                titleEl.innerText = "Tekrar Algoritması";
+                descEl.innerText = "Eklediğin soru ve notlar bilimsel aralıklara göre (1, 3, 7, 20 gün...) karşına gelir. Doğru bildikçe süresi uzar!";
+                previewEl.innerHTML = `
+                    <div class="flex justify-between items-center text-[10px] font-bold text-center gap-1">
+                        <div class="flex-1 p-2 bg-indigo-100 text-indigo-800 rounded-xl border border-indigo-200">1. Gün<br><span class="text-[9px] font-normal">İlk Tekrar</span></div>
+                        <span class="text-slate-400">➔</span>
+                        <div class="flex-1 p-2 bg-indigo-200 text-indigo-900 rounded-xl border border-indigo-300">3. Gün<br><span class="text-[9px] font-normal">Pekiştirme</span></div>
+                        <span class="text-slate-400">➔</span>
+                        <div class="flex-1 p-2 bg-indigo-600 text-white rounded-xl shadow-sm">7. Gün<br><span class="text-[9px] font-normal opacity-90">Kalıcı Hafıza</span></div>
+                    </div>
+                `;
+                btnNext.innerText = "İleri";
+            } else if (currentOnboardingStep === 3) {
+                iconEl.innerHTML = `<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>`;
+                titleEl.innerText = "Hadi İlk Sorunu Ekle!";
+                descEl.innerText = "Uygulamanın gücünü keşfetmek için ilk sorunu veya notunu ekleyerek başla. Seni yönlendiriyoruz!";
+                previewEl.innerHTML = `
+                    <div class="p-3 bg-indigo-50 rounded-2xl border border-indigo-100 text-center space-y-2">
+                        <span class="text-xs font-extrabold text-indigo-600 uppercase block">➕ Soru / Not Ekleme Alanı</span>
+                        <p class="text-[11px] font-medium text-slate-600">Ders ve konu seç, sorunun fotoğrafını yükle veya yaz, cevabını işaretle ve kaydet!</p>
+                    </div>
+                `;
+                btnNext.innerText = "İlk Sorumu Ekleyeyim 🚀";
+            }
+        }
+
+        function nextOnboardingStep() {
+            if (currentOnboardingStep < 3) {
+                currentOnboardingStep++;
+                renderOnboardingStep();
+            } else {
+                finishOnboarding();
+            }
+        }
+
+        function finishOnboarding() {
+            appState.hasSeenOnboarding = true;
+            saveState();
+            document.getElementById('onboarding-modal').classList.add('hidden');
+            switchTab('add');
+        }
+
+                function setEntryType(type) {
+            currentEntryType = type;
+            const btnQ = document.getElementById('btn-entry-question');
+            const btnN = document.getElementById('btn-entry-note');
+            const qSpecificArea = document.getElementById('question-specific-area');
+            const btnSave = document.getElementById('btn-save-data');
+            const labelNoteText = document.getElementById('label-note-text');
+            const labelImgUpload = document.getElementById('label-q-image-upload');
+
+            if (type === 'question') {
+                btnQ.className = "flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold uppercase transition-all rounded-xl";
+                btnN.className = "flex-1 text-slate-600 py-2 text-xs font-bold uppercase transition-all hover:text-amber-600 rounded-xl";
+                if (qSpecificArea) qSpecificArea.classList.remove('hidden');
+                if (btnSave) {
+                    btnSave.innerText = "SORUYU KAYDET";
+                    btnSave.className = "btn-cyber btn-cyber-purple w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 font-bold uppercase mt-6 rounded-2xl shadow-md";
+                }
+                if (labelImgUpload) {
+                    labelImgUpload.className = "flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3 flex justify-center items-center text-xs font-bold uppercase cursor-pointer transition-colors border border-indigo-600 rounded-xl shadow-sm";
+                }
+                if (labelNoteText) labelNoteText.innerText = "Çözüm Notu / Açıklama";
+            } else {
+                btnN.className = "flex-1 bg-white text-amber-600 shadow-sm py-2 text-xs font-bold uppercase transition-all rounded-xl";
+                btnQ.className = "flex-1 text-slate-600 py-2 text-xs font-bold uppercase transition-all hover:text-indigo-600 rounded-xl";
+                if (qSpecificArea) qSpecificArea.classList.add('hidden');
+                if (btnSave) {
+                    btnSave.innerText = "NOTU KAYDET";
+                    btnSave.className = "btn-cyber btn-cyber-yellow w-full bg-amber-500 hover:bg-amber-600 text-white py-4 font-bold uppercase mt-6 rounded-2xl shadow-md";
+                }
+                if (labelImgUpload) {
+                    labelImgUpload.className = "flex-1 bg-amber-500 hover:bg-amber-600 text-white py-3 flex justify-center items-center text-xs font-bold uppercase cursor-pointer transition-colors border border-amber-500 rounded-xl shadow-sm";
+                }
+                if (labelNoteText) labelNoteText.innerText = "Not Metni";
+            }
+            updateQuestionInputVisibility();
+        }
+
+        function setQuestionInputType(type) {
+            currentQuestionInputType = type;
+            updateQuestionInputVisibility();
+        }
+
+        function updateQuestionInputVisibility() {
+            const btnImg = document.getElementById('btn-qinput-image');
+            const btnText = document.getElementById('btn-qinput-text');
+            const imgContainer = document.getElementById('image-input-container');
+            const textQuestionContainer = document.getElementById('q-text-question-container');
+            const qTypeToggle = document.getElementById('question-type-toggle-area');
+
+            if (currentEntryType === 'question') {
+                if (qTypeToggle) qTypeToggle.classList.remove('hidden');
+                if (currentQuestionInputType === 'image') {
+                    if (btnImg) btnImg.className = "flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold uppercase transition-all rounded-xl";
+                    if (btnText) btnText.className = "flex-1 text-slate-600 py-2 text-xs font-bold uppercase transition-all hover:text-indigo-600 rounded-xl";
+                    if (imgContainer) imgContainer.classList.remove('hidden');
+                    if (textQuestionContainer) textQuestionContainer.classList.add('hidden');
+                } else {
+                    if (btnImg) btnImg.className = "flex-1 text-slate-600 py-2 text-xs font-bold uppercase transition-all hover:text-indigo-600 rounded-xl";
+                    if (btnText) btnText.className = "flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold uppercase transition-all rounded-xl";
+                    if (imgContainer) imgContainer.classList.add('hidden');
+                    if (textQuestionContainer) textQuestionContainer.classList.remove('hidden');
+                }
+            } else {
+                if (qTypeToggle) qTypeToggle.classList.add('hidden');
+                if (imgContainer) imgContainer.classList.remove('hidden');
+                if (textQuestionContainer) textQuestionContainer.classList.add('hidden');
+            }
+        }
+
+        function setAnsType(type) {
+            currentAnswerType = type;
+            const btnC = document.getElementById('btn-type-choice');
+            const btnT = document.getElementById('btn-type-text');
+            const cArea = document.getElementById('ans-choice-area');
+            const tArea = document.getElementById('ans-text-area');
+
+            if (type === 'choice') {
+                btnC.className = "flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold uppercase transition-all rounded-xl";
+                btnT.className = "flex-1 text-slate-600 py-2 text-xs font-bold uppercase transition-all hover:text-indigo-600 rounded-xl";
+                if(cArea) cArea.classList.remove('hidden');
+                if(tArea) tArea.classList.add('hidden');
+            } else {
+                btnT.className = "flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold uppercase transition-all rounded-xl";
+                btnC.className = "flex-1 text-slate-600 py-2 text-xs font-bold uppercase transition-all hover:text-indigo-600 rounded-xl";
+                if(cArea) cArea.classList.add('hidden');
+                if(tArea) tArea.classList.remove('hidden');
+            }
+        }
+
+        function selectChoice(val) {
+            selectedChoiceAnswer = val;
+            document.querySelectorAll('.choice-btn').forEach(btn => {
+                if (btn.innerText.trim() === val) {
+                    btn.className = "choice-btn w-12 h-12 bg-indigo-600 border border-indigo-600 text-white font-extrabold flex items-center justify-center transition-all rounded-xl shadow-sm";
+                } else {
+                    btn.className = "choice-btn w-12 h-12 bg-white border border-slate-300 font-bold text-slate-600 hover:border-indigo-600 hover:text-indigo-600 flex items-center justify-center transition-all rounded-xl shadow-sm";
+                }
+            });
+        }
+
+        function finishCrop() {
+            if (!cropperInstance) return;
+            const croppedCanvas = cropperInstance.getCroppedCanvas({ maxWidth: 800, maxHeight: 800 });
+            
+            document.getElementById('cropper-container').classList.add('hidden');
+            document.getElementById('canvas-container').classList.remove('hidden');
+            
+            const uImg = document.getElementById('upload-final-img');
+            uImg.src = croppedCanvas.toDataURL('image/jpeg', 0.8);
+            
+            const uCanvas = document.getElementById('upload-canvas');
+            uCanvas.width = croppedCanvas.width;
+            uCanvas.height = croppedCanvas.height;
+            const uCtx = uCanvas.getContext('2d');
+            uCtx.clearRect(0, 0, uCanvas.width, uCanvas.height);
+            
+            uCanvas.history = [uCtx.getImageData(0, 0, uCanvas.width, uCanvas.height)];
+            
+            cropperInstance.destroy(); cropperInstance = null;
+            
+            document.getElementById('btn-crop-ok').classList.add('hidden');
+            document.getElementById('upload-zoom-ui').classList.remove('hidden');
+            document.getElementById('upload-zoom-ui').classList.add('flex');
+            document.getElementById('upload-pen-sizes').classList.remove('hidden');
+            
+            manualZoom('upload', 1);
+            setUploadDrawMode('pen');
+            updateUploadSizeUI();
+        }
+
+        function setUploadDrawMode(mode) {
+            uploadDrawMode = mode;
+            let mBtn = document.getElementById('btn-up-move');
+            let pBtn = document.getElementById('btn-up-pen');
+            let eBtn = document.getElementById('btn-up-eraser');
+            let sDiv = document.getElementById('upload-pen-sizes');
+            let canvas = document.getElementById('upload-canvas');
+            
+            if (mBtn) mBtn.className = "bg-slate-200 text-slate-700 px-4 py-2 text-xs font-bold uppercase rounded-xl border border-slate-300";
+            if (pBtn) pBtn.className = "bg-slate-200 text-slate-700 px-4 py-2 text-xs font-bold uppercase rounded-xl border border-slate-300";
+            if (eBtn) eBtn.className = "bg-slate-200 text-slate-700 px-4 py-2 text-xs font-bold uppercase rounded-xl border border-slate-300";
+            
+            if (canvas) {
+                if(mode === 'move') {
+                    canvas.classList.add('pointer-events-none');
+                    if (mBtn) mBtn.className = "bg-amber-500 text-white px-4 py-2 text-xs font-bold uppercase rounded-xl border border-amber-500 shadow-sm";
+                    if(sDiv) sDiv.classList.add('hidden');
+                } else if(mode === 'pen') {
+                    canvas.classList.remove('pointer-events-none');
+                    if (pBtn) pBtn.className = "bg-indigo-600 text-white px-4 py-2 text-xs font-bold uppercase rounded-xl border border-indigo-600 shadow-sm";
+                    if(sDiv) sDiv.classList.remove('hidden');
+                } else if(mode === 'eraser') {
+                    canvas.classList.remove('pointer-events-none');
+                    if (eBtn) eBtn.className = "bg-indigo-600 text-white px-4 py-2 text-xs font-bold uppercase rounded-xl border border-indigo-600 shadow-sm";
+                    if(sDiv) sDiv.classList.add('hidden');
+                }
+            }
+        }
+
+        function setUploadPenSize(size) {
+            uploadPenSize = size;
+            updateUploadSizeUI();
+        }
+
+        function updateUploadSizeUI() {
+            [2, 4, 7, 12].forEach(s => {
+                let btn = document.getElementById(`btn-up-size-${s}`);
+                if(btn) {
+                    if(uploadPenSize === s) {
+                        btn.className = "px-2.5 py-1.5 inline-flex items-center justify-center bg-indigo-600 text-white border border-indigo-600 rounded-lg shadow-sm";
+                    } else {
+                        btn.className = "px-2.5 py-1.5 inline-flex items-center justify-center bg-slate-200 text-slate-600 border border-slate-300 rounded-lg";
+                    }
+                }
+            });
+        }
+
+        function clearSelectedImage() {
+            const imgInput = document.getElementById('q-image-input');
+            if (imgInput) imgInput.value = '';
+            
+            manualZoom('upload', 1);
+            
+            if (cropperInstance) { cropperInstance.destroy(); cropperInstance = null; }
+            document.getElementById('upload-placeholder').classList.remove('hidden');
+            document.getElementById('editor-area').classList.add('hidden');
+            const ui = document.getElementById('upload-zoom-ui');
+            if(ui) { ui.classList.add('hidden'); ui.classList.remove('flex'); }
+            document.getElementById('upload-pen-sizes').classList.add('hidden');
+        }
+
+        function initCanvasDrawing(canvasId, getModeFunc, getWidthFunc) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+            let isDrawing = false;
+
+            canvas.history = [];
+            setTimeout(() => {
+                try {
+                    if (canvas.width > 0 && canvas.height > 0) {
+                        canvas.history = [ctx.getImageData(0, 0, canvas.width, canvas.height)];
+                    }
+                } catch(e){}
+            }, 200);
+
+            const startPos = (e) => { 
+                const currentMode = getModeFunc();
+                if (currentMode === 'none' || currentMode === 'move' || !currentMode) return;
+                isDrawing = true; 
+                draw(e); 
+            };
+            const endPos = () => { 
+                if (isDrawing) {
+                    isDrawing = false; 
+                    ctx.beginPath(); 
+                    if (!canvas.history) canvas.history = [];
+                    if (canvas.history.length > 25) canvas.history.shift();
+                    try {
+                        canvas.history.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+                    } catch(e){}
+                }
+            };
+            const draw = (e) => {
+                if (!isDrawing) return;
+                const currentMode = getModeFunc();
+                if (currentMode === 'none' || currentMode === 'move' || !currentMode) return;
+                e.preventDefault();
+                const rect = canvas.getBoundingClientRect();
+                
+                let clientX, clientY;
+                if (e.touches && e.touches.length > 0) {
+                    clientX = e.touches[0].clientX;
+                    clientY = e.touches[0].clientY;
+                } else if (e.clientX !== undefined) {
+                    clientX = e.clientX;
+                    clientY = e.clientY;
+                }
+                
+                if (clientX === undefined || clientY === undefined) return;
+                
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                const x = (clientX - rect.left) * scaleX;
+                const y = (clientY - rect.top) * scaleY;
+
+                ctx.lineWidth = currentMode === 'eraser' ? 25 : (getWidthFunc ? getWidthFunc() : 3);
+                ctx.lineCap = 'round';
+                ctx.globalCompositeOperation = currentMode === 'eraser' ? 'destination-out' : 'source-over';
+                ctx.strokeStyle = '#e11d48'; 
+
+                ctx.lineTo(x, y); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(x, y);
+            };
+
+            canvas.addEventListener('mousedown', startPos); canvas.addEventListener('mouseup', endPos); canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('touchstart', startPos, {passive: false}); canvas.addEventListener('touchend', endPos); canvas.addEventListener('touchmove', draw, {passive: false});
+            canvas.addEventListener('mouseout', endPos);
+        }
+
+        function undoCanvas(canvasId) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas || !canvas.history || canvas.history.length <= 1) return;
+            canvas.history.pop();
+            const prevState = canvas.history[canvas.history.length - 1];
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (prevState) {
+                try {
+                    ctx.putImageData(prevState, 0, 0);
+                } catch(e) {
+                    console.error("Geri alma hatası:", e);
+                }
+            }
+        }
+
+        function stepZoom(target, delta) {
+            let current = zoomLevels[target] || 1;
+            let next = current + delta;
+            if(next < 1) next = 1;
+            if(next > 4) next = 4;
+            manualZoom(target, next);
+        }
+
+        function manualZoom(target, val) {
+            const scale = parseFloat(val);
+            zoomLevels[target] = scale;
+            const wrapperEl = document.getElementById(target + '-zoom-wrapper');
+            if(!wrapperEl) return;
+            const parent = wrapperEl.parentElement;
+            
+            wrapperEl.style.transform = `scale(${scale})`;
+            wrapperEl.style.transformOrigin = 'center center';
+            if(parent) parent.style.textAlign = 'center';
+        }
+
+        function setReviewDrawMode(mode) {
+            const canvas = document.getElementById('review-draw-canvas');
+            const img = document.getElementById('review-img');
+            let mBtn = document.getElementById('rev-btn-move');
+            let pBtn = document.getElementById('rev-btn-pen');
+            let eBtn = document.getElementById('rev-btn-eraser');
+            let sDiv = document.getElementById('review-pen-sizes');
+            
+            reviewDrawMode = mode;
+            
+            if(mBtn) mBtn.className = "bg-slate-200 text-slate-700 px-3 py-1 text-xs font-bold uppercase rounded-xl border border-slate-300 shadow-sm";
+            if(pBtn) pBtn.className = "bg-slate-200 text-slate-700 px-3 py-1 text-xs font-bold uppercase rounded-xl border border-slate-300 shadow-sm";
+            if(eBtn) eBtn.className = "bg-slate-200 text-slate-700 px-3 py-1 text-xs font-bold uppercase rounded-xl border border-slate-300 shadow-sm";
+            
+            if(img && canvas && img.naturalWidth > 0 && canvas.width !== img.naturalWidth) {
+                canvas.width = img.naturalWidth;
+                canvas.height = img.naturalHeight;
+                const ctx = canvas.getContext('2d');
+                canvas.history = [ctx.getImageData(0, 0, canvas.width, canvas.height)];
+            }
+
+            if(mode === 'move') {
+                if(canvas) canvas.classList.add('pointer-events-none');
+                if(mBtn) mBtn.className = "bg-amber-500 text-white px-3 py-1 text-xs font-bold uppercase rounded-xl border border-amber-500 shadow-sm";
+                if(sDiv) sDiv.classList.add('hidden');
+            } else if(mode === 'pen') {
+                if(canvas) canvas.classList.remove('pointer-events-none');
+                if(pBtn) pBtn.className = "bg-indigo-600 text-white px-3 py-1 text-xs font-bold uppercase rounded-xl border border-indigo-600 shadow-sm";
+                if(sDiv) sDiv.classList.remove('hidden');
+                updateReviewSizeUI();
+            } else if(mode === 'eraser') {
+                if(canvas) canvas.classList.remove('pointer-events-none');
+                if(eBtn) eBtn.className = "bg-indigo-600 text-white px-3 py-1 text-xs font-bold uppercase rounded-xl border border-indigo-600 shadow-sm";
+                if(sDiv) sDiv.classList.add('hidden');
+            }
+        }
+
+        function setReviewPenSize(size) {
+            reviewPenSize = size;
+            updateReviewSizeUI();
+        }
+
+        function updateReviewSizeUI() {
+            [2, 4, 7, 12].forEach(s => {
+                let btn = document.getElementById(`btn-rev-size-${s}`);
+                if(btn) {
+                    if(reviewPenSize === s) {
+                        btn.className = "px-2 py-0.5 inline-flex items-center justify-center bg-indigo-600 text-white border border-indigo-600 rounded-lg shadow-sm";
+                    } else {
+                        btn.className = "px-2 py-0.5 inline-flex items-center justify-center bg-slate-200 text-slate-600 border border-slate-300 rounded-lg";
+                    }
+                }
+            });
+        }
+
+        function clearReviewCanvas() {
+            const canvas = document.getElementById('review-draw-canvas');
+            if(!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            canvas.history = [ctx.getImageData(0, 0, canvas.width, canvas.height)];
+        }
+
+        function setCampReviewDrawMode(mode) {
+            const canvas = document.getElementById('camp-review-draw-canvas');
+            const img = document.getElementById('camp-review-img');
+            let mBtn = document.getElementById('camp-rev-btn-move');
+            let pBtn = document.getElementById('camp-rev-btn-pen');
+            let eBtn = document.getElementById('camp-rev-btn-eraser');
+            let sDiv = document.getElementById('camp-pen-sizes');
+            
+            campReviewDrawMode = mode;
+            
+            if(mBtn) mBtn.className = "bg-slate-200 text-slate-700 px-3 py-1.5 text-xs font-bold uppercase rounded-xl border border-slate-300";
+            if(pBtn) pBtn.className = "bg-slate-200 text-slate-700 px-3 py-1.5 text-xs font-bold uppercase rounded-xl border border-slate-300";
+            if(eBtn) eBtn.className = "bg-slate-200 text-slate-700 px-3 py-1.5 text-xs font-bold uppercase rounded-xl border border-slate-300";
+
+            if(img && canvas && img.naturalWidth > 0 && canvas.width !== img.naturalWidth) { 
+                canvas.width = img.naturalWidth; 
+                canvas.height = img.naturalHeight; 
+                const ctx = canvas.getContext('2d');
+                canvas.history = [ctx.getImageData(0, 0, canvas.width, canvas.height)];
+            }
+
+            if(mode === 'move') { 
+                if(canvas) canvas.classList.add('pointer-events-none');
+                if(mBtn) mBtn.className = "bg-amber-500 text-white px-3 py-1.5 text-xs font-bold uppercase rounded-xl border border-amber-500 shadow-sm";
+                if(sDiv) sDiv.classList.add('hidden');
+            } else if(mode === 'pen') { 
+                if(canvas) canvas.classList.remove('pointer-events-none');
+                if(pBtn) pBtn.className = "bg-indigo-600 text-white px-3 py-1.5 text-xs font-bold uppercase rounded-xl border border-indigo-600 shadow-sm";
+                if(sDiv) sDiv.classList.remove('hidden');
+                updateCampSizeUI();
+            } else if(mode === 'eraser') { 
+                if(canvas) canvas.classList.remove('pointer-events-none');
+                if(eBtn) eBtn.className = "bg-indigo-600 text-white px-3 py-1.5 text-xs font-bold uppercase rounded-xl border border-indigo-600 shadow-sm";
+                if(sDiv) sDiv.classList.add('hidden');
+            }
+        }
+
+        function setCampPenSize(size) {
+            campPenSize = size;
+            updateCampSizeUI();
+        }
+
+        function updateCampSizeUI() {
+            [2, 4, 7, 12].forEach(s => {
+                let btn = document.getElementById(`btn-camp-size-${s}`);
+                if(btn) {
+                    if(campPenSize === s) {
+                        btn.className = "px-2.5 py-1 inline-flex items-center justify-center bg-indigo-600 text-white border border-indigo-600 rounded-lg shadow-sm";
+                    } else {
+                        btn.className = "px-2.5 py-1 inline-flex items-center justify-center bg-slate-200 text-slate-600 border border-slate-300 rounded-lg";
+                    }
+                }
+            });
+        }
+
+        function clearCampReviewCanvas() {
+            const canvas = document.getElementById('camp-review-draw-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d'); 
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            canvas.history = [ctx.getImageData(0, 0, canvas.width, canvas.height)];
+        }
+
+        setTimeout(() => {
+            initCanvasDrawing('review-draw-canvas', () => reviewDrawMode, () => reviewPenSize);
+            initCanvasDrawing('camp-review-draw-canvas', () => campReviewDrawMode, () => campPenSize);
+        }, 500);
+
+        function applyTimelineShift() {
+            const todayStr = formatDate(getNowTR());
+            const lastActiveStr = localStorage.getItem('yks_core_last_active');
+            if (!lastActiveStr) { localStorage.setItem('yks_core_last_active', todayStr); return; }
+            
+            const d1 = new Date(lastActiveStr); 
+            const d2 = new Date(todayStr);
+            const daysMissed = Math.floor((d2 - d1) / (1000 * 60 * 60 * 24));
+            
+            if (daysMissed >= 1) {
+                let totalDue = 0;
+                let totalSolved = 0;
+
+                appState.questions.forEach(q => {
+                    if (q.lastReviewedDate === lastActiveStr) {
+                        totalSolved++;
+                        totalDue++;
+                    } else if (!q.is_mastered && q.nextReview <= lastActiveStr) {
+                        totalDue++;
+                    }
+                });
+
+                appState.notes.forEach(n => {
+                    if (n.lastReviewedDate === lastActiveStr) {
+                        totalSolved++;
+                        totalDue++;
+                    } else if (n.nextReview <= lastActiveStr) {
+                        totalDue++;
+                    }
+                });
+
+                if (totalDue > 0) {
+                    if (totalSolved >= (totalDue / 2)) {
+                        appState.questions.forEach(q => {
+                            if (!q.is_mastered && q.nextReview <= lastActiveStr && q.lastReviewedDate !== lastActiveStr) {
+                                shiftDate(q, daysMissed);
+                            }
+                        });
+                        appState.notes.forEach(n => {
+                            if (n.nextReview <= lastActiveStr && n.lastReviewedDate !== lastActiveStr) {
+                                shiftDate(n, daysMissed);
+                            }
+                        });
+                    } else {
+                        appState.questions.forEach(q => { if (!q.is_mastered && q.nextReview) shiftDate(q, daysMissed); });
+                        appState.notes.forEach(n => { if (n.nextReview) shiftDate(n, daysMissed); });
+                    }
+                }
+                saveState();
+            }
+            localStorage.setItem('yks_core_last_active', todayStr);
+        }
+
+        function shiftDate(item, days) {
+            let rDate = new Date(item.nextReview); rDate.setDate(rDate.getDate() + days); item.nextReview = formatDate(rDate);
+        }
+
+        function saveState() {
+            saveStateToDB(appState).then(() => {
+                updateHomeStats(); 
+            }).catch(e => {
+                console.error(e);
+                alert("SİSTEM HATASI: Veriler veritabanına kaydedilemedi!");
+            });
+        }
+
+        function syncSystemUI() {
+            buildHomeFilters(); populateCategoryDropdowns(); renderCourseManagement();
+            renderTopicManagement(); populateArchiveFilters(); updateHomeStats();
+            renderLibrary();
+            document.getElementById('setting-intervals').value = appState.intervals.join(',');
+            document.getElementById('setting-note-intervals').value = appState.noteIntervals.join(',');
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            
+            const btnHome = document.getElementById('nav-home');
+            const btnAdd = document.getElementById('nav-add');
+            const btnLibrary = document.getElementById('nav-library');
+            const btnProfile = document.getElementById('nav-profile');
+
+            if (btnHome) {
+                btnHome.className = "nav-btn flex-1 h-full flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all duration-300 ease-in-out hover:scale-105 rounded-tl-2xl";
+            }
+            if (btnAdd) {
+                btnAdd.className = "nav-btn flex items-center justify-center text-white bg-indigo-600 hover:bg-indigo-700 w-20 h-20 rounded-full shadow-2xl transition-all duration-300 ease-in-out hover:scale-110 active:scale-95 -translate-y-6 border-4 border-slate-50 shrink-0 z-30";
+            }
+            if (btnLibrary) {
+                btnLibrary.className = "nav-btn flex-1 h-full flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all duration-300 ease-in-out hover:scale-105 rounded-tr-2xl";
+            }
+            if (btnProfile) {
+                btnProfile.classList.remove('text-indigo-600', 'bg-indigo-50');
+                btnProfile.classList.add('text-slate-400');
+            }
+
+            if (tabId === 'home' && btnHome) {
+                btnHome.className = "nav-btn flex-1 h-full flex items-center justify-center text-indigo-600 bg-indigo-50/80 font-bold transition-all duration-300 ease-in-out border-t-2 border-indigo-600 rounded-tl-2xl";
+            } else if (tabId === 'add' && btnAdd) {
+                btnAdd.className = "nav-btn flex items-center justify-center text-white bg-indigo-600 hover:bg-indigo-700 w-20 h-20 rounded-full shadow-2xl transition-all duration-300 ease-in-out scale-110 active:scale-95 -translate-y-6 border-4 border-indigo-600 ring-4 ring-indigo-100 shrink-0 z-30";
+            } else if (tabId === 'library' && btnLibrary) {
+                btnLibrary.className = "nav-btn flex-1 h-full flex items-center justify-center text-indigo-600 bg-indigo-50/80 font-bold transition-all duration-300 ease-in-out border-t-2 border-indigo-600 rounded-tr-2xl";
+            } else if (tabId === 'profile' && btnProfile) {
+                btnProfile.classList.remove('text-slate-400');
+                btnProfile.classList.add('text-indigo-600', 'bg-indigo-50');
+            }
+
+            if(tabId === 'library') { populateArchiveFilters(); renderLibrary(); }
+            if(tabId === 'home') { updateHomeStats(); }
+        }
+
+        function updateHomeStats() {
+            let todayStr = formatDate(getNowTR());
+            let qQueue = appState.questions.filter(q => !q.is_mastered && (q.nextReview <= todayStr || q.lastReviewedDate === todayStr) && appState.selectedCourses.includes(q.course) && appState.selectedTopics.includes(q.course + '::' + q.topic));
+            let nQueue = appState.notes.filter(n => (n.nextReview <= todayStr || n.lastReviewedDate === todayStr) && appState.selectedCourses.includes(n.course) && appState.selectedTopics.includes(n.course + '::' + n.topic));
+            
+            document.getElementById('queue-count-questions').innerText = qQueue.length;
+            document.getElementById('queue-count-notes').innerText = nQueue.length;
+
+            let solvedToday = appState.questions.filter(q => q.lastReviewedDate === todayStr).length + appState.notes.filter(n => n.lastReviewedDate === todayStr).length;
+            let totalTarget = qQueue.length + nQueue.length + solvedToday;
+            
+            document.getElementById('progress-text').innerText = `${solvedToday}/${totalTarget}`;
+            let pct = totalTarget === 0 ? 100 : Math.round((solvedToday / totalTarget) * 100);
+            document.getElementById('progress-bar').style.width = pct + '%';
+        }
+
+        function toggleHomeFilters() {
+            const filterDiv = document.getElementById('home-subject-filters');
+            const chevron = document.getElementById('filter-chevron');
+            filterDiv.classList.toggle('hidden');
+            chevron.style.transform = filterDiv.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+        }
+
+        function buildHomeFilters() {
+            const container = document.getElementById('home-subject-filters');
+            if (!container) return;
+            container.innerHTML = '';
+
+            Object.keys(appState.categories).forEach(course => {
+                const cChecked = appState.selectedCourses.includes(course);
+                const cBox = document.createElement('div');
+                cBox.className = "bg-white p-3 rounded-xl border border-slate-200 shadow-sm space-y-2";
+                
+                let topicsHTML = '';
+                if (cChecked && appState.categories[course]) {
+                    topicsHTML = `<div class="pl-4 pt-2 border-t border-slate-100 flex flex-col gap-1.5">`;
+                    appState.categories[course].forEach(topic => {
+                        const tKey = course + '::' + topic;
+                        const tChecked = appState.selectedTopics.includes(tKey);
+                        topicsHTML += `
+                            <label class="flex items-center gap-2 text-slate-600 font-semibold cursor-pointer text-[11px] hover:text-indigo-600">
+                                <input type="checkbox" value="${tKey}" ${tChecked ? 'checked' : ''} onchange="toggleTopicFilter(this)" class="accent-indigo-600 rounded">
+                                <span>${topic}</span>
+                            </label>
+                        `;
+                    });
+                    topicsHTML += `</div>`;
+                }
+
+                cBox.innerHTML = `
+                    <label class="flex items-center justify-between cursor-pointer hover:text-indigo-600 transition-colors uppercase font-bold text-xs text-slate-800">
+                        <span>${course}</span>
+                        <input type="checkbox" value="${course}" ${cChecked ? 'checked' : ''} onchange="toggleCourseFilter(this)" class="accent-indigo-600 rounded w-4 h-4">
+                    </label>
+                    ${topicsHTML}
+                `;
+                container.appendChild(cBox);
+            });
+        }
+
+        function toggleCourseFilter(el) {
+            const course = el.value;
+            if (el.checked) {
+                if (!appState.selectedCourses.includes(course)) appState.selectedCourses.push(course);
+                if (appState.categories[course]) {
+                    appState.categories[course].forEach(t => {
+                        const k = course + '::' + t;
+                        if (!appState.selectedTopics.includes(k)) appState.selectedTopics.push(k);
+                    });
+                }
+            } else {
+                appState.selectedCourses = appState.selectedCourses.filter(c => c !== course);
+                appState.selectedTopics = appState.selectedTopics.filter(t => !t.startsWith(course + '::'));
+            }
+            saveState(); buildHomeFilters(); updateHomeStats();
+        }
+
+        function toggleTopicFilter(el) {
+            const val = el.value;
+            if (el.checked) {
+                if (!appState.selectedTopics.includes(val)) appState.selectedTopics.push(val);
+            } else {
+                appState.selectedTopics = appState.selectedTopics.filter(t => t !== val);
+            }
+            saveState(); updateHomeStats();
+        }
+
+        function populateCategoryDropdowns() {
+            const qCourse = document.getElementById('q-course');
+            const manageCourse = document.getElementById('topic-manage-course-select');
+            if (!qCourse) return;
+            
+            qCourse.innerHTML = '';
+            if (manageCourse) manageCourse.innerHTML = '';
+
+            Object.keys(appState.categories).forEach(c => {
+                let opt = document.createElement('option'); opt.value = c; opt.innerText = c;
+                qCourse.appendChild(opt);
+                if (manageCourse) {
+                    let opt2 = document.createElement('option'); opt2.value = c; opt2.innerText = c;
+                    manageCourse.appendChild(opt2);
+                }
+            });
+            updateTopicDropdown();
+        }
+
+        function updateTopicDropdown() {
+            const course = document.getElementById('q-course').value;
+            const qTopic = document.getElementById('q-topic');
+            if (!qTopic) return;
+            qTopic.innerHTML = '';
+
+            if (course && appState.categories[course]) {
+                appState.categories[course].forEach(t => {
+                    let opt = document.createElement('option'); opt.value = t; opt.innerText = t;
+                    qTopic.appendChild(opt);
+                });
+            }
+        }
+
+        function saveData() {
+            const course = document.getElementById('q-course').value;
+            const topic = document.getElementById('q-topic').value || "GENEL";
+            const noteText = document.getElementById('q-note').value.trim();
+            const todayStr = formatDate(getNowTR());
+
+            if (!course) { alert("Lütfen ders seçiniz!"); return; }
+
+            if (currentEntryType === 'question') {
+                let finalImage = null;
+                if (currentQuestionInputType === 'image') {
+                    const canvas = document.getElementById('upload-canvas');
+                    const img = document.getElementById('upload-final-img');
+                    if (!img || !img.src || document.getElementById('editor-area').classList.contains('hidden')) {
+                        alert("Lütfen görsel ekleyin veya YAZI türünü seçin!"); return;
+                    }
+                    const mergeCanvas = document.createElement('canvas');
+                    mergeCanvas.width = canvas.width; mergeCanvas.height = canvas.height;
+                    const ctx = mergeCanvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0); ctx.drawImage(canvas, 0, 0);
+                    finalImage = mergeCanvas.toDataURL('image/jpeg', 0.8);
+                }
+
+                let textQ = document.getElementById('q-text-question').value.trim();
+                if (currentQuestionInputType === 'text' && !textQ) {
+                    alert("Lütfen soru metnini yazın!"); return;
+                }
+
+                let answerVal = "";
+                if (currentAnswerType === 'choice') {
+                    if (!selectedChoiceAnswer) { alert("Lütfen doğru cevabı seçin!"); return; }
+                    answerVal = selectedChoiceAnswer;
+                } else {
+                    answerVal = document.getElementById('q-text-answer').value.trim();
+                    if (!answerVal) { alert("Lütfen metin olarak cevabı yazın!"); return; }
+                }
+
+                let days = appState.intervals[0] || 1;
+                let nextD = getNowTR(); nextD.setDate(nextD.getDate() + days);
+
+                const newQ = {
+                    id: Date.now(),
+                    course: course,
+                    topic: topic,
+                    img: finalImage,
+                    text_question: textQ,
+                    note: noteText,
+                    type: currentAnswerType,
+                    answer: answerVal,
+                    level: 0,
+                    nextReview: formatDate(nextD),
+                    lastReviewedDate: "",
+                    is_mastered: false,
+                    createdDate: todayStr
+                };
+
+                appState.questions.push(newQ);
+                alert("Soru başarıyla kaydedildi!");
+            } else {
+                if (!noteText) { alert("Lütfen not metnini yazınız!"); return; }
+                let finalImage = null;
+                const canvas = document.getElementById('upload-canvas');
+                const img = document.getElementById('upload-final-img');
+                if (img && img.src && !document.getElementById('editor-area').classList.contains('hidden')) {
+                    const mergeCanvas = document.createElement('canvas');
+                    mergeCanvas.width = canvas.width; mergeCanvas.height = canvas.height;
+                    const ctx = mergeCanvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0); ctx.drawImage(canvas, 0, 0);
+                    finalImage = mergeCanvas.toDataURL('image/jpeg', 0.8);
+                }
+
+                let days = appState.noteIntervals[0] || 1;
+                let nextD = getNowTR(); nextD.setDate(nextD.getDate() + days);
+
+                const newNote = {
+                    id: Date.now(),
+                    course: course,
+                    topic: topic,
+                    img: finalImage,
+                    note: noteText,
+                    stage: 0,
+                    nextReview: formatDate(nextD),
+                    lastReviewedDate: "",
+                    createdDate: todayStr
+                };
+
+                appState.notes.push(newNote);
+                alert("Not başarıyla kaydedildi!");
+            }
+
+            document.getElementById('q-note').value = '';
+            document.getElementById('q-text-question').value = '';
+            document.getElementById('q-text-answer').value = '';
+            selectedChoiceAnswer = '';
+            selectChoice('');
+            clearSelectedImage();
+            saveState();
+            switchTab('home');
+        }
+
+        // --- İNCELEME / ÇÖZÜM MODAL VE AKIŞI ---
+        function startReview(mode) {
+            currentReviewMode = mode;
+            let todayStr = formatDate(getNowTR());
+
+            if (mode === 'questions') {
+                currentReviewQueue = appState.questions.filter(q => 
+                    !q.is_mastered && 
+                    (q.nextReview <= todayStr || q.lastReviewedDate === todayStr) && 
+                    appState.selectedCourses.includes(q.course) && 
+                    appState.selectedTopics.includes(q.course + '::' + q.topic)
+                );
+            } else {
+                currentReviewQueue = appState.notes.filter(n => 
+                    (n.nextReview <= todayStr || n.lastReviewedDate === todayStr) && 
+                    appState.selectedCourses.includes(n.course) && 
+                    appState.selectedTopics.includes(n.course + '::' + n.topic)
+                );
+            }
+
+            if (currentReviewQueue.length === 0) {
+                alert("Bugün tekrar edilecek " + (mode === 'questions' ? "soru" : "not") + " bulunmuyor!");
+                return;
+            }
+
+            // KALDIĞI YERDEN BAŞLATMA: Gün içinde henüz çözülmemiş/işaretlenmemiş ilk veriyi bul
+            let resumeIndex = currentReviewQueue.findIndex(item => item.lastReviewedDate !== todayStr);
+            if (resumeIndex === -1) resumeIndex = 0; // Tümü bugün çözülmüşse baştan göster
+            currentReviewIndex = resumeIndex;
+
+            document.getElementById('review-modal').classList.remove('hidden');
+            renderReviewItem();
+        }
+
+        function renderReviewItem() {
+            if (!currentReviewQueue || currentReviewQueue.length === 0) {
+                closeReview(); return;
+            }
+
+            const item = currentReviewQueue[currentReviewIndex];
+            const todayStr = formatDate(getNowTR());
+            const isAnsweredToday = (item.lastReviewedDate === todayStr);
+
+            document.getElementById('review-progress').innerText = `${currentReviewMode === 'questions' ? 'SORU' : 'NOT'} ${currentReviewIndex + 1}/${currentReviewQueue.length}`;
+            document.getElementById('review-breadcrumbs').innerText = `${item.course} > ${item.topic}`;
+
+            // Görsel / Yazı Ayarı
+            const imgEl = document.getElementById('review-img');
+            const qTextEl = document.getElementById('review-question-text');
+            const frameBox = document.getElementById('review-frame-box');
+
+            if (item.img) {
+                imgEl.src = item.img;
+                imgEl.classList.remove('hidden');
+                frameBox.classList.remove('hidden');
+            } else {
+                imgEl.src = '';
+                imgEl.classList.add('hidden');
+                frameBox.classList.add('hidden');
+            }
+
+            if (item.text_question) {
+                qTextEl.innerText = item.text_question;
+                qTextEl.classList.remove('hidden');
+            } else {
+                qTextEl.innerText = '';
+                qTextEl.classList.add('hidden');
+            }
+
+            // Not Kutusu
+            const noteBox = document.getElementById('review-note-box');
+            if (item.note) {
+                noteBox.innerText = item.note;
+                noteBox.classList.remove('hidden');
+            } else {
+                noteBox.innerText = '';
+                noteBox.classList.add('hidden');
+            }
+
+            // Çizim tuşları ve Zoom sıfırlama
+            manualZoom('review', 1);
+            clearReviewCanvas();
+            document.getElementById('review-draw-tools').classList.remove('hidden');
+            setReviewDrawMode('pen');
+
+            // Alt Inputlar & Geribildirim
+            const choiceInput = document.getElementById('review-choice-input');
+            const textInput = document.getElementById('review-text-input');
+            const noteInput = document.getElementById('review-note-input');
+            const feedbackBox = document.getElementById('review-feedback-box');
+
+            choiceInput.classList.add('hidden');
+            textInput.classList.add('hidden');
+            noteInput.classList.add('hidden');
+            feedbackBox.classList.add('hidden');
+
+            if (currentReviewMode === 'questions') {
+                if (isAnsweredToday) {
+                    feedbackBox.className = "w-full p-3 text-xs font-extrabold text-center rounded-xl bg-emerald-100 text-emerald-800 shadow-sm block";
+                    feedbackBox.innerText = `BUGÜN ÇÖZÜLDÜ (VERİLEN CEVAP: ${item.userTodayAnswer || 'İŞARETLENDİ'}) - CEVAP: ${item.answer}`;
+                } else {
+                    if (item.type === 'choice') {
+                        choiceInput.classList.remove('hidden');
+                    } else {
+                        textInput.classList.remove('hidden');
+                        document.getElementById('review-text-val').value = '';
+                    }
+                }
+            } else {
+                // NOT İNCELEME MODU
+                if (isAnsweredToday) {
+                    const statusText = item.userTodayStatus === 'remembered' ? 'HATIRLANDI' : 'UNUTULDU';
+                    feedbackBox.className = `w-full p-3 text-xs font-extrabold text-center rounded-xl shadow-sm block ${item.userTodayStatus === 'remembered' ? 'bg-amber-100 text-amber-900' : 'bg-rose-100 text-rose-900'}`;
+                    feedbackBox.innerText = `BUGÜN İŞARETLENDİ: [ ${statusText} ]`;
+                } else {
+                    noteInput.classList.remove('hidden');
+                }
+            }
+
+            // Önceki/Sonraki Buton Durumu
+            document.getElementById('btn-rev-prev').disabled = (currentReviewIndex === 0);
+            document.getElementById('btn-rev-next').disabled = (currentReviewIndex === currentReviewQueue.length - 1);
+        }
+
+        function navigateReview(dir) {
+            let nextIdx = currentReviewIndex + dir;
+            if (nextIdx >= 0 && nextIdx < currentReviewQueue.length) {
+                currentReviewIndex = nextIdx;
+                renderReviewItem();
+            }
+        }
+
+        // ALGORİTMA DÜZELTMELERİ
+        function submitQuestionAnswer(userAns) {
+            let q = currentReviewQueue[currentReviewIndex];
+            if (!q) return;
+
+            let todayStr = formatDate(getNowTR());
+            let isCorrect = (String(userAns).trim().toUpperCase() === String(q.answer).trim().toUpperCase());
+
+            if (isCorrect) {
+                q.level = (q.level || 0) + 1;
+                if (q.level >= appState.intervals.length) {
+                    q.is_mastered = true;
+                }
+            } else {
+                // SIFIRLANMASIN: Bir önceki döngüye geri dönsün, 1. döngüdeyse 1'de kalsın
+                q.level = Math.max(0, (q.level || 0) - 1);
+            }
+
+            let days = appState.intervals[q.level] || 1;
+            let nextD = getNowTR(); nextD.setDate(nextD.getDate() + days);
+            q.nextReview = formatDate(nextD);
+            q.lastReviewedDate = todayStr;
+            q.userTodayAnswer = String(userAns).trim().toUpperCase();
+
+            saveState();
+            updateHomeStats();
+            renderReviewItem();
+        }
+
+        function submitNoteReview(remembered) {
+            let n = currentReviewQueue[currentReviewIndex];
+            if (!n) return;
+
+            let todayStr = formatDate(getNowTR());
+
+            if (remembered) {
+                n.stage = (n.stage || 0) + 1;
+            } else {
+                // SIFIRLANMASIN: Bir önceki döngüye geri dönsün, 1. döngüdeyse 1'de kalsın
+                n.stage = Math.max(0, (n.stage || 0) - 1);
+            }
+
+            let days = appState.noteIntervals[n.stage] || 1;
+            let nextD = getNowTR(); nextD.setDate(nextD.getDate() + days);
+            n.nextReview = formatDate(nextD);
+            n.lastReviewedDate = todayStr;
+            n.userTodayStatus = remembered ? 'remembered' : 'forgot';
+
+            saveState();
+            updateHomeStats();
+            renderReviewItem();
+        }
+
+        function closeReview() {
+            document.getElementById('review-modal').classList.add('hidden');
+            updateHomeStats();
+        }
+
+        // --- ARŞİV KISMI ---
+        function setArchiveDataType(type) {
+            activeArchiveType = type;
+            const btnQ = document.getElementById('btn-arch-type-q');
+            const btnN = document.getElementById('btn-arch-type-n');
+
+            if (type === 'question') {
+                btnQ.className = "flex-1 bg-white text-indigo-600 py-2 text-xs font-bold uppercase shadow-sm transition-all rounded-xl";
+                btnN.className = "flex-1 text-slate-600 py-2 text-xs font-bold uppercase transition-all hover:text-amber-600 rounded-xl";
+            } else {
+                btnN.className = "flex-1 bg-white text-amber-600 py-2 text-xs font-bold uppercase shadow-sm transition-all rounded-xl";
+                btnQ.className = "flex-1 text-slate-600 py-2 text-xs font-bold uppercase transition-all hover:text-indigo-600 rounded-xl";
+            }
+            renderLibrary();
+        }
+
+        function toggleArchiveFilters() {
+            const container = document.getElementById('arch-filters-container');
+            const chevron = document.getElementById('arch-filter-chevron');
+            container.classList.toggle('hidden');
+            chevron.style.transform = container.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+        }
+
+        function populateArchiveFilters() {
+            const courseDiv = document.getElementById('arch-course-filters');
+            const topicDiv = document.getElementById('arch-topic-filters');
+            if(!courseDiv || !topicDiv) return;
+
+            courseDiv.innerHTML = '';
+            topicDiv.innerHTML = '';
+
+            Object.keys(appState.categories).forEach(c => {
+                let active = archSelectedCourses.includes(c);
+                let btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase transition-all border ${active ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-slate-100 text-slate-600 border-slate-200'}`;
+                btn.innerText = c;
+                btn.onclick = () => {
+                    if(active) {
+                        archSelectedCourses = archSelectedCourses.filter(x => x !== c);
+                        archSelectedTopics = archSelectedTopics.filter(x => !x.startsWith(c + '::'));
+                    } else {
+                        archSelectedCourses.push(c);
+                        if(appState.categories[c]) appState.categories[c].forEach(t => archSelectedTopics.push(c + '::' + t));
+                    }
+                    populateArchiveFilters(); renderLibrary();
+                };
+                courseDiv.appendChild(btn);
+
+                if(active && appState.categories[c]) {
+                    appState.categories[c].forEach(t => {
+                        let tKey = c + '::' + t;
+                        let tActive = archSelectedTopics.includes(tKey);
+                        let tBtn = document.createElement('button');
+                        tBtn.type = 'button';
+                        tBtn.className = `px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase transition-all border ${tActive ? 'bg-amber-500 text-white border-amber-500' : 'bg-slate-100 text-slate-600 border-slate-200'}`;
+                        tBtn.innerText = `${c} > ${t}`;
+                        tBtn.onclick = () => {
+                            if(tActive) archSelectedTopics = archSelectedTopics.filter(x => x !== tKey);
+                            else archSelectedTopics.push(tKey);
+                            populateArchiveFilters(); renderLibrary();
+                        };
+                        topicDiv.appendChild(tBtn);
+                    });
+                }
+            });
+        }
+
+        function renderLibrary() {
+            const container = document.getElementById('library-list');
+            if (!container) return;
+            container.innerHTML = '';
+
+            let list = (activeArchiveType === 'question') ? appState.questions : appState.notes;
+            
+            list = list.filter(item => 
+                archSelectedCourses.includes(item.course) && 
+                archSelectedTopics.includes(item.course + '::' + item.topic)
+            );
+
+            if (list.length === 0) {
+                container.innerHTML = `<div class="p-8 text-center text-slate-400 font-bold text-xs uppercase bg-white rounded-2xl border border-slate-200 shadow-sm">Arşivde Kayıt Bulunamadı.</div>`;
+                return;
+            }
+
+            list.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "bg-white border border-slate-200 p-3.5 rounded-2xl shadow-sm space-y-2 relative overflow-hidden";
+                
+                let borderBarColor = activeArchiveType === 'question' ? 'bg-indigo-600' : 'bg-amber-500';
+                
+                let contentHTML = '';
+                if(item.img) {
+                    contentHTML += `<img src="${item.img}" class="w-full max-h-36 object-contain rounded-xl bg-slate-50 border border-slate-100 cursor-zoom-in" onclick="openLightbox('${item.img}')">`;
+                }
+                if(item.text_question) {
+                    contentHTML += `<div class="text-xs font-bold text-slate-800 uppercase bg-slate-50 p-2.5 rounded-xl border border-slate-100">${item.text_question}</div>`;
+                }
+                if(item.note) {
+                    contentHTML += `<div class="text-[11px] font-semibold text-amber-800 uppercase bg-amber-50 p-2 rounded-xl border border-amber-100">${item.note}</div>`;
+                }
+
+                let extraInfo = '';
+                if(activeArchiveType === 'question') {
+                    extraInfo = `
+                        <div class="flex justify-between items-center text-[10px] font-bold text-slate-500 border-t border-slate-100 pt-2">
+                            <span>CEVAP: <strong class="text-indigo-600">${item.answer}</strong></span>
+                            <span>DÖNGÜ: <strong class="text-indigo-600">${item.level + 1}</strong></span>
+                            <span>SONRAKİ: <strong class="text-indigo-600">${item.nextReview}</strong></span>
+                        </div>
+                    `;
+                } else {
+                    extraInfo = `
+                        <div class="flex justify-between items-center text-[10px] font-bold text-slate-500 border-t border-slate-100 pt-2">
+                            <span>DÖNGÜ: <strong class="text-amber-600">${(item.stage || 0) + 1}</strong></span>
+                            <span>SONRAKİ: <strong class="text-amber-600">${item.nextReview}</strong></span>
+                        </div>
+                    `;
+                }
+
+                card.innerHTML = `
+                    <div class="absolute top-0 left-0 w-1.5 h-full ${borderBarColor}"></div>
+                    <div class="flex justify-between items-center text-xs font-extrabold text-slate-700 uppercase">
+                        <span>${item.course} > ${item.topic}</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] text-slate-400 font-semibold">${item.createdDate || ''}</span>
+                            <button onclick="deleteItem('${activeArchiveType}', ${item.id})" class="text-rose-500 hover:text-rose-700 font-bold p-1">X</button>
+                        </div>
+                    </div>
+                    ${contentHTML}
+                    ${extraInfo}
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function deleteItem(type, id) {
+            if (!confirm("Bu kaydı silmek istediğinize emin misiniz?")) return;
+            if (type === 'question') {
+                appState.questions = appState.questions.filter(q => q.id !== id);
+            } else {
+                appState.notes = appState.notes.filter(n => n.id !== id);
+            }
+            saveState(); renderLibrary(); updateHomeStats();
+        }
+
+        // --- KAMP SİSTEMİ ---
+        function openCampSetup(type) {
+            campMode = type;
+            let list = (type === 'questions') ? appState.questions : appState.notes;
+            
+            document.getElementById('camp-total-count').innerText = list.length;
+            document.getElementById('camp-title').innerText = type === 'questions' ? "Soru Kampı Ayarı" : "Not Kampı Ayarı";
+            document.getElementById('camp-setup-modal').classList.remove('hidden');
+        }
+
+        function closeCampSetup() {
+            document.getElementById('camp-setup-modal').classList.add('hidden');
+        }
+
+        function startCamp() {
+            let count = parseInt(document.getElementById('camp-count-input').value) || 5;
+            let list = (campMode === 'questions') ? [...appState.questions] : [...appState.notes];
+
+            if (list.length === 0) {
+                alert("Kamp için yeterli veri yok!"); return;
+            }
+
+            list.sort(() => Math.random() - 0.5);
+            campQueue = list.slice(0, count);
+            campIndex = 0;
+
+            closeCampSetup();
+            document.getElementById('camp-review-modal').classList.remove('hidden');
+            renderCampItem();
+        }
+
+        function renderCampItem() {
+            if (!campQueue || campQueue.length === 0 || campIndex >= campQueue.length) {
+                closeCamp(); return;
+            }
+
+            const item = campQueue[campIndex];
+            document.getElementById('camp-review-progress').innerText = `KAMP ${campIndex + 1}/${campQueue.length}`;
+            document.getElementById('camp-breadcrumbs').innerText = `${item.course} > ${item.topic}`;
+
+            const imgEl = document.getElementById('camp-review-img');
+            const qTextEl = document.getElementById('camp-review-question-text');
+            const ansBox = document.getElementById('camp-review-answer-box');
+
+            if (item.img) {
+                imgEl.src = item.img;
+                imgEl.classList.remove('hidden');
+            } else {
+                imgEl.src = '';
+                imgEl.classList.add('hidden');
+            }
+
+            if (item.text_question) {
+                qTextEl.innerText = item.text_question;
+                qTextEl.classList.remove('hidden');
+            } else {
+                qTextEl.innerText = '';
+                qTextEl.classList.add('hidden');
+            }
+
+            ansBox.classList.add('hidden');
+            ansBox.innerHTML = '';
+
+            document.getElementById('camp-reveal-btn').classList.remove('hidden');
+            document.getElementById('camp-next-btn').classList.add('hidden');
+
+            manualZoom('camp', 1);
+            clearCampReviewCanvas();
+            setCampReviewDrawMode('pen');
+        }
+
+        function revealCampAnswer() {
+            const item = campQueue[campIndex];
+            const ansBox = document.getElementById('camp-review-answer-box');
+
+            if (campMode === 'questions') {
+                ansBox.innerHTML = `DOĞRU CEVAP: <strong>${item.answer}</strong>${item.note ? '<br><span class="text-amber-700 mt-1 block">' + item.note + '</span>' : ''}`;
+            } else {
+                ansBox.innerHTML = `NOT: <strong>${item.note}</strong>`;
+            }
+
+            ansBox.classList.remove('hidden');
+            document.getElementById('camp-reveal-btn').classList.add('hidden');
+            document.getElementById('camp-next-btn').classList.remove('hidden');
+        }
+
+        function nextCampQuestion() {
+            campIndex++;
+            if (campIndex < campQueue.length) {
+                renderCampItem();
+            } else {
+                alert("Kamp Tamamlandı! Tebrikler!");
+                closeCamp();
+            }
+        }
+
+        function closeCamp() {
+            document.getElementById('camp-review-modal').classList.add('hidden');
+        }
+
+        // --- DERS VE KONU YÖNETİMİ ---
+        function renderCourseManagement() {
+            const list = document.getElementById('course-manage-list');
+            if(!list) return;
+            list.innerHTML = '';
+
+            Object.keys(appState.categories).forEach(c => {
+                let div = document.createElement('div');
+                div.className = "flex justify-between items-center p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold uppercase text-slate-700";
+                div.innerHTML = `
+                    <span>${c}</span>
+                    <button onclick="deleteCourse('${c}')" class="text-rose-500 hover:text-rose-700">SİL</button>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function addCourse() {
+            let input = document.getElementById('new-course-input');
+            let val = input.value.trim().toUpperCase();
+            if(!val) return;
+
+            if(!appState.categories[val]) {
+                appState.categories[val] = ["GENEL"];
+                if(!appState.selectedCourses.includes(val)) appState.selectedCourses.push(val);
+                if(!appState.selectedTopics.includes(val + '::GENEL')) appState.selectedTopics.push(val + '::GENEL');
+                saveState(); syncSystemUI(); input.value = '';
+            } else {
+                alert("Bu ders zaten mevcut!");
+            }
+        }
+
+        function deleteCourse(course) {
+            if(!confirm(`${course} dersini silmek istediğinize emin misiniz?`)) return;
+            delete appState.categories[course];
+            appState.selectedCourses = appState.selectedCourses.filter(c => c !== course);
+            appState.selectedTopics = appState.selectedTopics.filter(t => !t.startsWith(course + '::'));
+            saveState(); syncSystemUI();
+        }
+
+        function renderTopicManagement() {
+            const courseSelect = document.getElementById('topic-manage-course-select');
+            const list = document.getElementById('topic-manage-list');
+            if(!courseSelect || !list) return;
+
+            let c = courseSelect.value;
+            list.innerHTML = '';
+
+            if(c && appState.categories[c]) {
+                appState.categories[c].forEach(t => {
+                    let div = document.createElement('div');
+                    div.className = "flex justify-between items-center p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold uppercase text-slate-700";
+                    div.innerHTML = `
+                        <span>${t}</span>
+                        ${t !== "GENEL" ? `<button onclick="deleteTopic('${c}', '${t}')" class="text-rose-500 hover:text-rose-700">SİL</button>` : `<span class="text-slate-400 text-[10px]">VARSAYILAN</span>`}
+                    `;
+                    list.appendChild(div);
+                });
+            }
+        }
+
+        function addTopic() {
+            const c = document.getElementById('topic-manage-course-select').value;
+            const input = document.getElementById('new-topic-input');
+            let val = input.value.trim().toUpperCase();
+            if(!c || !val) return;
+
+            if(!appState.categories[c].includes(val)) {
+                appState.categories[c].push(val);
+                let key = c + '::' + val;
+                if(!appState.selectedTopics.includes(key)) appState.selectedTopics.push(key);
+                saveState(); syncSystemUI(); input.value = '';
+            } else {
+                alert("Bu konu zaten mevcut!");
+            }
+        }
+
+        function deleteTopic(course, topic) {
+            if(!confirm(`${topic} konusunu silmek istediğinize emin misiniz?`)) return;
+            appState.categories[course] = appState.categories[course].filter(t => t !== topic);
+            appState.selectedTopics = appState.selectedTopics.filter(t => t !== (course + '::' + topic));
+            saveState(); syncSystemUI();
+        }
+
+        function saveIntervals() {
+            let str = document.getElementById('setting-intervals').value;
+            let arr = str.split(',').map(x => parseInt(x.trim())).filter(x => !isNaN(x) && x > 0);
+            if(arr.length > 0) {
+                appState.intervals = arr; saveState(); alert("Soru aralıkları güncellendi!");
+            } else alert("Geçersiz değerler!");
+        }
+
+        function saveNoteIntervals() {
+            let str = document.getElementById('setting-note-intervals').value;
+            let arr = str.split(',').map(x => parseInt(x.trim())).filter(x => !isNaN(x) && x > 0);
+            if(arr.length > 0) {
+                appState.noteIntervals = arr; saveState(); alert("Not aralıkları güncellendi!");
+            } else alert("Geçersiz değerler!");
+        }
+
+        function exportData() {
+            let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState));
+            let downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `YKS_Sistem_Yedek_${formatDate(getNowTR())}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function importData(input) {
+            let file = input.files[0];
+            if (!file) return;
+            let reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    let data = JSON.parse(e.target.result);
+                    if (data && data.categories && data.questions) {
+                        appState = data;
+                        await saveStateToDB(appState);
+                        syncSystemUI();
+                        alert("Veriler başarıyla yüklendi!");
+                    } else {
+                        alert("Geçersiz yedek dosyası!");
+                    }
+                } catch(err) {
+                    alert("Dosya okuma hatası!");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // --- LIGHTBOX ---
+        function openLightbox(src) {
+            if (!src) return;
+            document.getElementById('lightbox-img').src = src;
+            document.getElementById('lightbox').classList.remove('hidden');
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
+<!-- (Hiçbir kutuya/div'e sarmalamana gerek yok, doğrudan buraya ekle) -->
+
+
+<script>
+  // SİSTEM HATA DEDEKTÖRÜ: Kodda ne hata varsa ekrana yazdırır
+  window.onerror = function(message, source, lineno) {
+    const errorMsgEl = document.getElementById("error-msg");
+    if (errorMsgEl) {
+      errorMsgEl.innerHTML = "Sistem Hatası: " + message + "<br><small>Satır: " + lineno + "</small>";
+    }
+    return false;
+  };
+
+  try {
+    // Firebase Bağlantı Ayarları (Europe Sunucusu)
+    const firebaseConfig = {
+      databaseURL: "https://hadiartik-60685-default-rtdb.europe-west1.firebasedatabase.app"
+    };
+
+    if (typeof firebase === 'undefined') {
+      throw new Error("Firebase yüklenemedi! İnternetiniz kapalı olabilir veya script engellenmiş.");
+    }
+
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // Giriş kontrolü (Hatalara karşı korumalı)
+    let isAuthorized = false;
+    try {
+      isAuthorized = localStorage.getItem("authorized") === "true";
+    } catch (e) {
+      console.warn("Tarayıcı koruması nedeniyle LocalStorage engellendi.");
+    }
+
+    // Eğer kullanıcı zaten giriş yaptıysa perdeyi anında tamamen kaldır
+    if (isAuthorized) {
+      const curtain = document.getElementById("login-screen");
+      if (curtain) curtain.remove();
+    }
+
+    function checkPassword() {
+      const errorDisplay = document.getElementById("error-msg");
+      if (errorDisplay) {
+        errorDisplay.innerText = "Bağlantı kuruluyor, lütfen bekleyin...";
+      }
+
+      const enteredKey = document.getElementById("otp-input").value.trim();
+
+      if (!enteredKey) {
+        if (errorDisplay) errorDisplay.innerText = "Lütfen şifre alanını boş bırakmayın!";
+        return;
+      }
+
+      const keyRef = database.ref("keys/" + enteredKey);
+
+      keyRef.once("value").then((snapshot) => {
+        if (snapshot.val() === true) {
+          // Şifre doğru, veritabanından siliyoruz (tek kullanımlık olması için)
+          keyRef.remove().then(() => {
+            try {
+              localStorage.setItem("authorized", "true");
+            } catch (e) {}
+            // Giriş başarılı olunca perdeyi tamamen yok et
+            const curtain = document.getElementById("login-screen");
+            if (curtain) curtain.remove();
+          }).catch((err) => {
+            if (errorDisplay) errorDisplay.innerText = "Şifre silinirken hata oluştu: " + err.message;
+          });
+        } else {
+          if (errorDisplay) errorDisplay.innerText = "Geçersiz veya kullanılmış şifre!";
+        }
+      }).catch((error) => {
+        if (errorDisplay) errorDisplay.innerText = "Veritabanı Bağlantı Hatası: " + error.message;
+      });
+    }
+  } catch (globalError) {
+    const errorDisplay = document.getElementById("error-msg");
+    if (errorDisplay) {
+      errorDisplay.innerText = "Başlatma Hatası: " + globalError.message;
+    }
+  }
+</script>
