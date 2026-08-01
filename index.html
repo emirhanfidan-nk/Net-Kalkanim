@@ -1901,8 +1901,8 @@
             });
         }
 
-        function deleteItem(type, id) {
-            if (!confirm("Bu kaydı silmek istediğinize emin misiniz?")) return;
+       async function deleteItem(type, id) {
+            if (!(await customConfirm("Bu kaydı silmek istediğinize emin misiniz?")) return;
             if (type === 'question') {
                 appState.questions = appState.questions.filter(q => q.id !== id);
             } else {
@@ -2043,8 +2043,8 @@
             }
         }
 
-        function deleteCourse(course) {
-            if(!confirm(`${course} dersini silmek istediğinize emin misiniz?`)) return;
+       async function deleteCourse(course) {
+            if(!(await customConfirm(`${course} dersini silmek istediğinize emin misiniz?`)) return;
             delete appState.categories[course];
             appState.selectedCourses = appState.selectedCourses.filter(c => c !== course);
             appState.selectedTopics = appState.selectedTopics.filter(t => !t.startsWith(course + '::'));
@@ -2088,8 +2088,8 @@
             }
         }
 
-        function deleteTopic(course, topic) {
-            if(!confirm(`${topic} konusunu silmek istediğinize emin misiniz?`)) return;
+        async function deleteTopic(course, topic) {
+            if(!(await customConfirm(`${topic} konusunu silmek istediğinize emin misiniz?`)) return;
             appState.categories[course] = appState.categories[course].filter(t => t !== topic);
             appState.selectedTopics = appState.selectedTopics.filter(t => t !== (course + '::' + topic));
             saveState(); syncSystemUI();
@@ -2121,7 +2121,7 @@
             downloadAnchor.remove();
         }
 
-                function importData(input) {
+                        function importData(input) {
             let file = input.files[0];
             if (!file) return;
             let reader = new FileReader();
@@ -2166,11 +2166,47 @@
                 toast.classList.add('hidden');
             }, 2500);
         }
+
+        // --- ONAY MODALI FONKSİYONU ---
+        function customConfirm(mesaj) {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('confirm-modal');
+                const textEl = document.getElementById('confirm-modal-text');
+                const acceptBtn = document.getElementById('confirm-accept-btn');
+                const cancelBtn = document.getElementById('confirm-cancel-btn');
+
+                textEl.innerText = mesaj;
+                modal.classList.remove('hidden');
+
+                const close = () => {
+                    modal.classList.add('hidden');
+                    acceptBtn.onclick = null;
+                    cancelBtn.onclick = null;
+                };
+
+                acceptBtn.onclick = () => { close(); resolve(true); };
+                cancelBtn.onclick = () => { close(); resolve(false); };
+            });
+        }
     </script>
 
     <!-- ÖZEL BİLDİRİM KUTUSU (HTML) -->
     <div id="toast" class="fixed bottom-24 left-1/2 -translate-x-1/2 hidden bg-gray-900 text-white px-5 py-3 rounded-2xl shadow-xl z-50 text-sm font-medium transition-all duration-300 flex items-center gap-2 border border-gray-700">
         <span id="toast-message">Soru başarıyla kaydedildi!</span>
+    </div>
+
+    <!-- ÖZEL ONAY MODALI (HTML) -->
+    <div id="confirm-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-6 max-w-xs w-full shadow-2xl space-y-4 text-center border border-gray-100">
+            <div class="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto text-xl">
+                ⚠️
+            </div>
+            <p id="confirm-modal-text" class="text-sm font-semibold text-gray-800">Emin misiniz?</p>
+            <div class="flex gap-2 justify-center pt-2">
+                <button id="confirm-cancel-btn" class="w-full py-2.5 bg-gray-100 text-gray-700 text-sm font-semibold rounded-xl hover:bg-gray-200">İptal</button>
+                <button id="confirm-accept-btn" class="w-full py-2.5 bg-red-600 text-white text-sm font-semibold rounded-xl hover:bg-red-700 shadow-md">Sil</button>
+            </div>
+        </div>
     </div>
 
 <script>
@@ -2252,4 +2288,4 @@
 </script>
 
 </body>
-    </html>
+</html>
