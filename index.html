@@ -2121,7 +2121,7 @@
             downloadAnchor.remove();
         }
 
-        function importData(input) {
+                function importData(input) {
             let file = input.files[0];
             if (!file) return;
             let reader = new FileReader();
@@ -2132,12 +2132,12 @@
                         appState = data;
                         await saveStateToDB(appState);
                         syncSystemUI();
-                        alert("Veriler başarıyla yüklendi!");
+                        showToast("Veriler başarıyla yüklendi!");
                     } else {
-                        alert("Geçersiz yedek dosyası!");
+                        showToast("Geçersiz yedek dosyası!");
                     }
                 } catch(err) {
-                    alert("Dosya okuma hatası!");
+                    showToast("Dosya okuma hatası!");
                 }
             };
             reader.readAsText(file);
@@ -2153,11 +2153,25 @@
         function closeLightbox() {
             document.getElementById('lightbox').classList.add('hidden');
         }
-    </script>
-</body>
-</html>
-<!-- (Hiçbir kutuya/div'e sarmalamana gerek yok, doğrudan buraya ekle) -->
 
+        // --- BİLDİRİM FONKSİYONU ---
+        function showToast(mesaj) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            
+            toastMessage.innerText = mesaj;
+            toast.classList.remove('hidden');
+            
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 2500);
+        }
+    </script>
+
+    <!-- ÖZEL BİLDİRİM KUTUSU (HTML) -->
+    <div id="toast" class="fixed bottom-24 left-1/2 -translate-x-1/2 hidden bg-gray-900 text-white px-5 py-3 rounded-2xl shadow-xl z-50 text-sm font-medium transition-all duration-300 flex items-center gap-2 border border-gray-700">
+        <span id="toast-message">Soru başarıyla kaydedildi!</span>
+    </div>
 
 <script>
   // SİSTEM HATA DEDEKTÖRÜ: Kodda ne hata varsa ekrana yazdırır
@@ -2213,12 +2227,10 @@
 
       keyRef.once("value").then((snapshot) => {
         if (snapshot.val() === true) {
-          // Şifre doğru, veritabanından siliyoruz (tek kullanımlık olması için)
           keyRef.remove().then(() => {
             try {
               localStorage.setItem("authorized", "true");
             } catch (e) {}
-            // Giriş başarılı olunca perdeyi tamamen yok et
             const curtain = document.getElementById("login-screen");
             if (curtain) curtain.remove();
           }).catch((err) => {
@@ -2238,3 +2250,6 @@
     }
   }
 </script>
+
+</body>
+</html>
