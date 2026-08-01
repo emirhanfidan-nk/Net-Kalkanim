@@ -729,7 +729,7 @@
 
             } catch (error) {
                 console.error("Veritabanı başlatma hatası:", error);
-                alert("Sistem kritik bir hata ile karşılaştı. Veritabanı başlatılamadı.");
+                showToast("Sistem kritik bir hata ile karşılaştı. Veritabanı başlatılamadı.");
             }
         };
 
@@ -1305,7 +1305,7 @@
                 updateHomeStats(); 
             }).catch(e => {
                 console.error(e);
-                alert("SİSTEM HATASI: Veriler veritabanına kaydedilemedi!");
+                showToast("SİSTEM HATASI: Veriler veritabanına kaydedilemedi!");
             });
         }
 
@@ -1481,7 +1481,7 @@
             const noteText = document.getElementById('q-note').value.trim();
             const todayStr = formatDate(getNowTR());
 
-            if (!course) { alert("Lütfen ders seçiniz!"); return; }
+            if (!course) { showToast("Lütfen ders seçiniz!"); return; }
 
             if (currentEntryType === 'question') {
                 let finalImage = null;
@@ -1489,7 +1489,7 @@
                     const canvas = document.getElementById('upload-canvas');
                     const img = document.getElementById('upload-final-img');
                     if (!img || !img.src || document.getElementById('editor-area').classList.contains('hidden')) {
-                        alert("Lütfen görsel ekleyin veya YAZI türünü seçin!"); return;
+                        showToast("Lütfen görsel ekleyin veya YAZI türünü seçin!"); return;
                     }
                     const mergeCanvas = document.createElement('canvas');
                     mergeCanvas.width = canvas.width; mergeCanvas.height = canvas.height;
@@ -1500,16 +1500,16 @@
 
                 let textQ = document.getElementById('q-text-question').value.trim();
                 if (currentQuestionInputType === 'text' && !textQ) {
-                    alert("Lütfen soru metnini yazın!"); return;
+                    showToast("Lütfen soru metnini yazın!"); return;
                 }
 
                 let answerVal = "";
                 if (currentAnswerType === 'choice') {
-                    if (!selectedChoiceAnswer) { alert("Lütfen doğru cevabı seçin!"); return; }
+                    if (!selectedChoiceAnswer) { showToast("Lütfen doğru cevabı seçin!"); return; }
                     answerVal = selectedChoiceAnswer;
                 } else {
                     answerVal = document.getElementById('q-text-answer').value.trim();
-                    if (!answerVal) { alert("Lütfen metin olarak cevabı yazın!"); return; }
+                    if (!answerVal) { showToast("Lütfen metin olarak cevabı yazın!"); return; }
                 }
 
                 let days = appState.intervals[0] || 1;
@@ -1532,9 +1532,9 @@
                 };
 
                 appState.questions.push(newQ);
-                alert("Soru başarıyla kaydedildi!");
+                showToast("Soru başarıyla kaydedildi!");
             } else {
-                if (!noteText) { alert("Lütfen not metnini yazınız!"); return; }
+                if (!noteText) { showToast("Lütfen not metnini yazınız!"); return; }
                 let finalImage = null;
                 const canvas = document.getElementById('upload-canvas');
                 const img = document.getElementById('upload-final-img');
@@ -1562,7 +1562,7 @@
                 };
 
                 appState.notes.push(newNote);
-                alert("Not başarıyla kaydedildi!");
+                showToast("Not başarıyla kaydedildi!");
             }
 
             document.getElementById('q-note').value = '';
@@ -1596,7 +1596,7 @@
             }
 
             if (currentReviewQueue.length === 0) {
-                alert("Bugün tekrar edilecek " + (mode === 'questions' ? "soru" : "not") + " bulunmuyor!");
+                showToast("Bugün tekrar edilecek " + (mode === 'questions' ? "soru" : "not") + " bulunmuyor!");
                 return;
             }
 
@@ -1930,7 +1930,7 @@
             let list = (campMode === 'questions') ? [...appState.questions] : [...appState.notes];
 
             if (list.length === 0) {
-                alert("Kamp için yeterli veri yok!"); return;
+                showToast("Kamp için yeterli veri yok!"); return;
             }
 
             list.sort(() => Math.random() - 0.5);
@@ -2002,7 +2002,7 @@
             if (campIndex < campQueue.length) {
                 renderCampItem();
             } else {
-                alert("Kamp Tamamlandı! Tebrikler!");
+                showToast("Kamp Tamamlandı! Tebrikler!");
                 closeCamp();
             }
         }
@@ -2039,7 +2039,7 @@
                 if(!appState.selectedTopics.includes(val + '::GENEL')) appState.selectedTopics.push(val + '::GENEL');
                 saveState(); syncSystemUI(); input.value = '';
             } else {
-                alert("Bu ders zaten mevcut!");
+                showToast("Bu ders zaten mevcut!");
             }
         }
 
@@ -2084,7 +2084,7 @@
                 if(!appState.selectedTopics.includes(key)) appState.selectedTopics.push(key);
                 saveState(); syncSystemUI(); input.value = '';
             } else {
-                alert("Bu konu zaten mevcut!");
+                showToast("Bu konu zaten mevcut!");
             }
         }
 
@@ -2099,16 +2099,16 @@
             let str = document.getElementById('setting-intervals').value;
             let arr = str.split(',').map(x => parseInt(x.trim())).filter(x => !isNaN(x) && x > 0);
             if(arr.length > 0) {
-                appState.intervals = arr; saveState(); alert("Soru aralıkları güncellendi!");
-            } else alert("Geçersiz değerler!");
+                appState.intervals = arr; saveState(); showToast("Soru aralıkları güncellendi!");
+            } else showToast("Geçersiz değerler!");
         }
 
         function saveNoteIntervals() {
             let str = document.getElementById('setting-note-intervals').value;
             let arr = str.split(',').map(x => parseInt(x.trim())).filter(x => !isNaN(x) && x > 0);
             if(arr.length > 0) {
-                appState.noteIntervals = arr; saveState(); alert("Not aralıkları güncellendi!");
-            } else alert("Geçersiz değerler!");
+                appState.noteIntervals = arr; saveState(); showToast("Not aralıkları güncellendi!");
+            } else showToast("Geçersiz değerler!");
         }
 
         function exportData() {
@@ -2252,4 +2252,4 @@
 </script>
 
 </body>
-</html>
+    </html>
