@@ -240,7 +240,7 @@
 <input type="hidden" id="q-topic" value="">
 
 <div>
-    <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Ders Seçimi</label>
+    <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Ders Seç</label>
     <button type="button" id="btn-pick-course" onclick="openPicker('course')"
             class="w-full bg-white p-3.5 border border-slate-300 rounded-xl shadow-sm text-left flex justify-between items-center uppercase text-sm font-semibold text-slate-700 hover:border-indigo-500 transition-colors">
         <span id="btn-pick-course-text">Ders Seçiniz</span>
@@ -249,7 +249,7 @@
 </div>
 
 <div>
-    <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Konu Seçimi</label>
+    <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Konu Seç</label>
     <button type="button" id="btn-pick-topic" onclick="openPicker('topic')"
             class="w-full bg-white p-3.5 border border-slate-300 rounded-xl shadow-sm text-left flex justify-between items-center uppercase text-sm font-semibold text-slate-700 hover:border-amber-500 transition-colors">
         <span id="btn-pick-topic-text">Önce Ders Seçin</span>
@@ -260,7 +260,7 @@
                     <div id="image-input-container">
                         <div class="relative w-full">
                             <div id="upload-placeholder" class="w-full min-h-[11rem] bg-white border-2 border-dashed border-slate-300 p-4 flex flex-col items-center justify-center transition-colors rounded-2xl shadow-sm">
-                                <p class="text-xs uppercase font-bold tracking-wider text-slate-400 mb-4">Soru resmini ekle</p>
+                                <p class="text-xs uppercase font-bold tracking-wider text-slate-400 mb-4">Görsel kaynağını seç</p>
                                 <div class="flex gap-3 w-full max-w-[280px]">
     <!-- Galeri Butonu -->
     <label class="flex-1 bg-rose-600 hover:bg-rose-700 text-white py-3 flex justify-center items-center text-xs font-bold uppercase cursor-pointer transition-colors rounded-xl shadow-sm">
@@ -325,7 +325,7 @@
 
                     <div>
                         <label id="label-note-text" class="block text-xs font-bold text-slate-600 uppercase mb-2">Not</label>
-                        <textarea id="q-note" placeholder="METİN GİRİNİZ..." class="w-full bg-white p-3.5 border border-slate-300 outline-none focus:border-indigo-600 text-slate-800 text-xs font-semibold h-20 rounded-xl resize-none uppercase tracking-wide shadow-sm"></textarea>
+                        <textarea id="q-note" placeholder="METİN GİR..." class="w-full bg-white p-3.5 border border-slate-300 outline-none focus:border-indigo-600 text-slate-800 text-xs font-semibold h-20 rounded-xl resize-none uppercase tracking-wide shadow-sm"></textarea>
                     </div>
 
                     <div id="question-specific-area" class="space-y-4">
@@ -349,7 +349,7 @@
 
                         <div id="ans-text-area" class="hidden">
                             <label class="block text-xs font-bold text-indigo-700 uppercase mb-2">Doğru Cevap</label>
-                            <input type="text" id="q-text-answer" placeholder="METİN GİRİN..." class="w-full bg-white p-3.5 border border-slate-300 outline-none focus:border-indigo-600 text-slate-800 uppercase font-bold placeholder-slate-400 transition-colors rounded-xl shadow-sm">
+                            <input type="text" id="q-text-answer" placeholder="METİN GİR..." class="w-full bg-white p-3.5 border border-slate-300 outline-none focus:border-indigo-600 text-slate-800 uppercase font-bold placeholder-slate-400 transition-colors rounded-xl shadow-sm">
                         </div>
                     </div>
 
@@ -477,10 +477,10 @@
                 <!-- Manuel İlerleme İçin Ok Tuşları -->
                 <div id="review-nav-arrows" class="flex justify-between items-center w-full px-1 py-1 gap-3 shrink-0">
                     <button onclick="navigateReview(-1)" id="btn-rev-prev" class="flex-1 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 py-2.5 px-3 text-xs font-extrabold rounded-xl shadow-sm transition-colors flex items-center justify-center gap-2">
-                        <span>◄</span> <span>Önceki Soru</span>
+                        <span>◄</span> <span>Önceki</span>
                     </button>
                     <button onclick="navigateReview(1)" id="btn-rev-next" class="flex-1 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 py-2.5 px-3 text-xs font-extrabold rounded-xl shadow-sm transition-colors flex items-center justify-center gap-2">
-                        <span>Sonraki Soru</span> <span>►</span>
+                        <span>Sonraki</span> <span>►</span>
                     </button>
                 </div>
 
@@ -521,7 +521,7 @@
                     <button id="choice-btn-E" onclick="submitQuestionAnswer('E')" class="w-11 h-11 bg-slate-50 border border-slate-300 hover:bg-indigo-600 hover:border-indigo-600 hover:text-white font-extrabold text-base transition-all rounded-xl shadow-sm">E</button>
                 </div>
                 <div id="review-text-input" class="flex gap-2 hidden">
-                    <input type="text" id="review-text-val" placeholder="METİN GİRİN..." class="flex-1 bg-slate-50 p-3 border border-slate-300 outline-none focus:border-indigo-600 text-slate-800 font-bold uppercase tracking-wider transition-colors rounded-xl shadow-sm text-xs">
+                    <input type="text" id="review-text-val" placeholder="METİN GİR..." class="flex-1 bg-slate-50 p-3 border border-slate-300 outline-none focus:border-indigo-600 text-slate-800 font-bold uppercase tracking-wider transition-colors rounded-xl shadow-sm text-xs">
                     <button onclick="submitQuestionAnswer(document.getElementById('review-text-val').value)" class="bg-indigo-600 text-white px-5 font-bold uppercase hover:bg-indigo-700 transition-colors rounded-xl shadow-sm text-xs">İlet</button>
                 </div>
                 <div id="review-recall-input" class="hidden w-full mt-3">
@@ -643,6 +643,39 @@
                 </div>
             </div>
         </div>
+        
+        <!-- ANA EKRANA EKLE MODALI -->
+<div id="install-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[90] hidden flex justify-center items-center p-4">
+    <div class="modal-animate bg-white border border-slate-200 w-full max-w-sm p-6 rounded-3xl shadow-2xl flex flex-col items-center text-center relative overflow-hidden">
+        
+        <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mb-4 shadow-inner">
+            <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm0 3.45l8.15 14.1H3.85L12 5.45zM11 10h2v4h-2zm0 5h2v2h-2z"/></svg>
+        </div>
+
+        <h3 id="install-title" class="text-indigo-950 font-extrabold text-lg uppercase tracking-tight mb-2">Ana Ekrana Ekle</h3>
+        <p id="install-desc" class="text-slate-600 text-xs leading-relaxed font-medium mb-5">
+            Uygulamayı ana ekranınıza ekleyerek daha hızlı erişebilirsiniz.
+        </p>
+
+        <!-- Önizleme alanı (iOS için görsel/içerik buraya gelecek) -->
+        <div id="install-preview" class="w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl mb-6 text-left"></div>
+
+        <div class="w-full flex flex-col gap-2">
+            <button id="btn-install-accept" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 font-bold text-xs uppercase rounded-xl shadow-md transition-all">
+                Ana Ekrana Ekle
+            </button>
+            <div class="flex gap-2">
+                <button id="btn-install-cancel" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-500 py-3 font-bold text-xs uppercase rounded-xl transition-colors">
+                    İptal
+                </button>
+                <button id="btn-install-never" class="flex-1 bg-rose-100 hover:bg-rose-200 text-rose-600 py-3 font-bold text-xs uppercase rounded-xl transition-colors">
+                    Bir Daha Gösterme
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
 
         <!-- SABİT ALT NAVİGASYON -->
         <nav id="bottom-nav" class="bg-white border-t border-slate-200 h-[76px] flex items-center justify-around z-20 rounded-t-2xl shadow-lg shrink-0 relative">
@@ -2636,3 +2669,105 @@ function initCoursePicker() {
     }
   }
 </script>
+<script>
+    // Ana Ekrana Ekle Prompt Yönetimi
+    let deferredPrompt = null;
+    const installModal = document.getElementById('install-modal');
+    const installTitle = document.getElementById('install-title');
+    const installDesc = document.getElementById('install-desc');
+    const installPreview = document.getElementById('install-preview');
+    const btnInstallAccept = document.getElementById('btn-install-accept');
+    const btnInstallCancel = document.getElementById('btn-install-cancel');
+    const btnInstallNever = document.getElementById('btn-install-never');
+
+    // Cihaz tespiti
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+    // Kullanıcı daha önce "Bir Daha Gösterme" dedi mi?
+    function getInstallDismissed() {
+        return localStorage.getItem('installPromptDismissed') === 'true';
+    }
+    function setInstallDismissed() {
+        localStorage.setItem('installPromptDismissed', 'true');
+    }
+
+    // Modal'ı kapat
+    function closeInstallModal() {
+        installModal.classList.add('hidden');
+    }
+
+    // iOS için yönerge içeriğini hazırla
+    function showIOSInstructions() {
+        installTitle.innerText = 'Ana Ekrana Ekle';
+        installDesc.innerText = 'Uygulamayı ana ekranınıza eklemek için Safari\'de aşağıdaki adımları izleyin:';
+        installPreview.innerHTML = `
+    <div class="text-center">
+        <img src="ios-kurulum-rehberi.png" alt="iOS Kurulum Rehberi" class="mx-auto max-w-full rounded-xl border border-slate-300">
+    </div>
+`;
+        btnInstallAccept.innerText = 'Tamam';
+    }
+
+    // Android için kurulum içeriği
+    function showAndroidInstall() {
+        installTitle.innerText = 'Ana Ekrana Ekle';
+        installDesc.innerText = 'Net Kalkanım\'ı ana ekranınıza ekleyin, her zaman elinizin altında olsun!';
+        installPreview.innerHTML = `
+            <div class="flex items-center gap-3 p-3 bg-indigo-50 text-indigo-700 rounded-xl border border-indigo-100">
+                <span class="text-3xl">📲</span>
+                <span class="text-xs font-bold">Hızlı erişim için uygulamayı yükleyin</span>
+            </div>
+        `;
+        btnInstallAccept.innerText = 'Ana Ekrana Ekle';
+    }
+
+    // beforeinstallprompt eventini dinle
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // Event'i engelle (tarayıcı kendi infobarını göstermesin)
+        e.preventDefault();
+        deferredPrompt = e;
+
+        // Daha önce "Bir Daha Gösterme" denmediyse ve uygulama standalone değilse modalı göster
+        if (!getInstallDismissed() && !isStandalone) {
+            showAndroidInstall();
+            installModal.classList.remove('hidden');
+        }
+    });
+
+    // Eğer cihaz iOS ise ve uygulama standalone değilse, sayfa yüklendiğinde talimat modalını göster
+    window.addEventListener('load', () => {
+        if (isIOS && !isStandalone && !getInstallDismissed()) {
+            showIOSInstructions();
+            installModal.classList.remove('hidden');
+        }
+    });
+
+    // Buton tıklamaları
+    btnInstallAccept.addEventListener('click', async () => {
+        if (deferredPrompt) {
+            // Android'de kurulum prompt'unu göster
+            await deferredPrompt.prompt();
+            const choiceResult = await deferredPrompt.userChoice;
+            if (choiceResult.outcome === 'accepted') {
+                console.log('Kullanıcı kurulumu kabul etti');
+                // Başarılı kurulumdan sonra modalı kapatabiliriz
+                closeInstallModal();
+            } else {
+                console.log('Kullanıcı kurulumu reddetti');
+            }
+            // Event bir kez kullanılabilir, sıfırla
+            deferredPrompt = null;
+        } else {
+            // iOS'ta veya prompt yoksa modalı kapat
+            closeInstallModal();
+        }
+    });
+
+    btnInstallCancel.addEventListener('click', closeInstallModal);
+
+    btnInstallNever.addEventListener('click', () => {
+        setInstallDismissed();
+        closeInstallModal();
+    });
+    </script>
