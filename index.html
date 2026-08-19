@@ -9,8 +9,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <!-- Firebase Bağlantı Kütüphaneleri -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
         body { background-color: #f8fafc; color: #1e293b; font-family: 'Inter', sans-serif; }
         
@@ -149,6 +149,49 @@
             0% { transform: scale(0.9); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
+        /* Flip Kart Stilleri */
+.review-flip-inner {
+  transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transform-style: preserve-3d;
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.review-flip-inner.flipped {
+  transform: rotateY(180deg);
+}
+.review-flip-face {
+  backface-visibility: hidden;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.review-flip-front {
+  z-index: 2;
+}
+.review-flip-back {
+  transform: rotateY(180deg);
+  z-index: 1;
+  background: #fffbeb;
+  border-radius: 0.75rem;
+}
+/* Arka yüzdeki not görselini tam sığdır */
+#review-flip-back {
+  padding: 8px !important;
+}
+#review-flip-back img {
+  width: 100% !important;
+  height: auto !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  border-radius: 0.5rem;
+}
     </style>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="logo.png">
@@ -159,19 +202,32 @@
 </script>
 </head>
 <body class="flex justify-center min-h-screen">
-<!-- ŞİFRE EKRANI (Üstte Duran ve Giriş Yapınca Tamamen Yok Olan Perde) -->
+<!-- ŞİFRE / SEÇİM EKRANI -->
 <div id="login-screen" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #ffffff; z-index: 999999; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: sans-serif; box-sizing: border-box; padding: 20px; text-align: center;">
   <h2>Net Kalkanım'a Giriş</h2>
-  <p>Lütfen size verilen tek kullanımlık şifreyi girin:</p>
-  <input type="text" id="otp-input" placeholder="Şifreniz..." style="padding: 12px; width: 250px; font-size: 16px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"><br>
-  <button onclick="checkPassword()" style="padding: 12px 30px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px;">Giriş Yap</button>
-  <!-- Hata mesajları burada görünecek -->
-  <p id="error-msg" style="color: red; font-weight: bold; margin-top: 20px;"></p>
+  <p>Uygulamayı kullanmak için bir seçenek belirleyin:</p>
+  
+  <button onclick="showLoginFields()" style="padding: 12px 30px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 20px;">Şifrem Var</button>
+  <button onclick="startTrial()" style="padding: 12px 30px; font-size: 16px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px;">Ücretsiz Dene (20 Soru/Not)</button>
+  
+  <a href="https://shopier.com/senin-linkin" target="_blank" style="margin-top: 20px; color: #6c757d; text-decoration: underline; font-size: 14px;">Şifre Satın Al (Shopier)</a>
+  
+  <div id="login-fields" style="display: none; margin-top: 20px;">
+    <input type="text" id="otp-input" placeholder="Şifreniz..." style="padding: 12px; width: 250px; font-size: 16px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"><br>
+    <button onclick="checkPassword()" style="padding: 12px 30px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px;">Giriş Yap</button>
+    <p id="error-msg" style="color: red; font-weight: bold; margin-top: 20px;"></p>
+  </div>
 </div>
+
     <div class="w-full max-w-md bg-slate-50 h-screen flex flex-col relative border-x border-slate-200 shadow-xl overflow-hidden">
         
         <!-- HEADER -->
-        <header class="bg-white p-4 flex justify-end items-center border-b border-slate-200 shadow-sm relative z-10 rounded-b-2xl shrink-0">
+        <header class="bg-white p-4 flex justify-between items-center border-b border-slate-200 shadow-sm relative z-10 rounded-b-2xl shrink-0">
+            <div class="flex items-center gap-2">
+                <button onclick="openCodeModal()" id="btn-code-enter" class="hidden px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold uppercase rounded-lg shadow-sm transition-colors">
+                    Kodu Gir
+                </button>
+            </div>
             <button onclick="switchTab('profile')" id="nav-profile" title="Ayarlar" class="p-2 text-slate-400 hover:text-indigo-600 transition-colors rounded-xl">
                 <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
                     <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
@@ -182,13 +238,11 @@
         <main class="flex-1 p-5 overflow-y-auto pb-6">
             
             <div id="home" class="tab-content space-y-6">
-                <!-- Ev İkonu ve Ana Sayfa Metni -->
                 <div class="border-l-4 border-indigo-600 bg-white p-4 rounded-r-2xl border border-slate-200 shadow-sm flex items-center gap-2 text-indigo-900">
                     <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
                     <h2 class="text-lg font-bold uppercase">Günlük Tekrar</h2>
                 </div>
 
-                <!-- Günlük İlerleme Çubuğu -->
                 <div class="space-y-2 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
                     <div class="flex justify-between text-xs font-bold text-slate-500 uppercase tracking-wider">
                         <span>Günlük İlerleme</span>
@@ -199,7 +253,6 @@
                     </div>
                 </div>
 
-                <!-- Filtre Butonu ve Açılır Filtre Alanı -->
                 <div class="space-y-3">
                     <button onclick="toggleHomeFilters()" type="button" class="w-full bg-white border border-slate-200 p-3.5 rounded-2xl flex justify-between items-center text-xs font-bold text-slate-700 uppercase tracking-wider shadow-sm hover:bg-slate-50 transition-colors">
                         <span class="flex items-center gap-2">
@@ -212,7 +265,7 @@
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
-                    <button onclick="startReview('questions')" class="btn-cyber rounded-2xl w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 font-bold text-sm flex flex-col items-center justify-center gap-1 shadow-md">
+                    <button id="btn-start-questions" onclick="startReview('questions')" class="btn-cyber rounded-2xl w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 font-bold text-sm flex flex-col items-center justify-center gap-1 shadow-md">
                         <span>SORULARI BAŞLAT</span>
                         <span class="text-xs opacity-80">[ <span id="queue-count-questions">0</span> ]</span>
                     </button>
@@ -235,44 +288,41 @@
                 </div>
 
                 <div class="space-y-4">
-                    <!-- Gizli gerçek değerleri tutan inputlar (aynı ID’ler) -->
-<input type="hidden" id="q-course" value="">
-<input type="hidden" id="q-topic" value="">
+                    <input type="hidden" id="q-course" value="">
+                    <input type="hidden" id="q-topic" value="">
 
-<div>
-    <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Ders Seç</label>
-    <button type="button" id="btn-pick-course" onclick="openPicker('course')"
-            class="w-full bg-white p-3.5 border border-slate-300 rounded-xl shadow-sm text-left flex justify-between items-center uppercase text-sm font-semibold text-slate-700 hover:border-indigo-500 transition-colors">
-        <span id="btn-pick-course-text">Ders Seçiniz</span>
-        <svg class="w-4 h-4 fill-slate-400" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
-    </button>
-</div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Ders Seç</label>
+                        <button type="button" id="btn-pick-course" onclick="openPicker('course')"
+                                class="w-full bg-white p-3.5 border border-slate-300 rounded-xl shadow-sm text-left flex justify-between items-center uppercase text-sm font-semibold text-slate-700 hover:border-indigo-500 transition-colors">
+                            <span id="btn-pick-course-text">Ders Seçiniz</span>
+                            <svg class="w-4 h-4 fill-slate-400" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+                        </button>
+                    </div>
 
-<div>
-    <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Konu Seç</label>
-    <button type="button" id="btn-pick-topic" onclick="openPicker('topic')"
-            class="w-full bg-white p-3.5 border border-slate-300 rounded-xl shadow-sm text-left flex justify-between items-center uppercase text-sm font-semibold text-slate-700 hover:border-amber-500 transition-colors">
-        <span id="btn-pick-topic-text">Önce Ders Seçin</span>
-        <svg class="w-4 h-4 fill-slate-400" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
-    </button>
-</div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Konu Seç</label>
+                        <button type="button" id="btn-pick-topic" onclick="openPicker('topic')"
+                                class="w-full bg-white p-3.5 border border-slate-300 rounded-xl shadow-sm text-left flex justify-between items-center uppercase text-sm font-semibold text-slate-700 hover:border-amber-500 transition-colors">
+                            <span id="btn-pick-topic-text">Önce Ders Seçin</span>
+                            <svg class="w-4 h-4 fill-slate-400" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+                        </button>
+                    </div>
 
                     <div id="image-input-container">
                         <div class="relative w-full">
                             <div id="upload-placeholder" class="w-full min-h-[11rem] bg-white border-2 border-dashed border-slate-300 p-4 flex flex-col items-center justify-center transition-colors rounded-2xl shadow-sm">
                                 <p class="text-xs uppercase font-bold tracking-wider text-slate-400 mb-4">Görsel kaynağını seç</p>
                                 <div class="flex gap-3 w-full max-w-[280px]">
-    <!-- Galeri Butonu -->
-    <label class="flex-1 bg-rose-600 hover:bg-rose-700 text-white py-3 flex justify-center items-center text-xs font-bold uppercase cursor-pointer transition-colors rounded-xl shadow-sm">
-        GALERİ
-        <input type="file" id="q-image-gallery" accept="image/*" class="hidden">
-    </label>
-    <!-- Kamera Butonu -->
-    <label class="flex-1 bg-cyan-500 hover:bg-cyan-600 text-white py-3 flex justify-center items-center text-xs font-bold uppercase cursor-pointer transition-colors rounded-xl shadow-sm">
-        KAMERA
-        <input type="file" id="q-image-camera" accept="image/*" capture="environment" class="hidden">
-    </label>
-</div>
+                                    <label class="flex-1 bg-rose-600 hover:bg-rose-700 text-white py-3 flex justify-center items-center text-xs font-bold uppercase cursor-pointer transition-colors rounded-xl shadow-sm">
+                                        GALERİ
+                                        <input type="file" id="q-image-gallery" accept="image/*" class="hidden">
+                                    </label>
+                                    <label class="flex-1 bg-cyan-500 hover:bg-cyan-600 text-white py-3 flex justify-center items-center text-xs font-bold uppercase cursor-pointer transition-colors rounded-xl shadow-sm">
+                                        KAMERA
+                                        <input type="file" id="q-image-camera" accept="image/*" capture="environment" class="hidden">
+                                    </label>
+                                </div>
                             </div>
 
                             <div id="editor-area" class="hidden flex flex-col items-center bg-white border border-slate-300 mt-2 p-3 relative w-full rounded-2xl shadow-sm">
@@ -291,7 +341,6 @@
                                     <button type="button" id="btn-crop-ok" onclick="finishCrop()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 text-xs font-bold uppercase rounded-xl shadow-sm">Kırpmayı Onayla</button>
                                     
                                     <div id="upload-zoom-ui" class="hidden flex-col items-center gap-2 w-full">
-                                        <!-- Büyüt/Küçült butonları kaldırıldı -->
                                         <div class="flex gap-2 justify-center flex-wrap">
                                             <button type="button" id="btn-up-move" onclick="setUploadDrawMode('move')" class="bg-amber-500 text-white px-4 py-2 text-xs font-bold uppercase rounded-xl border border-amber-500">Kaydır</button>
                                             <button type="button" id="btn-up-pen" onclick="setUploadDrawMode('pen')" class="bg-indigo-600 text-white px-4 py-2 text-xs font-bold uppercase rounded-xl border border-indigo-600">
@@ -317,15 +366,45 @@
                         </div>
                     </div>
 
-                    <!-- Yazılı Soru Kutusu -->
                     <div id="q-text-question-container" class="hidden">
                         <label class="block text-xs font-bold text-indigo-700 uppercase mb-2">Yazılı Soru Kutusu</label>
                         <textarea id="q-text-question" placeholder="SORU METNİNİ BURAYA YAZINIZ..." class="w-full bg-white p-3.5 border border-slate-300 outline-none focus:border-indigo-600 text-slate-800 text-xs font-semibold h-20 rounded-xl resize-none uppercase tracking-wide shadow-sm"></textarea>
                     </div>
 
+                    <!-- YENİ NOT ALANI -->
                     <div>
-                        <label id="label-note-text" class="block text-xs font-bold text-slate-600 uppercase mb-2">Not</label>
-                        <textarea id="q-note" placeholder="METİN GİR..." class="w-full bg-white p-3.5 border border-slate-300 outline-none focus:border-indigo-600 text-slate-800 text-xs font-semibold h-20 rounded-xl resize-none uppercase tracking-wide shadow-sm"></textarea>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Not</label>
+                        <!-- Not tipi seçim butonları (sadece soru eklerken görünür) -->
+                        <div id="note-type-toggle" class="flex gap-3 mb-2 bg-slate-200 p-1.5 rounded-2xl hidden">
+                            <button type="button" onclick="setNoteInputType('text')" id="btn-note-type-text" class="flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold uppercase transition-all rounded-xl">Metin</button>
+                            <button type="button" onclick="setNoteInputType('image')" id="btn-note-type-image" class="flex-1 text-slate-600 py-2 text-xs font-bold uppercase transition-all hover:text-indigo-600 rounded-xl">Görsel</button>
+                        </div>
+                        <!-- Metin not alanı -->
+                        <div id="note-text-area">
+                            <textarea id="q-note" placeholder="METİN GİR..." class="w-full bg-white p-3.5 border border-slate-300 outline-none focus:border-indigo-600 text-slate-800 text-xs font-semibold h-20 rounded-xl resize-none uppercase tracking-wide shadow-sm"></textarea>
+                        </div>
+                        <!-- Görsel not alanı -->
+                        <div id="note-image-area" class="hidden">
+                            <div class="relative w-full">
+                                <div id="note-upload-placeholder" class="w-full min-h-[8rem] bg-white border-2 border-dashed border-slate-300 p-4 flex flex-col items-center justify-center transition-colors rounded-2xl shadow-sm">
+                                    <p class="text-xs uppercase font-bold tracking-wider text-slate-400 mb-4">Not Görseli Yükle</p>
+                                    <div class="flex gap-3 w-full max-w-[280px]">
+                                        <label class="flex-1 bg-rose-600 hover:bg-rose-700 text-white py-3 flex justify-center items-center text-xs font-bold uppercase cursor-pointer transition-colors rounded-xl shadow-sm">
+                                            GALERİ
+                                            <input type="file" id="note-image-gallery" accept="image/*" class="hidden">
+                                        </label>
+                                        <label class="flex-1 bg-cyan-500 hover:bg-cyan-600 text-white py-3 flex justify-center items-center text-xs font-bold uppercase cursor-pointer transition-colors rounded-xl shadow-sm">
+                                            KAMERA
+                                            <input type="file" id="note-image-camera" accept="image/*" capture="environment" class="hidden">
+                                        </label>
+                                    </div>
+                                </div>
+                                <div id="note-image-preview-area" class="hidden flex flex-col items-center bg-white border border-slate-300 mt-2 p-3 relative w-full rounded-2xl shadow-sm">
+                                    <img id="note-image-preview" class="max-w-full max-h-48 object-contain rounded-lg" alt="Not Görseli">
+                                    <button type="button" onclick="clearNoteImage()" class="absolute top-2 right-2 bg-rose-600 hover:bg-rose-700 text-white w-8 h-8 flex items-center justify-center text-xs font-bold rounded-full z-10 shadow-md">X</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div id="question-specific-area" class="space-y-4">
@@ -366,7 +445,7 @@
                 </div>
                 
                 <div class="mb-2">
-                    <button onclick="openCampSetup('questions')" class="w-full btn-cyber-yellow bg-amber-50 border border-amber-200 text-amber-600 hover:bg-amber-500 hover:text-white py-2.5 font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2 rounded-xl shadow-sm">
+                    <button id="btn-random-camp" onclick="openCampSetup('questions')" class="w-full btn-cyber-yellow bg-amber-50 border border-amber-200 text-amber-600 hover:bg-amber-500 hover:text-white py-2.5 font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2 rounded-xl shadow-sm">
                         Rastgele Kamp
                     </button>
                 </div>
@@ -376,7 +455,6 @@
                     <button type="button" onclick="setArchiveDataType('note')" id="btn-arch-type-n" class="flex-1 text-slate-600 py-2 text-xs font-bold uppercase transition-all hover:text-amber-600 rounded-xl">Notlarım</button>
                 </div>
 
-                <!-- Açılır Filtre Alanı -->
                 <div class="space-y-3 mb-2">
                     <button onclick="toggleArchiveFilters()" type="button" class="w-full bg-white border border-slate-200 p-3.5 rounded-2xl flex justify-between items-center text-xs font-bold text-slate-700 uppercase tracking-wider shadow-sm hover:bg-slate-50 transition-colors">
                         <span class="flex items-center gap-2">
@@ -408,29 +486,10 @@
                 </div>
 
                 <div class="bg-white border border-slate-200 p-5 space-y-4 relative overflow-hidden rounded-2xl shadow-sm">
-                    <div class="absolute top-0 left-0 w-1.5 h-full bg-blue-500"></div>
-                    <h3 class="font-bold text-xs text-blue-600 uppercase tracking-wider">Derslerim</h3>
-                    <div class="flex gap-2">
-                        <input type="text" id="new-course-input" placeholder="YENİ DERS (ÖRN: BİYOLOJİ)" class="flex-1 bg-slate-50 p-3 border border-slate-300 outline-none focus:border-blue-500 text-xs font-bold uppercase tracking-wider rounded-xl text-slate-800">
-                        <button onclick="addCourse()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 font-bold uppercase text-xs rounded-xl transition-colors shadow-sm">EKLE</button>
-                    </div>
-                    <div id="course-manage-list" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
-                </div>
-
-                <div class="bg-white border border-slate-200 p-5 space-y-4 relative overflow-hidden rounded-2xl shadow-sm">
-                    <div class="absolute top-0 left-0 w-1.5 h-full bg-emerald-500"></div>
-                    <h3 class="font-bold text-xs text-emerald-600 uppercase tracking-wider">Konularım</h3>
-                    <input type="hidden" id="settings-course" value="">
-<button type="button" id="btn-settings-course" onclick="openPickerForSettings('course')"
-        class="w-full bg-slate-50 p-3 border border-slate-300 rounded-xl shadow-sm text-left flex justify-between items-center uppercase text-sm font-semibold text-slate-700 hover:border-emerald-500 transition-colors">
-    <span id="btn-settings-course-text">Ders Seçiniz</span>
-    <svg class="w-4 h-4 fill-slate-400" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
-</button>
-                    <div class="flex gap-2">
-                        <input type="text" id="new-topic-input" placeholder="YENİ KONU (ÖRN: HÜCRE)" class="flex-1 bg-slate-50 p-3 border border-slate-300 outline-none focus:border-emerald-500 text-xs font-bold uppercase tracking-wider rounded-xl text-slate-800">
-                        <button onclick="addTopic()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 font-bold uppercase text-xs rounded-xl transition-colors shadow-sm">EKLE</button>
-                    </div>
-                    <div id="topic-manage-list" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
+                    <div class="absolute top-0 left-0 w-1.5 h-full bg-indigo-600"></div>
+                    <h3 class="font-bold text-xs text-indigo-600 uppercase tracking-wider">Alan Yönetimi</h3>
+                    <p class="text-xs text-slate-500">Seçili alan: <span id="current-field-label" class="font-bold text-indigo-600">-</span></p>
+                    <button onclick="openFieldChangeModal()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 font-bold text-xs uppercase rounded-xl transition-colors shadow-sm">Alan Değiştir</button>
                 </div>
 
                 <div class="bg-white border border-slate-200 p-5 space-y-4 relative overflow-hidden rounded-2xl shadow-sm">
@@ -467,14 +526,22 @@
                 
                 <div id="review-question-text" class="w-full bg-white border border-slate-200 p-2.5 text-xs text-slate-800 font-bold uppercase hidden tracking-wide text-center max-h-20 overflow-y-auto rounded-xl shadow-sm shrink-0"></div>
                 
-                <div id="review-frame-box" class="relative max-w-full flex-1 min-h-[120px] max-h-[48vh] border border-slate-200 shadow-md bg-white overflow-auto w-full p-1.5 text-center rounded-xl flex items-center justify-center transition-all">
-                    <div id="review-zoom-wrapper" class="relative inline-block max-w-full max-h-full transition-transform duration-200 origin-center">
-                        <img id="review-img" src="" onclick="openLightbox(this.src)" class="max-w-full max-h-[45vh] object-contain cursor-zoom-in block pointer-events-auto rounded-lg">
-                        <canvas id="review-draw-canvas" class="absolute top-0 left-0 w-full h-full pointer-events-none"></canvas>
-                    </div>
-                </div>
+                <div id="review-frame-box" class="relative max-w-full flex-1 min-h-[120px] max-h-[48vh] border border-slate-200 shadow-md bg-white w-full rounded-xl overflow-hidden" style="perspective: 1000px;">
+    <div id="review-flip-inner" class="review-flip-inner">
+        <!-- Ön Yüz: Soru Görseli / Çizim Alanı -->
+        <div id="review-flip-front" class="review-flip-face review-flip-front p-1.5 bg-white">
+            <div id="review-zoom-wrapper" class="relative inline-block max-w-full max-h-full transition-transform duration-200 origin-center">
+                <img id="review-img" src="" onclick="openLightbox(this.src)" class="max-w-full max-h-[45vh] object-contain cursor-zoom-in block pointer-events-auto rounded-lg">
+                <canvas id="review-draw-canvas" class="absolute top-0 left-0 w-full h-full pointer-events-none"></canvas>
+            </div>
+        </div>
+        <!-- Arka Yüz: Not Alanı -->
+        <div id="review-flip-back" class="review-flip-face review-flip-back p-3">
+            <div id="review-note-content" class="w-full text-xs font-semibold uppercase tracking-wide text-amber-800"></div>
+        </div>
+    </div>
+</div>
 
-                <!-- Manuel İlerleme İçin Ok Tuşları -->
                 <div id="review-nav-arrows" class="flex justify-between items-center w-full px-1 py-1 gap-3 shrink-0">
                     <button onclick="navigateReview(-1)" id="btn-rev-prev" class="flex-1 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 py-2.5 px-3 text-xs font-extrabold rounded-xl shadow-sm transition-colors flex items-center justify-center gap-2">
                         <span>◄</span> <span>Önceki</span>
@@ -484,8 +551,13 @@
                     </button>
                 </div>
 
-                <!-- Doğru/Yanlış Arka Plan Geribildirim Alanı (artık kullanılmıyor, gizli kalacak) -->
                 <div id="review-feedback-box" class="w-full p-3 text-xs font-extrabold text-center rounded-xl hidden transition-colors shadow-sm shrink-0"></div>
+
+                <!-- NOT GÖSTERME BUTONU VE ALANI -->
+                <div id="review-note-toggle-container" class="w-full flex justify-center shrink-0">
+                    <button id="review-note-toggle-btn" onclick="toggleReviewNote()" class="bg-amber-100 text-amber-800 border border-amber-300 px-4 py-2 rounded-xl text-xs font-bold uppercase shadow-sm hidden">Notu Göster</button>
+                </div>
+                <div id="review-note-box" class="w-full bg-amber-50 border border-amber-200 p-2.5 text-xs text-amber-800 font-semibold uppercase hidden tracking-wide overflow-y-auto max-h-40 rounded-xl text-center shadow-sm shrink-0"></div>
 
                 <div id="review-draw-tools" class="flex flex-col gap-1.5 hidden items-center w-full shrink-0">
                     <div class="flex gap-1.5 justify-center flex-wrap">
@@ -508,8 +580,6 @@
                         <button type="button" onclick="setReviewPenSize(12)" id="btn-rev-size-12" class="px-2 py-0.5 inline-flex items-center justify-center bg-slate-200 text-slate-600 border border-slate-300 rounded-lg"><span class="rounded-full bg-current w-[12px] h-[12px]"></span></button>
                     </div>
                 </div>
-
-                <div id="review-note-box" class="w-full bg-amber-50 border border-amber-200 p-2.5 text-xs text-amber-800 font-semibold uppercase hidden tracking-wide overflow-y-auto max-h-20 rounded-xl text-center shadow-sm shrink-0"></div>
             </div>
 
             <div class="bg-white p-3 border-t border-slate-200 shrink-0 space-y-3">
@@ -548,18 +618,19 @@
                 </div>
             </div>
         </div>
+
         <!-- Ders/Konu Seçim Penceresi -->
-<div id="picker-modal" class="modal-animate absolute inset-0 bg-slate-100/80 backdrop-blur-sm z-50 hidden flex flex-col items-center justify-center p-4">
-    <div class="bg-white w-full max-w-xs rounded-3xl shadow-2xl p-5 flex flex-col max-h-[70vh]">
-        <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-3">
-            <h3 id="picker-title" class="text-indigo-700 font-extrabold text-sm uppercase tracking-wider">Seçim Yap</h3>
-            <button onclick="closePicker()" class="text-slate-400 hover:text-slate-600 p-1">
-                <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-            </button>
+        <div id="picker-modal" class="modal-animate absolute inset-0 bg-slate-100/80 backdrop-blur-sm z-50 hidden flex flex-col items-center justify-center p-4">
+            <div class="bg-white w-full max-w-xs rounded-3xl shadow-2xl p-5 flex flex-col max-h-[70vh]">
+                <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-3">
+                    <h3 id="picker-title" class="text-indigo-700 font-extrabold text-sm uppercase tracking-wider">Seçim Yap</h3>
+                    <button onclick="closePicker()" class="text-slate-400 hover:text-slate-600 p-1">
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                    </button>
+                </div>
+                <div id="picker-list" class="overflow-y-auto flex-1 space-y-1 pr-1"></div>
+            </div>
         </div>
-        <div id="picker-list" class="overflow-y-auto flex-1 space-y-1 pr-1"></div>
-    </div>
-</div>
 
         <div id="camp-review-modal" class="modal-animate absolute inset-0 bg-slate-50 z-50 hidden flex flex-col rounded-none">
             <div class="flex justify-between items-center bg-white p-4 border-b border-indigo-100 shadow-sm" id="camp-header">
@@ -582,7 +653,6 @@
                 </div>
 
                 <div id="camp-review-draw-tools" class="flex flex-col gap-2 mt-3 items-center w-full">
-                    <!-- Büyüt/Küçült butonları kaldırıldı -->
                     <div class="flex gap-1.5 justify-center flex-wrap">
                         <button onclick="setCampReviewDrawMode('move')" id="camp-rev-btn-move" class="bg-amber-500 text-white px-3 py-1.5 text-xs font-bold uppercase rounded-xl border border-amber-500 shadow-sm">Kaydır</button>
                         <button onclick="setCampReviewDrawMode('pen')" id="camp-rev-btn-pen" class="bg-slate-200 text-slate-700 px-3 py-1.5 text-xs font-bold uppercase rounded-xl border border-slate-300 shadow-sm">
@@ -630,6 +700,10 @@
                     <div id="dot-step-1" class="w-4 h-1.5 rounded-full bg-indigo-600 transition-all"></div>
                     <div id="dot-step-2" class="w-1.5 h-1.5 rounded-full bg-slate-300 transition-all"></div>
                     <div id="dot-step-3" class="w-1.5 h-1.5 rounded-full bg-slate-300 transition-all"></div>
+                    <div id="dot-step-4" class="w-1.5 h-1.5 rounded-full bg-slate-300 transition-all"></div>
+                    <div id="dot-step-5" class="w-1.5 h-1.5 rounded-full bg-slate-300 transition-all"></div>
+                    <div id="dot-step-6" class="w-1.5 h-1.5 rounded-full bg-slate-300 transition-all"></div>
+                    <div id="dot-step-7" class="w-1.5 h-1.5 rounded-full bg-slate-300 transition-all"></div>
                 </div>
 
                 <h3 id="onboarding-title" class="text-indigo-950 font-extrabold text-lg uppercase tracking-tight mb-2"></h3>
@@ -645,37 +719,36 @@
         </div>
         
         <!-- ANA EKRANA EKLE MODALI -->
-<div id="install-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[90] hidden flex justify-center items-center p-4">
-    <div class="modal-animate bg-white border border-slate-200 w-full max-w-sm p-6 rounded-3xl shadow-2xl flex flex-col items-center text-center relative overflow-hidden">
-        
-        <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mb-4 shadow-inner">
-            <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm0 3.45l8.15 14.1H3.85L12 5.45zM11 10h2v4h-2zm0 5h2v2h-2z"/></svg>
-        </div>
+        <div id="install-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[90] hidden flex justify-center items-center p-4">
+            <div class="modal-animate bg-white border border-slate-200 w-full max-w-sm p-6 rounded-3xl shadow-2xl flex flex-col items-center text-center relative overflow-hidden">
+                
+                <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mb-4 shadow-inner">
+                    <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm0 3.45l8.15 14.1H3.85L12 5.45zM11 10h2v4h-2zm0 5h2v2h-2z"/></svg>
+                </div>
 
-        <h3 id="install-title" class="text-indigo-950 font-extrabold text-lg uppercase tracking-tight mb-2">Ana Ekrana Ekle</h3>
-        <p id="install-desc" class="text-slate-600 text-xs leading-relaxed font-medium mb-5">
-            Uygulamayı ana ekranınıza ekleyerek daha hızlı erişebilirsiniz.
-        </p>
+                <h3 id="install-title" class="text-indigo-950 font-extrabold text-lg uppercase tracking-tight mb-2">Ana Ekrana Ekle</h3>
+                <p id="install-desc" class="text-slate-600 text-xs leading-relaxed font-medium mb-5">
+                    Uygulamayı ana ekranına ekleyerek daha hızlı erişebilirsin.
+                </p>
 
-        <!-- Önizleme alanı (iOS için görsel/içerik buraya gelecek) -->
-        <div id="install-preview" class="w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl mb-6 text-left"></div>
+                <div id="install-preview" class="w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl mb-6 text-left"></div>
 
-        <div class="w-full flex flex-col gap-2">
-            <button id="btn-install-accept" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 font-bold text-xs uppercase rounded-xl shadow-md transition-all">
-                Ana Ekrana Ekle
-            </button>
-            <div class="flex gap-2">
-                <button id="btn-install-cancel" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-500 py-3 font-bold text-xs uppercase rounded-xl transition-colors">
-                    İptal
-                </button>
-                <button id="btn-install-never" class="flex-1 bg-rose-100 hover:bg-rose-200 text-rose-600 py-3 font-bold text-xs uppercase rounded-xl transition-colors">
-                    Bir Daha Gösterme
-                </button>
+                <div class="w-full flex flex-col gap-2">
+                    <button id="btn-install-accept" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 font-bold text-xs uppercase rounded-xl shadow-md transition-all">
+                        Ana Ekrana Ekle
+                    </button>
+                    <div class="flex gap-2">
+                        <button id="btn-install-cancel" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-500 py-3 font-bold text-xs uppercase rounded-xl transition-colors">
+                            İptal
+                        </button>
+                        <button id="btn-install-never" class="flex-1 bg-rose-100 hover:bg-rose-200 text-rose-600 py-3 font-bold text-xs uppercase rounded-xl transition-colors">
+                            Bir Daha Gösterme
+                        </button>
+                    </div>
+                </div>
+
             </div>
         </div>
-
-    </div>
-</div>
 
         <!-- SABİT ALT NAVİGASYON -->
         <nav id="bottom-nav" class="bg-white border-t border-slate-200 h-[76px] flex items-center justify-around z-20 rounded-t-2xl shadow-lg shrink-0 relative">
@@ -708,7 +781,103 @@
       </div>
     </div>
 
+    <!-- KODU GİR MODAL -->
+    <div id="code-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[110] hidden flex justify-center items-center p-4">
+        <div class="modal-animate bg-white border border-slate-200 w-full max-w-sm p-6 rounded-3xl shadow-2xl flex flex-col items-center text-center">
+            <h3 class="text-indigo-600 font-bold text-base uppercase mb-3">Tam Sürüme Geç</h3>
+            <p class="text-slate-500 text-xs uppercase tracking-wide mb-4">Shopier'den şifre aldıysan buradan gir</p>
+            
+            <a href="https://shopier.com/senin-linkin" target="_blank" class="mb-4 px-4 py-2 bg-amber-100 text-amber-700 font-bold text-xs uppercase rounded-xl hover:bg-amber-200 transition-colors">
+                Şifre Satın Al (Shopier)
+            </a>
+            
+            <input type="text" id="code-input" placeholder="Şifreniz..." class="w-full bg-slate-50 p-3.5 border border-slate-300 outline-none focus:border-indigo-600 text-slate-800 font-bold uppercase tracking-wider transition-colors rounded-xl shadow-sm mb-3">
+            <div class="flex gap-3 w-full">
+                <button onclick="closeCodeModal()" class="flex-1 bg-slate-100 border border-slate-300 text-slate-600 py-3 font-bold uppercase hover:bg-slate-200 transition-colors rounded-xl shadow-sm">Vazgeç</button>
+                <button onclick="submitCode()" class="flex-1 bg-indigo-600 text-white py-3 font-bold uppercase hover:bg-indigo-700 transition-colors rounded-xl shadow-sm">Giriş Yap</button>
+            </div>
+            <p id="code-error-msg" style="color: red; font-weight: bold; margin-top: 10px;"></p>
+        </div>
+    </div>
+
+    <!-- Alan Seçim Modalı -->
+    <div id="field-select-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[120] hidden flex justify-center items-center p-4">
+        <div class="modal-animate bg-white border border-slate-200 w-full max-w-sm p-6 rounded-3xl shadow-2xl flex flex-col items-center text-center">
+            <h3 class="text-indigo-600 font-bold text-base uppercase mb-3">Alanını Seç</h3>
+            <p class="text-slate-500 text-xs uppercase tracking-wide mb-5">Hangi alanda ilerlemek istiyorsun?</p>
+            <div class="grid grid-cols-1 gap-3 w-full">
+                <button onclick="changeField('sayisal')" class="field-option-btn w-full py-4 rounded-2xl border-2 border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 transition-all font-bold uppercase text-slate-700" data-field="sayisal">Sayısal</button>
+                <button onclick="changeField('esitagirlik')" class="field-option-btn w-full py-4 rounded-2xl border-2 border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 transition-all font-bold uppercase text-slate-700" data-field="esitagirlik">Eşit Ağırlık</button>
+                <button onclick="changeField('sozel')" class="field-option-btn w-full py-4 rounded-2xl border-2 border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 transition-all font-bold uppercase text-slate-700" data-field="sozel">Sözel</button>
+                <button onclick="changeField('dil')" class="field-option-btn w-full py-4 rounded-2xl border-2 border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 transition-all font-bold uppercase text-slate-700" data-field="dil">Dil</button>
+            </div>
+            <button onclick="closeFieldModal()" class="mt-5 w-full bg-slate-100 hover:bg-slate-200 text-slate-500 py-3 font-bold text-xs uppercase rounded-xl transition-colors">İptal</button>
+        </div>
+    </div>
+
     <script>
+        // ========== ALANLARA GÖRE DERS VE KONU LİSTELERİ ==========
+        const FIELD_COURSES = {
+            "sayisal": {
+                "AYT MATEMATİK": ["Temel Kavramlar", "Sayı Basamakları", "Bölme ve Bölünebilme", "EBOB - EKOK", "Rasyonel Sayılar", "Basit Eşitsizlikler", "Mutlak Değer", "Üslü Sayılar", "Köklü Sayılar", "Çarpanlara Ayırma", "Oran Orantı", "Denklem Çözme", "Problemler", "Kümeler", "Kartezyen Çarpım", "Mantık", "Fonksiyonlar", "Polinomlar", "2.Dereceden Denklemler", "Permütasyon ve Kombinasyon", "Binom ve Olasılık", "İstatistik", "Karmaşık Sayılar", "2.Dereceden Eşitsizlikler", "Parabol", "Trigonometri", "Logaritma", "Diziler", "Limit", "Türev", "İntegral"],
+                "AYT FİZİK": ["Vektörler", "Kuvvet, Tork ve Denge", "Kütle Merkezi", "Basit Makineler", "Hareket", "Newton’un Hareket Yasaları", "İş, Güç ve Enerji II", "Atışlar", "İtme ve Momentum", "Elektrik Alan ve Potansiyel", "Paralel Levhalar ve Sığa", "Manyetik Alan ve Manyetik Kuvvet", "İndüksiyon, Alternatif Akım ve Transformatörler", "Çembersel Hareket", "Dönme, Yuvarlanma ve Açısal Momentum", "Kütle Çekim ve Kepler Yasaları", "Basit Harmonik Hareket", "Dalga Mekaniği ve Elektromanyetik Dalgalar", "Atom Modelleri", "Büyük Patlama ve Parçacık Fiziği", "Radyoaktivite", "Özel Görelilik", "Kara Cisim Işıması", "Fotoelektrik Olay ve Compton Olayı", "Modern Fiziğin Teknolojideki Uygulamaları"],
+                "AYT KİMYA": ["Kimya Bilimi", "Atom ve Periyodik Sistem", "Kimyasal Türler Arası Etkileşimler", "Kimyasal Hesaplamalar", "Kimyanın Temel Kanunları", "Asit, Baz ve Tuz", "Maddenin Halleri", "Karışımlar", "Doğa ve Kimya", "Kimya Her Yerde", "Modern Atom Teorisi", "Gazlar", "Sıvı Çözeltiler", "Kimyasal Tepkimelerde Enerji", "Kimyasal Tepkimelerde Hız", "Kimyasal Tepkimelerde Denge", "Asit-Baz Dengesi", "Çözünürlük Dengesi", "Kimya ve Elektrik", "Organik Kimyaya Giriş", "Organik Kimya", "Enerji Kaynakları ve Bilimsel Gelişmeler"],
+                "AYT BİYOLOJİ": ["Sinir Sistemi", "Endokrin Sistem ve Hormonlar", "Duyu Organları", "Destek ve Hareket Sistemi", "Sindirim Sistemi", "Dolaşım ve Bağışıklık Sistemi", "Solunum Sistemi", "Üriner Sistem (Boşaltım)", "Üreme Sistemi ve Embriyonik Gelişim", "Komünite Ekolojisi", "Popülasyon Ekolojisi", "Genden Proteine", "Canlılarda Enerji Dönüşümleri", "Bitki Biyolojisi", "Canlılar ve Çevre"],
+                "TYT TÜRKÇE": ["Sözcükte Anlam", "Cümlede Anlam", "Paragrafta Anlam", "Ses Bilgisi", "Sözcükte Yapı", "Sözcük Türleri", "Cümlenin Ögeleri", "Fiilde Çatı", "Cümle Türleri", "Yazım Kuralları", "Noktalama İşaretleri", "Anlatım Bozuklukları"],
+                "TYT TARİH": ["Tarih Bilimi ve İlk Çağ Uygarlıkları", "İlk ve Orta Çağlarda Türk Dünyası", "İslam Medeniyeti ve Türk-İslam Devletleri", "Osmanlı Devleti ve Kültür Medeniyeti", "20. Yüzyıl Başlarında Osmanlı Devleti", "Milli Mücadele Dönemi", "Atatürk İnkılapları ve İlkeleri", "Atatürk Dönemi Türk Dış Politikası"],
+                "TYT COĞRAFYA": ["Doğa ve İnsan", "Dünyanın Şekli ve Coğrafi Konum", "Harita Bilgisi", "İklim Bilgisi", "Yer Şekilleri", "Su, Toprak ve Bitkiler", "Nüfus, Yerleşme ve Göç", "Bölge Kavramı ve Ulaşım", "Doğal Afetler ve Çevre"],
+                "TYT FELSEFE": ["Felsefeyi Tanıma", "Bilgi Felsefesi", "Varlık Felsefesi", "Ahlak Felsefesi", "Sanat Felsefesi", "Siyaset Felsefesi", "Din Felsefesi", "Bilim Felsefesi"],
+                "TYT DİN KÜLTÜRÜ": ["Bilgi ve İnanç", "İbadetler", "Ahlak ve Değerler", "Hz. Muhammed", "Vahiy ve Akıl", "İslam Düşüncesinde Yorumlar ve Mezhepler", "Din, Kültür ve Medeniyet"],
+                "TYT MATEMATİK": ["Temel Kavramlar", "Sayı Basamakları", "Bölme ve Bölünebilme", "EBOB - EKOK", "Rasyonel Sayılar", "Basit Eşitsizlikler", "Mutlak Değer", "Üslü Sayılar", "Köklü Sayılar", "Çarpanlara Ayırma", "Oran - Orantı", "Denklem Çözme", "Problemler", "Kümeler ve Kartezyen Çarpım", "Mantık", "Fonksiyonlar", "Polinomlar", "İkinci Dereceden Denklemler", "Permütasyon ve Kombinasyon", "Olasılık", "Veri ve İstatistik"],
+                "TYT FİZİK": ["Fizik Bilimine Giriş", "Madde ve Özellikleri", "Sıvıların Kaldırma Kuvveti", "Basınç", "Isı, Sıcaklık ve Genleşme", "Hareket ve Kuvvet", "Dinamik", "İş, Güç ve Enerji", "Elektrik", "Manyetizma", "Dalgalar", "Optik"],
+                "TYT KİMYA": ["Kimya Bilimi", "Atom ve Periyodik Sistem", "Kimyasal Türler Arası Etkileşimler", "Maddenin Hâlleri", "Doğa ve Kimya", "Kimyanın Temel Kanunları", "Kimyasal Hesaplamalar", "Karışımlar", "Asitler, Bazlar ve Tuzlar", "Kimya Her Yerde"],
+                "TYT BİYOLOJİ": ["Canlıların Ortak Özellikleri", "Canlıların Temel Bileşenleri", "Hücre ve Organeller – Madde Geçişleri", "Canlıların Sınıflandırılması", "Hücrede Bölünme – Üreme", "Kalıtım", "Ekosistem", "Bitki Biyolojisi"]
+            },
+            "esitagirlik": {
+                "AYT MATEMATİK": ["Temel Kavramlar", "Sayı Basamakları", "Bölme ve Bölünebilme", "EBOB - EKOK", "Rasyonel Sayılar", "Basit Eşitsizlikler", "Mutlak Değer", "Üslü Sayılar", "Köklü Sayılar", "Çarpanlara Ayırma", "Oran Orantı", "Denklem Çözme", "Problemler", "Kümeler", "Kartezyen Çarpım", "Mantık", "Fonksiyonlar", "Polinomlar", "2.Dereceden Denklemler", "Permütasyon ve Kombinasyon", "Binom ve Olasılık", "İstatistik", "Karmaşık Sayılar", "2.Dereceden Eşitsizlikler", "Parabol", "Trigonometri", "Logaritma", "Diziler", "Limit", "Türev", "İntegral"],
+                "AYT EDEBİYAT": ["Anlam Bilgisi", "Dil Bilgisi", "Güzel Sanatlar ve Edebiyat", "Metinlerin Sınıflandırılması", "Şiir Bilgisi", "Edebi Sanatlar", "Türk Edebiyatı Dönemleri", "İslamiyet Öncesi Türk Edebiyatı ve Geçiş Dönemi", "Halk Edebiyatı", "Divan Edebiyatı", "Tanzimat Edebiyatı", "Servet-i Fünun Edebiyatı", "Fecr-i Ati Edebiyatı", "Milli Edebiyat", "Cumhuriyet Dönemi Edebiyatı", "Edebiyat Akımları", "Dünya Edebiyatı"],
+                "AYT TARİH": ["Tarih ve Zaman", "İnsanlığın İlk Dönemleri", "Orta Çağ’da Dünya", "İlk ve Orta Çağlarda Türk Dünyası", "İslam Medeniyetinin Doğuşu", "Türklerin İslamiyet’i Kabulü ve İlk Türk İslam Devletleri", "Yerleşme ve Devletleşme Sürecinde Selçuklu Türkiyesi", "Beylikten Devlete Osmanlı Siyaseti", "Devletleşme Sürecinde Savaşçılar ve Askerler", "Beylikten Devlete Osmanlı Medeniyeti", "Dünya Gücü Osmanlı", "Sultan ve Osmanlı Merkez Teşkilatı", "Klasik Çağda Osmanlı Toplum Düzeni", "Değişen Dünya Dengeleri Karşısında Osmanlı Siyaseti", "Değişim Çağında Avrupa ve Osmanlı", "Uluslararası İlişkilerde Denge Stratejisi (1774-1914)", "Devrimler Çağında Değişen Devlet-Toplum İlişkileri", "Sermaye ve Emek", "XIX. ve XX. Yüzyılda Değişen Gündelik Hayat", "XX. Yüzyıl Başlarında Osmanlı Devleti ve Dünya", "Milli Mücadele", "Atatürkçülük ve Türk İnkılabı", "İki Savaş Arasındaki Dönemde Türkiye ve Dünya", "II. Dünya Savaşı Sürecinde Türkiye ve Dünya", "II. Dünya Savaşı Sonrasında Türkiye ve Dünya", "Toplumsal Devrim Çağında Dünya ve Türkiye", "XXI. Yüzyılın Eşiğinde Türkiye ve Dünya"],
+                "AYT COĞRAFYA": ["Ekosistem Nüfus Politikaları", "Türkiye’de Nüfus ve Yerleşme", "Ekonomik Faaliyetler ve Doğal Kaynaklar", "Göç ve Şehirleşme", "Türkiye Ekonomisi", "Geçmişten Geleceğe Şehir ve Ekonomi", "Türkiye’nin İşlevsel Bölgeleri ve Kalkınma Projeleri", "Hizmet Sektörünün Ekonomideki Yeri", "Küresel Ticaret", "Bölgeler ve Ülkeler", "Çevre ve Toplum"],
+                "TYT TÜRKÇE": ["Sözcükte Anlam", "Cümlede Anlam", "Paragrafta Anlam", "Ses Bilgisi", "Sözcükte Yapı", "Sözcük Türleri", "Cümlenin Ögeleri", "Fiilde Çatı", "Cümle Türleri", "Yazım Kuralları", "Noktalama İşaretleri", "Anlatım Bozuklukları"],
+                "TYT TARİH": ["Tarih Bilimi ve İlk Çağ Uygarlıkları", "İlk ve Orta Çağlarda Türk Dünyası", "İslam Medeniyeti ve Türk-İslam Devletleri", "Osmanlı Devleti ve Kültür Medeniyeti", "20. Yüzyıl Başlarında Osmanlı Devleti", "Milli Mücadele Dönemi", "Atatürk İnkılapları ve İlkeleri", "Atatürk Dönemi Türk Dış Politikası"],
+                "TYT COĞRAFYA": ["Doğa ve İnsan", "Dünyanın Şekli ve Coğrafi Konum", "Harita Bilgisi", "İklim Bilgisi", "Yer Şekilleri", "Su, Toprak ve Bitkiler", "Nüfus, Yerleşme ve Göç", "Bölge Kavramı ve Ulaşım", "Doğal Afetler ve Çevre"],
+                "TYT FELSEFE": ["Felsefeyi Tanıma", "Bilgi Felsefesi", "Varlık Felsefesi", "Ahlak Felsefesi", "Sanat Felsefesi", "Siyaset Felsefesi", "Din Felsefesi", "Bilim Felsefesi"],
+                "TYT DİN KÜLTÜRÜ": ["Bilgi ve İnanç", "İbadetler", "Ahlak ve Değerler", "Hz. Muhammed", "Vahiy ve Akıl", "İslam Düşüncesinde Yorumlar ve Mezhepler", "Din, Kültür ve Medeniyet"],
+                "TYT MATEMATİK": ["Temel Kavramlar", "Sayı Basamakları", "Bölme ve Bölünebilme", "EBOB - EKOK", "Rasyonel Sayılar", "Basit Eşitsizlikler", "Mutlak Değer", "Üslü Sayılar", "Köklü Sayılar", "Çarpanlara Ayırma", "Oran - Orantı", "Denklem Çözme", "Problemler", "Kümeler ve Kartezyen Çarpım", "Mantık", "Fonksiyonlar", "Polinomlar", "İkinci Dereceden Denklemler", "Permütasyon ve Kombinasyon", "Olasılık", "Veri ve İstatistik"],
+                "TYT FİZİK": ["Fizik Bilimine Giriş", "Madde ve Özellikleri", "Sıvıların Kaldırma Kuvveti", "Basınç", "Isı, Sıcaklık ve Genleşme", "Hareket ve Kuvvet", "Dinamik", "İş, Güç ve Enerji", "Elektrik", "Manyetizma", "Dalgalar", "Optik"],
+                "TYT KİMYA": ["Kimya Bilimi", "Atom ve Periyodik Sistem", "Kimyasal Türler Arası Etkileşimler", "Maddenin Hâlleri", "Doğa ve Kimya", "Kimyanın Temel Kanunları", "Kimyasal Hesaplamalar", "Karışımlar", "Asitler, Bazlar ve Tuzlar", "Kimya Her Yerde"],
+                "TYT BİYOLOJİ": ["Canlıların Ortak Özellikleri", "Canlıların Temel Bileşenleri", "Hücre ve Organeller – Madde Geçişleri", "Canlıların Sınıflandırılması", "Hücrede Bölünme – Üreme", "Kalıtım", "Ekosistem", "Bitki Biyolojisi"]
+            },
+            "sozel": {
+                "AYT EDEBİYAT": ["Anlam Bilgisi", "Dil Bilgisi", "Güzel Sanatlar ve Edebiyat", "Metinlerin Sınıflandırılması", "Şiir Bilgisi", "Edebi Sanatlar", "Türk Edebiyatı Dönemleri", "İslamiyet Öncesi Türk Edebiyatı ve Geçiş Dönemi", "Halk Edebiyatı", "Divan Edebiyatı", "Tanzimat Edebiyatı", "Servet-i Fünun Edebiyatı", "Fecr-i Ati Edebiyatı", "Milli Edebiyat", "Cumhuriyet Dönemi Edebiyatı", "Edebiyat Akımları", "Dünya Edebiyatı"],
+                "AYT TARİH": ["Tarih ve Zaman", "İnsanlığın İlk Dönemleri", "Orta Çağ’da Dünya", "İlk ve Orta Çağlarda Türk Dünyası", "İslam Medeniyetinin Doğuşu", "Türklerin İslamiyet’i Kabulü ve İlk Türk İslam Devletleri", "Yerleşme ve Devletleşme Sürecinde Selçuklu Türkiyesi", "Beylikten Devlete Osmanlı Siyaseti", "Devletleşme Sürecinde Savaşçılar ve Askerler", "Beylikten Devlete Osmanlı Medeniyeti", "Dünya Gücü Osmanlı", "Sultan ve Osmanlı Merkez Teşkilatı", "Klasik Çağda Osmanlı Toplum Düzeni", "Değişen Dünya Dengeleri Karşısında Osmanlı Siyaseti", "Değişim Çağında Avrupa ve Osmanlı", "Uluslararası İlişkilerde Denge Stratejisi (1774-1914)", "Devrimler Çağında Değişen Devlet-Toplum İlişkileri", "Sermaye ve Emek", "XIX. ve XX. Yüzyılda Değişen Gündelik Hayat", "XX. Yüzyıl Başlarında Osmanlı Devleti ve Dünya", "Milli Mücadele", "Atatürkçülük ve Türk İnkılabı", "İki Savaş Arasındaki Dönemde Türkiye ve Dünya", "II. Dünya Savaşı Sürecinde Türkiye ve Dünya", "II. Dünya Savaşı Sonrasında Türkiye ve Dünya", "Toplumsal Devrim Çağında Dünya ve Türkiye", "XXI. Yüzyılın Eşiğinde Türkiye ve Dünya"],
+                "AYT COĞRAFYA": ["Ekosistem Nüfus Politikaları", "Türkiye’de Nüfus ve Yerleşme", "Ekonomik Faaliyetler ve Doğal Kaynaklar", "Göç ve Şehirleşme", "Türkiye Ekonomisi", "Geçmişten Geleceğe Şehir ve Ekonomi", "Türkiye’nin İşlevsel Bölgeleri ve Kalkınma Projeleri", "Hizmet Sektörünün Ekonomideki Yeri", "Küresel Ticaret", "Bölgeler ve Ülkeler", "Çevre ve Toplum"],
+                "AYT FELSEFE": ["Felsefe’nin Konusu", "Mantık Konuları", "Psikoloji Bilimini Tanıyalım", "Sosyolojiye Giriş"],
+                "AYT DİN KÜLTÜRÜ": ["Gönül Coğrafyamız", "İslam ve İbadet", "Allah İnsan İlişkisi", "Hz. Muhammed ve Gençlik", "Din ve Hayat", "Ahlaki Tutum ve Davranışlar", "İslam Düşüncesinde İtikadi, Siyasi ve Fıkhi Yorumlar", "Dünya ve Ahiret", "Kur’an’a Göre Hz. Muhammed", "Kur’an’da Bazı Kavramlar", "İnançla İlgili Meseleler", "Yahudilik ve Hristiyanlık", "İslam ve Bilim", "Anadolu’da İslam", "İslam Düşüncesinde Tasavvufi Yorumlar", "Güncel Dini Meseleler", "Hint ve Çin Dinleri"],
+                "TYT TÜRKÇE": ["Sözcükte Anlam", "Cümlede Anlam", "Paragrafta Anlam", "Ses Bilgisi", "Sözcükte Yapı", "Sözcük Türleri", "Cümlenin Ögeleri", "Fiilde Çatı", "Cümle Türleri", "Yazım Kuralları", "Noktalama İşaretleri", "Anlatım Bozuklukları"],
+                "TYT TARİH": ["Tarih Bilimi ve İlk Çağ Uygarlıkları", "İlk ve Orta Çağlarda Türk Dünyası", "İslam Medeniyeti ve Türk-İslam Devletleri", "Osmanlı Devleti ve Kültür Medeniyeti", "20. Yüzyıl Başlarında Osmanlı Devleti", "Milli Mücadele Dönemi", "Atatürk İnkılapları ve İlkeleri", "Atatürk Dönemi Türk Dış Politikası"],
+                "TYT COĞRAFYA": ["Doğa ve İnsan", "Dünyanın Şekli ve Coğrafi Konum", "Harita Bilgisi", "İklim Bilgisi", "Yer Şekilleri", "Su, Toprak ve Bitkiler", "Nüfus, Yerleşme ve Göç", "Bölge Kavramı ve Ulaşım", "Doğal Afetler ve Çevre"],
+                "TYT FELSEFE": ["Felsefeyi Tanıma", "Bilgi Felsefesi", "Varlık Felsefesi", "Ahlak Felsefesi", "Sanat Felsefesi", "Siyaset Felsefesi", "Din Felsefesi", "Bilim Felsefesi"],
+                "TYT DİN KÜLTÜRÜ": ["Bilgi ve İnanç", "İbadetler", "Ahlak ve Değerler", "Hz. Muhammed", "Vahiy ve Akıl", "İslam Düşüncesinde Yorumlar ve Mezhepler", "Din, Kültür ve Medeniyet"],
+                "TYT MATEMATİK": ["Temel Kavramlar", "Sayı Basamakları", "Bölme ve Bölünebilme", "EBOB - EKOK", "Rasyonel Sayılar", "Basit Eşitsizlikler", "Mutlak Değer", "Üslü Sayılar", "Köklü Sayılar", "Çarpanlara Ayırma", "Oran - Orantı", "Denklem Çözme", "Problemler", "Kümeler ve Kartezyen Çarpım", "Mantık", "Fonksiyonlar", "Polinomlar", "İkinci Dereceden Denklemler", "Permütasyon ve Kombinasyon", "Olasılık", "Veri ve İstatistik"],
+                "TYT FİZİK": ["Fizik Bilimine Giriş", "Madde ve Özellikleri", "Sıvıların Kaldırma Kuvveti", "Basınç", "Isı, Sıcaklık ve Genleşme", "Hareket ve Kuvvet", "Dinamik", "İş, Güç ve Enerji", "Elektrik", "Manyetizma", "Dalgalar", "Optik"],
+                "TYT KİMYA": ["Kimya Bilimi", "Atom ve Periyodik Sistem", "Kimyasal Türler Arası Etkileşimler", "Maddenin Hâlleri", "Doğa ve Kimya", "Kimyanın Temel Kanunları", "Kimyasal Hesaplamalar", "Karışımlar", "Asitler, Bazlar ve Tuzlar", "Kimya Her Yerde"],
+                "TYT BİYOLOJİ": ["Canlıların Ortak Özellikleri", "Canlıların Temel Bileşenleri", "Hücre ve Organeller – Madde Geçişleri", "Canlıların Sınıflandırılması", "Hücrede Bölünme – Üreme", "Kalıtım", "Ekosistem", "Bitki Biyolojisi"]
+            },
+            "dil": {
+                "AYT İNGİLİZCE": ["Vocabulary", "Grammar", "Cloze Test", "Sentence Completion", "Paragraph Comprehension", "Dialogue Completion", "Restatement", "Situation", "Paragraph Completion", "Translation Eng->Tur", "Translation Tur->Eng", "Irrelevant Sentence"],
+                "TYT TÜRKÇE": ["Sözcükte Anlam", "Cümlede Anlam", "Paragrafta Anlam", "Ses Bilgisi", "Sözcükte Yapı", "Sözcük Türleri", "Cümlenin Ögeleri", "Fiilde Çatı", "Cümle Türleri", "Yazım Kuralları", "Noktalama İşaretleri", "Anlatım Bozuklukları"],
+                "TYT TARİH": ["Tarih Bilimi ve İlk Çağ Uygarlıkları", "İlk ve Orta Çağlarda Türk Dünyası", "İslam Medeniyeti ve Türk-İslam Devletleri", "Osmanlı Devleti ve Kültür Medeniyeti", "20. Yüzyıl Başlarında Osmanlı Devleti", "Milli Mücadele Dönemi", "Atatürk İnkılapları ve İlkeleri", "Atatürk Dönemi Türk Dış Politikası"],
+                "TYT COĞRAFYA": ["Doğa ve İnsan", "Dünyanın Şekli ve Coğrafi Konum", "Harita Bilgisi", "İklim Bilgisi", "Yer Şekilleri", "Su, Toprak ve Bitkiler", "Nüfus, Yerleşme ve Göç", "Bölge Kavramı ve Ulaşım", "Doğal Afetler ve Çevre"],
+                "TYT FELSEFE": ["Felsefeyi Tanıma", "Bilgi Felsefesi", "Varlık Felsefesi", "Ahlak Felsefesi", "Sanat Felsefesi", "Siyaset Felsefesi", "Din Felsefesi", "Bilim Felsefesi"],
+                "TYT DİN KÜLTÜRÜ": ["Bilgi ve İnanç", "İbadetler", "Ahlak ve Değerler", "Hz. Muhammed", "Vahiy ve Akıl", "İslam Düşüncesinde Yorumlar ve Mezhepler", "Din, Kültür ve Medeniyet"],
+                "TYT MATEMATİK": ["Temel Kavramlar", "Sayı Basamakları", "Bölme ve Bölünebilme", "EBOB - EKOK", "Rasyonel Sayılar", "Basit Eşitsizlikler", "Mutlak Değer", "Üslü Sayılar", "Köklü Sayılar", "Çarpanlara Ayırma", "Oran - Orantı", "Denklem Çözme", "Problemler", "Kümeler ve Kartezyen Çarpım", "Mantık", "Fonksiyonlar", "Polinomlar", "İkinci Dereceden Denklemler", "Permütasyon ve Kombinasyon", "Olasılık", "Veri ve İstatistik"],
+                "TYT FİZİK": ["Fizik Bilimine Giriş", "Madde ve Özellikleri", "Sıvıların Kaldırma Kuvveti", "Basınç", "Isı, Sıcaklık ve Genleşme", "Hareket ve Kuvvet", "Dinamik", "İş, Güç ve Enerji", "Elektrik", "Manyetizma", "Dalgalar", "Optik"],
+                "TYT KİMYA": ["Kimya Bilimi", "Atom ve Periyodik Sistem", "Kimyasal Türler Arası Etkileşimler", "Maddenin Hâlleri", "Doğa ve Kimya", "Kimyanın Temel Kanunları", "Kimyasal Hesaplamalar", "Karışımlar", "Asitler, Bazlar ve Tuzlar", "Kimya Her Yerde"],
+                "TYT BİYOLOJİ": ["Canlıların Ortak Özellikleri", "Canlıların Temel Bileşenleri", "Hücre ve Organeller – Madde Geçişleri", "Canlıların Sınıflandırılması", "Hücrede Bölünme – Üreme", "Kalıtım", "Ekosistem", "Bitki Biyolojisi"]
+            }
+        };
+
         // GMT+3 Zaman Hesaplayıcıları
         function getNowTR() {
             const d = new Date();
@@ -803,19 +972,17 @@
         }
 
         let appState = {
-            categories: {
-                "TYT MATEMATİK": ["TEMEL KAVRAMLAR", "ÜSLÜ SAYILAR"],
-                "TYT FİZİK": ["DALGALAR", "OPTİK", "ISI SICAKLIK"],
-                "TYT TÜRKÇE": ["DİL BİLGİSİ", "PARAGRAF"]
-            },
+            categories: {},
             questions: [],
             notes: [],
-            intervals: [1, 3, 7, 20, 30],
+            intervals: [1, 3, 7, 21, 45, 90, 180],
             noteIntervals: [1, 3, 7, 21, 45, 90, 180],
             selectedCourses: [], 
             selectedTopics: [],
             autoDestroyThreshold: 5,
-            hasSeenOnboarding: false
+            hasSeenOnboarding: false,
+            authState: "none",   // "none", "trial", "full"
+            selectedField: null   // YENİ
         };
 
         let currentEntryType = 'question'; 
@@ -845,6 +1012,69 @@
         let zoomLevels = { upload: 1, review: 1, camp: 1 };
         let currentOnboardingStep = 1;
 
+        // YENİ DEĞİŞKENLER
+        let currentNoteInputType = 'text'; // 'text' veya 'image'
+        let noteImageDataUrl = null; // Not görseli dataURL
+
+        // Alan seçim fonksiyonları
+        function openFieldChangeModal() {
+            document.getElementById('field-select-modal').classList.remove('hidden');
+        }
+
+        function closeFieldModal() {
+            document.getElementById('field-select-modal').classList.add('hidden');
+        }
+
+        function changeField(fieldKey) {
+            if (!FIELD_COURSES[fieldKey]) return;
+            applyFieldSelection(fieldKey);
+            closeFieldModal();
+            showToast("Alan değiştirildi. Eski sorularınız ve notlarınız korundu.");
+        }
+
+        function applyFieldSelection(fieldKey) {
+            appState.selectedField = fieldKey;
+            appState.categories = JSON.parse(JSON.stringify(FIELD_COURSES[fieldKey]));
+
+            // Mevcut verilerdeki dersleri topla
+            const existingCourses = new Set();
+            appState.questions.forEach(q => existingCourses.add(q.course));
+            appState.notes.forEach(n => existingCourses.add(n.course));
+            const allCourses = Array.from(new Set([...Object.keys(appState.categories), ...existingCourses]));
+
+            const existingTopicKeys = new Set();
+            appState.questions.forEach(q => existingTopicKeys.add(q.course + '::' + q.topic));
+            appState.notes.forEach(n => existingTopicKeys.add(n.course + '::' + n.topic));
+            const allTopicKeys = Array.from(new Set([...Object.keys(appState.categories).flatMap(c => (appState.categories[c] || []).map(t => c + '::' + t)), ...existingTopicKeys]));
+
+            appState.selectedCourses = allCourses;
+            appState.selectedTopics = allTopicKeys;
+
+            // Arşiv filtrelerini tüm verilere göre ayarla
+            archSelectedCourses = Array.from(new Set([...allCourses, ...existingCourses]));
+            archSelectedTopics = Array.from(new Set(allTopicKeys));
+
+            // UI'yi güncelle
+            syncSystemUI();
+            saveState();
+        }
+
+        // Onboarding için alan seçimi
+        function selectFieldInOnboarding(fieldKey) {
+            if (!FIELD_COURSES[fieldKey]) return;
+            appState.selectedField = fieldKey;
+            // Buton stillerini güncelle
+            document.querySelectorAll('.onboarding-field-btn').forEach(btn => {
+                if (btn.dataset.field === fieldKey) {
+                    btn.className = "onboarding-field-btn w-full py-4 rounded-2xl border-2 border-indigo-600 bg-indigo-600 text-white transition-all font-bold uppercase";
+                } else {
+                    btn.className = "onboarding-field-btn w-full py-4 rounded-2xl border-2 border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 transition-all font-bold uppercase text-slate-700";
+                }
+            });
+            // Kategorileri hemen uygula (UI arka planda güncellenir)
+            applyFieldSelection(fieldKey);
+        }
+
         window.onload = async function() {
             try {
                 await initDB();
@@ -865,81 +1095,120 @@
                     appState = { ...appState, ...savedData };
                 }
                 
-                if(Object.keys(appState.categories).length > 0 && appState.selectedCourses.length === 0) {
-                    appState.selectedCourses = Object.keys(appState.categories);
+                // Alan seçimi yoksa, kategoriler boş kalır
+                if (appState.selectedField && FIELD_COURSES[appState.selectedField]) {
+                    appState.categories = JSON.parse(JSON.stringify(FIELD_COURSES[appState.selectedField]));
+                } else {
+                    appState.selectedField = null;
+                    appState.categories = {};
                 }
-                
-                if(!appState.selectedTopics || appState.selectedTopics.length === 0) {
-                    appState.selectedTopics = [];
-                    appState.selectedCourses.forEach(c => {
-                        if(appState.categories[c]) {
-                            appState.categories[c].forEach(t => appState.selectedTopics.push(c + '::' + t));
-                        }
+
+                // Seçili dersler ve konuları güncelle
+                if (appState.selectedField && Object.keys(appState.categories).length > 0) {
+                    if (appState.selectedCourses.length === 0) {
+                        appState.selectedCourses = Object.keys(appState.categories);
+                    }
+                    if (appState.selectedTopics.length === 0) {
+                        appState.selectedCourses.forEach(c => {
+                            (appState.categories[c] || []).forEach(t => appState.selectedTopics.push(c + '::' + t));
+                        });
+                    }
+                }
+
+                // Arşiv filtrelerini mevcut verilere göre ayarla
+                if (archSelectedCourses.length === 0) {
+                    const allCourses = new Set();
+                    const allTopics = new Set();
+                    appState.questions.forEach(q => { allCourses.add(q.course); allTopics.add(q.course + '::' + q.topic); });
+                    appState.notes.forEach(n => { allCourses.add(n.course); allTopics.add(n.course + '::' + n.topic); });
+                    archSelectedCourses = Array.from(allCourses);
+                    archSelectedTopics = Array.from(allTopics);
+                    // Ayrıca seçili alanın derslerini de ekle
+                    Object.keys(appState.categories).forEach(c => {
+                        if (!archSelectedCourses.includes(c)) archSelectedCourses.push(c);
+                        (appState.categories[c] || []).forEach(t => {
+                            const key = c + '::' + t;
+                            if (!archSelectedTopics.includes(key)) archSelectedTopics.push(key);
+                        });
                     });
                 }
 
-                if (archSelectedCourses.length === 0 && Object.keys(appState.categories).length > 0) {
-                    archSelectedCourses = Object.keys(appState.categories);
-                }
-                if (archSelectedTopics.length === 0) {
-                    archSelectedCourses.forEach(c => {
-                        if(appState.categories[c]) {
-                            appState.categories[c].forEach(t => archSelectedTopics.push(c + '::' + t));
-                        }
-                    });
-                }
-                
                 applyTimelineShift();
                 syncSystemUI();
                 updateQuestionInputVisibility();
-                
+                updateNoteInputVisibility();
+
                 function handleImageUpload(e) {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            document.getElementById('upload-placeholder').classList.add('hidden');
-            document.getElementById('editor-area').classList.remove('hidden');
-            document.getElementById('cropper-container').classList.remove('hidden');
-            document.getElementById('canvas-container').classList.add('hidden');
-            document.getElementById('btn-crop-ok').classList.remove('hidden');
-            document.getElementById('upload-zoom-ui').classList.add('hidden');
-            document.getElementById('upload-zoom-ui').classList.remove('flex');
-            document.getElementById('upload-pen-sizes').classList.add('hidden');
-            
-            let image = document.getElementById('image-to-crop');
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                            document.getElementById('upload-placeholder').classList.add('hidden');
+                            document.getElementById('editor-area').classList.remove('hidden');
+                            document.getElementById('cropper-container').classList.remove('hidden');
+                            document.getElementById('canvas-container').classList.add('hidden');
+                            document.getElementById('btn-crop-ok').classList.remove('hidden');
+                            document.getElementById('upload-zoom-ui').classList.add('hidden');
+                            document.getElementById('upload-zoom-ui').classList.remove('flex');
+                            document.getElementById('upload-pen-sizes').classList.add('hidden');
+                            
+                            let image = document.getElementById('image-to-crop');
 
-            // Var olan kırpıcıyı temizle
-            if (cropperInstance) {
-                cropperInstance.destroy();
-                cropperInstance = null;
-            }
+                            if (cropperInstance) {
+                                cropperInstance.destroy();
+                                cropperInstance = null;
+                            }
 
-            // Kamera fotoğrafının boyutu büyük olduğu için tarayıcıya tamamen yüklenmesini bekle
-            image.onload = function() {
-                cropperInstance = new Cropper(image, { viewMode: 1, autoCropArea: 1 });
-            };
+                            image.onload = function() {
+                                cropperInstance = new Cropper(image, { viewMode: 1, autoCropArea: 1 });
+                            };
 
-            image.src = event.target.result;
-        }
-        reader.readAsDataURL(file);
+                            image.src = event.target.result;
+                        }
+                        reader.readAsDataURL(file);
 
-        // İkinci kez kamera açıldığında değişim (change) olayının tekrar tetiklenmesi için sıfırla
-        e.target.value = '';
-    }
-}
+                        e.target.value = '';
+                    }
+                }
 
                 const galleryInput = document.getElementById('q-image-gallery');
-const cameraInput = document.getElementById('q-image-camera');
-if (galleryInput) galleryInput.addEventListener('change', handleImageUpload);
-if (cameraInput) cameraInput.addEventListener('change', handleImageUpload);
+                const cameraInput = document.getElementById('q-image-camera');
+                if (galleryInput) galleryInput.addEventListener('change', handleImageUpload);
+                if (cameraInput) cameraInput.addEventListener('change', handleImageUpload);
+
+                // Not görseli yükleme input listener'ları
+                const noteGalleryInput = document.getElementById('note-image-gallery');
+                const noteCameraInput = document.getElementById('note-image-camera');
+                if (noteGalleryInput) noteGalleryInput.addEventListener('change', handleNoteImageUpload);
+                if (noteCameraInput) noteCameraInput.addEventListener('change', handleNoteImageUpload);
 
                 initCanvasDrawing('upload-canvas', () => uploadDrawMode, () => uploadPenSize);
 
-                if (!appState.hasSeenOnboarding) {
-                    showOnboarding();
+                // Giriş durumuna göre login ekranını yönet
+                if (appState.authState === "none") {
+                    document.getElementById('login-screen').style.display = 'flex';
+                    document.getElementById('login-fields').style.display = 'none';
+                } else if (appState.authState === "trial") {
+                    document.getElementById('login-screen').style.display = 'none';
+                    document.getElementById('btn-code-enter').classList.remove('hidden');
+                } else if (appState.authState === "full") {
+                    document.getElementById('login-screen').style.display = 'none';
+                    document.getElementById('btn-code-enter').classList.add('hidden');
+                }
+
+                if (!appState.selectedField) {
+                    // Alan seçilmemiş: onboarding veya alan seçim modalını göster
+                    if (!appState.hasSeenOnboarding) {
+                        showOnboarding();
+                    } else {
+                        openFieldChangeModal();
+                    }
                 } else {
-                    switchTab('add');
+                    if (!appState.hasSeenOnboarding) {
+                        showOnboarding();
+                    } else {
+                        switchTab('add');
+                    }
                 }
 
             } catch (error) {
@@ -948,8 +1217,138 @@ if (cameraInput) cameraInput.addEventListener('change', handleImageUpload);
             }
         };
 
+        // YENİ: Not görseli yükleme
+        function handleNoteImageUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    noteImageDataUrl = event.target.result;
+                    document.getElementById('note-upload-placeholder').classList.add('hidden');
+                    document.getElementById('note-image-preview-area').classList.remove('hidden');
+                    document.getElementById('note-image-preview').src = noteImageDataUrl;
+                };
+                reader.readAsDataURL(file);
+                e.target.value = '';
+            }
+        }
+
+        function clearNoteImage() {
+            noteImageDataUrl = null;
+            document.getElementById('note-upload-placeholder').classList.remove('hidden');
+            document.getElementById('note-image-preview-area').classList.add('hidden');
+            document.getElementById('note-image-preview').src = '';
+            document.getElementById('note-image-gallery').value = '';
+            document.getElementById('note-image-camera').value = '';
+        }
+
+        function setNoteInputType(type) {
+            currentNoteInputType = type;
+            const btnText = document.getElementById('btn-note-type-text');
+            const btnImage = document.getElementById('btn-note-type-image');
+            const textArea = document.getElementById('note-text-area');
+            const imageArea = document.getElementById('note-image-area');
+
+            if (type === 'text') {
+                btnText.className = "flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold uppercase transition-all rounded-xl";
+                btnImage.className = "flex-1 text-slate-600 py-2 text-xs font-bold uppercase transition-all hover:text-indigo-600 rounded-xl";
+                textArea.classList.remove('hidden');
+                imageArea.classList.add('hidden');
+            } else {
+                btnText.className = "flex-1 text-slate-600 py-2 text-xs font-bold uppercase transition-all hover:text-indigo-600 rounded-xl";
+                btnImage.className = "flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold uppercase transition-all rounded-xl";
+                textArea.classList.add('hidden');
+                imageArea.classList.remove('hidden');
+            }
+        }
+
+        function updateNoteInputVisibility() {
+            const noteTypeToggle = document.getElementById('note-type-toggle');
+            const noteTextArea = document.getElementById('note-text-area');
+            const noteImageArea = document.getElementById('note-image-area');
+
+            if (currentEntryType === 'question') {
+                noteTypeToggle.classList.remove('hidden');
+                setNoteInputType(currentNoteInputType);
+            } else {
+                noteTypeToggle.classList.add('hidden');
+                noteTextArea.classList.remove('hidden');
+                noteImageArea.classList.add('hidden');
+            }
+        }
+
+        function showLoginFields() {
+            document.getElementById('login-fields').style.display = 'block';
+        }
+
+        function startTrial() {
+            appState.authState = "trial";
+            saveState();
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('btn-code-enter').classList.remove('hidden');
+            if (!appState.selectedField) {
+                if (!appState.hasSeenOnboarding) {
+                    showOnboarding();
+                } else {
+                    openFieldChangeModal();
+                }
+            } else {
+                if (!appState.hasSeenOnboarding) {
+                    showOnboarding();
+                } else {
+                    switchTab('add');
+                }
+            }
+        }
+
+        function openCodeModal() {
+            document.getElementById('code-modal').classList.remove('hidden');
+            document.getElementById('code-error-msg').innerText = '';
+            document.getElementById('code-input').value = '';
+        }
+
+        function closeCodeModal() {
+            document.getElementById('code-modal').classList.add('hidden');
+        }
+
+        function submitCode() {
+            const codeInput = document.getElementById('code-input');
+            const errorMsg = document.getElementById('code-error-msg');
+            const code = codeInput.value.trim();
+
+            if (!code) {
+                errorMsg.innerText = "Lütfen şifre girin!";
+                return;
+            }
+
+            errorMsg.innerText = "Kontrol ediliyor...";
+
+            const keyRef = database.ref("keys/" + code);
+            keyRef.once("value").then((snapshot) => {
+                if (snapshot.val() === true) {
+                    keyRef.remove().then(() => {
+                        appState.authState = "full";
+                        saveState();
+                        try {
+                            localStorage.setItem("authorized", "true");
+                        } catch (e) {}
+                        document.getElementById('btn-code-enter').classList.add('hidden');
+                        closeCodeModal();
+                        showToast("Tam sürüme geçildi! Artık sınırsız ekleme hakkın var.");
+                    }).catch((err) => {
+                        errorMsg.innerText = "Şifre silinirken hata: " + err.message;
+                    });
+                } else {
+                    errorMsg.innerText = "Geçersiz veya kullanılmış şifre!";
+                }
+            }).catch((error) => {
+                errorMsg.innerText = "Veritabanı hatası: " + error.message;
+            });
+        }
+
         function showOnboarding() {
             currentOnboardingStep = 1;
+            switchTab('home');
             renderOnboardingStep();
             document.getElementById('onboarding-modal').classList.remove('hidden');
         }
@@ -961,77 +1360,214 @@ if (cameraInput) cameraInput.addEventListener('change', handleImageUpload);
             const previewEl = document.getElementById('onboarding-preview');
             const btnNext = document.getElementById('btn-onboarding-next');
 
-            const dot1 = document.getElementById('dot-step-1');
-            const dot2 = document.getElementById('dot-step-2');
-            const dot3 = document.getElementById('dot-step-3');
-
-            dot1.className = currentOnboardingStep === 1 ? "w-4 h-1.5 rounded-full bg-indigo-600 transition-all" : "w-1.5 h-1.5 rounded-full bg-slate-300 transition-all";
-            dot2.className = currentOnboardingStep === 2 ? "w-4 h-1.5 rounded-full bg-indigo-600 transition-all" : "w-1.5 h-1.5 rounded-full bg-slate-300 transition-all";
-            dot3.className = currentOnboardingStep === 3 ? "w-4 h-1.5 rounded-full bg-indigo-600 transition-all" : "w-1.5 h-1.5 rounded-full bg-slate-300 transition-all";
+            // Dot güncelle
+            for (let i = 1; i <= 7; i++) {
+                const dot = document.getElementById(`dot-step-${i}`);
+                if (dot) {
+                    if (i === currentOnboardingStep) {
+                        dot.className = "w-4 h-1.5 rounded-full bg-indigo-600 transition-all";
+                    } else {
+                        dot.className = "w-1.5 h-1.5 rounded-full bg-slate-300 transition-all";
+                    }
+                }
+            }
 
             if (currentOnboardingStep === 1) {
                 iconEl.innerHTML = `<path d="M12 2L1 21h22L12 2zm0 3.45l8.15 14.1H3.85L12 5.45zM11 10h2v4h-2zm0 5h2v2h-2z"/>`;
-                titleEl.innerText = "Net Kalkanım'a Hoş Geldin!";
-                descEl.innerText = "Sınav hazırlığında öğrendiklerini unutmayı engelleyen akıllı aralıklı tekrar sistemine ilk adımını attın.";
+                titleEl.innerText = "Alanını Seç";
+                descEl.innerText = "Hangi alanda ilerlemek istediğini seç. Ders ve konu listeleri bu seçime göre otomatik yüklenecek.";
                 previewEl.innerHTML = `
-                    <div class="space-y-2 text-[11px] font-bold text-slate-700">
-                        <div class="flex items-center gap-2.5 p-2.5 bg-indigo-50 text-indigo-700 rounded-xl border border-indigo-100">
-                            <span class="text-base">🧠</span> <span>Akıllı Aralıklı Tekrar Algoritması</span>
-                        </div>
-                        <div class="flex items-center gap-2.5 p-2.5 bg-amber-50 text-amber-700 rounded-xl border border-amber-100">
-                            <span class="text-base">✏️</span> <span>Görsel Yükleme, Çizim ve Not Alma</span>
-                        </div>
-                        <div class="flex items-center gap-2.5 p-2.5 bg-emerald-50 text-emerald-700 rounded-xl border border-emerald-100">
-                            <span class="text-base">🎯</span> <span>Özel Kamp ve Arşiv</span>
-                        </div>
+                    <div class="space-y-2">
+                        <button onclick="selectFieldInOnboarding('sayisal')" data-field="sayisal" class="onboarding-field-btn w-full py-4 rounded-2xl border-2 border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 transition-all font-bold uppercase text-slate-700">Sayısal</button>
+                        <button onclick="selectFieldInOnboarding('esitagirlik')" data-field="esitagirlik" class="onboarding-field-btn w-full py-4 rounded-2xl border-2 border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 transition-all font-bold uppercase text-slate-700">Eşit Ağırlık</button>
+                        <button onclick="selectFieldInOnboarding('sozel')" data-field="sozel" class="onboarding-field-btn w-full py-4 rounded-2xl border-2 border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 transition-all font-bold uppercase text-slate-700">Sözel</button>
+                        <button onclick="selectFieldInOnboarding('dil')" data-field="dil" class="onboarding-field-btn w-full py-4 rounded-2xl border-2 border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 transition-all font-bold uppercase text-slate-700">Dil</button>
                     </div>
                 `;
                 btnNext.innerText = "Devam Et";
             } else if (currentOnboardingStep === 2) {
-                iconEl.innerHTML = `<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>`;
-                titleEl.innerText = "Tekrar Algoritması";
-                descEl.innerText = "Eklediğin soru ve notlar bilimsel aralıklara göre (1, 3, 7, 20 gün...) karşına gelir. Doğru bildikçe süresi uzar!";
+                iconEl.innerHTML = `<path d="M12 2L1 21h22L12 2zm0 3.45l8.15 14.1H3.85L12 5.45zM11 10h2v4h-2zm0 5h2v2h-2z"/>`;
+                titleEl.innerText = "Öğrendiklerini Neden Unutuyorsun?";
+                descEl.innerText = "Tekrar edilmeyen bilgilerin %66'sı 1 gün içinde unutulur. 1 ay sonra ise yalnızca %21'i hafızada kalır";
                 previewEl.innerHTML = `
-                    <div class="flex justify-between items-center text-[10px] font-bold text-center gap-1">
-                        <div class="flex-1 p-2 bg-indigo-100 text-indigo-800 rounded-xl border border-indigo-200">1. Gün<br><span class="text-[9px] font-normal">İlk Tekrar</span></div>
-                        <span class="text-slate-400">➔</span>
-                        <div class="flex-1 p-2 bg-indigo-200 text-indigo-900 rounded-xl border border-indigo-300">3. Gün<br><span class="text-[9px] font-normal">Pekiştirme</span></div>
-                        <span class="text-slate-400">➔</span>
-                        <div class="flex-1 p-2 bg-indigo-600 text-white rounded-xl shadow-sm">7. Gün<br><span class="text-[9px] font-normal opacity-90">Kalıcı Hafıza</span></div>
+                    <div class="space-y-3">
+                        <div>
+                            <div class="flex justify-between text-[10px] font-bold text-slate-600 mb-1"><span>1 Gün Sonra</span><span>%34 Hatırlama</span></div>
+                            <div class="w-full bg-slate-200 rounded-full h-4"><div class="h-4 rounded-full bg-lime-500" style="width: 34%"></div></div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-[10px] font-bold text-slate-600 mb-1"><span>1 Hafta Sonra</span><span>%25 Hatırlama</span></div>
+                            <div class="w-full bg-slate-200 rounded-full h-4"><div class="h-4 rounded-full bg-orange-500" style="width: 25%"></div></div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-[10px] font-bold text-slate-600 mb-1"><span>1 Ay Sonra</span><span>%21 Hatırlama</span></div>
+                            <div class="w-full bg-slate-200 rounded-full h-4"><div class="h-4 rounded-full bg-red-500" style="width: 21%"></div></div>
+                        </div>
                     </div>
                 `;
-                btnNext.innerText = "İleri";
+                btnNext.innerText = "Bu Sorunu Çözelim";
             } else if (currentOnboardingStep === 3) {
-                iconEl.innerHTML = `<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>`;
-                titleEl.innerText = "Hadi İlk Sorunu Ekle!";
-                descEl.innerText = "Uygulamanın gücünü keşfetmek için ilk sorunu veya notunu ekleyerek başla. Seni yönlendiriyoruz!";
+                iconEl.innerHTML = `<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>`;
+                titleEl.innerText = "Akıllı Tekrar Sistemi Nasıl Çalışır?";
+                descEl.innerText = "Net Kalkanım, bilgiyi tam unutmadan hemen önce hatırlatır. Daha akıllıca çalışarak bilgiyi uzun hafızaya yerleştirmeni sağlar.";
                 previewEl.innerHTML = `
-                    <div class="p-3 bg-indigo-50 rounded-2xl border border-indigo-100 text-center space-y-2">
-                        <span class="text-xs font-extrabold text-indigo-600 uppercase block">➕ Soru / Not Ekleme Alanı</span>
-                        <p class="text-[11px] font-medium text-slate-600">Ders ve konu seç, sorunun fotoğrafını yükle veya yaz, cevabını işaretle ve kaydet!</p>
+                    <div class="flex items-center justify-between text-[10px] font-bold text-center gap-1">
+                        <div class="flex-1 p-2 bg-indigo-100 text-indigo-800 rounded-lg">1 Gün</div>
+                        <span class="text-slate-400">→</span>
+                        <div class="flex-1 p-2 bg-indigo-200 text-indigo-900 rounded-lg">3 Gün</div>
+                        <span class="text-slate-400">→</span>
+                        <div class="flex-1 p-2 bg-indigo-300 text-indigo-950 rounded-lg">7 Gün</div>
+                        <span class="text-slate-400">→</span>
+                        <div class="flex-1 p-2 bg-indigo-400 text-white rounded-lg">21 Gün</div>
+                        <span class="text-slate-400">→</span>
+                        <div class="flex-1 p-2 bg-indigo-600 text-white rounded-lg">45 Gün</div>
                     </div>
                 `;
-                btnNext.innerText = "İlk Sorumu Ekleyeyim 🚀";
+                btnNext.innerText = "Anladım, Devam";
+            } else if (currentOnboardingStep === 4) {
+                iconEl.innerHTML = `<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>`;
+                titleEl.innerText = "Kendi Soru Bankanı Oluştur";
+                descEl.innerText = "Sorularının yanına notlarını ve çözümlerini ekle. Sorularının ve Notlarının tamamına bir yerden erişim sağla.";
+                previewEl.innerHTML = `
+                    <div class="space-y-2">
+                        <div class="bg-slate-200 p-2 rounded-lg text-[10px] font-bold text-slate-600">DERS SEÇ</div>
+                        <div class="bg-slate-200 p-2 rounded-lg text-[10px] font-bold text-slate-600">KONU SEÇ</div>
+                        <div class="bg-slate-100 border border-dashed border-slate-300 p-4 rounded-lg text-center text-[10px] font-bold text-slate-500">GÖRSEL YÜKLE</div>
+                        <div class="flex gap-2">
+                            <div class="flex-1 bg-indigo-100 p-2 rounded-lg text-center text-[10px] font-bold text-indigo-700">CEVAP A</div>
+                            <div class="flex-1 bg-slate-100 p-2 rounded-lg text-center text-[10px] font-bold text-slate-500">B</div>
+                            <div class="flex-1 bg-slate-100 p-2 rounded-lg text-center text-[10px] font-bold text-slate-500">C</div>
+                            <div class="flex-1 bg-slate-100 p-2 rounded-lg text-center text-[10px] font-bold text-slate-500">D</div>
+                            <div class="flex-1 bg-slate-100 p-2 rounded-lg text-center text-[10px] font-bold text-slate-500">E</div>
+                        </div>
+                    </div>
+                `;
+                btnNext.innerText = "Devam Et";
+            } else if (currentOnboardingStep === 5) {
+                iconEl.innerHTML = `<path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>`;
+                titleEl.innerText = "Notların da Unutulmasın";
+                descEl.innerText = "Notların da aynı algoritmayla tekrar edilir.";
+                previewEl.innerHTML = `
+                    <div class="bg-amber-100 border border-amber-200 p-4 rounded-xl">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-[10px] font-bold text-amber-800">TYT BİYOLOJİ</span>
+                            <span class="text-[10px] font-bold text-amber-600">📅 21.08.2026</span>
+                        </div>
+                        <p class="text-[11px] font-semibold text-amber-900 uppercase">Mitoz bölünme evreleri: Profaz, Metafaz, Anafaz, Telofaz</p>
+                    </div>
+                `;
+                btnNext.innerText = "Devam Et";
+            } else if (currentOnboardingStep === 6) {
+                iconEl.innerHTML = `<path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>`;
+                titleEl.innerText = "Her Gün Ne Yapacaksın?";
+                descEl.innerText = "Ders çalıştığın her gün 'Soruları Başlat' ve 'Notları Başlat' bölümlerine girmeli ve geri bildirim vermelisin yoksa SİSTEM DEVAM ETMEZ! Bazı günler giremezsen sorun değil, soruların ötelenir ve kaldığın yerden devam edebilirsin. ";
+                previewEl.innerHTML = `
+                    <div class="space-y-2">
+                        <div class="bg-white border border-slate-200 p-3 rounded-xl">
+                            <div class="flex justify-between text-[10px] font-bold text-slate-500 mb-1"><span>GÜNLÜK İLERLEME</span><span>0/5</span></div>
+                            <div class="w-full bg-slate-200 rounded-full h-2"><div class="h-2 bg-indigo-600 rounded-full" style="width: 0%"></div></div>
+                        </div>
+                        <div class="flex gap-2">
+                            <div class="flex-1 bg-indigo-600 text-white p-3 rounded-xl text-center text-[10px] font-bold">SORULARI BAŞLAT</div>
+                            <div class="flex-1 bg-amber-500 text-white p-3 rounded-xl text-center text-[10px] font-bold">NOTLARI BAŞLAT</div>
+                        </div>
+                    </div>
+                `;
+                btnNext.innerText = "Devam et";
+            } else if (currentOnboardingStep === 7) {
+                iconEl.innerHTML = `<path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM6.24 5h11.52l.83 1H5.41l.83-1zM5 19V8h14v11H5zm11-5.5H8v-2h8v2z"/>`;
+                titleEl.innerText = "Arşiv & Kamp Modu";
+                descEl.innerText = "'Arşiv' sekmesinden bütün soru ve notlarına erişim sağlayabilir ve istediğin konulardan rastgele soru kampı yapabilirsin.";
+                previewEl.innerHTML = `
+                    <div class="space-y-2">
+                        <div class="flex gap-2 mb-1">
+                            <div class="flex-1 bg-indigo-50 border border-indigo-200 p-2 rounded-lg text-center text-[10px] font-bold text-indigo-600">SORULARIM</div>
+                            <div class="flex-1 bg-slate-50 border border-slate-200 p-2 rounded-lg text-center text-[10px] font-bold text-slate-400">NOTLARIM</div>
+                        </div>
+                        <div class="bg-white border border-slate-200 p-3 rounded-xl">
+                            <div class="flex justify-between items-center text-[10px] font-bold text-slate-600 mb-1"><span>TYT MATEMATİK</span><span>📅 20.08.2026</span></div>
+                            <p class="text-[11px] font-semibold text-slate-800">Üslü sayılar sorusu</p>
+                        </div>
+                        <div class="bg-amber-50 border border-amber-200 p-2 rounded-xl text-center text-[11px] font-bold text-amber-600">RASTGELE KAMP</div>
+                    </div>
+                `;
+                btnNext.innerText = "Hadi Başlayalım 🚀";
             }
         }
 
         function nextOnboardingStep() {
-            if (currentOnboardingStep < 3) {
+            if (currentOnboardingStep === 1 && !appState.selectedField) {
+                showToast("Lütfen önce alanınızı seçin.", true);
+                return;
+            }
+            if (currentOnboardingStep < 7) {
                 currentOnboardingStep++;
-                renderOnboardingStep();
+                const modal = document.getElementById('onboarding-modal');
+                
+                // Özel adımlar: 4,6,7 -> modalı kapat, vurgula, sonra aç
+                if (currentOnboardingStep === 4 || currentOnboardingStep === 6 || currentOnboardingStep === 7) {
+                    modal.classList.add('hidden');
+                    
+                    let targetTab, targetElement;
+                    if (currentOnboardingStep === 4) {
+                        targetTab = 'add';
+                        targetElement = document.getElementById('upload-placeholder');
+                    } else if (currentOnboardingStep === 6) {
+                        targetTab = 'home';
+                        targetElement = document.getElementById('btn-start-questions');
+                    } else {
+                        targetTab = 'library';
+                        targetElement = document.getElementById('btn-random-camp');
+                    }
+                    
+                    switchTab(targetTab);
+                    if (targetElement) {
+                        targetElement.classList.add('ring-4', 'ring-indigo-300');
+                        setTimeout(() => {
+                            targetElement.classList.remove('ring-4', 'ring-indigo-300');
+                            renderOnboardingStep();
+                            modal.classList.remove('hidden');
+                        }, 1500);
+                    } else {
+                        renderOnboardingStep();
+                        modal.classList.remove('hidden');
+                    }
+                } else {
+                    // Normal adımlar: sekme geçişi yap, render et
+                    if (currentOnboardingStep === 3) {
+                        switchTab('home');
+                    } else if (currentOnboardingStep === 5) {
+                        switchTab('add');
+                        // Not ekleme butonunu vurgula (modal açıkken)
+                        const noteBtn = document.getElementById('btn-entry-note');
+                        if (noteBtn) {
+                            noteBtn.classList.add('ring-4', 'ring-indigo-300');
+                            setTimeout(() => {
+                                noteBtn.classList.remove('ring-4', 'ring-indigo-300');
+                            }, 1500);
+                        }
+                    }
+                    renderOnboardingStep();
+                }
             } else {
                 finishOnboarding();
             }
         }
 
         function finishOnboarding() {
+            if (!appState.selectedField) {
+                showToast("Lütfen önce alanınızı seçin.", true);
+                currentOnboardingStep = 1;
+                renderOnboardingStep();
+                return;
+            }
             appState.hasSeenOnboarding = true;
             saveState();
             document.getElementById('onboarding-modal').classList.add('hidden');
             switchTab('add');
         }
 
-                function setEntryType(type) {
+        function setEntryType(type) {
             currentEntryType = type;
             const btnQ = document.getElementById('btn-entry-question');
             const btnN = document.getElementById('btn-entry-note');
@@ -1066,6 +1602,7 @@ if (cameraInput) cameraInput.addEventListener('change', handleImageUpload);
                 if (labelNoteText) labelNoteText.innerText = "Not Metni";
             }
             updateQuestionInputVisibility();
+            updateNoteInputVisibility(); // Yeni eklenen
         }
 
         function setQuestionInputType(type) {
@@ -1132,37 +1669,35 @@ if (cameraInput) cameraInput.addEventListener('change', handleImageUpload);
         }
 
         function finishCrop() {
-    if (!cropperInstance) return;
-    
-    // Görseli orijinal boyut sınırlandırması olmadan tam çözünürlükte alıyoruz
-    const croppedCanvas = cropperInstance.getCroppedCanvas();
-    
-    document.getElementById('cropper-container').classList.add('hidden');
-    document.getElementById('canvas-container').classList.remove('hidden');
-    
-    const uImg = document.getElementById('upload-final-img');
-    // 1.0 kalitesi ile sıfır sıkıştırma (Maksimum Kalite) uyguluyoruz
-    uImg.src = croppedCanvas.toDataURL('image/jpeg', 0.92);
-    
-    const uCanvas = document.getElementById('upload-canvas');
-    uCanvas.width = croppedCanvas.width;
-    uCanvas.height = croppedCanvas.height;
-    const uCtx = uCanvas.getContext('2d');
-    uCtx.clearRect(0, 0, uCanvas.width, uCanvas.height);
-    
-    uCanvas.history = [uCtx.getImageData(0, 0, uCanvas.width, uCanvas.height)];
-    
-    cropperInstance.destroy(); 
-    cropperInstance = null;
-    
-    document.getElementById('btn-crop-ok').classList.add('hidden');
-    document.getElementById('upload-zoom-ui').classList.remove('hidden');
-    document.getElementById('upload-zoom-ui').classList.add('flex');
-    document.getElementById('upload-pen-sizes').classList.remove('hidden');
-    
-    manualZoom('upload', 1);
-    setUploadDrawMode('pen');
-    updateUploadSizeUI();
+            if (!cropperInstance) return;
+            
+            const croppedCanvas = cropperInstance.getCroppedCanvas();
+            
+            document.getElementById('cropper-container').classList.add('hidden');
+            document.getElementById('canvas-container').classList.remove('hidden');
+            
+            const uImg = document.getElementById('upload-final-img');
+            uImg.src = croppedCanvas.toDataURL('image/jpeg', 0.92);
+            
+            const uCanvas = document.getElementById('upload-canvas');
+            uCanvas.width = croppedCanvas.width;
+            uCanvas.height = croppedCanvas.height;
+            const uCtx = uCanvas.getContext('2d');
+            uCtx.clearRect(0, 0, uCanvas.width, uCanvas.height);
+            
+            uCanvas.history = [uCtx.getImageData(0, 0, uCanvas.width, uCanvas.height)];
+            
+            cropperInstance.destroy(); 
+            cropperInstance = null;
+            
+            document.getElementById('btn-crop-ok').classList.add('hidden');
+            document.getElementById('upload-zoom-ui').classList.remove('hidden');
+            document.getElementById('upload-zoom-ui').classList.add('flex');
+            document.getElementById('upload-pen-sizes').classList.remove('hidden');
+            
+            manualZoom('upload', 1);
+            setUploadDrawMode('pen');
+            updateUploadSizeUI();
         }
 
         function setUploadDrawMode(mode) {
@@ -1213,20 +1748,20 @@ if (cameraInput) cameraInput.addEventListener('change', handleImageUpload);
         }
 
         function clearSelectedImage() {
-    const galleryInput = document.getElementById('q-image-gallery');
-    const cameraInput = document.getElementById('q-image-camera');
-    if (galleryInput) galleryInput.value = '';
-    if (cameraInput) cameraInput.value = '';
-    
-    manualZoom('upload', 1);
-    
-    if (cropperInstance) { cropperInstance.destroy(); cropperInstance = null; }
-    document.getElementById('upload-placeholder').classList.remove('hidden');
-    document.getElementById('editor-area').classList.add('hidden');
-    const ui = document.getElementById('upload-zoom-ui');
-    if(ui) { ui.classList.add('hidden'); ui.classList.remove('flex'); }
-    document.getElementById('upload-pen-sizes').classList.add('hidden');
-}
+            const galleryInput = document.getElementById('q-image-gallery');
+            const cameraInput = document.getElementById('q-image-camera');
+            if (galleryInput) galleryInput.value = '';
+            if (cameraInput) cameraInput.value = '';
+            
+            manualZoom('upload', 1);
+            
+            if (cropperInstance) { cropperInstance.destroy(); cropperInstance = null; }
+            document.getElementById('upload-placeholder').classList.remove('hidden');
+            document.getElementById('editor-area').classList.add('hidden');
+            const ui = document.getElementById('upload-zoom-ui');
+            if(ui) { ui.classList.add('hidden'); ui.classList.remove('flex'); }
+            document.getElementById('upload-pen-sizes').classList.add('hidden');
+        }
 
         function initCanvasDrawing(canvasId, getModeFunc, getWidthFunc) {
             const canvas = document.getElementById(canvasId);
@@ -1531,11 +2066,19 @@ if (cameraInput) cameraInput.addEventListener('change', handleImageUpload);
         }
 
         function syncSystemUI() {
-            buildHomeFilters(); populateCategoryDropdowns(); renderCourseManagement();
-            renderTopicManagement(); populateArchiveFilters(); updateHomeStats();
+            updateCurrentFieldLabel();
+            buildHomeFilters(); populateCategoryDropdowns(); populateArchiveFilters(); updateHomeStats();
             renderLibrary();
             document.getElementById('setting-intervals').value = appState.intervals.join(',');
             document.getElementById('setting-note-intervals').value = appState.noteIntervals.join(',');
+        }
+
+        function updateCurrentFieldLabel() {
+            const label = document.getElementById('current-field-label');
+            if (label) {
+                const fieldNames = { sayisal: 'Sayısal', esitagirlik: 'Eşit Ağırlık', sozel: 'Sözel', dil: 'Dil' };
+                label.innerText = appState.selectedField ? fieldNames[appState.selectedField] : 'Seçilmedi';
+            }
         }
 
         function switchTab(tabId) {
@@ -1664,135 +2207,97 @@ if (cameraInput) cameraInput.addEventListener('change', handleImageUpload);
         }
 
         function populateCategoryDropdowns() {
-    // Ayarlar > Konularım için varsayılan dersi belirle
-    const courses = Object.keys(appState.categories);
-    if (courses.length > 0) {
-        const defaultCourse = courses[0];
-        document.getElementById('settings-course').value = defaultCourse;
-        document.getElementById('btn-settings-course-text').innerText = defaultCourse;
-    }
-    initCoursePicker();
-    renderTopicManagement();
-}
-
-        function updateTopicDropdown() {
-    // Yeni seçici kullanıldığı için boş
-}
-// ===== YENİ DERS/KONU SEÇİCİ =====
-let pickerType = ''; // 'course' veya 'topic'
-
-function openPicker(type) {
-    pickerType = type;
-    const modal = document.getElementById('picker-modal');
-    const title = document.getElementById('picker-title');
-    const listDiv = document.getElementById('picker-list');
-    listDiv.innerHTML = '';
-
-    if (type === 'course') {
-        title.innerText = 'Ders Seçiniz';
-        const courses = Object.keys(appState.categories);
-        courses.forEach(course => {
-            const btn = document.createElement('button');
-            btn.className = "w-full text-left px-4 py-3 rounded-xl text-sm font-bold uppercase text-slate-700 bg-slate-50 border border-slate-200 hover:bg-indigo-50 hover:border-indigo-300 transition-colors";
-            btn.innerText = course;
-            btn.onclick = () => selectCourse(course);
-            listDiv.appendChild(btn);
-        });
-    } else if (type === 'topic') {
-        const selectedCourse = document.getElementById('q-course').value;
-        if (!selectedCourse) {
-            showToast('Lütfen önce bir ders seçin!', true);
-            return;
+            const courses = Object.keys(appState.categories);
+            if (courses.length > 0) {
+                const defaultCourse = courses[0];
+                document.getElementById('settings-course').value = defaultCourse;
+                document.getElementById('btn-settings-course-text').innerText = defaultCourse;
+            }
+            initCoursePicker();
         }
-        title.innerText = `${selectedCourse} › Konu Seç`;
-        const topics = appState.categories[selectedCourse] || [];
-        topics.forEach(topic => {
-            const btn = document.createElement('button');
-            btn.className = "w-full text-left px-4 py-3 rounded-xl text-sm font-bold uppercase text-slate-700 bg-slate-50 border border-slate-200 hover:bg-amber-50 hover:border-amber-300 transition-colors";
-            btn.innerText = topic;
-            btn.onclick = () => selectTopic(topic);
-            listDiv.appendChild(btn);
-        });
-    }
-    modal.classList.remove('hidden');
-}
 
-function closePicker() {
-    document.getElementById('picker-modal').classList.add('hidden');
-}
-// Ayarlar için picker modal'ı açar (sadece ders seçimi)
-function openPickerForSettings(type) {
-    pickerType = type;
-    const modal = document.getElementById('picker-modal');
-    const title = document.getElementById('picker-title');
-    const listDiv = document.getElementById('picker-list');
-    listDiv.innerHTML = '';
+        // ===== YENİ DERS/KONU SEÇİCİ =====
+        let pickerType = ''; // 'course' veya 'topic'
 
-    if (type === 'course') {
-        title.innerText = 'Ders Seçiniz';
-        const courses = Object.keys(appState.categories);
-        courses.forEach(course => {
-            const btn = document.createElement('button');
-            btn.className = "w-full text-left px-4 py-3 rounded-xl text-sm font-bold uppercase text-slate-700 bg-slate-50 border border-slate-200 hover:bg-emerald-50 hover:border-emerald-300 transition-colors";
-            btn.innerText = course;
-            btn.onclick = () => selectSettingsCourse(course);
-            listDiv.appendChild(btn);
-        });
-    }
-    modal.classList.remove('hidden');
-}
+        function openPicker(type) {
+            pickerType = type;
+            const modal = document.getElementById('picker-modal');
+            const title = document.getElementById('picker-title');
+            const listDiv = document.getElementById('picker-list');
+            listDiv.innerHTML = '';
 
-// Ayarlar'daki ders seçimini işler
-function selectSettingsCourse(course) {
-    document.getElementById('settings-course').value = course;
-    document.getElementById('btn-settings-course-text').innerText = course;
-    closePicker();
-    renderTopicManagement();
-}
-
-function selectCourse(course) {
-    // Gizli input’u güncelle
-    document.getElementById('q-course').value = course;
-    // Butonun üstündeki metni değiştir
-    document.getElementById('btn-pick-course-text').innerText = course;
-    // Konuyu sıfırla
-    document.getElementById('q-topic').value = '';
-    document.getElementById('btn-pick-topic-text').innerText = 'Konu Seçiniz';
-    // Eğer otomatik ilk konuyu seçmek istersen (isteğe bağlı):
-    // const firstTopic = (appState.categories[course] || [])[0];
-    // if (firstTopic) selectTopic(firstTopic);
-    closePicker();
-    // Konu dropdown'unu güncellemek için (artık buton olduğu için ayrıca bir şey yapmaya gerek yok)
-}
-
-function selectTopic(topic) {
-    document.getElementById('q-topic').value = topic;
-    document.getElementById('btn-pick-topic-text').innerText = topic;
-    closePicker();
-}
-
-// Başlangıçta dersleri yükle (eski populate fonksiyonlarını devre dışı bırakacağız)
-function initCoursePicker() {
-    // İlk dersi varsayılan olarak seç (opsiyonel)
-    const courses = Object.keys(appState.categories);
-    if (courses.length > 0) {
-        // Varsayılan olarak ilk dersi seç
-        const defaultCourse = courses[0];
-        document.getElementById('q-course').value = defaultCourse;
-        document.getElementById('btn-pick-course-text').innerText = defaultCourse;
-        // İlk konuyu da seç (isteğe bağlı)
-        const firstTopic = (appState.categories[defaultCourse] || [])[0];
-        if (firstTopic) {
-            document.getElementById('q-topic').value = firstTopic;
-            document.getElementById('btn-pick-topic-text').innerText = firstTopic;
+            if (type === 'course') {
+                title.innerText = 'Ders Seçiniz';
+                const courses = Object.keys(appState.categories);
+                courses.forEach(course => {
+                    const btn = document.createElement('button');
+                    btn.className = "w-full text-left px-4 py-3 rounded-xl text-sm font-bold uppercase text-slate-700 bg-slate-50 border border-slate-200 hover:bg-indigo-50 hover:border-indigo-300 transition-colors";
+                    btn.innerText = course;
+                    btn.onclick = () => selectCourse(course);
+                    listDiv.appendChild(btn);
+                });
+            } else if (type === 'topic') {
+                const selectedCourse = document.getElementById('q-course').value;
+                if (!selectedCourse) {
+                    showToast('Lütfen önce bir ders seçin!', true);
+                    return;
+                }
+                title.innerText = `${selectedCourse} › Konu Seç`;
+                const topics = appState.categories[selectedCourse] || [];
+                topics.forEach(topic => {
+                    const btn = document.createElement('button');
+                    btn.className = "w-full text-left px-4 py-3 rounded-xl text-sm font-bold uppercase text-slate-700 bg-slate-50 border border-slate-200 hover:bg-amber-50 hover:border-amber-300 transition-colors";
+                    btn.innerText = topic;
+                    btn.onclick = () => selectTopic(topic);
+                    listDiv.appendChild(btn);
+                });
+            }
+            modal.classList.remove('hidden');
         }
-    }
-}
-// ===== YENİ SEÇİCİ SONU =====
+
+        function closePicker() {
+            document.getElementById('picker-modal').classList.add('hidden');
+        }
+
+        function selectCourse(course) {
+            document.getElementById('q-course').value = course;
+            document.getElementById('btn-pick-course-text').innerText = course;
+            document.getElementById('q-topic').value = '';
+            document.getElementById('btn-pick-topic-text').innerText = 'Konu Seçiniz';
+            closePicker();
+        }
+
+        function selectTopic(topic) {
+            document.getElementById('q-topic').value = topic;
+            document.getElementById('btn-pick-topic-text').innerText = topic;
+            closePicker();
+        }
+
+        function initCoursePicker() {
+            const courses = Object.keys(appState.categories);
+            if (courses.length > 0) {
+                const defaultCourse = courses[0];
+                document.getElementById('q-course').value = defaultCourse;
+                document.getElementById('btn-pick-course-text').innerText = defaultCourse;
+                const firstTopic = (appState.categories[defaultCourse] || [])[0];
+                if (firstTopic) {
+                    document.getElementById('q-topic').value = firstTopic;
+                    document.getElementById('btn-pick-topic-text').innerText = firstTopic;
+                }
+            }
+        }
+        // ===== YENİ SEÇİCİ SONU =====
+
         function saveData() {
+            // Deneme sürümü limit kontrolü
+            if (appState.authState === "trial" && (appState.questions.length + appState.notes.length) >= 20) {
+                showToast("Ücretsiz deneme limitine ulaştın! Tam sürüme geçmek için kodu gir.", true);
+                openCodeModal();
+                return;
+            }
+
             const course = document.getElementById('q-course').value;
             const topic = document.getElementById('q-topic').value || "GENEL";
-            const noteText = document.getElementById('q-note').value.trim();
             const todayStr = formatDate(getNowTR());
 
             if (!course) { showToast("Lütfen ders seçiniz!", true); return; }
@@ -1826,6 +2331,15 @@ function initCoursePicker() {
                     if (!answerVal) { showToast("Lütfen metin olarak cevabı yazın!", true); return; }
                 }
 
+                // YENİ: Not alanı işleme
+                let noteText = '';
+                let noteImg = null;
+                if (currentNoteInputType === 'text') {
+                    noteText = document.getElementById('q-note').value.trim();
+                } else {
+                    noteImg = noteImageDataUrl;
+                }
+
                 let days = appState.intervals[0] || 1;
                 let nextD = getNowTR(); nextD.setDate(nextD.getDate() + days);
 
@@ -1835,7 +2349,8 @@ function initCoursePicker() {
                     topic: topic,
                     img: finalImage,
                     text_question: textQ,
-                    note: noteText,
+                    note_text: noteText,
+                    note_img: noteImg,
                     type: currentAnswerType,
                     answer: answerVal,
                     level: 0,
@@ -1859,6 +2374,8 @@ function initCoursePicker() {
                     finalImage = mergeCanvas.toDataURL('image/jpeg', 0.92);
                 }
 
+                let noteText = document.getElementById('q-note').value.trim();
+
                 let days = appState.noteIntervals[0] || 1;
                 let nextD = getNowTR(); nextD.setDate(nextD.getDate() + days);
 
@@ -1878,12 +2395,14 @@ function initCoursePicker() {
                 showToast("Not başarıyla kaydedildi!");
             }
 
+            // Temizlik
             document.getElementById('q-note').value = '';
             document.getElementById('q-text-question').value = '';
             document.getElementById('q-text-answer').value = '';
             selectedChoiceAnswer = '';
             selectChoice('');
             clearSelectedImage();
+            clearNoteImage(); // Not görselini temizle
             saveState();
             switchTab('home');
         }
@@ -1913,9 +2432,8 @@ function initCoursePicker() {
                 return;
             }
 
-            // KALDIĞI YERDEN BAŞLATMA: Gün içinde henüz çözülmemiş/işaretlenmemiş ilk veriyi bul
             let resumeIndex = currentReviewQueue.findIndex(item => item.lastReviewedDate !== todayStr);
-            if (resumeIndex === -1) resumeIndex = 0; // Tümü bugün çözülmüşse baştan göster
+            if (resumeIndex === -1) resumeIndex = 0;
             currentReviewIndex = resumeIndex;
 
             document.getElementById('review-modal').classList.remove('hidden');
@@ -1934,7 +2452,6 @@ function initCoursePicker() {
             document.getElementById('review-progress').innerText = `${currentReviewMode === 'questions' ? 'SORU' : 'NOT'} ${currentReviewIndex + 1}/${currentReviewQueue.length}`;
             document.getElementById('review-breadcrumbs').innerText = `${item.course} > ${item.topic}`;
 
-            // Görsel / Yazı Ayarı
             const imgEl = document.getElementById('review-img');
             const qTextEl = document.getElementById('review-question-text');
             const frameBox = document.getElementById('review-frame-box');
@@ -1957,29 +2474,67 @@ function initCoursePicker() {
                 qTextEl.classList.add('hidden');
             }
 
-            // Not Kutusu
+            const noteToggleBtn = document.getElementById('review-note-toggle-btn');
+            const flipInner = document.getElementById('review-flip-inner');
+            const noteContentDiv = document.getElementById('review-note-content');
             const noteBox = document.getElementById('review-note-box');
-            if (item.note) {
-                noteBox.innerText = item.note;
-                noteBox.classList.remove('hidden');
-            } else {
-                noteBox.innerText = '';
-                noteBox.classList.add('hidden');
+
+            let hasNote = false;
+            let noteContent = '';
+
+            if (item.note_text) {
+                hasNote = true;
+                noteContent = item.note_text;
+            }
+            if (item.note_img) {
+                hasNote = true;
+                if (noteContent) noteContent += '<br>';
+                noteContent += `<img src="${item.note_img}" class="w-full h-auto object-contain rounded-lg mt-1">`;
+            }
+            if (!hasNote && item.note) {
+                hasNote = true;
+                noteContent = item.note;
             }
 
-            // Çizim tuşları ve Zoom sıfırlama
+            if (flipInner) flipInner.classList.remove('flipped');
+            if (noteBox) {
+                noteBox.innerHTML = '';
+                noteBox.classList.add('hidden');
+                noteBox.style.display = 'none';
+            }
+
+            if (currentReviewMode === 'questions') {
+                if (noteContentDiv) noteContentDiv.innerHTML = noteContent;
+                if (hasNote) {
+                    noteToggleBtn.classList.remove('hidden');
+                    noteToggleBtn.style.display = '';
+                    noteToggleBtn.textContent = 'Notu Göster';
+                } else {
+                    noteToggleBtn.classList.add('hidden');
+                    noteToggleBtn.style.display = 'none';
+                }
+            } else {
+                noteToggleBtn.classList.add('hidden');
+                noteToggleBtn.style.display = 'none';
+                if (hasNote) {
+                    if (noteBox) {
+                        noteBox.innerHTML = noteContent;
+                        noteBox.classList.remove('hidden');
+                        noteBox.style.display = '';
+                    }
+                }
+            }
+
             manualZoom('review', 1);
             clearReviewCanvas();
             document.getElementById('review-draw-tools').classList.remove('hidden');
             setReviewDrawMode('pen');
 
-            // Alt Inputlar & Geribildirim
             const choiceInput = document.getElementById('review-choice-input');
             const textInput = document.getElementById('review-text-input');
             const recallInput = document.getElementById('review-recall-input');
             const feedbackBox = document.getElementById('review-feedback-box');
 
-            // Geribildirim kutusu artık kullanılmıyor, her zaman gizli kalacak
             feedbackBox.classList.add('hidden');
             feedbackBox.classList.remove('block');
 
@@ -1989,10 +2544,8 @@ function initCoursePicker() {
 
             if (currentReviewMode === 'questions') {
                 if (isAnsweredToday) {
-                    // Cevap verilmiş, inputları kilitle ve renklendir
                     if (item.type === 'choice') {
                         choiceInput.classList.remove('hidden');
-                        // Tüm butonları disabled yap ve renklendir
                         ['A','B','C','D','E'].forEach(letter => {
                             const btn = document.getElementById(`choice-btn-${letter}`);
                             if (btn) {
@@ -2018,14 +2571,14 @@ function initCoursePicker() {
                         } else {
                             textInputEl.className = "flex-1 bg-red-50 p-3 border-2 border-red-500 outline-none text-slate-800 font-bold uppercase tracking-wider transition-colors rounded-xl shadow-sm text-xs";
                         }
+                        feedbackBox.innerHTML = `Doğru Cevap: <strong>${item.answer}</strong>`;
+                        feedbackBox.className = `w-full p-3 text-xs font-extrabold text-center rounded-xl transition-colors shadow-sm shrink-0 ${isCorrect ? 'bg-green-100 text-green-800 border border-green-300' : 'bg-red-100 text-red-800 border border-red-300'}`;
+                        feedbackBox.classList.remove('hidden');
                     }
 
-                    // Hatırlama butonlarını göster
                     recallInput.classList.remove('hidden');
-                    // Hatırlama durumuna göre butonları ayarla
                     updateRecallButtons(item.userRecallStatus);
                 } else {
-                    // Cevap verilmemiş, inputları aktif göster
                     if (item.type === 'choice') {
                         choiceInput.classList.remove('hidden');
                         ['A','B','C','D','E'].forEach(letter => {
@@ -2042,24 +2595,31 @@ function initCoursePicker() {
                         textInputEl.disabled = false;
                         textInputEl.className = "flex-1 bg-slate-50 p-3 border border-slate-300 outline-none focus:border-indigo-600 text-slate-800 font-bold uppercase tracking-wider transition-colors rounded-xl shadow-sm text-xs";
                     }
-                    // Hatırlama butonlarını gizle
                     recallInput.classList.add('hidden');
                 }
             } else {
-                // NOT İNCELEME MODU: her zaman hatırlama butonları göster
                 recallInput.classList.remove('hidden');
                 if (isAnsweredToday) {
-                    // Bugün işaretlenmiş, butonları kilitle ve seçili olanı renklendir
                     updateRecallButtons(item.userRecallStatus);
                 } else {
-                    // Aktif butonlar
                     updateRecallButtons(null);
                 }
             }
 
-            // Önceki/Sonraki Buton Durumu
             document.getElementById('btn-rev-prev').disabled = (currentReviewIndex === 0);
             document.getElementById('btn-rev-next').disabled = (currentReviewIndex === currentReviewQueue.length - 1);
+        }
+
+        function toggleReviewNote() {
+            const flipInner = document.getElementById('review-flip-inner');
+            const btn = document.getElementById('review-note-toggle-btn');
+            if (flipInner.classList.contains('flipped')) {
+                flipInner.classList.remove('flipped');
+                btn.textContent = 'Notu Göster';
+            } else {
+                flipInner.classList.add('flipped');
+                btn.textContent = 'Soruyu Göster';
+            }
         }
 
         function updateRecallButtons(status) {
@@ -2081,13 +2641,11 @@ function initCoursePicker() {
                 remembered: "flex-1 py-3 font-bold uppercase text-xs rounded-xl border-2 transition-all bg-slate-200 border-slate-300 text-slate-400 cursor-not-allowed"
             };
 
-            // Eğer status belirtilmişse (kilitli)
             if (status) {
                 forgotBtn.disabled = true;
                 partialBtn.disabled = true;
                 rememberedBtn.disabled = true;
 
-                // Seçili olan buton kendi rengini korur, diğerleri pasif
                 if (status === 'forgot') {
                     forgotBtn.className = activeClasses.forgot;
                     partialBtn.className = disabledClasses.partial;
@@ -2101,13 +2659,11 @@ function initCoursePicker() {
                     partialBtn.className = disabledClasses.partial;
                     rememberedBtn.className = activeClasses.remembered;
                 } else {
-                    // Bilinmeyen durum, hepsini pasif yap
                     forgotBtn.className = disabledClasses.forgot;
                     partialBtn.className = disabledClasses.partial;
                     rememberedBtn.className = disabledClasses.remembered;
                 }
             } else {
-                // Aktif mod
                 forgotBtn.disabled = false;
                 partialBtn.disabled = false;
                 rememberedBtn.disabled = false;
@@ -2125,44 +2681,37 @@ function initCoursePicker() {
             }
         }
 
-        // SORU CEVAPLAMA (sadece cevabı işaretler, döngü değiştirmez)
         function submitQuestionAnswer(userAns) {
             let q = currentReviewQueue[currentReviewIndex];
             if (!q) return;
 
             let todayStr = formatDate(getNowTR());
 
-            // Eğer zaten bugün cevaplanmışsa işlem yapma (önlem)
             if (q.lastReviewedDate === todayStr && q.userTodayAnswer) {
                 return;
             }
 
-            // Cevabı kaydet
             q.userTodayAnswer = String(userAns).trim().toUpperCase();
-            q.lastReviewedDate = todayStr; // Bugün cevaplandı olarak işaretle
+            q.lastReviewedDate = todayStr;
 
             saveState();
             updateHomeStats();
-            renderReviewItem(); // Görsel geri bildirim ve hatırlama butonları görünsün
+            renderReviewItem();
         }
 
-        // HATIRLAMA SEVİYESİ İŞLEME (sorular ve notlar için ortak)
         function submitRecallStatus(status) {
             const item = currentReviewQueue[currentReviewIndex];
             if (!item) return;
 
             const todayStr = formatDate(getNowTR());
 
-            // Daha önce seçim yapılmışsa tekrar yapılmasın
             if (item.userRecallStatus) {
                 return;
             }
 
-            // Durumu kaydet
             item.userRecallStatus = status;
             item.lastReviewedDate = todayStr;
 
-            // Döngü güncellemesi
             if (currentReviewMode === 'questions') {
                 const q = item;
                 let days;
@@ -2170,7 +2719,6 @@ function initCoursePicker() {
                     q.level = 0;
                     days = appState.intervals[0] || 1;
                 } else if (status === 'partial') {
-                    // seviye aynı kalır
                     days = appState.intervals[q.level] || 1;
                 } else if (status === 'remembered') {
                     q.level = (q.level || 0) + 1;
@@ -2188,7 +2736,6 @@ function initCoursePicker() {
                     n.stage = 0;
                     days = appState.noteIntervals[0] || 1;
                 } else if (status === 'partial') {
-                    // stage aynı kalır
                     days = appState.noteIntervals[n.stage] || 1;
                 } else if (status === 'remembered') {
                     n.stage = (n.stage || 0) + 1;
@@ -2200,10 +2747,8 @@ function initCoursePicker() {
 
             saveState();
             updateHomeStats();
-            renderReviewItem(); // Butonlar kilitlensin ve seçili renkli görünsün
+            renderReviewItem();
         }
-
-        // Eski submitNoteReview tamamen kaldırıldı, yerine submitRecallStatus kullanılıyor.
 
         function closeReview() {
             document.getElementById('review-modal').classList.add('hidden');
@@ -2241,7 +2786,7 @@ function initCoursePicker() {
             courseDiv.innerHTML = '';
             topicDiv.innerHTML = '';
 
-            Object.keys(appState.categories).forEach(c => {
+            archSelectedCourses.forEach(c => {
                 let active = archSelectedCourses.includes(c);
                 let btn = document.createElement('button');
                 btn.type = 'button';
@@ -2253,20 +2798,25 @@ function initCoursePicker() {
                         archSelectedTopics = archSelectedTopics.filter(x => !x.startsWith(c + '::'));
                     } else {
                         archSelectedCourses.push(c);
-                        if(appState.categories[c]) appState.categories[c].forEach(t => archSelectedTopics.push(c + '::' + t));
+                        // Bu derse ait tüm konuları archSelectedTopics'e ekle
+                        const topicsForCourse = new Set();
+                        appState.questions.forEach(q => { if(q.course === c) topicsForCourse.add(c + '::' + q.topic); });
+                        appState.notes.forEach(n => { if(n.course === c) topicsForCourse.add(c + '::' + n.topic); });
+                        topicsForCourse.forEach(t => { if(!archSelectedTopics.includes(t)) archSelectedTopics.push(t); });
                     }
                     populateArchiveFilters(); renderLibrary();
                 };
                 courseDiv.appendChild(btn);
 
-                if(active && appState.categories[c]) {
-                    appState.categories[c].forEach(t => {
-                        let tKey = c + '::' + t;
+                if(active) {
+                    const topics = archSelectedTopics.filter(t => t.startsWith(c + '::'));
+                    topics.forEach(tKey => {
+                        const topicName = tKey.substring(c.length + 2);
                         let tActive = archSelectedTopics.includes(tKey);
                         let tBtn = document.createElement('button');
                         tBtn.type = 'button';
                         tBtn.className = `px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase transition-all border ${tActive ? 'bg-amber-500 text-white border-amber-500' : 'bg-slate-100 text-slate-600 border-slate-200'}`;
-                        tBtn.innerText = `${c} > ${t}`;
+                        tBtn.innerText = topicName;
                         tBtn.onclick = () => {
                             if(tActive) archSelectedTopics = archSelectedTopics.filter(x => x !== tKey);
                             else archSelectedTopics.push(tKey);
@@ -2288,9 +2838,8 @@ function initCoursePicker() {
                 archSelectedCourses.includes(item.course) && 
                 archSelectedTopics.includes(item.course + '::' + item.topic)
             );
-            filteredList.reverse(); // EN YENİ EKLENENİ EN ÜSTE ALIR
+            filteredList.reverse();
 
-            // Sayacı ekle
             const countDisplay = document.createElement('div');
             countDisplay.className = "text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 px-1";
             countDisplay.textContent = `Bulunan ${activeArchiveType === 'question' ? 'Soru' : 'Not'}: ${filteredList.length}`;
@@ -2314,7 +2863,13 @@ function initCoursePicker() {
                 if(item.text_question) {
                     contentHTML += `<div class="text-xs font-bold text-slate-800 uppercase bg-slate-50 p-2.5 rounded-xl border border-slate-100">${item.text_question}</div>`;
                 }
-                if(item.note) {
+                if(item.note_text) {
+                    contentHTML += `<div class="text-[11px] font-semibold text-amber-800 uppercase bg-amber-50 p-2 rounded-xl border border-amber-100">${item.note_text}</div>`;
+                }
+                if(item.note_img) {
+                    contentHTML += `<img src="${item.note_img}" class="w-full max-h-36 object-contain rounded-xl bg-amber-50 border border-amber-100 cursor-zoom-in mt-1" onclick="openLightbox('${item.note_img}')">`;
+                }
+                if(!item.note_text && !item.note_img && item.note) {
                     contentHTML += `<div class="text-[11px] font-semibold text-amber-800 uppercase bg-amber-50 p-2 rounded-xl border border-amber-100">${item.note}</div>`;
                 }
 
@@ -2368,7 +2923,6 @@ function initCoursePicker() {
         // --- KAMP SİSTEMİ (FİLTRELİ) ---
         function openCampSetup(type) {
             campMode = type;
-            // Sadece arşiv filtrelerine uyanları al
             let list = (type === 'questions') ? appState.questions : appState.notes;
             list = list.filter(item => 
                 archSelectedCourses.includes(item.course) && 
@@ -2386,7 +2940,6 @@ function initCoursePicker() {
         function startCamp() {
             let count = parseInt(document.getElementById('camp-count-input').value) || 5;
             let list = (campMode === 'questions') ? [...appState.questions] : [...appState.notes];
-            // Filtre uygula
             list = list.filter(item => 
                 archSelectedCourses.includes(item.course) && 
                 archSelectedTopics.includes(item.course + '::' + item.topic)
@@ -2450,7 +3003,11 @@ function initCoursePicker() {
             const ansBox = document.getElementById('camp-review-answer-box');
 
             if (campMode === 'questions') {
-                ansBox.innerHTML = `DOĞRU CEVAP: <strong>${item.answer}</strong>${item.note ? '<br><span class="text-amber-700 mt-1 block">' + item.note + '</span>' : ''}`;
+                let noteHtml = '';
+                if (item.note_text) noteHtml = `<br><span class="text-amber-700 mt-1 block">${item.note_text}</span>`;
+                if (item.note_img) noteHtml += `<br><img src="${item.note_img}" class="max-h-32 object-contain rounded-lg mt-1 mx-auto">`;
+                if (!noteHtml && item.note) noteHtml = `<br><span class="text-amber-700 mt-1 block">${item.note}</span>`;
+                ansBox.innerHTML = `DOĞRU CEVAP: <strong>${item.answer}</strong>${noteHtml}`;
             } else {
                 ansBox.innerHTML = `NOT: <strong>${item.note}</strong>`;
             }
@@ -2472,90 +3029,6 @@ function initCoursePicker() {
 
         function closeCamp() {
             document.getElementById('camp-review-modal').classList.add('hidden');
-        }
-
-        // --- DERS VE KONU YÖNETİMİ ---
-        function renderCourseManagement() {
-            const list = document.getElementById('course-manage-list');
-            if(!list) return;
-            list.innerHTML = '';
-
-            Object.keys(appState.categories).forEach(c => {
-                let div = document.createElement('div');
-                div.className = "flex justify-between items-center p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold uppercase text-slate-700";
-                div.innerHTML = `
-                    <span>${c}</span>
-                    <button onclick="deleteCourse('${c}')" class="text-rose-500 hover:text-rose-700">SİL</button>
-                `;
-                list.appendChild(div);
-            });
-        }
-
-        function addCourse() {
-            let input = document.getElementById('new-course-input');
-            let val = input.value.trim().toLocaleUpperCase('tr-TR');
-            if(!val) return;
-
-            if(!appState.categories[val]) {
-                appState.categories[val] = ["GENEL"];
-                if(!appState.selectedCourses.includes(val)) appState.selectedCourses.push(val);
-                if(!appState.selectedTopics.includes(val + '::GENEL')) appState.selectedTopics.push(val + '::GENEL');
-                saveState(); syncSystemUI(); input.value = '';
-            } else {
-                showToast("Bu ders zaten mevcut!", true);
-            }
-        }
-
-        function deleteCourse(course) {
-            showCustomConfirm(`${course} dersini silmek istediğinize emin misiniz?`, () => {
-                delete appState.categories[course];
-                appState.selectedCourses = appState.selectedCourses.filter(c => c !== course);
-                appState.selectedTopics = appState.selectedTopics.filter(t => !t.startsWith(course + '::'));
-                saveState(); syncSystemUI();
-            });
-        }
-
-        function renderTopicManagement() {
-    const list = document.getElementById('topic-manage-list');
-    if(!list) return;
-    list.innerHTML = '';
-
-    const course = document.getElementById('settings-course').value;
-    if(course && appState.categories[course]) {
-        appState.categories[course].forEach(t => {
-            let div = document.createElement('div');
-            div.className = "flex justify-between items-center p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold uppercase text-slate-700";
-            div.innerHTML = `
-                <span>${t}</span>
-                ${t !== "GENEL" ? `<button onclick="deleteTopic('${course}', '${t}')" class="text-rose-500 hover:text-rose-700">SİL</button>` : `<span class="text-slate-400 text-[10px]">VARSAYILAN</span>`}
-            `;
-            list.appendChild(div);
-        });
-    }
-}
-
-        function addTopic() {
-            const c = document.getElementById('settings-course').value;
-            const input = document.getElementById('new-topic-input');
-            let val = input.value.trim().toLocaleUpperCase('tr-TR');
-            if(!c || !val) return;
-
-            if(!appState.categories[c].includes(val)) {
-                appState.categories[c].push(val);
-                let key = c + '::' + val;
-                if(!appState.selectedTopics.includes(key)) appState.selectedTopics.push(key);
-                saveState(); syncSystemUI(); input.value = '';
-            } else {
-                showToast("Bu konu zaten mevcut!", true);
-            }
-        }
-
-        function deleteTopic(course, topic) {
-            showCustomConfirm(`${topic} konusunu silmek istediğinize emin misiniz?`, () => {
-                appState.categories[course] = appState.categories[course].filter(t => t !== topic);
-                appState.selectedTopics = appState.selectedTopics.filter(t => t !== (course + '::' + topic));
-                saveState(); syncSystemUI();
-            });
         }
 
         function saveIntervals() {
@@ -2585,189 +3058,156 @@ function initCoursePicker() {
             document.getElementById('lightbox').classList.add('hidden');
         }
     </script>
-</body>
-</html>
-<!-- (Hiçbir kutuya/div'e sarmalamana gerek yok, doğrudan buraya ekle) -->
 
+    <script>
+        // Firebase Bağlantı Ayarları
+        const firebaseConfig = {
+            databaseURL: "https://hadiartik-60685-default-rtdb.europe-west1.firebasedatabase.app"
+        };
 
-<script>
-  // SİSTEM HATA DEDEKTÖRÜ: Kodda ne hata varsa ekrana yazdırır
-  window.onerror = function(message, source, lineno) {
-    const errorMsgEl = document.getElementById("error-msg");
-    if (errorMsgEl) {
-      errorMsgEl.innerHTML = "Sistem Hatası: " + message + "<br><small>Satır: " + lineno + "</small>";
-    }
-    return false;
-  };
-
-  try {
-    // Firebase Bağlantı Ayarları (Europe Sunucusu)
-    const firebaseConfig = {
-      databaseURL: "https://hadiartik-60685-default-rtdb.europe-west1.firebasedatabase.app"
-    };
-
-    if (typeof firebase === 'undefined') {
-      throw new Error("Firebase yüklenemedi! İnternetiniz kapalı olabilir veya script engellenmiş.");
-    }
-
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
-
-    // Giriş kontrolü (Hatalara karşı korumalı)
-    let isAuthorized = false;
-    try {
-      isAuthorized = localStorage.getItem("authorized") === "true";
-    } catch (e) {
-      console.warn("Tarayıcı koruması nedeniyle LocalStorage engellendi.");
-    }
-
-    // Eğer kullanıcı zaten giriş yaptıysa perdeyi anında tamamen kaldır
-    if (isAuthorized) {
-      const curtain = document.getElementById("login-screen");
-      if (curtain) curtain.remove();
-    }
-
-    function checkPassword() {
-      const errorDisplay = document.getElementById("error-msg");
-      if (errorDisplay) {
-        errorDisplay.innerText = "Bağlantı kuruluyor, lütfen bekleyin...";
-      }
-
-      const enteredKey = document.getElementById("otp-input").value.trim();
-
-      if (!enteredKey) {
-        if (errorDisplay) errorDisplay.innerText = "Lütfen şifre alanını boş bırakmayın!";
-        return;
-      }
-
-      const keyRef = database.ref("keys/" + enteredKey);
-
-      keyRef.once("value").then((snapshot) => {
-        if (snapshot.val() === true) {
-          // Şifre doğru, veritabanından siliyoruz (tek kullanımlık olması için)
-          keyRef.remove().then(() => {
-            try {
-              localStorage.setItem("authorized", "true");
-            } catch (e) {}
-            // Giriş başarılı olunca perdeyi tamamen yok et
-            const curtain = document.getElementById("login-screen");
-            if (curtain) curtain.remove();
-          }).catch((err) => {
-            if (errorDisplay) errorDisplay.innerText = "Şifre silinirken hata oluştu: " + err.message;
-          });
+        if (typeof firebase !== 'undefined') {
+            firebase.initializeApp(firebaseConfig);
+            window.database = firebase.database();
         } else {
-          if (errorDisplay) errorDisplay.innerText = "Geçersiz veya kullanılmış şifre!";
+            console.error("Firebase yüklenemedi!");
         }
-      }).catch((error) => {
-        if (errorDisplay) errorDisplay.innerText = "Veritabanı Bağlantı Hatası: " + error.message;
-      });
-    }
-  } catch (globalError) {
-    const errorDisplay = document.getElementById("error-msg");
-    if (errorDisplay) {
-      errorDisplay.innerText = "Başlatma Hatası: " + globalError.message;
-    }
-  }
-</script>
-<script>
-    // Ana Ekrana Ekle Prompt Yönetimi
-    let deferredPrompt = null;
-    const installModal = document.getElementById('install-modal');
-    const installTitle = document.getElementById('install-title');
-    const installDesc = document.getElementById('install-desc');
-    const installPreview = document.getElementById('install-preview');
-    const btnInstallAccept = document.getElementById('btn-install-accept');
-    const btnInstallCancel = document.getElementById('btn-install-cancel');
-    const btnInstallNever = document.getElementById('btn-install-never');
 
-    // Cihaz tespiti
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+        // Global hata yakalayıcı
+        window.onerror = function(message, source, lineno) {
+            const errorMsgEl = document.getElementById("error-msg");
+            if (errorMsgEl) {
+                errorMsgEl.innerHTML = "Sistem Hatası: " + message + "<br><small>Satır: " + lineno + "</small>";
+            }
+            return false;
+        };
 
-    // Kullanıcı daha önce "Bir Daha Gösterme" dedi mi?
-    function getInstallDismissed() {
-        return localStorage.getItem('installPromptDismissed') === 'true';
-    }
-    function setInstallDismissed() {
-        localStorage.setItem('installPromptDismissed', 'true');
-    }
+        // checkPassword fonksiyonu global scope'ta
+        function checkPassword() {
+            const errorDisplay = document.getElementById("error-msg");
+            if (errorDisplay) {
+                errorDisplay.innerText = "Bağlantı kuruluyor, lütfen bekleyin...";
+            }
 
-    // Modal'ı kapat
-    function closeInstallModal() {
-        installModal.classList.add('hidden');
-    }
+            const enteredKey = document.getElementById("otp-input").value.trim();
 
-    // iOS için yönerge içeriğini hazırla
-    function showIOSInstructions() {
-        installTitle.innerText = 'Ana Ekrana Ekle';
-        installDesc.innerText = 'Uygulamayı ana ekranınıza eklemek için Safari\'de aşağıdaki adımları izleyin:';
-        installPreview.innerHTML = `
+            if (!enteredKey) {
+                if (errorDisplay) errorDisplay.innerText = "Lütfen şifre alanını boş bırakmayın!";
+                return;
+            }
+
+            const keyRef = window.database.ref("keys/" + enteredKey);
+
+            keyRef.once("value").then((snapshot) => {
+                if (snapshot.val() === true) {
+                    keyRef.remove().then(() => {
+                        appState.authState = "full";
+                        saveState();
+                        try {
+                            localStorage.setItem("authorized", "true");
+                        } catch (e) {}
+                        const curtain = document.getElementById("login-screen");
+                        if (curtain) curtain.style.display = 'none';
+                        const codeBtn = document.getElementById("btn-code-enter");
+                        if (codeBtn) codeBtn.classList.add('hidden');
+                    }).catch((err) => {
+                        if (errorDisplay) errorDisplay.innerText = "Şifre silinirken hata oluştu: " + err.message;
+                    });
+                } else {
+                    if (errorDisplay) errorDisplay.innerText = "Geçersiz veya kullanılmış şifre!";
+                }
+            }).catch((error) => {
+                if (errorDisplay) errorDisplay.innerText = "Veritabanı Bağlantı Hatası: " + error.message;
+            });
+        }
+    </script>
+
+    <script>
+        // Ana Ekrana Ekle Prompt Yönetimi
+        let deferredPrompt = null;
+        const installModal = document.getElementById('install-modal');
+        const installTitle = document.getElementById('install-title');
+        const installDesc = document.getElementById('install-desc');
+        const installPreview = document.getElementById('install-preview');
+        const btnInstallAccept = document.getElementById('btn-install-accept');
+        const btnInstallCancel = document.getElementById('btn-install-cancel');
+        const btnInstallNever = document.getElementById('btn-install-never');
+
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+        function getInstallDismissed() {
+            return localStorage.getItem('installPromptDismissed') === 'true';
+        }
+        function setInstallDismissed() {
+            localStorage.setItem('installPromptDismissed', 'true');
+        }
+
+        function closeInstallModal() {
+            installModal.classList.add('hidden');
+        }
+
+        function showIOSInstructions() {
+            installTitle.innerText = 'Ana Ekrana Ekle';
+            installDesc.innerText = 'Uygulamayı ana ekranına eklemek için Safari\'de aşağıdaki adımları izle:';
+            installPreview.innerHTML = `
     <div class="text-center">
         <img src="ios-kurulum-rehberi.png" alt="iOS Kurulum Rehberi" class="mx-auto max-w-full rounded-xl border border-slate-300">
     </div>
 `;
-        btnInstallAccept.innerText = 'Tamam';
-    }
+            btnInstallAccept.innerText = 'Tamam';
+        }
 
-    // Android için kurulum içeriği
-    function showAndroidInstall() {
-        installTitle.innerText = 'Ana Ekrana Ekle';
-        installDesc.innerText = 'Net Kalkanım\'ı ana ekranınıza ekleyin, her zaman elinizin altında olsun!';
-        installPreview.innerHTML = `
+        function showAndroidInstall() {
+            installTitle.innerText = 'Ana Ekrana Ekle';
+            installDesc.innerText = 'Net Kalkanım\'ı ana ekranına ekle, her zaman elinin altında olsun!';
+            installPreview.innerHTML = `
             <div class="flex items-center gap-3 p-3 bg-indigo-50 text-indigo-700 rounded-xl border border-indigo-100">
                 <span class="text-3xl">📲</span>
                 <span class="text-xs font-bold">Hızlı erişim için uygulamayı yükleyin</span>
             </div>
         `;
-        btnInstallAccept.innerText = 'Ana Ekrana Ekle';
-    }
-
-    // beforeinstallprompt eventini dinle
-    window.addEventListener('beforeinstallprompt', (e) => {
-        // Event'i engelle (tarayıcı kendi infobarını göstermesin)
-        e.preventDefault();
-        deferredPrompt = e;
-
-        // Daha önce "Bir Daha Gösterme" denmediyse ve uygulama standalone değilse modalı göster
-        if (!getInstallDismissed() && !isStandalone) {
-            showAndroidInstall();
-            installModal.classList.remove('hidden');
+            btnInstallAccept.innerText = 'Ana Ekrana Ekle';
         }
-    });
 
-    // Eğer cihaz iOS ise ve uygulama standalone değilse, sayfa yüklendiğinde talimat modalını göster
-    window.addEventListener('load', () => {
-        if (isIOS && !isStandalone && !getInstallDismissed()) {
-            showIOSInstructions();
-            installModal.classList.remove('hidden');
-        }
-    });
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
 
-    // Buton tıklamaları
-    btnInstallAccept.addEventListener('click', async () => {
-        if (deferredPrompt) {
-            // Android'de kurulum prompt'unu göster
-            await deferredPrompt.prompt();
-            const choiceResult = await deferredPrompt.userChoice;
-            if (choiceResult.outcome === 'accepted') {
-                console.log('Kullanıcı kurulumu kabul etti');
-                // Başarılı kurulumdan sonra modalı kapatabiliriz
-                closeInstallModal();
-            } else {
-                console.log('Kullanıcı kurulumu reddetti');
+            if (!getInstallDismissed() && !isStandalone) {
+                showAndroidInstall();
+                installModal.classList.remove('hidden');
             }
-            // Event bir kez kullanılabilir, sıfırla
-            deferredPrompt = null;
-        } else {
-            // iOS'ta veya prompt yoksa modalı kapat
+        });
+
+        window.addEventListener('load', () => {
+            if (isIOS && !isStandalone && !getInstallDismissed()) {
+                showIOSInstructions();
+                installModal.classList.remove('hidden');
+            }
+        });
+
+        btnInstallAccept.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                await deferredPrompt.prompt();
+                const choiceResult = await deferredPrompt.userChoice;
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('Kullanıcı kurulumu kabul etti');
+                    closeInstallModal();
+                } else {
+                    console.log('Kullanıcı kurulumu reddetti');
+                }
+                deferredPrompt = null;
+            } else {
+                closeInstallModal();
+            }
+        });
+
+        btnInstallCancel.addEventListener('click', closeInstallModal);
+
+        btnInstallNever.addEventListener('click', () => {
+            setInstallDismissed();
             closeInstallModal();
-        }
-    });
-
-    btnInstallCancel.addEventListener('click', closeInstallModal);
-
-    btnInstallNever.addEventListener('click', () => {
-        setInstallDismissed();
-        closeInstallModal();
-    });
-</script>
+        });
+    </script>
+</body>
+</html>
