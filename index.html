@@ -486,10 +486,29 @@
                 </div>
 
                 <div class="bg-white border border-slate-200 p-5 space-y-4 relative overflow-hidden rounded-2xl shadow-sm">
-                    <div class="absolute top-0 left-0 w-1.5 h-full bg-indigo-600"></div>
-                    <h3 class="font-bold text-xs text-indigo-600 uppercase tracking-wider">Alan Yönetimi</h3>
-                    <p class="text-xs text-slate-500">Seçili alan: <span id="current-field-label" class="font-bold text-indigo-600">-</span></p>
-                    <button onclick="openFieldChangeModal()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 font-bold text-xs uppercase rounded-xl transition-colors shadow-sm">Alan Değiştir</button>
+                    <div class="absolute top-0 left-0 w-1.5 h-full bg-blue-500"></div>
+                    <h3 class="font-bold text-xs text-blue-600 uppercase tracking-wider">Derslerim</h3>
+                    <div class="flex gap-2">
+                        <input type="text" id="new-course-input" placeholder="YENİ DERS (ÖRN: BİYOLOJİ)" class="flex-1 bg-slate-50 p-3 border border-slate-300 outline-none focus:border-blue-500 text-xs font-bold uppercase tracking-wider rounded-xl text-slate-800">
+                        <button onclick="addCourse()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 font-bold uppercase text-xs rounded-xl transition-colors shadow-sm">EKLE</button>
+                    </div>
+                    <div id="course-manage-list" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
+                </div>
+
+                <div class="bg-white border border-slate-200 p-5 space-y-4 relative overflow-hidden rounded-2xl shadow-sm">
+                    <div class="absolute top-0 left-0 w-1.5 h-full bg-emerald-500"></div>
+                    <h3 class="font-bold text-xs text-emerald-600 uppercase tracking-wider">Konularım</h3>
+                    <input type="hidden" id="settings-course" value="">
+                    <button type="button" id="btn-settings-course" onclick="openPickerForSettings('course')"
+                            class="w-full bg-slate-50 p-3 border border-slate-300 rounded-xl shadow-sm text-left flex justify-between items-center uppercase text-sm font-semibold text-slate-700 hover:border-emerald-500 transition-colors">
+                        <span id="btn-settings-course-text">Ders Seçiniz</span>
+                        <svg class="w-4 h-4 fill-slate-400" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+                    </button>
+                    <div class="flex gap-2">
+                        <input type="text" id="new-topic-input" placeholder="YENİ KONU (ÖRN: HÜCRE)" class="flex-1 bg-slate-50 p-3 border border-slate-300 outline-none focus:border-emerald-500 text-xs font-bold uppercase tracking-wider rounded-xl text-slate-800">
+                        <button onclick="addTopic()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 font-bold uppercase text-xs rounded-xl transition-colors shadow-sm">EKLE</button>
+                    </div>
+                    <div id="topic-manage-list" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
                 </div>
 
                 <div class="bg-white border border-slate-200 p-5 space-y-4 relative overflow-hidden rounded-2xl shadow-sm">
@@ -703,7 +722,6 @@
                     <div id="dot-step-4" class="w-1.5 h-1.5 rounded-full bg-slate-300 transition-all"></div>
                     <div id="dot-step-5" class="w-1.5 h-1.5 rounded-full bg-slate-300 transition-all"></div>
                     <div id="dot-step-6" class="w-1.5 h-1.5 rounded-full bg-slate-300 transition-all"></div>
-                    <div id="dot-step-7" class="w-1.5 h-1.5 rounded-full bg-slate-300 transition-all"></div>
                 </div>
 
                 <h3 id="onboarding-title" class="text-indigo-950 font-extrabold text-lg uppercase tracking-tight mb-2"></h3>
@@ -800,84 +818,8 @@
         </div>
     </div>
 
-    <!-- Alan Seçim Modalı -->
-    <div id="field-select-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[120] hidden flex justify-center items-center p-4">
-        <div class="modal-animate bg-white border border-slate-200 w-full max-w-sm p-6 rounded-3xl shadow-2xl flex flex-col items-center text-center">
-            <h3 class="text-indigo-600 font-bold text-base uppercase mb-3">Alanını Seç</h3>
-            <p class="text-slate-500 text-xs uppercase tracking-wide mb-5">Hangi alanda ilerlemek istiyorsun?</p>
-            <div class="grid grid-cols-1 gap-3 w-full">
-                <button onclick="changeField('sayisal')" class="field-option-btn w-full py-4 rounded-2xl border-2 border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 transition-all font-bold uppercase text-slate-700" data-field="sayisal">Sayısal</button>
-                <button onclick="changeField('esitagirlik')" class="field-option-btn w-full py-4 rounded-2xl border-2 border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 transition-all font-bold uppercase text-slate-700" data-field="esitagirlik">Eşit Ağırlık</button>
-                <button onclick="changeField('sozel')" class="field-option-btn w-full py-4 rounded-2xl border-2 border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 transition-all font-bold uppercase text-slate-700" data-field="sozel">Sözel</button>
-                <button onclick="changeField('dil')" class="field-option-btn w-full py-4 rounded-2xl border-2 border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 transition-all font-bold uppercase text-slate-700" data-field="dil">Dil</button>
-            </div>
-            <button onclick="closeFieldModal()" class="mt-5 w-full bg-slate-100 hover:bg-slate-200 text-slate-500 py-3 font-bold text-xs uppercase rounded-xl transition-colors">İptal</button>
-        </div>
-    </div>
-
     <script>
-        // ========== ALANLARA GÖRE DERS VE KONU LİSTELERİ ==========
-        const FIELD_COURSES = {
-            "sayisal": {
-                "AYT MATEMATİK": ["Temel Kavramlar", "Sayı Basamakları", "Bölme ve Bölünebilme", "EBOB - EKOK", "Rasyonel Sayılar", "Basit Eşitsizlikler", "Mutlak Değer", "Üslü Sayılar", "Köklü Sayılar", "Çarpanlara Ayırma", "Oran Orantı", "Denklem Çözme", "Problemler", "Kümeler", "Kartezyen Çarpım", "Mantık", "Fonksiyonlar", "Polinomlar", "2.Dereceden Denklemler", "Permütasyon ve Kombinasyon", "Binom ve Olasılık", "İstatistik", "Karmaşık Sayılar", "2.Dereceden Eşitsizlikler", "Parabol", "Trigonometri", "Logaritma", "Diziler", "Limit", "Türev", "İntegral"],
-                "AYT FİZİK": ["Vektörler", "Kuvvet, Tork ve Denge", "Kütle Merkezi", "Basit Makineler", "Hareket", "Newton’un Hareket Yasaları", "İş, Güç ve Enerji II", "Atışlar", "İtme ve Momentum", "Elektrik Alan ve Potansiyel", "Paralel Levhalar ve Sığa", "Manyetik Alan ve Manyetik Kuvvet", "İndüksiyon, Alternatif Akım ve Transformatörler", "Çembersel Hareket", "Dönme, Yuvarlanma ve Açısal Momentum", "Kütle Çekim ve Kepler Yasaları", "Basit Harmonik Hareket", "Dalga Mekaniği ve Elektromanyetik Dalgalar", "Atom Modelleri", "Büyük Patlama ve Parçacık Fiziği", "Radyoaktivite", "Özel Görelilik", "Kara Cisim Işıması", "Fotoelektrik Olay ve Compton Olayı", "Modern Fiziğin Teknolojideki Uygulamaları"],
-                "AYT KİMYA": ["Kimya Bilimi", "Atom ve Periyodik Sistem", "Kimyasal Türler Arası Etkileşimler", "Kimyasal Hesaplamalar", "Kimyanın Temel Kanunları", "Asit, Baz ve Tuz", "Maddenin Halleri", "Karışımlar", "Doğa ve Kimya", "Kimya Her Yerde", "Modern Atom Teorisi", "Gazlar", "Sıvı Çözeltiler", "Kimyasal Tepkimelerde Enerji", "Kimyasal Tepkimelerde Hız", "Kimyasal Tepkimelerde Denge", "Asit-Baz Dengesi", "Çözünürlük Dengesi", "Kimya ve Elektrik", "Organik Kimyaya Giriş", "Organik Kimya", "Enerji Kaynakları ve Bilimsel Gelişmeler"],
-                "AYT BİYOLOJİ": ["Sinir Sistemi", "Endokrin Sistem ve Hormonlar", "Duyu Organları", "Destek ve Hareket Sistemi", "Sindirim Sistemi", "Dolaşım ve Bağışıklık Sistemi", "Solunum Sistemi", "Üriner Sistem (Boşaltım)", "Üreme Sistemi ve Embriyonik Gelişim", "Komünite Ekolojisi", "Popülasyon Ekolojisi", "Genden Proteine", "Canlılarda Enerji Dönüşümleri", "Bitki Biyolojisi", "Canlılar ve Çevre"],
-                "TYT TÜRKÇE": ["Sözcükte Anlam", "Cümlede Anlam", "Paragrafta Anlam", "Ses Bilgisi", "Sözcükte Yapı", "Sözcük Türleri", "Cümlenin Ögeleri", "Fiilde Çatı", "Cümle Türleri", "Yazım Kuralları", "Noktalama İşaretleri", "Anlatım Bozuklukları"],
-                "TYT TARİH": ["Tarih Bilimi ve İlk Çağ Uygarlıkları", "İlk ve Orta Çağlarda Türk Dünyası", "İslam Medeniyeti ve Türk-İslam Devletleri", "Osmanlı Devleti ve Kültür Medeniyeti", "20. Yüzyıl Başlarında Osmanlı Devleti", "Milli Mücadele Dönemi", "Atatürk İnkılapları ve İlkeleri", "Atatürk Dönemi Türk Dış Politikası"],
-                "TYT COĞRAFYA": ["Doğa ve İnsan", "Dünyanın Şekli ve Coğrafi Konum", "Harita Bilgisi", "İklim Bilgisi", "Yer Şekilleri", "Su, Toprak ve Bitkiler", "Nüfus, Yerleşme ve Göç", "Bölge Kavramı ve Ulaşım", "Doğal Afetler ve Çevre"],
-                "TYT FELSEFE": ["Felsefeyi Tanıma", "Bilgi Felsefesi", "Varlık Felsefesi", "Ahlak Felsefesi", "Sanat Felsefesi", "Siyaset Felsefesi", "Din Felsefesi", "Bilim Felsefesi"],
-                "TYT DİN KÜLTÜRÜ": ["Bilgi ve İnanç", "İbadetler", "Ahlak ve Değerler", "Hz. Muhammed", "Vahiy ve Akıl", "İslam Düşüncesinde Yorumlar ve Mezhepler", "Din, Kültür ve Medeniyet"],
-                "TYT MATEMATİK": ["Temel Kavramlar", "Sayı Basamakları", "Bölme ve Bölünebilme", "EBOB - EKOK", "Rasyonel Sayılar", "Basit Eşitsizlikler", "Mutlak Değer", "Üslü Sayılar", "Köklü Sayılar", "Çarpanlara Ayırma", "Oran - Orantı", "Denklem Çözme", "Problemler", "Kümeler ve Kartezyen Çarpım", "Mantık", "Fonksiyonlar", "Polinomlar", "İkinci Dereceden Denklemler", "Permütasyon ve Kombinasyon", "Olasılık", "Veri ve İstatistik"],
-                "TYT FİZİK": ["Fizik Bilimine Giriş", "Madde ve Özellikleri", "Sıvıların Kaldırma Kuvveti", "Basınç", "Isı, Sıcaklık ve Genleşme", "Hareket ve Kuvvet", "Dinamik", "İş, Güç ve Enerji", "Elektrik", "Manyetizma", "Dalgalar", "Optik"],
-                "TYT KİMYA": ["Kimya Bilimi", "Atom ve Periyodik Sistem", "Kimyasal Türler Arası Etkileşimler", "Maddenin Hâlleri", "Doğa ve Kimya", "Kimyanın Temel Kanunları", "Kimyasal Hesaplamalar", "Karışımlar", "Asitler, Bazlar ve Tuzlar", "Kimya Her Yerde"],
-                "TYT BİYOLOJİ": ["Canlıların Ortak Özellikleri", "Canlıların Temel Bileşenleri", "Hücre ve Organeller – Madde Geçişleri", "Canlıların Sınıflandırılması", "Hücrede Bölünme – Üreme", "Kalıtım", "Ekosistem", "Bitki Biyolojisi"]
-            },
-            "esitagirlik": {
-                "AYT MATEMATİK": ["Temel Kavramlar", "Sayı Basamakları", "Bölme ve Bölünebilme", "EBOB - EKOK", "Rasyonel Sayılar", "Basit Eşitsizlikler", "Mutlak Değer", "Üslü Sayılar", "Köklü Sayılar", "Çarpanlara Ayırma", "Oran Orantı", "Denklem Çözme", "Problemler", "Kümeler", "Kartezyen Çarpım", "Mantık", "Fonksiyonlar", "Polinomlar", "2.Dereceden Denklemler", "Permütasyon ve Kombinasyon", "Binom ve Olasılık", "İstatistik", "Karmaşık Sayılar", "2.Dereceden Eşitsizlikler", "Parabol", "Trigonometri", "Logaritma", "Diziler", "Limit", "Türev", "İntegral"],
-                "AYT EDEBİYAT": ["Anlam Bilgisi", "Dil Bilgisi", "Güzel Sanatlar ve Edebiyat", "Metinlerin Sınıflandırılması", "Şiir Bilgisi", "Edebi Sanatlar", "Türk Edebiyatı Dönemleri", "İslamiyet Öncesi Türk Edebiyatı ve Geçiş Dönemi", "Halk Edebiyatı", "Divan Edebiyatı", "Tanzimat Edebiyatı", "Servet-i Fünun Edebiyatı", "Fecr-i Ati Edebiyatı", "Milli Edebiyat", "Cumhuriyet Dönemi Edebiyatı", "Edebiyat Akımları", "Dünya Edebiyatı"],
-                "AYT TARİH": ["Tarih ve Zaman", "İnsanlığın İlk Dönemleri", "Orta Çağ’da Dünya", "İlk ve Orta Çağlarda Türk Dünyası", "İslam Medeniyetinin Doğuşu", "Türklerin İslamiyet’i Kabulü ve İlk Türk İslam Devletleri", "Yerleşme ve Devletleşme Sürecinde Selçuklu Türkiyesi", "Beylikten Devlete Osmanlı Siyaseti", "Devletleşme Sürecinde Savaşçılar ve Askerler", "Beylikten Devlete Osmanlı Medeniyeti", "Dünya Gücü Osmanlı", "Sultan ve Osmanlı Merkez Teşkilatı", "Klasik Çağda Osmanlı Toplum Düzeni", "Değişen Dünya Dengeleri Karşısında Osmanlı Siyaseti", "Değişim Çağında Avrupa ve Osmanlı", "Uluslararası İlişkilerde Denge Stratejisi (1774-1914)", "Devrimler Çağında Değişen Devlet-Toplum İlişkileri", "Sermaye ve Emek", "XIX. ve XX. Yüzyılda Değişen Gündelik Hayat", "XX. Yüzyıl Başlarında Osmanlı Devleti ve Dünya", "Milli Mücadele", "Atatürkçülük ve Türk İnkılabı", "İki Savaş Arasındaki Dönemde Türkiye ve Dünya", "II. Dünya Savaşı Sürecinde Türkiye ve Dünya", "II. Dünya Savaşı Sonrasında Türkiye ve Dünya", "Toplumsal Devrim Çağında Dünya ve Türkiye", "XXI. Yüzyılın Eşiğinde Türkiye ve Dünya"],
-                "AYT COĞRAFYA": ["Ekosistem Nüfus Politikaları", "Türkiye’de Nüfus ve Yerleşme", "Ekonomik Faaliyetler ve Doğal Kaynaklar", "Göç ve Şehirleşme", "Türkiye Ekonomisi", "Geçmişten Geleceğe Şehir ve Ekonomi", "Türkiye’nin İşlevsel Bölgeleri ve Kalkınma Projeleri", "Hizmet Sektörünün Ekonomideki Yeri", "Küresel Ticaret", "Bölgeler ve Ülkeler", "Çevre ve Toplum"],
-                "TYT TÜRKÇE": ["Sözcükte Anlam", "Cümlede Anlam", "Paragrafta Anlam", "Ses Bilgisi", "Sözcükte Yapı", "Sözcük Türleri", "Cümlenin Ögeleri", "Fiilde Çatı", "Cümle Türleri", "Yazım Kuralları", "Noktalama İşaretleri", "Anlatım Bozuklukları"],
-                "TYT TARİH": ["Tarih Bilimi ve İlk Çağ Uygarlıkları", "İlk ve Orta Çağlarda Türk Dünyası", "İslam Medeniyeti ve Türk-İslam Devletleri", "Osmanlı Devleti ve Kültür Medeniyeti", "20. Yüzyıl Başlarında Osmanlı Devleti", "Milli Mücadele Dönemi", "Atatürk İnkılapları ve İlkeleri", "Atatürk Dönemi Türk Dış Politikası"],
-                "TYT COĞRAFYA": ["Doğa ve İnsan", "Dünyanın Şekli ve Coğrafi Konum", "Harita Bilgisi", "İklim Bilgisi", "Yer Şekilleri", "Su, Toprak ve Bitkiler", "Nüfus, Yerleşme ve Göç", "Bölge Kavramı ve Ulaşım", "Doğal Afetler ve Çevre"],
-                "TYT FELSEFE": ["Felsefeyi Tanıma", "Bilgi Felsefesi", "Varlık Felsefesi", "Ahlak Felsefesi", "Sanat Felsefesi", "Siyaset Felsefesi", "Din Felsefesi", "Bilim Felsefesi"],
-                "TYT DİN KÜLTÜRÜ": ["Bilgi ve İnanç", "İbadetler", "Ahlak ve Değerler", "Hz. Muhammed", "Vahiy ve Akıl", "İslam Düşüncesinde Yorumlar ve Mezhepler", "Din, Kültür ve Medeniyet"],
-                "TYT MATEMATİK": ["Temel Kavramlar", "Sayı Basamakları", "Bölme ve Bölünebilme", "EBOB - EKOK", "Rasyonel Sayılar", "Basit Eşitsizlikler", "Mutlak Değer", "Üslü Sayılar", "Köklü Sayılar", "Çarpanlara Ayırma", "Oran - Orantı", "Denklem Çözme", "Problemler", "Kümeler ve Kartezyen Çarpım", "Mantık", "Fonksiyonlar", "Polinomlar", "İkinci Dereceden Denklemler", "Permütasyon ve Kombinasyon", "Olasılık", "Veri ve İstatistik"],
-                "TYT FİZİK": ["Fizik Bilimine Giriş", "Madde ve Özellikleri", "Sıvıların Kaldırma Kuvveti", "Basınç", "Isı, Sıcaklık ve Genleşme", "Hareket ve Kuvvet", "Dinamik", "İş, Güç ve Enerji", "Elektrik", "Manyetizma", "Dalgalar", "Optik"],
-                "TYT KİMYA": ["Kimya Bilimi", "Atom ve Periyodik Sistem", "Kimyasal Türler Arası Etkileşimler", "Maddenin Hâlleri", "Doğa ve Kimya", "Kimyanın Temel Kanunları", "Kimyasal Hesaplamalar", "Karışımlar", "Asitler, Bazlar ve Tuzlar", "Kimya Her Yerde"],
-                "TYT BİYOLOJİ": ["Canlıların Ortak Özellikleri", "Canlıların Temel Bileşenleri", "Hücre ve Organeller – Madde Geçişleri", "Canlıların Sınıflandırılması", "Hücrede Bölünme – Üreme", "Kalıtım", "Ekosistem", "Bitki Biyolojisi"]
-            },
-            "sozel": {
-                "AYT EDEBİYAT": ["Anlam Bilgisi", "Dil Bilgisi", "Güzel Sanatlar ve Edebiyat", "Metinlerin Sınıflandırılması", "Şiir Bilgisi", "Edebi Sanatlar", "Türk Edebiyatı Dönemleri", "İslamiyet Öncesi Türk Edebiyatı ve Geçiş Dönemi", "Halk Edebiyatı", "Divan Edebiyatı", "Tanzimat Edebiyatı", "Servet-i Fünun Edebiyatı", "Fecr-i Ati Edebiyatı", "Milli Edebiyat", "Cumhuriyet Dönemi Edebiyatı", "Edebiyat Akımları", "Dünya Edebiyatı"],
-                "AYT TARİH": ["Tarih ve Zaman", "İnsanlığın İlk Dönemleri", "Orta Çağ’da Dünya", "İlk ve Orta Çağlarda Türk Dünyası", "İslam Medeniyetinin Doğuşu", "Türklerin İslamiyet’i Kabulü ve İlk Türk İslam Devletleri", "Yerleşme ve Devletleşme Sürecinde Selçuklu Türkiyesi", "Beylikten Devlete Osmanlı Siyaseti", "Devletleşme Sürecinde Savaşçılar ve Askerler", "Beylikten Devlete Osmanlı Medeniyeti", "Dünya Gücü Osmanlı", "Sultan ve Osmanlı Merkez Teşkilatı", "Klasik Çağda Osmanlı Toplum Düzeni", "Değişen Dünya Dengeleri Karşısında Osmanlı Siyaseti", "Değişim Çağında Avrupa ve Osmanlı", "Uluslararası İlişkilerde Denge Stratejisi (1774-1914)", "Devrimler Çağında Değişen Devlet-Toplum İlişkileri", "Sermaye ve Emek", "XIX. ve XX. Yüzyılda Değişen Gündelik Hayat", "XX. Yüzyıl Başlarında Osmanlı Devleti ve Dünya", "Milli Mücadele", "Atatürkçülük ve Türk İnkılabı", "İki Savaş Arasındaki Dönemde Türkiye ve Dünya", "II. Dünya Savaşı Sürecinde Türkiye ve Dünya", "II. Dünya Savaşı Sonrasında Türkiye ve Dünya", "Toplumsal Devrim Çağında Dünya ve Türkiye", "XXI. Yüzyılın Eşiğinde Türkiye ve Dünya"],
-                "AYT COĞRAFYA": ["Ekosistem Nüfus Politikaları", "Türkiye’de Nüfus ve Yerleşme", "Ekonomik Faaliyetler ve Doğal Kaynaklar", "Göç ve Şehirleşme", "Türkiye Ekonomisi", "Geçmişten Geleceğe Şehir ve Ekonomi", "Türkiye’nin İşlevsel Bölgeleri ve Kalkınma Projeleri", "Hizmet Sektörünün Ekonomideki Yeri", "Küresel Ticaret", "Bölgeler ve Ülkeler", "Çevre ve Toplum"],
-                "AYT FELSEFE": ["Felsefe’nin Konusu", "Mantık Konuları", "Psikoloji Bilimini Tanıyalım", "Sosyolojiye Giriş"],
-                "AYT DİN KÜLTÜRÜ": ["Gönül Coğrafyamız", "İslam ve İbadet", "Allah İnsan İlişkisi", "Hz. Muhammed ve Gençlik", "Din ve Hayat", "Ahlaki Tutum ve Davranışlar", "İslam Düşüncesinde İtikadi, Siyasi ve Fıkhi Yorumlar", "Dünya ve Ahiret", "Kur’an’a Göre Hz. Muhammed", "Kur’an’da Bazı Kavramlar", "İnançla İlgili Meseleler", "Yahudilik ve Hristiyanlık", "İslam ve Bilim", "Anadolu’da İslam", "İslam Düşüncesinde Tasavvufi Yorumlar", "Güncel Dini Meseleler", "Hint ve Çin Dinleri"],
-                "TYT TÜRKÇE": ["Sözcükte Anlam", "Cümlede Anlam", "Paragrafta Anlam", "Ses Bilgisi", "Sözcükte Yapı", "Sözcük Türleri", "Cümlenin Ögeleri", "Fiilde Çatı", "Cümle Türleri", "Yazım Kuralları", "Noktalama İşaretleri", "Anlatım Bozuklukları"],
-                "TYT TARİH": ["Tarih Bilimi ve İlk Çağ Uygarlıkları", "İlk ve Orta Çağlarda Türk Dünyası", "İslam Medeniyeti ve Türk-İslam Devletleri", "Osmanlı Devleti ve Kültür Medeniyeti", "20. Yüzyıl Başlarında Osmanlı Devleti", "Milli Mücadele Dönemi", "Atatürk İnkılapları ve İlkeleri", "Atatürk Dönemi Türk Dış Politikası"],
-                "TYT COĞRAFYA": ["Doğa ve İnsan", "Dünyanın Şekli ve Coğrafi Konum", "Harita Bilgisi", "İklim Bilgisi", "Yer Şekilleri", "Su, Toprak ve Bitkiler", "Nüfus, Yerleşme ve Göç", "Bölge Kavramı ve Ulaşım", "Doğal Afetler ve Çevre"],
-                "TYT FELSEFE": ["Felsefeyi Tanıma", "Bilgi Felsefesi", "Varlık Felsefesi", "Ahlak Felsefesi", "Sanat Felsefesi", "Siyaset Felsefesi", "Din Felsefesi", "Bilim Felsefesi"],
-                "TYT DİN KÜLTÜRÜ": ["Bilgi ve İnanç", "İbadetler", "Ahlak ve Değerler", "Hz. Muhammed", "Vahiy ve Akıl", "İslam Düşüncesinde Yorumlar ve Mezhepler", "Din, Kültür ve Medeniyet"],
-                "TYT MATEMATİK": ["Temel Kavramlar", "Sayı Basamakları", "Bölme ve Bölünebilme", "EBOB - EKOK", "Rasyonel Sayılar", "Basit Eşitsizlikler", "Mutlak Değer", "Üslü Sayılar", "Köklü Sayılar", "Çarpanlara Ayırma", "Oran - Orantı", "Denklem Çözme", "Problemler", "Kümeler ve Kartezyen Çarpım", "Mantık", "Fonksiyonlar", "Polinomlar", "İkinci Dereceden Denklemler", "Permütasyon ve Kombinasyon", "Olasılık", "Veri ve İstatistik"],
-                "TYT FİZİK": ["Fizik Bilimine Giriş", "Madde ve Özellikleri", "Sıvıların Kaldırma Kuvveti", "Basınç", "Isı, Sıcaklık ve Genleşme", "Hareket ve Kuvvet", "Dinamik", "İş, Güç ve Enerji", "Elektrik", "Manyetizma", "Dalgalar", "Optik"],
-                "TYT KİMYA": ["Kimya Bilimi", "Atom ve Periyodik Sistem", "Kimyasal Türler Arası Etkileşimler", "Maddenin Hâlleri", "Doğa ve Kimya", "Kimyanın Temel Kanunları", "Kimyasal Hesaplamalar", "Karışımlar", "Asitler, Bazlar ve Tuzlar", "Kimya Her Yerde"],
-                "TYT BİYOLOJİ": ["Canlıların Ortak Özellikleri", "Canlıların Temel Bileşenleri", "Hücre ve Organeller – Madde Geçişleri", "Canlıların Sınıflandırılması", "Hücrede Bölünme – Üreme", "Kalıtım", "Ekosistem", "Bitki Biyolojisi"]
-            },
-            "dil": {
-                "AYT İNGİLİZCE": ["Vocabulary", "Grammar", "Cloze Test", "Sentence Completion", "Paragraph Comprehension", "Dialogue Completion", "Restatement", "Situation", "Paragraph Completion", "Translation Eng->Tur", "Translation Tur->Eng", "Irrelevant Sentence"],
-                "TYT TÜRKÇE": ["Sözcükte Anlam", "Cümlede Anlam", "Paragrafta Anlam", "Ses Bilgisi", "Sözcükte Yapı", "Sözcük Türleri", "Cümlenin Ögeleri", "Fiilde Çatı", "Cümle Türleri", "Yazım Kuralları", "Noktalama İşaretleri", "Anlatım Bozuklukları"],
-                "TYT TARİH": ["Tarih Bilimi ve İlk Çağ Uygarlıkları", "İlk ve Orta Çağlarda Türk Dünyası", "İslam Medeniyeti ve Türk-İslam Devletleri", "Osmanlı Devleti ve Kültür Medeniyeti", "20. Yüzyıl Başlarında Osmanlı Devleti", "Milli Mücadele Dönemi", "Atatürk İnkılapları ve İlkeleri", "Atatürk Dönemi Türk Dış Politikası"],
-                "TYT COĞRAFYA": ["Doğa ve İnsan", "Dünyanın Şekli ve Coğrafi Konum", "Harita Bilgisi", "İklim Bilgisi", "Yer Şekilleri", "Su, Toprak ve Bitkiler", "Nüfus, Yerleşme ve Göç", "Bölge Kavramı ve Ulaşım", "Doğal Afetler ve Çevre"],
-                "TYT FELSEFE": ["Felsefeyi Tanıma", "Bilgi Felsefesi", "Varlık Felsefesi", "Ahlak Felsefesi", "Sanat Felsefesi", "Siyaset Felsefesi", "Din Felsefesi", "Bilim Felsefesi"],
-                "TYT DİN KÜLTÜRÜ": ["Bilgi ve İnanç", "İbadetler", "Ahlak ve Değerler", "Hz. Muhammed", "Vahiy ve Akıl", "İslam Düşüncesinde Yorumlar ve Mezhepler", "Din, Kültür ve Medeniyet"],
-                "TYT MATEMATİK": ["Temel Kavramlar", "Sayı Basamakları", "Bölme ve Bölünebilme", "EBOB - EKOK", "Rasyonel Sayılar", "Basit Eşitsizlikler", "Mutlak Değer", "Üslü Sayılar", "Köklü Sayılar", "Çarpanlara Ayırma", "Oran - Orantı", "Denklem Çözme", "Problemler", "Kümeler ve Kartezyen Çarpım", "Mantık", "Fonksiyonlar", "Polinomlar", "İkinci Dereceden Denklemler", "Permütasyon ve Kombinasyon", "Olasılık", "Veri ve İstatistik"],
-                "TYT FİZİK": ["Fizik Bilimine Giriş", "Madde ve Özellikleri", "Sıvıların Kaldırma Kuvveti", "Basınç", "Isı, Sıcaklık ve Genleşme", "Hareket ve Kuvvet", "Dinamik", "İş, Güç ve Enerji", "Elektrik", "Manyetizma", "Dalgalar", "Optik"],
-                "TYT KİMYA": ["Kimya Bilimi", "Atom ve Periyodik Sistem", "Kimyasal Türler Arası Etkileşimler", "Maddenin Hâlleri", "Doğa ve Kimya", "Kimyanın Temel Kanunları", "Kimyasal Hesaplamalar", "Karışımlar", "Asitler, Bazlar ve Tuzlar", "Kimya Her Yerde"],
-                "TYT BİYOLOJİ": ["Canlıların Ortak Özellikleri", "Canlıların Temel Bileşenleri", "Hücre ve Organeller – Madde Geçişleri", "Canlıların Sınıflandırılması", "Hücrede Bölünme – Üreme", "Kalıtım", "Ekosistem", "Bitki Biyolojisi"]
-            }
-        };
-
+    
         // GMT+3 Zaman Hesaplayıcıları
         function getNowTR() {
             const d = new Date();
@@ -972,7 +914,11 @@
         }
 
         let appState = {
-            categories: {},
+            categories: {
+                "TYT MATEMATİK": ["TEMEL KAVRAMLAR", "ÜSLÜ SAYILAR"],
+                "TYT FİZİK": ["DALGALAR", "OPTİK", "ISI SICAKLIK"],
+                "TYT TÜRKÇE": ["DİL BİLGİSİ", "PARAGRAF"]
+            },
             questions: [],
             notes: [],
             intervals: [1, 3, 7, 21, 45, 90, 180],
@@ -981,8 +927,7 @@
             selectedTopics: [],
             autoDestroyThreshold: 5,
             hasSeenOnboarding: false,
-            authState: "none",   // "none", "trial", "full"
-            selectedField: null   // YENİ
+            authState: "none"   // "none", "trial", "full"
         };
 
         let currentEntryType = 'question'; 
@@ -1016,65 +961,6 @@
         let currentNoteInputType = 'text'; // 'text' veya 'image'
         let noteImageDataUrl = null; // Not görseli dataURL
 
-        // Alan seçim fonksiyonları
-        function openFieldChangeModal() {
-            document.getElementById('field-select-modal').classList.remove('hidden');
-        }
-
-        function closeFieldModal() {
-            document.getElementById('field-select-modal').classList.add('hidden');
-        }
-
-        function changeField(fieldKey) {
-            if (!FIELD_COURSES[fieldKey]) return;
-            applyFieldSelection(fieldKey);
-            closeFieldModal();
-            showToast("Alan değiştirildi. Eski sorularınız ve notlarınız korundu.");
-        }
-
-        function applyFieldSelection(fieldKey) {
-            appState.selectedField = fieldKey;
-            appState.categories = JSON.parse(JSON.stringify(FIELD_COURSES[fieldKey]));
-
-            // Mevcut verilerdeki dersleri topla
-            const existingCourses = new Set();
-            appState.questions.forEach(q => existingCourses.add(q.course));
-            appState.notes.forEach(n => existingCourses.add(n.course));
-            const allCourses = Array.from(new Set([...Object.keys(appState.categories), ...existingCourses]));
-
-            const existingTopicKeys = new Set();
-            appState.questions.forEach(q => existingTopicKeys.add(q.course + '::' + q.topic));
-            appState.notes.forEach(n => existingTopicKeys.add(n.course + '::' + n.topic));
-            const allTopicKeys = Array.from(new Set([...Object.keys(appState.categories).flatMap(c => (appState.categories[c] || []).map(t => c + '::' + t)), ...existingTopicKeys]));
-
-            appState.selectedCourses = allCourses;
-            appState.selectedTopics = allTopicKeys;
-
-            // Arşiv filtrelerini tüm verilere göre ayarla
-            archSelectedCourses = Array.from(new Set([...allCourses, ...existingCourses]));
-            archSelectedTopics = Array.from(new Set(allTopicKeys));
-
-            // UI'yi güncelle
-            syncSystemUI();
-            saveState();
-        }
-
-        // Onboarding için alan seçimi
-        function selectFieldInOnboarding(fieldKey) {
-            if (!FIELD_COURSES[fieldKey]) return;
-            appState.selectedField = fieldKey;
-            // Buton stillerini güncelle
-            document.querySelectorAll('.onboarding-field-btn').forEach(btn => {
-                if (btn.dataset.field === fieldKey) {
-                    btn.className = "onboarding-field-btn w-full py-4 rounded-2xl border-2 border-indigo-600 bg-indigo-600 text-white transition-all font-bold uppercase";
-                } else {
-                    btn.className = "onboarding-field-btn w-full py-4 rounded-2xl border-2 border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 transition-all font-bold uppercase text-slate-700";
-                }
-            });
-            // Kategorileri hemen uygula (UI arka planda güncellenir)
-            applyFieldSelection(fieldKey);
-        }
-
         window.onload = async function() {
             try {
                 await initDB();
@@ -1095,48 +981,34 @@
                     appState = { ...appState, ...savedData };
                 }
                 
-                // Alan seçimi yoksa, kategoriler boş kalır
-                if (appState.selectedField && FIELD_COURSES[appState.selectedField]) {
-                    appState.categories = JSON.parse(JSON.stringify(FIELD_COURSES[appState.selectedField]));
-                } else {
-                    appState.selectedField = null;
-                    appState.categories = {};
+                if(Object.keys(appState.categories).length > 0 && appState.selectedCourses.length === 0) {
+                    appState.selectedCourses = Object.keys(appState.categories);
                 }
-
-                // Seçili dersler ve konuları güncelle
-                if (appState.selectedField && Object.keys(appState.categories).length > 0) {
-                    if (appState.selectedCourses.length === 0) {
-                        appState.selectedCourses = Object.keys(appState.categories);
-                    }
-                    if (appState.selectedTopics.length === 0) {
-                        appState.selectedCourses.forEach(c => {
-                            (appState.categories[c] || []).forEach(t => appState.selectedTopics.push(c + '::' + t));
-                        });
-                    }
-                }
-
-                // Arşiv filtrelerini mevcut verilere göre ayarla
-                if (archSelectedCourses.length === 0) {
-                    const allCourses = new Set();
-                    const allTopics = new Set();
-                    appState.questions.forEach(q => { allCourses.add(q.course); allTopics.add(q.course + '::' + q.topic); });
-                    appState.notes.forEach(n => { allCourses.add(n.course); allTopics.add(n.course + '::' + n.topic); });
-                    archSelectedCourses = Array.from(allCourses);
-                    archSelectedTopics = Array.from(allTopics);
-                    // Ayrıca seçili alanın derslerini de ekle
-                    Object.keys(appState.categories).forEach(c => {
-                        if (!archSelectedCourses.includes(c)) archSelectedCourses.push(c);
-                        (appState.categories[c] || []).forEach(t => {
-                            const key = c + '::' + t;
-                            if (!archSelectedTopics.includes(key)) archSelectedTopics.push(key);
-                        });
+                
+                if(!appState.selectedTopics || appState.selectedTopics.length === 0) {
+                    appState.selectedTopics = [];
+                    appState.selectedCourses.forEach(c => {
+                        if(appState.categories[c]) {
+                            appState.categories[c].forEach(t => appState.selectedTopics.push(c + '::' + t));
+                        }
                     });
                 }
 
+                if (archSelectedCourses.length === 0 && Object.keys(appState.categories).length > 0) {
+                    archSelectedCourses = Object.keys(appState.categories);
+                }
+                if (archSelectedTopics.length === 0) {
+                    archSelectedCourses.forEach(c => {
+                        if(appState.categories[c]) {
+                            appState.categories[c].forEach(t => archSelectedTopics.push(c + '::' + t));
+                        }
+                    });
+                }
+                
                 applyTimelineShift();
                 syncSystemUI();
                 updateQuestionInputVisibility();
-                updateNoteInputVisibility();
+                updateNoteInputVisibility(); // Yeni eklenen
 
                 function handleImageUpload(e) {
                     const file = e.target.files[0];
@@ -1196,19 +1068,10 @@
                     document.getElementById('btn-code-enter').classList.add('hidden');
                 }
 
-                if (!appState.selectedField) {
-                    // Alan seçilmemiş: onboarding veya alan seçim modalını göster
-                    if (!appState.hasSeenOnboarding) {
-                        showOnboarding();
-                    } else {
-                        openFieldChangeModal();
-                    }
+                if (!appState.hasSeenOnboarding) {
+                    showOnboarding();
                 } else {
-                    if (!appState.hasSeenOnboarding) {
-                        showOnboarding();
-                    } else {
-                        switchTab('add');
-                    }
+                    switchTab('add');
                 }
 
             } catch (error) {
@@ -1242,6 +1105,7 @@
             document.getElementById('note-image-camera').value = '';
         }
 
+        // YENİ: Not tipi seçimi
         function setNoteInputType(type) {
             currentNoteInputType = type;
             const btnText = document.getElementById('btn-note-type-text');
@@ -1262,6 +1126,7 @@
             }
         }
 
+        // YENİ: Not alanı görünürlüğü (soru eklerken seçim butonları gösterilir, not eklerken sadece textarea)
         function updateNoteInputVisibility() {
             const noteTypeToggle = document.getElementById('note-type-toggle');
             const noteTextArea = document.getElementById('note-text-area');
@@ -1269,8 +1134,10 @@
 
             if (currentEntryType === 'question') {
                 noteTypeToggle.classList.remove('hidden');
+                // Mevcut seçime göre alanları ayarla
                 setNoteInputType(currentNoteInputType);
             } else {
+                // Not eklerken sadece metin alanı görünsün
                 noteTypeToggle.classList.add('hidden');
                 noteTextArea.classList.remove('hidden');
                 noteImageArea.classList.add('hidden');
@@ -1286,18 +1153,10 @@
             saveState();
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('btn-code-enter').classList.remove('hidden');
-            if (!appState.selectedField) {
-                if (!appState.hasSeenOnboarding) {
-                    showOnboarding();
-                } else {
-                    openFieldChangeModal();
-                }
+            if (!appState.hasSeenOnboarding) {
+                showOnboarding();
             } else {
-                if (!appState.hasSeenOnboarding) {
-                    showOnboarding();
-                } else {
-                    switchTab('add');
-                }
+                switchTab('add');
             }
         }
 
@@ -1361,7 +1220,7 @@
             const btnNext = document.getElementById('btn-onboarding-next');
 
             // Dot güncelle
-            for (let i = 1; i <= 7; i++) {
+            for (let i = 1; i <= 6; i++) {
                 const dot = document.getElementById(`dot-step-${i}`);
                 if (dot) {
                     if (i === currentOnboardingStep) {
@@ -1373,19 +1232,6 @@
             }
 
             if (currentOnboardingStep === 1) {
-                iconEl.innerHTML = `<path d="M12 2L1 21h22L12 2zm0 3.45l8.15 14.1H3.85L12 5.45zM11 10h2v4h-2zm0 5h2v2h-2z"/>`;
-                titleEl.innerText = "Alanını Seç";
-                descEl.innerText = "Hangi alanda ilerlemek istediğini seç. Ders ve konu listeleri bu seçime göre otomatik yüklenecek.";
-                previewEl.innerHTML = `
-                    <div class="space-y-2">
-                        <button onclick="selectFieldInOnboarding('sayisal')" data-field="sayisal" class="onboarding-field-btn w-full py-4 rounded-2xl border-2 border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 transition-all font-bold uppercase text-slate-700">Sayısal</button>
-                        <button onclick="selectFieldInOnboarding('esitagirlik')" data-field="esitagirlik" class="onboarding-field-btn w-full py-4 rounded-2xl border-2 border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 transition-all font-bold uppercase text-slate-700">Eşit Ağırlık</button>
-                        <button onclick="selectFieldInOnboarding('sozel')" data-field="sozel" class="onboarding-field-btn w-full py-4 rounded-2xl border-2 border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 transition-all font-bold uppercase text-slate-700">Sözel</button>
-                        <button onclick="selectFieldInOnboarding('dil')" data-field="dil" class="onboarding-field-btn w-full py-4 rounded-2xl border-2 border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 transition-all font-bold uppercase text-slate-700">Dil</button>
-                    </div>
-                `;
-                btnNext.innerText = "Devam Et";
-            } else if (currentOnboardingStep === 2) {
                 iconEl.innerHTML = `<path d="M12 2L1 21h22L12 2zm0 3.45l8.15 14.1H3.85L12 5.45zM11 10h2v4h-2zm0 5h2v2h-2z"/>`;
                 titleEl.innerText = "Öğrendiklerini Neden Unutuyorsun?";
                 descEl.innerText = "Tekrar edilmeyen bilgilerin %66'sı 1 gün içinde unutulur. 1 ay sonra ise yalnızca %21'i hafızada kalır";
@@ -1406,7 +1252,7 @@
                     </div>
                 `;
                 btnNext.innerText = "Bu Sorunu Çözelim";
-            } else if (currentOnboardingStep === 3) {
+            } else if (currentOnboardingStep === 2) {
                 iconEl.innerHTML = `<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>`;
                 titleEl.innerText = "Akıllı Tekrar Sistemi Nasıl Çalışır?";
                 descEl.innerText = "Net Kalkanım, bilgiyi tam unutmadan hemen önce hatırlatır. Daha akıllıca çalışarak bilgiyi uzun hafızaya yerleştirmeni sağlar.";
@@ -1424,7 +1270,7 @@
                     </div>
                 `;
                 btnNext.innerText = "Anladım, Devam";
-            } else if (currentOnboardingStep === 4) {
+            } else if (currentOnboardingStep === 3) {
                 iconEl.innerHTML = `<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>`;
                 titleEl.innerText = "Kendi Soru Bankanı Oluştur";
                 descEl.innerText = "Sorularının yanına notlarını ve çözümlerini ekle. Sorularının ve Notlarının tamamına bir yerden erişim sağla.";
@@ -1443,7 +1289,7 @@
                     </div>
                 `;
                 btnNext.innerText = "Devam Et";
-            } else if (currentOnboardingStep === 5) {
+            } else if (currentOnboardingStep === 4) {
                 iconEl.innerHTML = `<path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>`;
                 titleEl.innerText = "Notların da Unutulmasın";
                 descEl.innerText = "Notların da aynı algoritmayla tekrar edilir.";
@@ -1457,13 +1303,13 @@
                     </div>
                 `;
                 btnNext.innerText = "Devam Et";
-            } else if (currentOnboardingStep === 6) {
+            } else if (currentOnboardingStep === 5) {
                 iconEl.innerHTML = `<path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>`;
                 titleEl.innerText = "Her Gün Ne Yapacaksın?";
                 descEl.innerText = "Ders çalıştığın her gün 'Soruları Başlat' ve 'Notları Başlat' bölümlerine girmeli ve geri bildirim vermelisin yoksa SİSTEM DEVAM ETMEZ! Bazı günler giremezsen sorun değil, soruların ötelenir ve kaldığın yerden devam edebilirsin. ";
                 previewEl.innerHTML = `
                     <div class="space-y-2">
-                        <div class="bg-white border border-slate-200 p-3 rounded-xl">
+                        <div class="bg-red border border-slate-200 p-3 rounded-xl">
                             <div class="flex justify-between text-[10px] font-bold text-slate-500 mb-1"><span>GÜNLÜK İLERLEME</span><span>0/5</span></div>
                             <div class="w-full bg-slate-200 rounded-full h-2"><div class="h-2 bg-indigo-600 rounded-full" style="width: 0%"></div></div>
                         </div>
@@ -1474,7 +1320,7 @@
                     </div>
                 `;
                 btnNext.innerText = "Devam et";
-            } else if (currentOnboardingStep === 7) {
+            } else if (currentOnboardingStep === 6) {
                 iconEl.innerHTML = `<path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM6.24 5h11.52l.83 1H5.41l.83-1zM5 19V8h14v11H5zm11-5.5H8v-2h8v2z"/>`;
                 titleEl.innerText = "Arşiv & Kamp Modu";
                 descEl.innerText = "'Arşiv' sekmesinden bütün soru ve notlarına erişim sağlayabilir ve istediğin konulardan rastgele soru kampı yapabilirsin.";
@@ -1496,23 +1342,19 @@
         }
 
         function nextOnboardingStep() {
-            if (currentOnboardingStep === 1 && !appState.selectedField) {
-                showToast("Lütfen önce alanınızı seçin.", true);
-                return;
-            }
-            if (currentOnboardingStep < 7) {
+            if (currentOnboardingStep < 6) {
                 currentOnboardingStep++;
                 const modal = document.getElementById('onboarding-modal');
                 
-                // Özel adımlar: 4,6,7 -> modalı kapat, vurgula, sonra aç
-                if (currentOnboardingStep === 4 || currentOnboardingStep === 6 || currentOnboardingStep === 7) {
+                // Özel adımlar: 3,5,6 -> modalı kapat, vurgula, sonra aç
+                if (currentOnboardingStep === 3 || currentOnboardingStep === 5 || currentOnboardingStep === 6) {
                     modal.classList.add('hidden');
                     
                     let targetTab, targetElement;
-                    if (currentOnboardingStep === 4) {
+                    if (currentOnboardingStep === 3) {
                         targetTab = 'add';
                         targetElement = document.getElementById('upload-placeholder');
-                    } else if (currentOnboardingStep === 6) {
+                    } else if (currentOnboardingStep === 5) {
                         targetTab = 'home';
                         targetElement = document.getElementById('btn-start-questions');
                     } else {
@@ -1534,9 +1376,9 @@
                     }
                 } else {
                     // Normal adımlar: sekme geçişi yap, render et
-                    if (currentOnboardingStep === 3) {
+                    if (currentOnboardingStep === 2) {
                         switchTab('home');
-                    } else if (currentOnboardingStep === 5) {
+                    } else if (currentOnboardingStep === 4) {
                         switchTab('add');
                         // Not ekleme butonunu vurgula (modal açıkken)
                         const noteBtn = document.getElementById('btn-entry-note');
@@ -1555,12 +1397,6 @@
         }
 
         function finishOnboarding() {
-            if (!appState.selectedField) {
-                showToast("Lütfen önce alanınızı seçin.", true);
-                currentOnboardingStep = 1;
-                renderOnboardingStep();
-                return;
-            }
             appState.hasSeenOnboarding = true;
             saveState();
             document.getElementById('onboarding-modal').classList.add('hidden');
@@ -2066,19 +1902,11 @@
         }
 
         function syncSystemUI() {
-            updateCurrentFieldLabel();
-            buildHomeFilters(); populateCategoryDropdowns(); populateArchiveFilters(); updateHomeStats();
+            buildHomeFilters(); populateCategoryDropdowns(); renderCourseManagement();
+            renderTopicManagement(); populateArchiveFilters(); updateHomeStats();
             renderLibrary();
             document.getElementById('setting-intervals').value = appState.intervals.join(',');
             document.getElementById('setting-note-intervals').value = appState.noteIntervals.join(',');
-        }
-
-        function updateCurrentFieldLabel() {
-            const label = document.getElementById('current-field-label');
-            if (label) {
-                const fieldNames = { sayisal: 'Sayısal', esitagirlik: 'Eşit Ağırlık', sozel: 'Sözel', dil: 'Dil' };
-                label.innerText = appState.selectedField ? fieldNames[appState.selectedField] : 'Seçilmedi';
-            }
         }
 
         function switchTab(tabId) {
@@ -2214,6 +2042,11 @@
                 document.getElementById('btn-settings-course-text').innerText = defaultCourse;
             }
             initCoursePicker();
+            renderTopicManagement();
+        }
+
+        function updateTopicDropdown() {
+            // Yeni seçici kullanıldığı için boş
         }
 
         // ===== YENİ DERS/KONU SEÇİCİ =====
@@ -2257,6 +2090,34 @@
 
         function closePicker() {
             document.getElementById('picker-modal').classList.add('hidden');
+        }
+
+        function openPickerForSettings(type) {
+            pickerType = type;
+            const modal = document.getElementById('picker-modal');
+            const title = document.getElementById('picker-title');
+            const listDiv = document.getElementById('picker-list');
+            listDiv.innerHTML = '';
+
+            if (type === 'course') {
+                title.innerText = 'Ders Seçiniz';
+                const courses = Object.keys(appState.categories);
+                courses.forEach(course => {
+                    const btn = document.createElement('button');
+                    btn.className = "w-full text-left px-4 py-3 rounded-xl text-sm font-bold uppercase text-slate-700 bg-slate-50 border border-slate-200 hover:bg-emerald-50 hover:border-emerald-300 transition-colors";
+                    btn.innerText = course;
+                    btn.onclick = () => selectSettingsCourse(course);
+                    listDiv.appendChild(btn);
+                });
+            }
+            modal.classList.remove('hidden');
+        }
+
+        function selectSettingsCourse(course) {
+            document.getElementById('settings-course').value = course;
+            document.getElementById('btn-settings-course-text').innerText = course;
+            closePicker();
+            renderTopicManagement();
         }
 
         function selectCourse(course) {
@@ -2473,57 +2334,84 @@
                 qTextEl.innerText = '';
                 qTextEl.classList.add('hidden');
             }
+// YENİ: Not gösterimi yönetimi (Flip için) - TEMİZ SÜRÜM
+const noteToggleBtn = document.getElementById('review-note-toggle-btn');
+const flipInner = document.getElementById('review-flip-inner');
+const noteContentDiv = document.getElementById('review-note-content');
+const noteBox = document.getElementById('review-note-box');
 
-            const noteToggleBtn = document.getElementById('review-note-toggle-btn');
-            const flipInner = document.getElementById('review-flip-inner');
-            const noteContentDiv = document.getElementById('review-note-content');
-            const noteBox = document.getElementById('review-note-box');
+let hasNote = false;
+let noteContent = '';
 
-            let hasNote = false;
-            let noteContent = '';
+// Not içeriğini belirle
+if (item.note_text) {
+    hasNote = true;
+    noteContent = item.note_text;
+}
+if (item.note_img) {
+    hasNote = true;
+    if (noteContent) noteContent += '<br>';
+    noteContent += `<img src="${item.note_img}" class="w-full h-auto object-contain rounded-lg mt-1">`;
+}
+if (!hasNote && item.note) {
+    hasNote = true;
+    noteContent = item.note;
+}
 
-            if (item.note_text) {
-                hasNote = true;
-                noteContent = item.note_text;
-            }
-            if (item.note_img) {
-                hasNote = true;
-                if (noteContent) noteContent += '<br>';
-                noteContent += `<img src="${item.note_img}" class="w-full h-auto object-contain rounded-lg mt-1">`;
-            }
-            if (!hasNote && item.note) {
-                hasNote = true;
-                noteContent = item.note;
-            }
+// Her modda temizlik yap
+if (flipInner) flipInner.classList.remove('flipped');
+if (noteBox) {
+    noteBox.innerHTML = '';
+    noteBox.classList.add('hidden');
+    noteBox.style.display = 'none';
+}
 
-            if (flipInner) flipInner.classList.remove('flipped');
-            if (noteBox) {
-                noteBox.innerHTML = '';
-                noteBox.classList.add('hidden');
-                noteBox.style.display = 'none';
-            }
+if (currentReviewMode === 'questions') {
+    // Soru modunda flip kullan
+    if (noteContentDiv) noteContentDiv.innerHTML = noteContent;
+    if (hasNote) {
+        noteToggleBtn.classList.remove('hidden');
+        noteToggleBtn.style.display = '';
+        noteToggleBtn.textContent = 'Notu Göster';
+    } else {
+        noteToggleBtn.classList.add('hidden');
+        noteToggleBtn.style.display = 'none';
+    }
+} else {
+    // Not modunda eski yapıyı kullan
+    noteToggleBtn.classList.add('hidden');
+    noteToggleBtn.style.display = 'none';
+    if (hasNote) {
+        if (noteBox) {
+            noteBox.innerHTML = noteContent;
+            noteBox.classList.remove('hidden');
+            noteBox.style.display = '';
+        }
+    }
+}
 
-            if (currentReviewMode === 'questions') {
-                if (noteContentDiv) noteContentDiv.innerHTML = noteContent;
-                if (hasNote) {
-                    noteToggleBtn.classList.remove('hidden');
-                    noteToggleBtn.style.display = '';
-                    noteToggleBtn.textContent = 'Notu Göster';
-                } else {
-                    noteToggleBtn.classList.add('hidden');
-                    noteToggleBtn.style.display = 'none';
-                }
-            } else {
-                noteToggleBtn.classList.add('hidden');
-                noteToggleBtn.style.display = 'none';
-                if (hasNote) {
-                    if (noteBox) {
-                        noteBox.innerHTML = noteContent;
-                        noteBox.classList.remove('hidden');
-                        noteBox.style.display = '';
-                    }
-                }
-            }
+if (currentReviewMode === 'questions') {
+    // Soru modunda: flip kullan
+    noteToggleBtn.classList.remove('hidden');
+    noteToggleBtn.textContent = 'Notu Göster';
+    noteContentDiv.innerHTML = noteContent;
+    // Flip'i sıfırla (ön yüz göster)
+    flipInner.classList.remove('flipped');
+    // Eğer not yoksa butonu gizle
+    if (!hasNote) {
+        noteToggleBtn.classList.add('hidden');
+    }
+} else {
+    // Not modunda: flip yok, eski yapıyı kullan
+    noteToggleBtn.classList.add('hidden');
+    if (hasNote) {
+        noteBox.innerHTML = noteContent;
+        noteBox.classList.remove('hidden');
+    } else {
+        noteBox.innerHTML = '';
+        noteBox.classList.add('hidden');
+    }
+}
 
             manualZoom('review', 1);
             clearReviewCanvas();
@@ -2561,6 +2449,7 @@
                             }
                         });
                     } else {
+                        // Metin tipi
                         textInput.classList.remove('hidden');
                         const textInputEl = document.getElementById('review-text-val');
                         textInputEl.value = item.userTodayAnswer || '';
@@ -2571,6 +2460,7 @@
                         } else {
                             textInputEl.className = "flex-1 bg-red-50 p-3 border-2 border-red-500 outline-none text-slate-800 font-bold uppercase tracking-wider transition-colors rounded-xl shadow-sm text-xs";
                         }
+                        // YENİ: Doğru cevabı göster
                         feedbackBox.innerHTML = `Doğru Cevap: <strong>${item.answer}</strong>`;
                         feedbackBox.className = `w-full p-3 text-xs font-extrabold text-center rounded-xl transition-colors shadow-sm shrink-0 ${isCorrect ? 'bg-green-100 text-green-800 border border-green-300' : 'bg-red-100 text-red-800 border border-red-300'}`;
                         feedbackBox.classList.remove('hidden');
@@ -2610,17 +2500,18 @@
             document.getElementById('btn-rev-next').disabled = (currentReviewIndex === currentReviewQueue.length - 1);
         }
 
+        // YENİ: Not aç/kapat fonksiyonu
         function toggleReviewNote() {
-            const flipInner = document.getElementById('review-flip-inner');
-            const btn = document.getElementById('review-note-toggle-btn');
-            if (flipInner.classList.contains('flipped')) {
-                flipInner.classList.remove('flipped');
-                btn.textContent = 'Notu Göster';
-            } else {
-                flipInner.classList.add('flipped');
-                btn.textContent = 'Soruyu Göster';
-            }
-        }
+    const flipInner = document.getElementById('review-flip-inner');
+    const btn = document.getElementById('review-note-toggle-btn');
+    if (flipInner.classList.contains('flipped')) {
+        flipInner.classList.remove('flipped');
+        btn.textContent = 'Notu Göster';
+    } else {
+        flipInner.classList.add('flipped');
+        btn.textContent = 'Soruyu Göster';
+    }
+}
 
         function updateRecallButtons(status) {
             const forgotBtn = document.getElementById('recall-btn-forgot');
@@ -2786,7 +2677,7 @@
             courseDiv.innerHTML = '';
             topicDiv.innerHTML = '';
 
-            archSelectedCourses.forEach(c => {
+            Object.keys(appState.categories).forEach(c => {
                 let active = archSelectedCourses.includes(c);
                 let btn = document.createElement('button');
                 btn.type = 'button';
@@ -2798,25 +2689,20 @@
                         archSelectedTopics = archSelectedTopics.filter(x => !x.startsWith(c + '::'));
                     } else {
                         archSelectedCourses.push(c);
-                        // Bu derse ait tüm konuları archSelectedTopics'e ekle
-                        const topicsForCourse = new Set();
-                        appState.questions.forEach(q => { if(q.course === c) topicsForCourse.add(c + '::' + q.topic); });
-                        appState.notes.forEach(n => { if(n.course === c) topicsForCourse.add(c + '::' + n.topic); });
-                        topicsForCourse.forEach(t => { if(!archSelectedTopics.includes(t)) archSelectedTopics.push(t); });
+                        if(appState.categories[c]) appState.categories[c].forEach(t => archSelectedTopics.push(c + '::' + t));
                     }
                     populateArchiveFilters(); renderLibrary();
                 };
                 courseDiv.appendChild(btn);
 
-                if(active) {
-                    const topics = archSelectedTopics.filter(t => t.startsWith(c + '::'));
-                    topics.forEach(tKey => {
-                        const topicName = tKey.substring(c.length + 2);
+                if(active && appState.categories[c]) {
+                    appState.categories[c].forEach(t => {
+                        let tKey = c + '::' + t;
                         let tActive = archSelectedTopics.includes(tKey);
                         let tBtn = document.createElement('button');
                         tBtn.type = 'button';
                         tBtn.className = `px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase transition-all border ${tActive ? 'bg-amber-500 text-white border-amber-500' : 'bg-slate-100 text-slate-600 border-slate-200'}`;
-                        tBtn.innerText = topicName;
+                        tBtn.innerText = `${c} > ${t}`;
                         tBtn.onclick = () => {
                             if(tActive) archSelectedTopics = archSelectedTopics.filter(x => x !== tKey);
                             else archSelectedTopics.push(tKey);
@@ -3031,6 +2917,90 @@
             document.getElementById('camp-review-modal').classList.add('hidden');
         }
 
+        // --- DERS VE KONU YÖNETİMİ ---
+        function renderCourseManagement() {
+            const list = document.getElementById('course-manage-list');
+            if(!list) return;
+            list.innerHTML = '';
+
+            Object.keys(appState.categories).forEach(c => {
+                let div = document.createElement('div');
+                div.className = "flex justify-between items-center p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold uppercase text-slate-700";
+                div.innerHTML = `
+                    <span>${c}</span>
+                    <button onclick="deleteCourse('${c}')" class="text-rose-500 hover:text-rose-700">SİL</button>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function addCourse() {
+            let input = document.getElementById('new-course-input');
+            let val = input.value.trim().toLocaleUpperCase('tr-TR');
+            if(!val) return;
+
+            if(!appState.categories[val]) {
+                appState.categories[val] = ["GENEL"];
+                if(!appState.selectedCourses.includes(val)) appState.selectedCourses.push(val);
+                if(!appState.selectedTopics.includes(val + '::GENEL')) appState.selectedTopics.push(val + '::GENEL');
+                saveState(); syncSystemUI(); input.value = '';
+            } else {
+                showToast("Bu ders zaten mevcut!", true);
+            }
+        }
+
+        function deleteCourse(course) {
+            showCustomConfirm(`${course} dersini silmek istediğinize emin misiniz?`, () => {
+                delete appState.categories[course];
+                appState.selectedCourses = appState.selectedCourses.filter(c => c !== course);
+                appState.selectedTopics = appState.selectedTopics.filter(t => !t.startsWith(course + '::'));
+                saveState(); syncSystemUI();
+            });
+        }
+
+        function renderTopicManagement() {
+            const list = document.getElementById('topic-manage-list');
+            if(!list) return;
+            list.innerHTML = '';
+
+            const course = document.getElementById('settings-course').value;
+            if(course && appState.categories[course]) {
+                appState.categories[course].forEach(t => {
+                    let div = document.createElement('div');
+                    div.className = "flex justify-between items-center p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold uppercase text-slate-700";
+                    div.innerHTML = `
+                        <span>${t}</span>
+                        ${t !== "GENEL" ? `<button onclick="deleteTopic('${course}', '${t}')" class="text-rose-500 hover:text-rose-700">SİL</button>` : `<span class="text-slate-400 text-[10px]">VARSAYILAN</span>`}
+                    `;
+                    list.appendChild(div);
+                });
+            }
+        }
+
+        function addTopic() {
+            const c = document.getElementById('settings-course').value;
+            const input = document.getElementById('new-topic-input');
+            let val = input.value.trim().toLocaleUpperCase('tr-TR');
+            if(!c || !val) return;
+
+            if(!appState.categories[c].includes(val)) {
+                appState.categories[c].push(val);
+                let key = c + '::' + val;
+                if(!appState.selectedTopics.includes(key)) appState.selectedTopics.push(key);
+                saveState(); syncSystemUI(); input.value = '';
+            } else {
+                showToast("Bu konu zaten mevcut!", true);
+            }
+        }
+
+        function deleteTopic(course, topic) {
+            showCustomConfirm(`${topic} konusunu silmek istediğinize emin misiniz?`, () => {
+                appState.categories[course] = appState.categories[course].filter(t => t !== topic);
+                appState.selectedTopics = appState.selectedTopics.filter(t => t !== (course + '::' + topic));
+                saveState(); syncSystemUI();
+            });
+        }
+
         function saveIntervals() {
             let str = document.getElementById('setting-intervals').value;
             let arr = str.split(',').map(x => parseInt(x.trim())).filter(x => !isNaN(x) && x > 0);
@@ -3210,4 +3180,4 @@
         });
     </script>
 </body>
-                                            </html>
+    </html>
