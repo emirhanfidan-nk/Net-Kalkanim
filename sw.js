@@ -19,6 +19,7 @@ const CDN_URLS = [
 
 // Kurulum aşamasında gerekli dosyaları önbelleğe al
 self.addEventListener('install', event => {
+	self. skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then(async cache => {
       await cache.addAll(APP_SHELL);
@@ -40,9 +41,11 @@ self.addEventListener('install', event => {
 // Eski cache'leri temizle
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(keys => Promise.all(
-      keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
-    ))
+    caches.keys()
+      .then(keys => Promise.all(
+        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
+      ))
+      .then(() => self.clients.claim()) // ⬅️ BU SATIRI EKLE
   );
 });
 
