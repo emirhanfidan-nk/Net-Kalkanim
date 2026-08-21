@@ -242,14 +242,48 @@
                     <h2 class="text-lg font-bold uppercase">Günlük Tekrar</h2>
                 </div>
 
-                <div class="space-y-2 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-                    <div class="flex justify-between text-xs font-bold text-slate-500 uppercase tracking-wider">
-                        <span>Günlük İlerleme</span>
-                        <span id="progress-text" class="text-indigo-600 font-extrabold">0/0</span>
+                <!-- KIRMIZI KUTU (BÜYÜK) -->
+                <div class="bg-white border-2 border-rose-200 rounded-3xl p-5 shadow-lg relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-2 h-full bg-rose-500"></div>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-rose-600 font-extrabold text-sm uppercase tracking-wider">🔴 Kırmızı Kutu</h3>
+                        <span class="bg-rose-100 text-rose-800 text-xs font-bold px-3 py-1 rounded-full">Bekleyen: <span id="red-total-count">0</span></span>
                     </div>
-                    <div class="w-full h-2.5 bg-slate-100 overflow-hidden rounded-full border border-slate-200">
-                        <div id="progress-bar" class="h-full bg-indigo-600 w-0 transition-all duration-500 ease-out rounded-full shadow-sm"></div>
+                    <p class="text-xs text-slate-500 font-medium mb-3">Bugün halletmen gerekenler</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="startReview('questions')" class="btn-cyber btn-cyber-red bg-rose-600 hover:bg-rose-700 text-white py-4 rounded-2xl font-bold text-sm flex flex-col items-center justify-center gap-1 shadow-md">
+                            <span>SORULARI BAŞLAT</span>
+                            <span class="text-xs opacity-80">[ <span id="red-question-count">0</span> ]</span>
+                        </button>
+                        <button onclick="startReview('notes')" class="btn-cyber btn-cyber-yellow bg-amber-500 hover:bg-amber-600 text-white py-4 rounded-2xl font-bold text-sm flex flex-col items-center justify-center gap-1 shadow-md">
+                            <span>NOTLARI BAŞLAT</span>
+                            <span class="text-xs opacity-80">[ <span id="red-note-count">0</span> ]</span>
+                        </button>
                     </div>
+                </div>
+
+                <!-- SARI VE YEŞİL KUTULAR (YAN YANA) -->
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="goToLibraryWithFilter('yellow')" class="bg-white border-2 border-yellow-200 rounded-2xl p-4 shadow-sm hover:bg-yellow-50 transition-colors text-left">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-yellow-600 font-extrabold text-xs uppercase">🟡 Sarı Kutu</h3>
+                        </div>
+                        <p class="text-xs text-slate-500 font-medium mb-3">Ara sıra bakabilirsin</p>
+                        <div class="text-xs font-bold text-slate-700 space-y-1">
+                            <div>Soru: <span id="yellow-question-count">0</span></div>
+                            <div>Not: <span id="yellow-note-count">0</span></div>
+                        </div>
+                    </button>
+                    <button onclick="goToLibraryWithFilter('green')" class="bg-white border-2 border-green-200 rounded-2xl p-4 shadow-sm hover:bg-green-50 transition-colors text-left">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-green-600 font-extrabold text-xs uppercase">🟢 Yeşil Kutu</h3>
+                        </div>
+                        <p class="text-xs text-slate-500 font-medium mb-3">Ustalık, ayda bir göz at</p>
+                        <div class="text-xs font-bold text-slate-700 space-y-1">
+                            <div>Soru: <span id="green-question-count">0</span></div>
+                            <div>Not: <span id="green-note-count">0</span></div>
+                        </div>
+                    </button>
                 </div>
 
                 <div class="space-y-3">
@@ -261,17 +295,6 @@
                         <span id="filter-chevron" class="text-slate-400 transition-transform duration-200">▼</span>
                     </button>
                     <div id="home-subject-filters" class="hidden flex flex-col gap-2.5 text-xs"></div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <button id="btn-start-questions" onclick="startReview('questions')" class="btn-cyber rounded-2xl w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 font-bold text-sm flex flex-col items-center justify-center gap-1 shadow-md">
-                        <span>SORULARI BAŞLAT</span>
-                        <span class="text-xs opacity-80">[ <span id="queue-count-questions">0</span> ]</span>
-                    </button>
-                    <button onclick="startReview('notes')" class="btn-cyber btn-cyber-yellow rounded-2xl w-full bg-amber-500 hover:bg-amber-600 text-white py-4 font-bold text-sm flex flex-col items-center justify-center gap-1 shadow-md">
-                        <span>NOTLARI BAŞLAT</span>
-                        <span class="text-xs opacity-80">[ <span id="queue-count-notes">0</span> ]</span>
-                    </button>
                 </div>
             </div>
 
@@ -451,6 +474,9 @@
                     <button type="button" onclick="setArchiveDataType('note')" id="btn-arch-type-n" class="flex-1 text-slate-600 py-2 text-xs font-bold uppercase transition-all hover:text-amber-600 rounded-xl">Notlarım</button>
                 </div>
 
+                <!-- RENK FİLTRELERİ -->
+                <div id="library-color-filters" class="flex gap-2 mb-2"></div>
+
                 <div class="space-y-3 mb-2">
                     <button onclick="toggleArchiveFilters()" type="button" class="w-full bg-white border border-slate-200 p-3.5 rounded-2xl flex justify-between items-center text-xs font-bold text-slate-700 uppercase tracking-wider shadow-sm hover:bg-slate-50 transition-colors">
                         <span class="flex items-center gap-2">
@@ -494,6 +520,23 @@
                     <button onclick="openFieldChangeModal()" class="w-full bg-violet-600 hover:bg-violet-700 text-white py-3 font-bold text-xs uppercase rounded-xl transition-colors shadow-sm">
                         Alan Değiştir
                     </button>
+                </div>
+
+                <!-- GÜNLÜK LİMİTLER -->
+                <div class="bg-white border border-slate-200 p-5 space-y-4 relative overflow-hidden rounded-2xl shadow-sm">
+                    <div class="absolute top-0 left-0 w-1.5 h-full bg-cyan-500"></div>
+                    <h3 class="font-bold text-xs text-cyan-600 uppercase tracking-wider">Günlük Limitler</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Günlük Soru Limiti (0 = limitsiz)</label>
+                            <input type="number" id="setting-daily-limit-q" class="w-full bg-slate-50 p-3 border border-slate-300 font-mono text-center text-slate-700 font-bold outline-none focus:border-cyan-500 transition-colors rounded-xl">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Günlük Not Limiti (0 = limitsiz)</label>
+                            <input type="number" id="setting-daily-limit-n" class="w-full bg-slate-50 p-3 border border-slate-300 font-mono text-center text-slate-700 font-bold outline-none focus:border-cyan-500 transition-colors rounded-xl">
+                        </div>
+                        <button onclick="saveDailyLimits()" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-3 font-bold text-xs uppercase rounded-xl transition-colors shadow-sm">Limitleri Kaydet</button>
+                    </div>
                 </div>
 
                 <div class="bg-white border border-slate-200 p-5 space-y-4 relative overflow-hidden rounded-2xl shadow-sm">
@@ -1009,7 +1052,7 @@ function saveStateToDB(state) {
 }
 
 let appState = {
-    field: null, // YENİ: Seçilen alan
+    field: null,
     categories: {},
     questions: [],
     notes: [],
@@ -1021,7 +1064,9 @@ let appState = {
     archSelectedTopics: [],
     autoDestroyThreshold: 5,
     hasSeenOnboarding: false,
-    authState: "none"   // "none", "trial", "full"
+    authState: "none",   // "none", "trial", "full"
+    dailyLimitQ: 20,      // YENİ: Günlük soru limiti
+    dailyLimitN: 20       // YENİ: Günlük not limiti
 };
 
 let currentEntryType = 'question'; 
@@ -1031,7 +1076,9 @@ let selectedChoiceAnswer = '';
 let currentReviewMode = 'questions'; 
 let currentReviewQueue = [];
 let currentReviewIndex = 0;
+let currentBoxColor = 'red'; // YENİ: Aktif kutu rengi
 let activeArchiveType = 'question'; 
+let activeColorFilter = 'all'; // YENİ: Arşiv renk filtresi
 let campMode = ''; 
 let campQueue = [];
 let campIndex = 0;
@@ -1047,9 +1094,8 @@ let campPenSize = 3;
 
 let zoomLevels = { upload: 1, review: 1, camp: 1 };
 let currentOnboardingStep = 1;
-let fieldSelectedInOnboarding = false; // YENİ: Onboarding'de alan seçimi kontrolü
+let fieldSelectedInOnboarding = false;
 
-// YENİ DEĞİŞKENLER
 let currentNoteInputType = 'text';
 let noteImageDataUrl = null;
 
@@ -1069,20 +1115,18 @@ window.onload = async function() {
             }
             if (!savedData.notes) savedData.notes = [];
             if (!savedData.noteIntervals) savedData.noteIntervals = [1, 3, 7, 21, 45, 90, 180];
+            if (savedData.dailyLimitQ === undefined) savedData.dailyLimitQ = 20;
+            if (savedData.dailyLimitN === undefined) savedData.dailyLimitN = 20;
             savedData.questions.forEach(q => { if(!q.topic) q.topic = "GENEL"; if(!q.text_question) q.text_question = ""; });
             appState = { ...appState, ...savedData };
         }
         
-        // ALAN KONTROLÜ VE YÜKLEME
         if (appState.field && FIELD_DATA[appState.field]) {
-            // Seçili alan varsa categories'i yükle
             appState.categories = JSON.parse(JSON.stringify(FIELD_DATA[appState.field]));
         } else {
-            // Alan yoksa categories boş kalır, onboarding ile seçim yapılacak
             appState.categories = {};
         }
 
-        // Seçili ders ve konuları güncelle (tümü seçili olsun)
         if (Object.keys(appState.categories).length > 0) {
             appState.selectedCourses = Object.keys(appState.categories);
             appState.selectedTopics = [];
@@ -1106,11 +1150,10 @@ window.onload = async function() {
     });
 }
 
-        applyTimelineShift();
         syncSystemUI();
         updateQuestionInputVisibility();
         updateNoteInputVisibility();
-        updateFieldDisplay(); // YENİ: Alan bilgisini göster
+        updateFieldDisplay();
 
         function handleImageUpload(e) {
             const file = e.target.files[0];
@@ -1157,7 +1200,6 @@ window.onload = async function() {
 
         initCanvasDrawing('upload-canvas', () => uploadDrawMode, () => uploadPenSize);
 
-        // Giriş durumuna göre login ekranını yönet
         if (appState.authState === "none") {
             document.getElementById('login-screen').style.display = 'flex';
             document.getElementById('login-fields').style.display = 'none';
@@ -1173,7 +1215,6 @@ window.onload = async function() {
             showOnboarding();
         } else {
             if (!appState.field) {
-                // Onboarding görüldü ama alan seçilmemişse alan seçimi modalını göster
                 openFieldChangeModal();
             } else {
                 switchTab('add');
@@ -1185,6 +1226,19 @@ window.onload = async function() {
         showToast("Sistem kritik bir hata ile karşılaştı. Veritabanı başlatılamadı.", true);
     }
 };
+
+// YENİ: Renk Hesaplama Fonksiyonu
+function getCardColor(card, type) {
+    const today = formatDate(getNowTR());
+    if (!card.nextReview || card.nextReview <= today) return 'red';
+    if (type === 'question') {
+        if (card.is_mastered || card.level >= 4) return 'green';
+        return 'yellow';
+    } else {
+        if ((card.stage || 0) >= 4) return 'green';
+        return 'yellow';
+    }
+}
 
 // YENİ: Alan bilgisini güncelle
 function updateFieldDisplay() {
@@ -1209,7 +1263,6 @@ function changeField(field) {
     appState.field = field;
     appState.categories = JSON.parse(JSON.stringify(FIELD_DATA[field]));
     
-    // Seçili ders ve konuları sıfırla ve yeni alana göre doldur
     appState.selectedCourses = Object.keys(appState.categories);
     appState.selectedTopics = [];
     appState.selectedCourses.forEach(c => {
@@ -1218,7 +1271,6 @@ function changeField(field) {
         }
     });
 
-    // Arşiv filtrelerini de güncelle
 appState.archSelectedCourses = Object.keys(appState.categories);
 appState.archSelectedTopics = [];
 appState.archSelectedCourses.forEach(c => {
@@ -1233,7 +1285,6 @@ appState.archSelectedCourses.forEach(c => {
     closeFieldChangeModal();
     showToast(`Alan değiştirildi: ${field}`);
     if (!appState.hasSeenOnboarding) {
-        // Onboarding sırasında alan seçimi yapıldıysa
         if (currentOnboardingStep === 1) {
             fieldSelectedInOnboarding = true;
             nextOnboardingStep();
@@ -1384,7 +1435,6 @@ function renderOnboardingStep() {
     const btnNext = document.getElementById('btn-onboarding-next');
     const btnSkip = document.getElementById('btn-onboarding-skip');
 
-    // Dot güncelle
     for (let i = 1; i <= 7; i++) {
         const dot = document.getElementById(`dot-step-${i}`);
         if (dot) {
@@ -1397,7 +1447,6 @@ function renderOnboardingStep() {
     }
 
     if (currentOnboardingStep === 1) {
-        // ALAN SEÇİMİ ADIMI
         iconEl.innerHTML = `<path d="M12 2L1 21h22L12 2zm0 3.45l8.15 14.1H3.85L12 5.45zM11 10h2v4h-2zm0 5h2v2h-2z"/>`;
         titleEl.innerText = "Alanını Seç";
         descEl.innerText = "Sınava hazırlık alanını seç, ders ve konuların otomatik yüklensin.";
@@ -1490,17 +1539,17 @@ function renderOnboardingStep() {
         btnNext.innerText = "Devam Et";
     } else if (currentOnboardingStep === 6) {
         iconEl.innerHTML = `<path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>`;
-        titleEl.innerText = "Her Gün Ne Yapacaksın?";
-        descEl.innerText = "Algoritmanıns çalışması için ders çalıştığın her gün 'Soruları Başlat' ve 'Notları Başlat' bölümlerine girmeli ve geri bildirim vermelisin! Bazı günler giremezsen sorun değil, soruların ötelenir ve kaldığın yerden devam edebilirsin.";
+        titleEl.innerText = "Kutu Sistemi ile Tekrar";
+        descEl.innerText = "Kırmızı kutu bugün çözmen gerekenleri, sarı kutu yaklaşanları, yeşil kutu ise ustalaştıklarını gösterir. Her gün girmek zorunda değilsin, gecikenler kırmızı kutuda birikir.";
         previewEl.innerHTML = `
             <div class="space-y-2">
-                <div class="bg-red border border-slate-200 p-3 rounded-xl">
-                    <div class="flex justify-between text-[10px] font-bold text-slate-500 mb-1"><span>GÜNLÜK İLERLEME</span><span>0/5</span></div>
-                    <div class="w-full bg-slate-200 rounded-full h-2"><div class="h-2 bg-indigo-600 rounded-full" style="width: 0%"></div></div>
+                <div class="bg-rose-50 border border-rose-200 p-3 rounded-xl">
+                    <div class="flex justify-between text-[10px] font-bold text-rose-600 mb-1"><span>🔴 KIRMIZI KUTU</span><span>Bekleyen: 12</span></div>
+                    <div class="text-[10px] text-slate-600">Bugün halletmen gerekenler</div>
                 </div>
                 <div class="flex gap-2">
-                    <div class="flex-1 bg-indigo-600 text-white p-3 rounded-xl text-center text-[10px] font-bold">SORULARI BAŞLAT</div>
-                    <div class="flex-1 bg-amber-500 text-white p-3 rounded-xl text-center text-[10px] font-bold">NOTLARI BAŞLAT</div>
+                    <div class="flex-1 bg-yellow-50 border border-yellow-200 p-2 rounded-lg text-center text-[10px] font-bold text-yellow-600">🟡 Sarı</div>
+                    <div class="flex-1 bg-green-50 border border-green-200 p-2 rounded-lg text-center text-[10px] font-bold text-green-600">🟢 Yeşil</div>
                 </div>
             </div>
         `;
@@ -1526,7 +1575,6 @@ function renderOnboardingStep() {
     }
 }
 
-// YENİ: Onboarding'de alan seçimi ve otomatik ilerleme
 function selectFieldAndContinue(field) {
     if (!FIELD_DATA[field]) return;
     appState.field = field;
@@ -1540,7 +1588,7 @@ function selectFieldAndContinue(field) {
         }
     });
 
-    appState.archSelectedCourses = Object.keys(appState.categories);
+appState.archSelectedCourses = Object.keys(appState.categories);
 appState.archSelectedTopics = [];
 appState.archSelectedCourses.forEach(c => {
     if (appState.categories[c]) {
@@ -1552,7 +1600,6 @@ appState.archSelectedCourses.forEach(c => {
     syncSystemUI();
     updateFieldDisplay();
     fieldSelectedInOnboarding = true;
-    // Butonu aktifleştir ve otomatik ilerle
     document.getElementById('btn-onboarding-next').disabled = false;
     document.getElementById('btn-onboarding-next').classList.remove('opacity-50', 'cursor-not-allowed');
     nextOnboardingStep();
@@ -1560,7 +1607,6 @@ appState.archSelectedCourses.forEach(c => {
 
 function nextOnboardingStep() {
     if (currentOnboardingStep === 1) {
-        // İlk adımda alan seçimi yapılmadan ilerlenemez
         if (!fieldSelectedInOnboarding) {
             showToast('Lütfen önce alanını seç!', true);
             return;
@@ -1571,7 +1617,6 @@ function nextOnboardingStep() {
         currentOnboardingStep++;
         const modal = document.getElementById('onboarding-modal');
         
-        // Özel adımlar: 4,6,7 -> modalı kapat, vurgula, sonra aç
         if (currentOnboardingStep === 4 || currentOnboardingStep === 6 || currentOnboardingStep === 7) {
             modal.classList.add('hidden');
             
@@ -1600,7 +1645,6 @@ function nextOnboardingStep() {
                 modal.classList.remove('hidden');
             }
         } else {
-            // Normal adımlar: sekme geçişi yap, render et
             if (currentOnboardingStep === 3) {
                 switchTab('home');
             } else if (currentOnboardingStep === 5) {
@@ -2063,71 +2107,6 @@ setTimeout(() => {
     initCanvasDrawing('camp-review-draw-canvas', () => campReviewDrawMode, () => campPenSize);
 }, 500);
 
-function applyTimelineShift() {
-    const todayStr = formatDate(getNowTR());
-    const lastActiveStr = localStorage.getItem('yks_core_last_active');
-    if (!lastActiveStr) { localStorage.setItem('yks_core_last_active', todayStr); return; }
-    
-    const d1 = new Date(lastActiveStr); 
-    const d2 = new Date(todayStr);
-    const daysMissed = Math.floor((d2 - d1) / (1000 * 60 * 60 * 24));
-    
-    if (daysMissed >= 1) {
-        let totalDue = 0;
-        let totalSolved = 0;
-
-        appState.questions.forEach(q => {
-            if (q.lastReviewedDate === lastActiveStr) {
-                totalSolved++;
-                totalDue++;
-            } else if (!q.is_mastered && q.nextReview <= lastActiveStr) {
-                totalDue++;
-            }
-        });
-
-        appState.notes.forEach(n => {
-            if (n.lastReviewedDate === lastActiveStr) {
-                totalSolved++;
-                totalDue++;
-            } else if (n.nextReview <= lastActiveStr) {
-                totalDue++;
-            }
-        });
-
-        if (totalDue > 0) {
-            if (totalSolved >= (totalDue / 2)) {
-                appState.questions.forEach(q => {
-                    if (!q.is_mastered && q.nextReview <= lastActiveStr && q.lastReviewedDate !== lastActiveStr) {
-                        shiftDate(q, daysMissed);
-                    }
-                });
-                appState.notes.forEach(n => {
-                    if (n.nextReview <= lastActiveStr && n.lastReviewedDate !== lastActiveStr) {
-                        shiftDate(n, daysMissed);
-                    }
-                });
-            } else {
-                appState.questions.forEach(q => { if (!q.is_mastered && q.nextReview) shiftDate(q, daysMissed); });
-                appState.notes.forEach(n => { if (n.nextReview) shiftDate(n, daysMissed); });
-            }
-        }
-        saveState();
-    }
-    localStorage.setItem('yks_core_last_active', todayStr);
-}
-
-function shiftDate(item, days) {
-    let rDate = new Date(item.nextReview); rDate.setDate(rDate.getDate() + days); item.nextReview = formatDate(rDate);
-}
-
-function saveState() {
-    saveStateToDB(appState).then(() => {
-        updateHomeStats(); 
-    }).catch(e => {
-        console.error(e);
-        showToast("SİSTEM HATASI: Veriler veritabanına kaydedilemedi!", true);
-    });
-}
 // ==================== ALGORİTMA DÖNGÜSÜ GÜNCELLEME (GERİYE DÖNÜK) ====================
 function saveIntervals() {
     const input = document.getElementById('setting-intervals');
@@ -2176,7 +2155,6 @@ function recalculateQuestionDates() {
     appState.questions.forEach(q => {
         if (!q.is_mastered) {
             if (q.level >= appState.intervals.length) {
-                // Eğer seviye dizi boyutunu aşarsa artık mastered kabul et
                 q.is_mastered = true;
                 q.nextReview = null;
             } else {
@@ -2200,11 +2178,36 @@ function recalculateNoteDates() {
         n.nextReview = formatDate(next);
     });
 }
+
+function saveState() {
+    saveStateToDB(appState).then(() => {
+        updateHomeStats(); 
+    }).catch(e => {
+        console.error(e);
+        showToast("SİSTEM HATASI: Veriler veritabanına kaydedilemedi!", true);
+    });
+}
+
+// Günlük limitleri kaydet
+function saveDailyLimits() {
+    let qVal = parseInt(document.getElementById('setting-daily-limit-q').value) || 0;
+    let nVal = parseInt(document.getElementById('setting-daily-limit-n').value) || 0;
+    if (qVal < 0) qVal = 0;
+    if (nVal < 0) nVal = 0;
+    appState.dailyLimitQ = qVal;
+    appState.dailyLimitN = nVal;
+    saveState();
+    syncSystemUI();
+    showToast("Günlük limitler güncellendi!");
+}
+
 function syncSystemUI() {
     buildHomeFilters(); populateCategoryDropdowns(); populateArchiveFilters(); updateHomeStats();
     renderLibrary();
     document.getElementById('setting-intervals').value = appState.intervals.join(',');
     document.getElementById('setting-note-intervals').value = appState.noteIntervals.join(',');
+    document.getElementById('setting-daily-limit-q').value = appState.dailyLimitQ;
+    document.getElementById('setting-daily-limit-n').value = appState.dailyLimitN;
     updateFieldDisplay();
 }
 
@@ -2246,20 +2249,57 @@ function switchTab(tabId) {
     if(tabId === 'home') { updateHomeStats(); }
 }
 
+// Güncellenmiş ana ekran istatistikleri
 function updateHomeStats() {
-    let todayStr = formatDate(getNowTR());
-    let qQueue = appState.questions.filter(q => !q.is_mastered && (q.nextReview <= todayStr || q.lastReviewedDate === todayStr) && appState.selectedCourses.includes(q.course) && appState.selectedTopics.includes(q.course + '::' + q.topic));
-    let nQueue = appState.notes.filter(n => (n.nextReview <= todayStr || n.lastReviewedDate === todayStr) && appState.selectedCourses.includes(n.course) && appState.selectedTopics.includes(n.course + '::' + n.topic));
-    
-    document.getElementById('queue-count-questions').innerText = qQueue.length;
-    document.getElementById('queue-count-notes').innerText = nQueue.length;
+    const todayStr = formatDate(getNowTR());
 
-    let solvedToday = appState.questions.filter(q => q.lastReviewedDate === todayStr).length + appState.notes.filter(n => n.lastReviewedDate === todayStr).length;
-    let totalTarget = qQueue.length + nQueue.length;
-    
-    document.getElementById('progress-text').innerText = `${solvedToday}/${totalTarget}`;
-    let pct = totalTarget === 0 ? 100 : Math.round((solvedToday / totalTarget) * 100);
-    document.getElementById('progress-bar').style.width = pct + '%';
+    // Sorular için sayılar
+    const redQuestions = appState.questions.filter(q => 
+        !q.is_mastered && 
+        appState.selectedCourses.includes(q.course) && 
+        appState.selectedTopics.includes(q.course + '::' + q.topic) &&
+        getCardColor(q, 'question') === 'red'
+    );
+    const yellowQuestions = appState.questions.filter(q => 
+        appState.selectedCourses.includes(q.course) && 
+        appState.selectedTopics.includes(q.course + '::' + q.topic) &&
+        getCardColor(q, 'question') === 'yellow'
+    );
+    const greenQuestions = appState.questions.filter(q => 
+        appState.selectedCourses.includes(q.course) && 
+        appState.selectedTopics.includes(q.course + '::' + q.topic) &&
+        getCardColor(q, 'question') === 'green'
+    );
+
+    // Notlar için sayılar
+    const redNotes = appState.notes.filter(n => 
+        appState.selectedCourses.includes(n.course) && 
+        appState.selectedTopics.includes(n.course + '::' + n.topic) &&
+        getCardColor(n, 'note') === 'red'
+    );
+    const yellowNotes = appState.notes.filter(n => 
+        appState.selectedCourses.includes(n.course) && 
+        appState.selectedTopics.includes(n.course + '::' + n.topic) &&
+        getCardColor(n, 'note') === 'yellow'
+    );
+    const greenNotes = appState.notes.filter(n => 
+        appState.selectedCourses.includes(n.course) && 
+        appState.selectedTopics.includes(n.course + '::' + n.topic) &&
+        getCardColor(n, 'note') === 'green'
+    );
+
+    // Kırmızı kutu toplam bekleyen (soru + not)
+    const totalRed = redQuestions.length + redNotes.length;
+
+    // HTML güncelle
+    document.getElementById('red-total-count').innerText = totalRed;
+    document.getElementById('red-question-count').innerText = redQuestions.length;
+    document.getElementById('red-note-count').innerText = redNotes.length;
+
+    document.getElementById('yellow-question-count').innerText = yellowQuestions.length;
+    document.getElementById('yellow-note-count').innerText = yellowNotes.length;
+    document.getElementById('green-question-count').innerText = greenQuestions.length;
+    document.getElementById('green-note-count').innerText = greenNotes.length;
 }
 
 function toggleHomeFilters() {
@@ -2532,36 +2572,87 @@ function saveData() {
 }
 
 // --- İNCELEME / ÇÖZÜM MODAL VE AKIŞI ---
-function startReview(mode) {
+function startReview(mode, boxColor = 'red', specificItem = null) {
     currentReviewMode = mode;
+    currentBoxColor = boxColor;
     let todayStr = formatDate(getNowTR());
 
-    if (mode === 'questions') {
-        currentReviewQueue = appState.questions.filter(q => 
-            !q.is_mastered && 
-            (q.nextReview <= todayStr || q.lastReviewedDate === todayStr) && 
-            appState.selectedCourses.includes(q.course) && 
-            appState.selectedTopics.includes(q.course + '::' + q.topic)
-        );
-    } else {
-        currentReviewQueue = appState.notes.filter(n => 
-            (n.nextReview <= todayStr || n.lastReviewedDate === todayStr) && 
-            appState.selectedCourses.includes(n.course) && 
-            appState.selectedTopics.includes(n.course + '::' + n.topic)
-        );
-    }
-
-    if (currentReviewQueue.length === 0) {
-        showToast("Bugün tekrar edilecek " + (mode === 'questions' ? "soru" : "not") + " bulunmuyor!", true);
+    if (specificItem) {
+        currentReviewQueue = [specificItem];
+        currentReviewIndex = 0;
+        document.getElementById('review-modal').classList.remove('hidden');
+        renderReviewItem();
         return;
     }
 
-    let resumeIndex = currentReviewQueue.findIndex(item => item.lastReviewedDate !== todayStr);
-    if (resumeIndex === -1) resumeIndex = 0;
-    currentReviewIndex = resumeIndex;
+    // Kırmızı kutu için due kartlarını topla
+    if (boxColor === 'red') {
+        if (mode === 'questions') {
+            currentReviewQueue = appState.questions.filter(q => 
+                !q.is_mastered && 
+                q.nextReview && q.nextReview <= todayStr &&
+                appState.selectedCourses.includes(q.course) && 
+                appState.selectedTopics.includes(q.course + '::' + q.topic)
+            );
+            // Sıralama: nextReview artan, eşitse id
+            currentReviewQueue.sort((a, b) => (a.nextReview || '').localeCompare(b.nextReview || '') || a.id - b.id);
+        } else {
+            currentReviewQueue = appState.notes.filter(n => 
+                n.nextReview && n.nextReview <= todayStr &&
+                appState.selectedCourses.includes(n.course) && 
+                appState.selectedTopics.includes(n.course + '::' + n.topic)
+            );
+            currentReviewQueue.sort((a, b) => (a.nextReview || '').localeCompare(b.nextReview || '') || a.id - b.id);
+        }
 
-    document.getElementById('review-modal').classList.remove('hidden');
-    renderReviewItem();
+        if (currentReviewQueue.length === 0) {
+            showToast("Bugün tekrar edilecek " + (mode === 'questions' ? "soru" : "not") + " bulunmuyor!", true);
+            return;
+        }
+
+        // Günlük limit kontrolü
+        let limit = (mode === 'questions') ? appState.dailyLimitQ : appState.dailyLimitN;
+        if (limit > 0) {
+            let solvedToday = (mode === 'questions') 
+                ? appState.questions.filter(q => q.lastReviewedDate === todayStr).length
+                : appState.notes.filter(n => n.lastReviewedDate === todayStr).length;
+            let remaining = limit - solvedToday;
+            if (remaining <= 0) {
+                showToast("Bugünkü limitini tamamladın!", true);
+                return;
+            }
+            // Queue'yu kalan hak kadar kırp (hepsi çözülmemiş çünkü nextReview <= today, çözülmüş olsalar nextReview bugünden büyük olurdu)
+            currentReviewQueue = currentReviewQueue.slice(0, remaining);
+        }
+
+        currentReviewIndex = 0;
+        document.getElementById('review-modal').classList.remove('hidden');
+        renderReviewItem();
+    } else {
+        // Sarı veya yeşil kutu için toplu başlatma (opsiyonel)
+        let filtered = [];
+        if (mode === 'questions') {
+            filtered = appState.questions.filter(q => 
+                appState.selectedCourses.includes(q.course) && 
+                appState.selectedTopics.includes(q.course + '::' + q.topic) &&
+                getCardColor(q, 'question') === boxColor
+            );
+        } else {
+            filtered = appState.notes.filter(n => 
+                appState.selectedCourses.includes(n.course) && 
+                appState.selectedTopics.includes(n.course + '::' + n.topic) &&
+                getCardColor(n, 'note') === boxColor
+            );
+        }
+        if (filtered.length === 0) {
+            showToast("Bu kutuda tekrar edilecek kart yok!", true);
+            return;
+        }
+        currentReviewQueue = filtered;
+        currentReviewIndex = 0;
+        document.getElementById('review-modal').classList.remove('hidden');
+        renderReviewItem();
+    }
 }
 
 function renderReviewItem() {
@@ -2666,72 +2757,96 @@ function renderReviewItem() {
     textInput.classList.add('hidden');
     recallInput.classList.add('hidden');
 
-    if (currentReviewMode === 'questions') {
-        if (isAnsweredToday) {
-            if (item.type === 'choice') {
-                choiceInput.classList.remove('hidden');
-                ['A','B','C','D','E'].forEach(letter => {
-                    const btn = document.getElementById(`choice-btn-${letter}`);
-                    if (btn) {
-                        btn.disabled = true;
-                        btn.classList.remove('hover:bg-indigo-600', 'hover:border-indigo-600', 'hover:text-white');
-                        if (letter === item.answer) {
-                            btn.className = "w-11 h-11 bg-green-500 border border-green-500 text-white font-extrabold text-base transition-all rounded-xl shadow-sm opacity-100";
-                        } else if (letter === item.userTodayAnswer) {
-                            btn.className = "w-11 h-11 bg-red-500 border border-red-500 text-white font-extrabold text-base transition-all rounded-xl shadow-sm opacity-100";
-                        } else {
-                            btn.className = "w-11 h-11 bg-slate-100 border border-slate-300 text-slate-400 font-extrabold text-base transition-all rounded-xl shadow-sm opacity-50 cursor-not-allowed";
+    // Kutu rengine göre UI belirle
+    if (currentBoxColor === 'red') {
+        if (currentReviewMode === 'questions') {
+            if (isAnsweredToday) {
+                if (item.type === 'choice') {
+                    choiceInput.classList.remove('hidden');
+                    ['A','B','C','D','E'].forEach(letter => {
+                        const btn = document.getElementById(`choice-btn-${letter}`);
+                        if (btn) {
+                            btn.disabled = true;
+                            btn.classList.remove('hover:bg-indigo-600', 'hover:border-indigo-600', 'hover:text-white');
+                            if (letter === item.answer) {
+                                btn.className = "w-11 h-11 bg-green-500 border border-green-500 text-white font-extrabold text-base transition-all rounded-xl shadow-sm opacity-100";
+                            } else if (letter === item.userTodayAnswer) {
+                                btn.className = "w-11 h-11 bg-red-500 border border-red-500 text-white font-extrabold text-base transition-all rounded-xl shadow-sm opacity-100";
+                            } else {
+                                btn.className = "w-11 h-11 bg-slate-100 border border-slate-300 text-slate-400 font-extrabold text-base transition-all rounded-xl shadow-sm opacity-50 cursor-not-allowed";
+                            }
                         }
-                    }
-                });
-            } else {
-                textInput.classList.remove('hidden');
-                const textInputEl = document.getElementById('review-text-val');
-                textInputEl.value = item.userTodayAnswer || '';
-                textInputEl.disabled = true;
-                const isCorrect = (item.userTodayAnswer === item.answer);
-                if (isCorrect) {
-                    textInputEl.className = "flex-1 bg-green-50 p-3 border-2 border-green-500 outline-none text-slate-800 font-bold uppercase tracking-wider transition-colors rounded-xl shadow-sm text-xs";
+                    });
                 } else {
-                    textInputEl.className = "flex-1 bg-red-50 p-3 border-2 border-red-500 outline-none text-slate-800 font-bold uppercase tracking-wider transition-colors rounded-xl shadow-sm text-xs";
-                }
-                feedbackBox.innerHTML = `Doğru Cevap: <strong>${item.answer}</strong>`;
-                feedbackBox.className = `w-full p-3 text-xs font-extrabold text-center rounded-xl transition-colors shadow-sm shrink-0 ${isCorrect ? 'bg-green-100 text-green-800 border border-green-300' : 'bg-red-100 text-red-800 border border-red-300'}`;
-                feedbackBox.classList.remove('hidden');
-            }
-
-            recallInput.classList.remove('hidden');
-            updateRecallButtons(item.userRecallStatus);
-        } else {
-            if (item.type === 'choice') {
-                choiceInput.classList.remove('hidden');
-                ['A','B','C','D','E'].forEach(letter => {
-                    const btn = document.getElementById(`choice-btn-${letter}`);
-                    if (btn) {
-                        btn.disabled = false;
-                        btn.className = "w-11 h-11 bg-slate-50 border border-slate-300 hover:bg-indigo-600 hover:border-indigo-600 hover:text-white font-extrabold text-base transition-all rounded-xl shadow-sm";
+                    textInput.classList.remove('hidden');
+                    const textInputEl = document.getElementById('review-text-val');
+                    textInputEl.value = item.userTodayAnswer || '';
+                    textInputEl.disabled = true;
+                    const isCorrect = (item.userTodayAnswer === item.answer);
+                    if (isCorrect) {
+                        textInputEl.className = "flex-1 bg-green-50 p-3 border-2 border-green-500 outline-none text-slate-800 font-bold uppercase tracking-wider transition-colors rounded-xl shadow-sm text-xs";
+                    } else {
+                        textInputEl.className = "flex-1 bg-red-50 p-3 border-2 border-red-500 outline-none text-slate-800 font-bold uppercase tracking-wider transition-colors rounded-xl shadow-sm text-xs";
                     }
-                });
+                    feedbackBox.innerHTML = `Doğru Cevap: <strong>${item.answer}</strong>`;
+                    feedbackBox.className = `w-full p-3 text-xs font-extrabold text-center rounded-xl transition-colors shadow-sm shrink-0 ${isCorrect ? 'bg-green-100 text-green-800 border border-green-300' : 'bg-red-100 text-red-800 border border-red-300'}`;
+                    feedbackBox.classList.remove('hidden');
+                }
+
+                recallInput.classList.remove('hidden');
+                updateRecallButtons(item.userRecallStatus);
             } else {
-                textInput.classList.remove('hidden');
-                const textInputEl = document.getElementById('review-text-val');
-                textInputEl.value = '';
-                textInputEl.disabled = false;
-                textInputEl.className = "flex-1 bg-slate-50 p-3 border border-slate-300 outline-none focus:border-indigo-600 text-slate-800 font-bold uppercase tracking-wider transition-colors rounded-xl shadow-sm text-xs";
+                if (item.type === 'choice') {
+                    choiceInput.classList.remove('hidden');
+                    ['A','B','C','D','E'].forEach(letter => {
+                        const btn = document.getElementById(`choice-btn-${letter}`);
+                        if (btn) {
+                            btn.disabled = false;
+                            btn.className = "w-11 h-11 bg-slate-50 border border-slate-300 hover:bg-indigo-600 hover:border-indigo-600 hover:text-white font-extrabold text-base transition-all rounded-xl shadow-sm";
+                        }
+                    });
+                } else {
+                    textInput.classList.remove('hidden');
+                    const textInputEl = document.getElementById('review-text-val');
+                    textInputEl.value = '';
+                    textInputEl.disabled = false;
+                    textInputEl.className = "flex-1 bg-slate-50 p-3 border border-slate-300 outline-none focus:border-indigo-600 text-slate-800 font-bold uppercase tracking-wider transition-colors rounded-xl shadow-sm text-xs";
+                }
+                recallInput.classList.add('hidden');
             }
-            recallInput.classList.add('hidden');
+        } else {
+            recallInput.classList.remove('hidden');
+            if (isAnsweredToday) {
+                updateRecallButtons(item.userRecallStatus);
+            } else {
+                updateRecallButtons(null);
+            }
         }
     } else {
+        // Sarı/yeşil pasif mod: sadece Unuttum ve Hatırladım butonları
         recallInput.classList.remove('hidden');
-        if (isAnsweredToday) {
-            updateRecallButtons(item.userRecallStatus);
-        } else {
-            updateRecallButtons(null);
-        }
+        // Kısmen hatırladım butonunu gizle
+        const partialBtn = document.getElementById('recall-btn-partial');
+        if (partialBtn) partialBtn.style.display = 'none';
+        // Sadece iki buton aktif
+        updateRecallButtonsPassive();
     }
 
     document.getElementById('btn-rev-prev').disabled = (currentReviewIndex === 0);
     document.getElementById('btn-rev-next').disabled = (currentReviewIndex === currentReviewQueue.length - 1);
+}
+
+function updateRecallButtonsPassive() {
+    const forgotBtn = document.getElementById('recall-btn-forgot');
+    const rememberedBtn = document.getElementById('recall-btn-remembered');
+    if (forgotBtn) {
+        forgotBtn.disabled = false;
+        forgotBtn.className = "flex-1 py-3 font-bold uppercase text-xs rounded-xl border-2 transition-all bg-rose-600 border-rose-600 text-white hover:bg-rose-700";
+    }
+    if (rememberedBtn) {
+        rememberedBtn.disabled = false;
+        rememberedBtn.className = "flex-1 py-3 font-bold uppercase text-xs rounded-xl border-2 transition-all bg-emerald-600 border-emerald-600 text-white hover:bg-emerald-700";
+    }
 }
 
 function toggleReviewNote() {
@@ -2825,6 +2940,33 @@ function submitRecallStatus(status) {
 
     const todayStr = formatDate(getNowTR());
 
+    // Sarı/yeşil pasif mod
+    if (currentBoxColor !== 'red') {
+        if (status === 'forgot') {
+            if (currentReviewMode === 'questions') {
+                item.level = 0;
+                item.is_mastered = false;
+            } else {
+                item.stage = 0;
+            }
+            item.nextReview = todayStr; // bugüne çek, yarın değil
+            // lastReviewedDate'i güncelleme, böylece kırmızıya düşer
+            showToast("Kart kırmızı kutuya taşındı!");
+        } else if (status === 'remembered') {
+            // Hiçbir şey değişmez
+            showToast("Kart döngüsü korundu.");
+        } else {
+            // partial yok sayılır
+            showToast("Geçersiz işlem.");
+            return;
+        }
+        saveState();
+        updateHomeStats();
+        closeReview();
+        return;
+    }
+
+    // Kırmızı kutu normal akış
     if (item.userRecallStatus) {
         return;
     }
@@ -2945,16 +3087,56 @@ function populateArchiveFilters() {
     });
 }
 
+// YENİ: Arşiv için aktif renk filtresini ayarla ve arşive geç
+function goToLibraryWithFilter(color) {
+    activeColorFilter = color;
+    switchTab('library');
+    renderLibrary();
+}
+
 function renderLibrary() {
     const container = document.getElementById('library-list');
     if (!container) return;
     container.innerHTML = '';
 
+    // Renk filtresi butonlarını oluştur
+    const colorFilterDiv = document.getElementById('library-color-filters');
+    if (colorFilterDiv) {
+        const filters = [
+            { key: 'all', label: 'Tümü', colorClass: 'bg-slate-600' },
+            { key: 'red', label: '🔴 Kırmızı', colorClass: 'bg-rose-600' },
+            { key: 'yellow', label: '🟡 Sarı', colorClass: 'bg-yellow-500' },
+            { key: 'green', label: '🟢 Yeşil', colorClass: 'bg-green-600' }
+        ];
+        colorFilterDiv.innerHTML = '';
+        filters.forEach(f => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = `px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all border ${
+                activeColorFilter === f.key 
+                ? 'bg-slate-800 text-white border-slate-800 shadow' 
+                : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+            }`;
+            btn.innerText = f.label;
+            btn.onclick = () => {
+                activeColorFilter = f.key;
+                renderLibrary();
+            };
+            colorFilterDiv.appendChild(btn);
+        });
+    }
+
     let filteredList = (activeArchiveType === 'question') ? appState.questions : appState.notes;
     filteredList = filteredList.filter(item => 
-    appState.archSelectedCourses.includes(item.course) && 
-    appState.archSelectedTopics.includes(item.course + '::' + item.topic)
-);
+        appState.archSelectedCourses.includes(item.course) && 
+        appState.archSelectedTopics.includes(item.course + '::' + item.topic)
+    );
+
+    // Renk filtresini uygula
+    if (activeColorFilter !== 'all') {
+        filteredList = filteredList.filter(item => getCardColor(item, activeArchiveType) === activeColorFilter);
+    }
+
     filteredList.reverse();
 
     const countDisplay = document.createElement('div');
@@ -2969,13 +3151,13 @@ function renderLibrary() {
 
     filteredList.forEach(item => {
         const card = document.createElement('div');
-        card.className = "bg-white border border-slate-200 p-3.5 rounded-2xl shadow-sm space-y-2 relative overflow-hidden";
+        card.className = "bg-white border border-slate-200 p-3.5 rounded-2xl shadow-sm space-y-2 relative overflow-hidden cursor-pointer hover:border-indigo-300 transition-colors";
         
         let borderBarColor = activeArchiveType === 'question' ? 'bg-indigo-600' : 'bg-amber-500';
         
         let contentHTML = '';
         if(item.img) {
-            contentHTML += `<img src="${item.img}" class="w-full max-h-36 object-contain rounded-xl bg-slate-50 border border-slate-100 cursor-zoom-in" onclick="openLightbox('${item.img}')">`;
+            contentHTML += `<img src="${item.img}" class="w-full max-h-36 object-contain rounded-xl bg-slate-50 border border-slate-100 cursor-zoom-in" onclick="event.stopPropagation(); openLightbox('${item.img}')">`;
         }
         if(item.text_question) {
             contentHTML += `<div class="text-xs font-bold text-slate-800 uppercase bg-slate-50 p-2.5 rounded-xl border border-slate-100">${item.text_question}</div>`;
@@ -2984,7 +3166,7 @@ function renderLibrary() {
             contentHTML += `<div class="text-[11px] font-semibold text-amber-800 uppercase bg-amber-50 p-2 rounded-xl border border-amber-100">${item.note_text}</div>`;
         }
         if(item.note_img) {
-            contentHTML += `<img src="${item.note_img}" class="w-full max-h-36 object-contain rounded-xl bg-amber-50 border border-amber-100 cursor-zoom-in mt-1" onclick="openLightbox('${item.note_img}')">`;
+            contentHTML += `<img src="${item.note_img}" class="w-full max-h-36 object-contain rounded-xl bg-amber-50 border border-amber-100 cursor-zoom-in mt-1" onclick="event.stopPropagation(); openLightbox('${item.note_img}')">`;
         }
         if(!item.note_text && !item.note_img && item.note) {
             contentHTML += `<div class="text-[11px] font-semibold text-amber-800 uppercase bg-amber-50 p-2 rounded-xl border border-amber-100">${item.note}</div>`;
@@ -3014,7 +3196,7 @@ function renderLibrary() {
                 <span>${item.course} > ${item.topic}</span>
                 <div class="flex items-center gap-2">
                     <span class="text-[10px] text-slate-400 font-semibold">${item.createdDate || ''}</span>
-                    <button onclick="deleteItem('${activeArchiveType}', ${item.id})" class="text-rose-500 hover:text-rose-700 p-1" title="Sil">
+                    <button onclick="event.stopPropagation(); deleteItem('${activeArchiveType}', ${item.id})" class="text-rose-500 hover:text-rose-700 p-1" title="Sil">
     <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
 </button>
                 </div>
@@ -3022,8 +3204,23 @@ function renderLibrary() {
             ${contentHTML}
             ${extraInfo}
         `;
+        card.onclick = () => openArchiveItem(activeArchiveType, item.id);
         container.appendChild(card);
     });
+}
+
+// YENİ: Arşivden kart aç
+function openArchiveItem(type, id) {
+    let item;
+    if (type === 'question') {
+        item = appState.questions.find(q => q.id === id);
+    } else {
+        item = appState.notes.find(n => n.id === id);
+    }
+    if (!item) return;
+    let color = getCardColor(item, type);
+    // Pasif mod için startReview'ı item ile çağır
+    startReview(type, color, item);
 }
 
 function deleteItem(type, id) {
@@ -3309,4 +3506,4 @@ function closeLightbox() {
         });
     </script>
 </body>
-                            </html>
+                        </html>
