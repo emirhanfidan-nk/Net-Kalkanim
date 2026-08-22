@@ -1046,8 +1046,15 @@ function saveStateToDB(state) {
         let tx = db.transaction(STORE_NAME, 'readwrite');
         let store = tx.objectStore(STORE_NAME);
         let req = store.put(state, 'yks_sr_state');
-        req.onsuccess = () => resolve();
-        req.onerror = () => reject(req.error);
+
+        tx.oncomplete = () => resolve();
+        tx.onerror = (event) => reject(event.target.error);
+        req.onerror = (event) => reject(event.target.error);
+
+        // localStorage yedeği
+        try {
+            localStorage.setItem('yks_sr_state_backup', JSON.stringify(state));
+        } catch (e) {}
     });
 }
 
@@ -2455,7 +2462,7 @@ function initCoursePicker() {
     }
 }
 
-function saveData() {
+async function saveData() {
     if (appState.authState === "trial" && (appState.questions.length + appState.notes.length) >= 20) {
         showToast("Ücretsiz deneme limitine ulaştın! Tam sürüme geçmek için kodu gir.", true);
         openCodeModal();
@@ -2569,7 +2576,7 @@ function saveData() {
     selectChoice('');
     clearSelectedImage();
     clearNoteImage();
-    saveState();
+    await saveState();
     switchTab('home');
 }
 
