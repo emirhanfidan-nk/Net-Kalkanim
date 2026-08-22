@@ -2509,21 +2509,22 @@ function saveData() {
         let nextD = getNowTR(); nextD.setDate(nextD.getDate() + days);
 
         const newQ = {
-            id: Date.now(),
-            course: course,
-            topic: topic,
-            img: finalImage,
-            text_question: textQ,
-            note_text: noteText,
-            note_img: noteImg,
-            type: currentAnswerType,
-            answer: answerVal,
-            level: 0,
-            nextReview: formatDate(nextD),
-            lastReviewedDate: "",
-            is_mastered: false,
-            createdDate: todayStr
-        };
+    id: Date.now(),
+    course: course,
+    topic: topic,
+    img: finalImage,
+    text_question: textQ,
+    note_text: noteText,
+    note_img: noteImg,
+    type: currentAnswerType,
+    answer: answerVal,
+    level: 0,
+    nextReview: formatDate(nextD),
+    lastReviewedDate: "",
+    is_mastered: false,
+    createdDate: todayStr,
+    sortOrder: Date.now()   // ← EKLENDİ
+};
 
         appState.questions.push(newQ);
         showToast("Soru başarıyla kaydedildi!");
@@ -2545,16 +2546,17 @@ function saveData() {
         let nextD = getNowTR(); nextD.setDate(nextD.getDate() + days);
 
         const newNote = {
-            id: Date.now(),
-            course: course,
-            topic: topic,
-            img: finalImage,
-            note: noteText,
-            stage: 0,
-            nextReview: formatDate(nextD),
-            lastReviewedDate: "",
-            createdDate: todayStr
-        };
+    id: Date.now(),
+    course: course,
+    topic: topic,
+    img: finalImage,
+    note: noteText,
+    stage: 0,
+    nextReview: formatDate(nextD),
+    lastReviewedDate: "",
+    createdDate: todayStr,
+    sortOrder: Date.now()   // ← EKLENDİ
+};
 
         appState.notes.push(newNote);
         showToast("Not başarıyla kaydedildi!");
@@ -2823,14 +2825,9 @@ function renderReviewItem() {
             }
         }
     } else {
-        // Sarı/yeşil pasif mod: sadece Unuttum ve Hatırladım butonları
-        recallInput.classList.remove('hidden');
-        // Kısmen hatırladım butonunu gizle
-        const partialBtn = document.getElementById('recall-btn-partial');
-        if (partialBtn) partialBtn.style.display = 'none';
-        // Sadece iki buton aktif
-        updateRecallButtonsPassive();
-    }
+    // Sarı/yeşil pasif modda geri bildirim butonları gösterilmez
+    recallInput.classList.add('hidden');
+}
 
     document.getElementById('btn-rev-prev').disabled = (currentReviewIndex === 0);
     document.getElementById('btn-rev-next').disabled = (currentReviewIndex === currentReviewQueue.length - 1);
@@ -2973,6 +2970,7 @@ function submitRecallStatus(status) {
 
     item.userRecallStatus = status;
     item.lastReviewedDate = todayStr;
+    item.sortOrder = Date.now();
 
     if (currentReviewMode === 'questions') {
         const q = item;
@@ -3137,7 +3135,11 @@ function renderLibrary() {
         filteredList = filteredList.filter(item => getCardColor(item, activeArchiveType) === activeColorFilter);
     }
 
-    filteredList.reverse();
+    filteredList.sort((a, b) => {
+    const aSort = (a.sortOrder !== undefined && a.sortOrder !== null) ? a.sortOrder : a.id;
+    const bSort = (b.sortOrder !== undefined && b.sortOrder !== null) ? b.sortOrder : b.id;
+    return bSort - aSort;
+});
 
     const countDisplay = document.createElement('div');
     countDisplay.className = "text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 px-1";
@@ -3150,63 +3152,85 @@ function renderLibrary() {
     }
 
     filteredList.forEach(item => {
-        const card = document.createElement('div');
-        card.className = "bg-white border border-slate-200 p-3.5 rounded-2xl shadow-sm space-y-2 relative overflow-hidden cursor-pointer hover:border-indigo-300 transition-colors";
-        
-        let borderBarColor = activeArchiveType === 'question' ? 'bg-indigo-600' : 'bg-amber-500';
-        
-        let contentHTML = '';
-        if(item.img) {
-            contentHTML += `<img src="${item.img}" class="w-full max-h-36 object-contain rounded-xl bg-slate-50 border border-slate-100 cursor-zoom-in" onclick="event.stopPropagation(); openLightbox('${item.img}')">`;
-        }
-        if(item.text_question) {
-            contentHTML += `<div class="text-xs font-bold text-slate-800 uppercase bg-slate-50 p-2.5 rounded-xl border border-slate-100">${item.text_question}</div>`;
-        }
-        if(item.note_text) {
-            contentHTML += `<div class="text-[11px] font-semibold text-amber-800 uppercase bg-amber-50 p-2 rounded-xl border border-amber-100">${item.note_text}</div>`;
-        }
-        if(item.note_img) {
-            contentHTML += `<img src="${item.note_img}" class="w-full max-h-36 object-contain rounded-xl bg-amber-50 border border-amber-100 cursor-zoom-in mt-1" onclick="event.stopPropagation(); openLightbox('${item.note_img}')">`;
-        }
-        if(!item.note_text && !item.note_img && item.note) {
-            contentHTML += `<div class="text-[11px] font-semibold text-amber-800 uppercase bg-amber-50 p-2 rounded-xl border border-amber-100">${item.note}</div>`;
-        }
+    const card = document.createElement('div');
+    
+    // Renk belirle
+    let itemColor = getCardColor(item, activeArchiveType);
+    let bgColorClass = 'bg-white';
+    let borderBarColor = 'bg-slate-300';
+    if (itemColor === 'red') {
+        bgColorClass = 'bg-red-50';
+        borderBarColor = 'bg-red-500';
+    } else if (itemColor === 'yellow') {
+        bgColorClass = 'bg-yellow-50';
+        borderBarColor = 'bg-yellow-500';
+    } else if (itemColor === 'green') {
+        bgColorClass = 'bg-green-50';
+        borderBarColor = 'bg-green-500';
+    }
+    
+    card.className = `${bgColorClass} border border-slate-200 p-3.5 rounded-2xl shadow-sm space-y-2 relative overflow-hidden cursor-pointer hover:border-indigo-300 transition-colors`;
+    
+    let contentHTML = '';
+    if(item.img) {
+        contentHTML += `<img src="${item.img}" class="w-full max-h-36 object-contain rounded-xl bg-slate-50 border border-slate-100 cursor-zoom-in" onclick="event.stopPropagation(); openLightbox('${item.img}')">`;
+    }
+    if(item.text_question) {
+        contentHTML += `<div class="text-xs font-bold text-slate-800 uppercase bg-slate-50 p-2.5 rounded-xl border border-slate-100">${item.text_question}</div>`;
+    }
+    if(item.note_text) {
+        contentHTML += `<div class="text-[11px] font-semibold text-amber-800 uppercase bg-amber-50 p-2 rounded-xl border border-amber-100">${item.note_text}</div>`;
+    }
+    if(item.note_img) {
+        contentHTML += `<img src="${item.note_img}" class="w-full max-h-36 object-contain rounded-xl bg-amber-50 border border-amber-100 cursor-zoom-in mt-1" onclick="event.stopPropagation(); openLightbox('${item.note_img}')">`;
+    }
+    if(!item.note_text && !item.note_img && item.note) {
+        contentHTML += `<div class="text-[11px] font-semibold text-amber-800 uppercase bg-amber-50 p-2 rounded-xl border border-amber-100">${item.note}</div>`;
+    }
 
-        let extraInfo = '';
-        if(activeArchiveType === 'question') {
-            extraInfo = `
-                <div class="flex justify-between items-center text-[10px] font-bold text-slate-500 border-t border-slate-100 pt-2">
-                    <span>CEVAP: <strong class="text-indigo-600">${item.answer}</strong></span>
-                    <span>DÖNGÜ: <strong class="text-indigo-600">${item.level + 1}</strong></span>
-                    <span>SONRAKİ: <strong class="text-indigo-600">${item.nextReview}</strong></span>
-                </div>
-            `;
-        } else {
-            extraInfo = `
-                <div class="flex justify-between items-center text-[10px] font-bold text-slate-500 border-t border-slate-100 pt-2">
-                    <span>DÖNGÜ: <strong class="text-amber-600">${(item.stage || 0) + 1}</strong></span>
-                    <span>SONRAKİ: <strong class="text-amber-600">${item.nextReview}</strong></span>
-                </div>
-            `;
-        }
-
-        card.innerHTML = `
-            <div class="absolute top-0 left-0 w-1.5 h-full ${borderBarColor}"></div>
-            <div class="flex justify-between items-center text-xs font-extrabold text-slate-700 uppercase">
-                <span>${item.course} > ${item.topic}</span>
-                <div class="flex items-center gap-2">
-                    <span class="text-[10px] text-slate-400 font-semibold">${item.createdDate || ''}</span>
-                    <button onclick="event.stopPropagation(); deleteItem('${activeArchiveType}', ${item.id})" class="text-rose-500 hover:text-rose-700 p-1" title="Sil">
-    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
-</button>
-                </div>
+    let extraInfo = '';
+    if(activeArchiveType === 'question') {
+        extraInfo = `
+            <div class="flex justify-between items-center text-[10px] font-bold text-slate-500 border-t border-slate-100 pt-2">
+                <span>CEVAP: <strong class="text-indigo-600">${item.answer}</strong></span>
+                <span>DÖNGÜ: <strong class="text-indigo-600">${item.level + 1}</strong></span>
+                <span>SONRAKİ: <strong class="text-indigo-600">${item.nextReview}</strong></span>
             </div>
-            ${contentHTML}
-            ${extraInfo}
         `;
-        card.onclick = () => openArchiveItem(activeArchiveType, item.id);
-        container.appendChild(card);
-    });
+    } else {
+        extraInfo = `
+            <div class="flex justify-between items-center text-[10px] font-bold text-slate-500 border-t border-slate-100 pt-2">
+                <span>DÖNGÜ: <strong class="text-amber-600">${(item.stage || 0) + 1}</strong></span>
+                <span>SONRAKİ: <strong class="text-amber-600">${item.nextReview}</strong></span>
+            </div>
+        `;
+    }
+
+    // pushBtnHTML'i burada tanımla
+    let pushBtnHTML = '';
+    if (activeColorFilter === 'yellow' || activeColorFilter === 'green') {
+        pushBtnHTML = `<button onclick="event.stopPropagation(); pushToEnd('${activeArchiveType}', ${item.id})" class="bg-white/80 hover:bg-white text-slate-700 border border-slate-300 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase shadow-sm transition-colors" title="En sona at">En Alta Gönder</button>`;
+    }
+
+    card.innerHTML = `
+        <div class="absolute top-0 left-0 w-1.5 h-full ${borderBarColor}"></div>
+        <div class="flex justify-between items-center text-xs font-extrabold text-slate-700 uppercase">
+            <span>${item.course} > ${item.topic}</span>
+            <div class="flex items-center gap-2">
+                <span class="text-[10px] text-slate-400 font-semibold">${item.createdDate || ''}</span>
+                ${pushBtnHTML}
+                <button onclick="event.stopPropagation(); deleteItem('${activeArchiveType}', ${item.id})" class="text-rose-500 hover:text-rose-700 p-1" title="Sil">
+                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                </button>
+            </div>
+        </div>
+        ${contentHTML}
+        ${extraInfo}
+    `;
+    
+    card.onclick = () => openArchiveItem(activeArchiveType, item.id);
+    container.appendChild(card);
+});
 }
 
 // YENİ: Arşivden kart aç
@@ -3232,6 +3256,16 @@ function deleteItem(type, id) {
         }
         saveState(); renderLibrary(); updateHomeStats();
     });
+}
+function pushToEnd(type, id) {
+    let arr = type === 'question' ? appState.questions : appState.notes;
+    let item = arr.find(x => x.id === id);
+    if (item) {
+        item.sortOrder = -Date.now(); // Negatif yap, en alta at
+        saveState();
+        renderLibrary();
+        updateHomeStats();
+    }
 }
 
 // --- KAMP SİSTEMİ (FİLTRELİ) ---
@@ -3506,4 +3540,4 @@ function closeLightbox() {
         });
     </script>
 </body>
-                        </html>
+    </html>
