@@ -1,4 +1,4 @@
-const CACHE_NAME = 'net-kalkanim-v10';
+const CACHE_NAME = 'net-kalkanim-v11';
 
 const APP_SHELL = [
   '/',
