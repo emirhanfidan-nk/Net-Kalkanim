@@ -498,6 +498,13 @@
             </div>
 
             <div id="profile" class="tab-content space-y-6">
+            
+            <div class="bg-white border border-slate-200 p-5 space-y-3 relative overflow-hidden rounded-2xl shadow-sm">
+    <div class="absolute top-0 left-0 w-1.5 h-full bg-emerald-500"></div>
+    <h3 class="font-bold text-xs text-emerald-600 uppercase tracking-wider">Depolama Kullanımı</h3>
+    <p id="storage-usage-info" class="text-sm font-semibold text-slate-700"></p>
+    <p class="text-xs text-slate-400">Fotoğraflarını kaybetmemek için hiçbir veriyi silme.</p>
+</div>
                 
                 <div class="bg-white border border-slate-200 p-5 space-y-4 relative overflow-hidden rounded-2xl shadow-sm">
                     <div class="absolute top-0 left-0 w-1.5 h-full bg-indigo-600"></div>
@@ -1011,16 +1018,71 @@ function showCustomConfirm(message, onConfirm) {
 // IndexedDB Ayarları
 let db;
 const DB_NAME = 'Net Kalkanım';
-const DB_VERSION = 1;
-const STORE_NAME = 'app_state';
+const DB_VERSION = 2; // Yeni sürüm
+const STORE_NAMES = {
+    questions: 'questions',
+    notes: 'notes',
+    settings: 'settings'
+};
+
+// WebP destek kontrolü
+const supportsWebP = document.createElement('canvas').toDataURL('image/webp').indexOf('data:image/webp') === 0;
 
 function initDB() {
     return new Promise((resolve, reject) => {
-        let request = indexedDB.open(DB_NAME, DB_VERSION);
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
         request.onupgradeneeded = (e) => {
             db = e.target.result;
-            if (!db.objectStoreNames.contains(STORE_NAME)) {
-                db.createObjectStore(STORE_NAME);
+            const oldVersion = e.oldVersion;
+            
+            if (!db.objectStoreNames.contains(STORE_NAMES.questions)) {
+                db.createObjectStore(STORE_NAMES.questions, { keyPath: 'id' });
+            }
+            if (!db.objectStoreNames.contains(STORE_NAMES.notes)) {
+                db.createObjectStore(STORE_NAMES.notes, { keyPath: 'id' });
+            }
+            if (!db.objectStoreNames.contains(STORE_NAMES.settings)) {
+                db.createObjectStore(STORE_NAMES.settings);
+            }
+            
+            // Migration from old app_state store (version < 2)
+            if (oldVersion < 2 && db.objectStoreNames.contains('app_state')) {
+                const oldStore = e.target.transaction.objectStore('app_state');
+                const getReq = oldStore.get('yks_sr_state');
+                getReq.onsuccess = () => {
+                    const oldData = getReq.result;
+                    if (oldData) {
+                        const settings = {
+                            field: oldData.field || null,
+                            categories: oldData.categories || {},
+                            authState: oldData.authState || 'none',
+                            dailyLimitQ: oldData.dailyLimitQ !== undefined ? oldData.dailyLimitQ : 20,
+                            dailyLimitN: oldData.dailyLimitN !== undefined ? oldData.dailyLimitN : 20,
+                            intervals: oldData.intervals || [1,3,7,21,45,90,180],
+                            noteIntervals: oldData.noteIntervals || [1,3,7,21,45,90,180],
+                            selectedCourses: oldData.selectedCourses || [],
+                            selectedTopics: oldData.selectedTopics || [],
+                            archSelectedCourses: oldData.archSelectedCourses || [],
+                            archSelectedTopics: oldData.archSelectedTopics || [],
+                            hasSeenOnboarding: oldData.hasSeenOnboarding !== undefined ? oldData.hasSeenOnboarding : false
+                        };
+                        const settingsStore = e.target.transaction.objectStore(STORE_NAMES.settings);
+                        settingsStore.put(settings, 'app_settings');
+                        
+                        const questionsStore = e.target.transaction.objectStore(STORE_NAMES.questions);
+                        (oldData.questions || []).forEach(q => {
+                            if (q && q.id !== undefined) questionsStore.put(q);
+                        });
+                        
+                        const notesStore = e.target.transaction.objectStore(STORE_NAMES.notes);
+                        (oldData.notes || []).forEach(n => {
+                            if (n && n.id !== undefined) notesStore.put(n);
+                        });
+                    }
+                };
+                getReq.onerror = () => {
+                    console.warn('Migration reading old data failed');
+                };
             }
         };
         request.onsuccess = (e) => {
@@ -1031,30 +1093,140 @@ function initDB() {
     });
 }
 
-function loadStateFromDB() {
-    return new Promise((resolve, reject) => {
-        let tx = db.transaction(STORE_NAME, 'readonly');
-        let store = tx.objectStore(STORE_NAME);
-        let req = store.get('yks_sr_state');
-        req.onsuccess = () => resolve(req.result);
-        req.onerror = () => resolve(null);
+function loadAllDataFromDB() {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const settings = await new Promise((res, rej) => {
+                const tx = db.transaction(STORE_NAMES.settings, 'readonly');
+                const store = tx.objectStore(STORE_NAMES.settings);
+                const req = store.get('app_settings');
+                req.onsuccess = () => res(req.result);
+                req.onerror = () => rej(req.error);
+            });
+            
+            const questions = await new Promise((res, rej) => {
+                const tx = db.transaction(STORE_NAMES.questions, 'readonly');
+                const store = tx.objectStore(STORE_NAMES.questions);
+                const req = store.getAll();
+                req.onsuccess = () => res(req.result || []);
+                req.onerror = () => rej(req.error);
+            });
+            
+            const notes = await new Promise((res, rej) => {
+                const tx = db.transaction(STORE_NAMES.notes, 'readonly');
+                const store = tx.objectStore(STORE_NAMES.notes);
+                const req = store.getAll();
+                req.onsuccess = () => res(req.result || []);
+                req.onerror = () => rej(req.error);
+            });
+            
+            resolve({ settings, questions, notes });
+        } catch(e) {
+            reject(e);
+        }
     });
 }
 
-function saveStateToDB(state) {
+// Yeni kaydetme fonksiyonları
+function saveQuestion(question) {
     return new Promise((resolve, reject) => {
-        let tx = db.transaction(STORE_NAME, 'readwrite');
-        let store = tx.objectStore(STORE_NAME);
-        let req = store.put(state, 'yks_sr_state');
+        const tx = db.transaction(STORE_NAMES.questions, 'readwrite');
+        const store = tx.objectStore(STORE_NAMES.questions);
+        const req = store.put(question);
+        tx.oncomplete = () => {
+            updateHomeStats();
+            resolve();
+        };
+        tx.onerror = (e) => {
+            console.error('Soru kaydedilemedi:', e);
+            showToast('Soru kaydedilemedi!', true);
+            reject(e);
+        };
+    });
+}
 
-        tx.oncomplete = () => resolve();
-        tx.onerror = (event) => reject(event.target.error);
-        req.onerror = (event) => reject(event.target.error);
+function saveNote(note) {
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAMES.notes, 'readwrite');
+        const store = tx.objectStore(STORE_NAMES.notes);
+        const req = store.put(note);
+        tx.oncomplete = () => {
+            updateHomeStats();
+            resolve();
+        };
+        tx.onerror = (e) => {
+            console.error('Not kaydedilemedi:', e);
+            showToast('Not kaydedilemedi!', true);
+            reject(e);
+        };
+    });
+}
 
-        // localStorage yedeği
-        try {
-            localStorage.setItem('yks_sr_state_backup', JSON.stringify(state));
-        } catch (e) {}
+function saveSettings() {
+    const settings = {
+        field: appState.field,
+        categories: appState.categories,
+        authState: appState.authState,
+        dailyLimitQ: appState.dailyLimitQ,
+        dailyLimitN: appState.dailyLimitN,
+        intervals: appState.intervals,
+        noteIntervals: appState.noteIntervals,
+        selectedCourses: appState.selectedCourses,
+        selectedTopics: appState.selectedTopics,
+        archSelectedCourses: appState.archSelectedCourses,
+        archSelectedTopics: appState.archSelectedTopics,
+        hasSeenOnboarding: appState.hasSeenOnboarding
+    };
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAMES.settings, 'readwrite');
+        const store = tx.objectStore(STORE_NAMES.settings);
+        const req = store.put(settings, 'app_settings');
+        tx.oncomplete = () => {
+            updateHomeStats();
+            try {
+                localStorage.setItem('yks_sr_settings_backup', JSON.stringify(settings));
+            } catch(e) {}
+            resolve();
+        };
+        tx.onerror = (e) => {
+            console.error('Ayarlar kaydedilemedi:', e);
+            showToast('Ayarlar kaydedilemedi!', true);
+            reject(e);
+        };
+    });
+}
+
+function deleteQuestion(id) {
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAMES.questions, 'readwrite');
+        const store = tx.objectStore(STORE_NAMES.questions);
+        const req = store.delete(id);
+        tx.oncomplete = () => {
+            updateHomeStats();
+            resolve();
+        };
+        tx.onerror = (e) => {
+            console.error('Soru silinemedi:', e);
+            showToast('Soru silinemedi!', true);
+            reject(e);
+        };
+    });
+}
+
+function deleteNote(id) {
+    return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAMES.notes, 'readwrite');
+        const store = tx.objectStore(STORE_NAMES.notes);
+        const req = store.delete(id);
+        tx.oncomplete = () => {
+            updateHomeStats();
+            resolve();
+        };
+        tx.onerror = (e) => {
+            console.error('Not silinemedi:', e);
+            showToast('Not silinemedi!', true);
+            reject(e);
+        };
     });
 }
 
@@ -1071,9 +1243,9 @@ let appState = {
     archSelectedTopics: [],
     autoDestroyThreshold: 5,
     hasSeenOnboarding: false,
-    authState: "none",   // "none", "trial", "full"
-    dailyLimitQ: 20,      // YENİ: Günlük soru limiti
-    dailyLimitN: 20       // YENİ: Günlük not limiti
+    authState: "none",
+    dailyLimitQ: 20,
+    dailyLimitN: 20
 };
 
 let currentEntryType = 'question'; 
@@ -1083,9 +1255,9 @@ let selectedChoiceAnswer = '';
 let currentReviewMode = 'questions'; 
 let currentReviewQueue = [];
 let currentReviewIndex = 0;
-let currentBoxColor = 'red'; // YENİ: Aktif kutu rengi
+let currentBoxColor = 'red';
 let activeArchiveType = 'question'; 
-let activeColorFilter = 'all'; // YENİ: Arşiv renk filtresi
+let activeColorFilter = 'all';
 let campMode = ''; 
 let campQueue = [];
 let campIndex = 0;
@@ -1106,35 +1278,75 @@ let fieldSelectedInOnboarding = false;
 let currentNoteInputType = 'text';
 let noteImageDataUrl = null;
 
+// URL yönetimi için global değişkenler
+let lightboxObjectURL = null;
+let reviewObjectURL = null;
+let campObjectURL = null;
+let archiveObserver = null;
+
 window.onload = async function() {
     try {
         await initDB();
-        let savedData = await loadStateFromDB();
-
-        if (!savedData && localStorage.getItem('yks_sr_state')) {
-            savedData = JSON.parse(localStorage.getItem('yks_sr_state'));
-            await saveStateToDB(savedData);
-        }
-
-        if (savedData) {
-            if (savedData.subjects && Array.isArray(savedData.subjects)) {
-                savedData.categories = {}; savedData.subjects.forEach(s => savedData.categories[s] = ["GENEL"]); delete savedData.subjects;
+        
+        const data = await loadAllDataFromDB();
+        
+        // Settings yükle
+        if (data.settings) {
+            appState = { ...appState, ...data.settings };
+        } else {
+            // Eğer settings yoksa, localStorage'dan yedek varsa onu yükle ve kaydet
+            const localSettings = localStorage.getItem('yks_sr_settings_backup');
+            if (localSettings) {
+                const s = JSON.parse(localSettings);
+                appState = { ...appState, ...s };
+                await saveSettings();
+            } else if (localStorage.getItem('yks_sr_state')) {
+                // Eski tam yedek varsa ondan çıkar
+                const old = JSON.parse(localStorage.getItem('yks_sr_state'));
+                if (old) {
+                    appState.field = old.field;
+                    appState.categories = old.categories || {};
+                    appState.authState = old.authState || 'none';
+                    appState.dailyLimitQ = old.dailyLimitQ !== undefined ? old.dailyLimitQ : 20;
+                    appState.dailyLimitN = old.dailyLimitN !== undefined ? old.dailyLimitN : 20;
+                    appState.intervals = old.intervals || [1,3,7,21,45,90,180];
+                    appState.noteIntervals = old.noteIntervals || [1,3,7,21,45,90,180];
+                    appState.selectedCourses = old.selectedCourses || [];
+                    appState.selectedTopics = old.selectedTopics || [];
+                    appState.archSelectedCourses = old.archSelectedCourses || [];
+                    appState.archSelectedTopics = old.archSelectedTopics || [];
+                    appState.hasSeenOnboarding = old.hasSeenOnboarding !== undefined ? old.hasSeenOnboarding : false;
+                    await saveSettings();
+                    
+                    if (old.questions) {
+                        for (const q of old.questions) {
+                            if (q && q.id !== undefined) await saveQuestion(q);
+                        }
+                    }
+                    if (old.notes) {
+                        for (const n of old.notes) {
+                            if (n && n.id !== undefined) await saveNote(n);
+                        }
+                    }
+                }
             }
-            if (!savedData.notes) savedData.notes = [];
-            if (!savedData.noteIntervals) savedData.noteIntervals = [1, 3, 7, 21, 45, 90, 180];
-            if (savedData.dailyLimitQ === undefined) savedData.dailyLimitQ = 20;
-            if (savedData.dailyLimitN === undefined) savedData.dailyLimitN = 20;
-            savedData.questions.forEach(q => { if(!q.topic) q.topic = "GENEL"; if(!q.text_question) q.text_question = ""; });
-            appState = { ...appState, ...savedData };
         }
         
+        appState.questions = data.questions || [];
+        appState.notes = data.notes || [];
+        
+        // Alan ve kategori düzeltmeleri
         if (appState.field && FIELD_DATA[appState.field]) {
             appState.categories = JSON.parse(JSON.stringify(FIELD_DATA[appState.field]));
         } else {
             appState.categories = {};
         }
-
-        if (Object.keys(appState.categories).length > 0) {
+        
+        if (Object.keys(appState.categories).length === 0 && appState.field) {
+            appState.categories = JSON.parse(JSON.stringify(FIELD_DATA[appState.field]));
+        }
+        
+        if (appState.selectedCourses.length === 0 && Object.keys(appState.categories).length > 0) {
             appState.selectedCourses = Object.keys(appState.categories);
             appState.selectedTopics = [];
             appState.selectedCourses.forEach(c => {
@@ -1142,71 +1354,42 @@ window.onload = async function() {
                     appState.categories[c].forEach(t => appState.selectedTopics.push(c + '::' + t));
                 }
             });
-        } else {
-            appState.selectedCourses = [];
-            appState.selectedTopics = [];
         }
-
-        if (!appState.archSelectedCourses || appState.archSelectedCourses.length === 0) {
-    appState.archSelectedCourses = Object.keys(appState.categories);
-    appState.archSelectedTopics = [];
-    appState.archSelectedCourses.forEach(c => {
-        if(appState.categories[c]) {
-            appState.categories[c].forEach(t => appState.archSelectedTopics.push(c + '::' + t));
+        if (appState.archSelectedCourses.length === 0 && Object.keys(appState.categories).length > 0) {
+            appState.archSelectedCourses = Object.keys(appState.categories);
+            appState.archSelectedTopics = [];
+            appState.archSelectedCourses.forEach(c => {
+                if (appState.categories[c]) {
+                    appState.categories[c].forEach(t => appState.archSelectedTopics.push(c + '::' + t));
+                }
+            });
         }
-    });
-}
-
+        
+        // Eksik alanları düzelt
+        appState.questions.forEach(q => { if(!q.topic) q.topic = "GENEL"; if(!q.text_question) q.text_question = ""; if(!q.sortOrder) q.sortOrder = q.id; });
+        appState.notes.forEach(n => { if(!n.topic) n.topic = "GENEL"; if(!n.note) n.note = ""; if(!n.sortOrder) n.sortOrder = n.id; });
+        
+        // Migration: Base64 string'leri Blob'a dönüştür
+        await migrateBase64ToBlob();
+        
         syncSystemUI();
         updateQuestionInputVisibility();
         updateNoteInputVisibility();
         updateFieldDisplay();
-
-        function handleImageUpload(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    document.getElementById('upload-placeholder').classList.add('hidden');
-                    document.getElementById('editor-area').classList.remove('hidden');
-                    document.getElementById('cropper-container').classList.remove('hidden');
-                    document.getElementById('canvas-container').classList.add('hidden');
-                    document.getElementById('btn-crop-ok').classList.remove('hidden');
-                    document.getElementById('upload-zoom-ui').classList.add('hidden');
-                    document.getElementById('upload-zoom-ui').classList.remove('flex');
-                    document.getElementById('upload-pen-sizes').classList.add('hidden');
-                    
-                    let image = document.getElementById('image-to-crop');
-
-                    if (cropperInstance) {
-                        cropperInstance.destroy();
-                        cropperInstance = null;
-                    }
-
-                    image.onload = function() {
-                        cropperInstance = new Cropper(image, { viewMode: 1, autoCropArea: 1 });
-                    };
-
-                    image.src = event.target.result;
-                }
-                reader.readAsDataURL(file);
-
-                e.target.value = '';
-            }
-        }
-
+        
+        // Event listenerlar
         const galleryInput = document.getElementById('q-image-gallery');
         const cameraInput = document.getElementById('q-image-camera');
         if (galleryInput) galleryInput.addEventListener('change', handleImageUpload);
         if (cameraInput) cameraInput.addEventListener('change', handleImageUpload);
-
+        
         const noteGalleryInput = document.getElementById('note-image-gallery');
         const noteCameraInput = document.getElementById('note-image-camera');
         if (noteGalleryInput) noteGalleryInput.addEventListener('change', handleNoteImageUpload);
         if (noteCameraInput) noteCameraInput.addEventListener('change', handleNoteImageUpload);
-
+        
         initCanvasDrawing('upload-canvas', () => uploadDrawMode, () => uploadPenSize);
-
+        
         if (appState.authState === "none") {
             document.getElementById('login-screen').style.display = 'flex';
             document.getElementById('login-fields').style.display = 'none';
@@ -1217,7 +1400,7 @@ window.onload = async function() {
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('btn-code-enter').classList.add('hidden');
         }
-
+        
         if (!appState.hasSeenOnboarding) {
             showOnboarding();
         } else {
@@ -1227,77 +1410,169 @@ window.onload = async function() {
                 switchTab('add');
             }
         }
-
+        
+        // Depolama kotası kontrolü
+        checkStorageUsage();
+        setInterval(checkStorageUsage, 60000); // Her dakika kontrol et
+        
     } catch (error) {
         console.error("Veritabanı başlatma hatası:", error);
         showToast("Sistem kritik bir hata ile karşılaştı. Veritabanı başlatılamadı.", true);
     }
 };
 
-// YENİ: Renk Hesaplama Fonksiyonu
-function getCardColor(card, type) {
-    const today = formatDate(getNowTR());
-    if (!card.nextReview || card.nextReview <= today) return 'red';
-    if (type === 'question') {
-        if (card.is_mastered || card.level >= 4) return 'green';
-        return 'yellow';
-    } else {
-        if ((card.stage || 0) >= 4) return 'green';
-        return 'yellow';
+// Base64 string'i Blob'a çevir
+function base64ToBlob(base64, mimeType) {
+    const byteCharacters = atob(base64.split(',')[1]);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
     }
+    const byteArray = new Uint8Array(byteNumbers);
+    return new Blob([byteArray], { type: mimeType });
 }
 
-// YENİ: Alan bilgisini güncelle
-function updateFieldDisplay() {
-    const display = document.getElementById('current-field-display');
-    if (display) {
-        display.textContent = appState.field ? appState.field : '-';
+// dataURL'yi Blob'a çevir
+function dataURLToBlob(dataURL) {
+    const parts = dataURL.split(',');
+    const mime = parts[0].match(/:(.*?);/)[1];
+    const bstr = atob(parts[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while(n--){
+        u8arr[n] = bstr.charCodeAt(n);
     }
+    return new Blob([u8arr], { type: mime });
 }
 
-// YENİ: Alan değiştirme modalını aç
-function openFieldChangeModal() {
-    document.getElementById('field-change-modal').classList.remove('hidden');
-}
-
-function closeFieldChangeModal() {
-    document.getElementById('field-change-modal').classList.add('hidden');
-}
-
-// YENİ: Alan değiştir
-function changeField(field) {
-    if (!FIELD_DATA[field]) return;
-    appState.field = field;
-    appState.categories = JSON.parse(JSON.stringify(FIELD_DATA[field]));
+// Eski verileri Blob'a dönüştür
+async function migrateBase64ToBlob() {
+    let changed = false;
     
-    appState.selectedCourses = Object.keys(appState.categories);
-    appState.selectedTopics = [];
-    appState.selectedCourses.forEach(c => {
-        if (appState.categories[c]) {
-            appState.categories[c].forEach(t => appState.selectedTopics.push(c + '::' + t));
+    for (let i = 0; i < appState.questions.length; i++) {
+        const q = appState.questions[i];
+        if (q.img && typeof q.img === 'string' && q.img.startsWith('data:image')) {
+            q.img = dataURLToBlob(q.img);
+            changed = true;
         }
-    });
-
-appState.archSelectedCourses = Object.keys(appState.categories);
-appState.archSelectedTopics = [];
-appState.archSelectedCourses.forEach(c => {
-    if (appState.categories[c]) {
-        appState.categories[c].forEach(t => appState.archSelectedTopics.push(c + '::' + t));
+        if (q.note_img && typeof q.note_img === 'string' && q.note_img.startsWith('data:image')) {
+            q.note_img = dataURLToBlob(q.note_img);
+            changed = true;
+        }
     }
-});
-
-    saveState();
-    syncSystemUI();
-    updateFieldDisplay();
-    closeFieldChangeModal();
-    showToast(`Alan değiştirildi: ${field}`);
-    if (!appState.hasSeenOnboarding) {
-        if (currentOnboardingStep === 1) {
-            fieldSelectedInOnboarding = true;
-            nextOnboardingStep();
+    
+    for (let i = 0; i < appState.notes.length; i++) {
+        const n = appState.notes[i];
+        if (n.img && typeof n.img === 'string' && n.img.startsWith('data:image')) {
+            n.img = dataURLToBlob(n.img);
+            changed = true;
         }
-    } else {
-        switchTab('add');
+    }
+    
+    if (changed) {
+        // Değişiklikleri IndexedDB'ye kaydet
+        for (const q of appState.questions) {
+            await saveQuestion(q);
+        }
+        for (const n of appState.notes) {
+            await saveNote(n);
+        }
+        showToast("Eski görüntüler yeni formata dönüştürüldü.");
+    }
+}
+
+// Canvas'tan Blob üret (WebP/JPEG)
+function canvasToBlob(canvas, quality = 0.85) {
+    return new Promise((resolve, reject) => {
+        const mimeType = supportsWebP ? 'image/webp' : 'image/jpeg';
+        canvas.toBlob((blob) => {
+            if (blob) resolve(blob);
+            else reject(new Error('Blob üretilemedi'));
+        }, mimeType, quality);
+    });
+}
+
+// Object URL yönetimi
+function createObjectURL(blob) {
+    if (!blob) return null;
+    return URL.createObjectURL(blob);
+}
+
+function revokeObjectURL(url) {
+    if (url) URL.revokeObjectURL(url);
+}
+
+// Depolama kotası kontrolü
+async function checkStorageUsage() {
+    if (!navigator.storage || !navigator.storage.estimate) return;
+
+    try {
+        const estimate = await navigator.storage.estimate();
+        const usage = estimate.usage || 0;
+        let quota = estimate.quota || 0;
+
+        // localStorage'da daha önce saklanmış sabit kota var mı?
+        const savedQuota = localStorage.getItem('fixedStorageQuota');
+        if (savedQuota) {
+            const parsed = Number(savedQuota);
+            if (!isNaN(parsed) && parsed > 0) {
+                quota = parsed;
+            } else {
+                // Bozuk değer varsa temizle ve yeniden kaydet
+                localStorage.removeItem('fixedStorageQuota');
+                localStorage.setItem('fixedStorageQuota', String(quota));
+            }
+        } else {
+            // İlk kez çalışıyorsa kotayı kaydet
+            localStorage.setItem('fixedStorageQuota', String(quota));
+        }
+
+        const usagePercent = quota > 0 ? (usage / quota) * 100 : 0;
+
+        const storageInfoEl = document.getElementById('storage-usage-info');
+        if (storageInfoEl) {
+            const usedMB = (usage / (1024 * 1024)).toFixed(1);
+            const quotaMB = (quota / (1024 * 1024)).toFixed(1);
+            storageInfoEl.textContent = `Kullanılan: ${usedMB} MB / Cihaz Kotası: ${quotaMB} MB (%${usagePercent.toFixed(1)})`;
+        }
+
+        if (usagePercent > 90) {
+            showToast("Depolama alanı %90'ın üzerinde! Lütfen bazı kayıtları silin.", true);
+        }
+    } catch (e) {
+        console.warn('Depolama kotası alınamadı:', e);
+    }
+}
+
+function handleImageUpload(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            document.getElementById('upload-placeholder').classList.add('hidden');
+            document.getElementById('editor-area').classList.remove('hidden');
+            document.getElementById('cropper-container').classList.remove('hidden');
+            document.getElementById('canvas-container').classList.add('hidden');
+            document.getElementById('btn-crop-ok').classList.remove('hidden');
+            document.getElementById('upload-zoom-ui').classList.add('hidden');
+            document.getElementById('upload-zoom-ui').classList.remove('flex');
+            document.getElementById('upload-pen-sizes').classList.add('hidden');
+            
+            let image = document.getElementById('image-to-crop');
+
+            if (cropperInstance) {
+                cropperInstance.destroy();
+                cropperInstance = null;
+            }
+
+            image.onload = function() {
+                cropperInstance = new Cropper(image, { viewMode: 1, autoCropArea: 1 });
+            };
+
+            image.src = event.target.result;
+        }
+        reader.readAsDataURL(file);
+        e.target.value = '';
     }
 }
 
@@ -1365,9 +1640,9 @@ function showLoginFields() {
     document.getElementById('login-fields').style.display = 'block';
 }
 
-function startTrial() {
+async function startTrial() {
     appState.authState = "trial";
-    saveState();
+    await saveSettings();
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('btn-code-enter').classList.remove('hidden');
     if (!appState.hasSeenOnboarding) {
@@ -1391,7 +1666,7 @@ function closeCodeModal() {
     document.getElementById('code-modal').classList.add('hidden');
 }
 
-function submitCode() {
+async function submitCode() {
     const codeInput = document.getElementById('code-input');
     const errorMsg = document.getElementById('code-error-msg');
     const code = codeInput.value.trim();
@@ -1404,11 +1679,11 @@ function submitCode() {
     errorMsg.innerText = "Kontrol ediliyor...";
 
     const keyRef = database.ref("keys/" + code);
-    keyRef.once("value").then((snapshot) => {
+    keyRef.once("value").then(async (snapshot) => {
         if (snapshot.val() === true) {
-            keyRef.remove().then(() => {
+            keyRef.remove().then(async () => {
                 appState.authState = "full";
-                saveState();
+                await saveSettings();
                 try {
                     localStorage.setItem("authorized", "true");
                 } catch (e) {}
@@ -1582,7 +1857,7 @@ function renderOnboardingStep() {
     }
 }
 
-function selectFieldAndContinue(field) {
+async function selectFieldAndContinue(field) {
     if (!FIELD_DATA[field]) return;
     appState.field = field;
     appState.categories = JSON.parse(JSON.stringify(FIELD_DATA[field]));
@@ -1595,15 +1870,15 @@ function selectFieldAndContinue(field) {
         }
     });
 
-appState.archSelectedCourses = Object.keys(appState.categories);
-appState.archSelectedTopics = [];
-appState.archSelectedCourses.forEach(c => {
-    if (appState.categories[c]) {
-        appState.categories[c].forEach(t => appState.archSelectedTopics.push(c + '::' + t));
-    }
-});
+    appState.archSelectedCourses = Object.keys(appState.categories);
+    appState.archSelectedTopics = [];
+    appState.archSelectedCourses.forEach(c => {
+        if (appState.categories[c]) {
+            appState.categories[c].forEach(t => appState.archSelectedTopics.push(c + '::' + t));
+        }
+    });
 
-    saveState();
+    await saveSettings();
     syncSystemUI();
     updateFieldDisplay();
     fieldSelectedInOnboarding = true;
@@ -1671,9 +1946,9 @@ function nextOnboardingStep() {
     }
 }
 
-function finishOnboarding() {
+async function finishOnboarding() {
     appState.hasSeenOnboarding = true;
-    saveState();
+    await saveSettings();
     document.getElementById('onboarding-modal').classList.add('hidden');
     if (!appState.field) {
         openFieldChangeModal();
@@ -1786,7 +2061,8 @@ function selectChoice(val) {
 function finishCrop() {
     if (!cropperInstance) return;
     
-    const croppedCanvas = cropperInstance.getCroppedCanvas({ maxWidth: 200, maxHeight: 200 });
+    // Kırpma sonrası maksimum 1600px sınırı
+    const croppedCanvas = cropperInstance.getCroppedCanvas({ maxWidth: 1400, maxHeight: 1400 });
     
     document.getElementById('cropper-container').classList.add('hidden');
     document.getElementById('canvas-container').classList.remove('hidden');
@@ -2115,7 +2391,7 @@ setTimeout(() => {
 }, 500);
 
 // ==================== ALGORİTMA DÖNGÜSÜ GÜNCELLEME (GERİYE DÖNÜK) ====================
-function saveIntervals() {
+async function saveIntervals() {
     const input = document.getElementById('setting-intervals');
     const raw = input.value.trim();
     if (!raw) {
@@ -2130,13 +2406,13 @@ function saveIntervals() {
     }
 
     appState.intervals = parts;
-    recalculateQuestionDates();
-    saveState();
+    await saveSettings();
+    await recalculateQuestionDates();
     syncSystemUI();
     showToast("Soru algoritma döngüsü geriye dönük güncellendi!");
 }
 
-function saveNoteIntervals() {
+async function saveNoteIntervals() {
     const input = document.getElementById('setting-note-intervals');
     const raw = input.value.trim();
     if (!raw) {
@@ -2151,15 +2427,15 @@ function saveNoteIntervals() {
     }
 
     appState.noteIntervals = parts;
-    recalculateNoteDates();
-    saveState();
+    await saveSettings();
+    await recalculateNoteDates();
     syncSystemUI();
     showToast("Not algoritma döngüsü geriye dönük güncellendi!");
 }
 
-function recalculateQuestionDates() {
+async function recalculateQuestionDates() {
     const today = getNowTR();
-    appState.questions.forEach(q => {
+    for (const q of appState.questions) {
         if (!q.is_mastered) {
             if (q.level >= appState.intervals.length) {
                 q.is_mastered = true;
@@ -2170,41 +2446,38 @@ function recalculateQuestionDates() {
                 next.setDate(next.getDate() + days);
                 q.nextReview = formatDate(next);
             }
+            await saveQuestion(q);
         }
-    });
+    }
 }
 
-function recalculateNoteDates() {
+async function recalculateNoteDates() {
     const today = getNowTR();
-    appState.notes.forEach(n => {
+    for (const n of appState.notes) {
         const days = appState.noteIntervals[n.stage] !== undefined
             ? appState.noteIntervals[n.stage]
             : appState.noteIntervals[appState.noteIntervals.length - 1] || 1;
         const next = new Date(today);
         next.setDate(next.getDate() + days);
         n.nextReview = formatDate(next);
-    });
-}
-
-async function saveState() {
-    try {
-        await saveStateToDB(appState);
-        updateHomeStats();
-    } catch(e) {
-        console.error(e);
-        alert("Veriler kaydedilemedi! Lütfen uygulamayı kapatmayın ve tekrar deneyin. Hata: " + e.message);
+        await saveNote(n);
     }
 }
 
+// saveState artık sadece saveSettings çağırır
+async function saveState() {
+    await saveSettings();
+}
+
 // Günlük limitleri kaydet
-function saveDailyLimits() {
+async function saveDailyLimits() {
     let qVal = parseInt(document.getElementById('setting-daily-limit-q').value) || 0;
     let nVal = parseInt(document.getElementById('setting-daily-limit-n').value) || 0;
     if (qVal < 0) qVal = 0;
     if (nVal < 0) nVal = 0;
     appState.dailyLimitQ = qVal;
     appState.dailyLimitN = nVal;
-    saveState();
+    await saveSettings();
     syncSystemUI();
     showToast("Günlük limitler güncellendi!");
 }
@@ -2217,6 +2490,8 @@ function syncSystemUI() {
     document.getElementById('setting-daily-limit-q').value = appState.dailyLimitQ;
     document.getElementById('setting-daily-limit-n').value = appState.dailyLimitN;
     updateFieldDisplay();
+    // Depolama bilgisi güncelle
+    checkStorageUsage();
 }
 
 function switchTab(tabId) {
@@ -2261,7 +2536,6 @@ function switchTab(tabId) {
 function updateHomeStats() {
     const todayStr = formatDate(getNowTR());
 
-    // Sorular için sayılar
     const redQuestions = appState.questions.filter(q => 
         !q.is_mastered && 
         appState.selectedCourses.includes(q.course) && 
@@ -2279,7 +2553,6 @@ function updateHomeStats() {
         getCardColor(q, 'question') === 'green'
     );
 
-    // Notlar için sayılar
     const redNotes = appState.notes.filter(n => 
         appState.selectedCourses.includes(n.course) && 
         appState.selectedTopics.includes(n.course + '::' + n.topic) &&
@@ -2296,10 +2569,8 @@ function updateHomeStats() {
         getCardColor(n, 'note') === 'green'
     );
 
-    // Kırmızı kutu toplam bekleyen (soru + not)
     const totalRed = redQuestions.length + redNotes.length;
 
-    // HTML güncelle
     document.getElementById('red-total-count').innerText = totalRed;
     document.getElementById('red-question-count').innerText = redQuestions.length;
     document.getElementById('red-note-count').innerText = redNotes.length;
@@ -2354,7 +2625,7 @@ function buildHomeFilters() {
     });
 }
 
-function toggleCourseFilter(el) {
+async function toggleCourseFilter(el) {
     const course = el.value;
     if (el.checked) {
         if (!appState.selectedCourses.includes(course)) appState.selectedCourses.push(course);
@@ -2368,17 +2639,20 @@ function toggleCourseFilter(el) {
         appState.selectedCourses = appState.selectedCourses.filter(c => c !== course);
         appState.selectedTopics = appState.selectedTopics.filter(t => !t.startsWith(course + '::'));
     }
-    saveState(); buildHomeFilters(); updateHomeStats();
+    await saveSettings();
+    buildHomeFilters();
+    updateHomeStats();
 }
 
-function toggleTopicFilter(el) {
+async function toggleTopicFilter(el) {
     const val = el.value;
     if (el.checked) {
         if (!appState.selectedTopics.includes(val)) appState.selectedTopics.push(val);
     } else {
         appState.selectedTopics = appState.selectedTopics.filter(t => t !== val);
     }
-    saveState(); updateHomeStats();
+    await saveSettings();
+    updateHomeStats();
 }
 
 function populateCategoryDropdowns() {
@@ -2488,7 +2762,8 @@ async function saveData() {
             mergeCanvas.width = canvas.width; mergeCanvas.height = canvas.height;
             const ctx = mergeCanvas.getContext('2d');
             ctx.drawImage(img, 0, 0); ctx.drawImage(canvas, 0, 0);
-            finalImage = mergeCanvas.toDataURL('image/jpeg', 0.8);
+            // Blob üret (WebP/JPEG)
+            finalImage = await canvasToBlob(mergeCanvas, 0.85);
         }
 
         let textQ = document.getElementById('q-text-question').value.trim();
@@ -2510,32 +2785,36 @@ async function saveData() {
         if (currentNoteInputType === 'text') {
             noteText = document.getElementById('q-note').value.trim();
         } else {
-            noteImg = noteImageDataUrl;
+            if (noteImageDataUrl) {
+                noteImg = dataURLToBlob(noteImageDataUrl);
+            }
         }
 
         let days = appState.intervals[0] || 1;
         let nextD = getNowTR(); nextD.setDate(nextD.getDate() + days);
 
         const newQ = {
-    id: Date.now(),
-    course: course,
-    topic: topic,
-    img: finalImage,
-    text_question: textQ,
-    note_text: noteText,
-    note_img: noteImg,
-    type: currentAnswerType,
-    answer: answerVal,
-    level: 0,
-    nextReview: formatDate(nextD),
-    lastReviewedDate: "",
-    is_mastered: false,
-    createdDate: todayStr,
-    sortOrder: Date.now()   // ← EKLENDİ
-};
+            id: Date.now(),
+            course: course,
+            topic: topic,
+            img: finalImage,
+            text_question: textQ,
+            note_text: noteText,
+            note_img: noteImg,
+            type: currentAnswerType,
+            answer: answerVal,
+            level: 0,
+            nextReview: formatDate(nextD),
+            lastReviewedDate: "",
+            is_mastered: false,
+            createdDate: todayStr,
+            sortOrder: Date.now()
+        };
 
         appState.questions.push(newQ);
+        await saveQuestion(newQ);
         showToast("Soru başarıyla kaydedildi!");
+        await checkStorageUsage();
     } else {
         let finalImage = null;
         const canvas = document.getElementById('upload-canvas');
@@ -2545,7 +2824,7 @@ async function saveData() {
             mergeCanvas.width = canvas.width; mergeCanvas.height = canvas.height;
             const ctx = mergeCanvas.getContext('2d');
             ctx.drawImage(img, 0, 0); ctx.drawImage(canvas, 0, 0);
-            finalImage = mergeCanvas.toDataURL('image/jpeg', 0.8);
+            finalImage = await canvasToBlob(mergeCanvas, 0.85);
         }
 
         let noteText = document.getElementById('q-note').value.trim();
@@ -2554,20 +2833,22 @@ async function saveData() {
         let nextD = getNowTR(); nextD.setDate(nextD.getDate() + days);
 
         const newNote = {
-    id: Date.now(),
-    course: course,
-    topic: topic,
-    img: finalImage,
-    note: noteText,
-    stage: 0,
-    nextReview: formatDate(nextD),
-    lastReviewedDate: "",
-    createdDate: todayStr,
-    sortOrder: Date.now()   // ← EKLENDİ
-};
+            id: Date.now(),
+            course: course,
+            topic: topic,
+            img: finalImage,
+            note: noteText,
+            stage: 0,
+            nextReview: formatDate(nextD),
+            lastReviewedDate: "",
+            createdDate: todayStr,
+            sortOrder: Date.now()
+        };
 
         appState.notes.push(newNote);
+        await saveNote(newNote);
         showToast("Not başarıyla kaydedildi!");
+        await checkStorageUsage();
     }
 
     document.getElementById('q-note').value = '';
@@ -2577,12 +2858,14 @@ async function saveData() {
     selectChoice('');
     clearSelectedImage();
     clearNoteImage();
-    await saveState();
     switchTab('home');
 }
 
 // --- İNCELEME / ÇÖZÜM MODAL VE AKIŞI ---
 function startReview(mode, boxColor = 'red', specificItem = null) {
+    // Önceki object URL'leri temizle
+    if (reviewObjectURL) { revokeObjectURL(reviewObjectURL); reviewObjectURL = null; }
+    
     currentReviewMode = mode;
     currentBoxColor = boxColor;
     let todayStr = formatDate(getNowTR());
@@ -2595,7 +2878,6 @@ function startReview(mode, boxColor = 'red', specificItem = null) {
         return;
     }
 
-    // Kırmızı kutu için due kartlarını topla
     if (boxColor === 'red') {
         if (mode === 'questions') {
             currentReviewQueue = appState.questions.filter(q => 
@@ -2604,7 +2886,6 @@ function startReview(mode, boxColor = 'red', specificItem = null) {
                 appState.selectedCourses.includes(q.course) && 
                 appState.selectedTopics.includes(q.course + '::' + q.topic)
             );
-            // Sıralama: nextReview artan, eşitse id
             currentReviewQueue.sort((a, b) => (a.nextReview || '').localeCompare(b.nextReview || '') || a.id - b.id);
         } else {
             currentReviewQueue = appState.notes.filter(n => 
@@ -2620,7 +2901,6 @@ function startReview(mode, boxColor = 'red', specificItem = null) {
             return;
         }
 
-        // Günlük limit kontrolü
         let limit = (mode === 'questions') ? appState.dailyLimitQ : appState.dailyLimitN;
         if (limit > 0) {
             let solvedToday = (mode === 'questions') 
@@ -2631,7 +2911,6 @@ function startReview(mode, boxColor = 'red', specificItem = null) {
                 showToast("Bugünkü limitini tamamladın!", true);
                 return;
             }
-            // Queue'yu kalan hak kadar kırp (hepsi çözülmemiş çünkü nextReview <= today, çözülmüş olsalar nextReview bugünden büyük olurdu)
             currentReviewQueue = currentReviewQueue.slice(0, remaining);
         }
 
@@ -2639,7 +2918,6 @@ function startReview(mode, boxColor = 'red', specificItem = null) {
         document.getElementById('review-modal').classList.remove('hidden');
         renderReviewItem();
     } else {
-        // Sarı veya yeşil kutu için toplu başlatma (opsiyonel)
         let filtered = [];
         if (mode === 'questions') {
             filtered = appState.questions.filter(q => 
@@ -2681,8 +2959,13 @@ function renderReviewItem() {
     const qTextEl = document.getElementById('review-question-text');
     const frameBox = document.getElementById('review-frame-box');
 
+    // Önceki URL'yi temizle
+    if (reviewObjectURL) { revokeObjectURL(reviewObjectURL); reviewObjectURL = null; }
+
     if (item.img) {
-        imgEl.src = item.img;
+        // Blob'dan object URL oluştur
+        reviewObjectURL = createObjectURL(item.img);
+        imgEl.src = reviewObjectURL;
         imgEl.classList.remove('hidden');
         frameBox.classList.remove('hidden');
     } else {
@@ -2713,8 +2996,11 @@ function renderReviewItem() {
     }
     if (item.note_img) {
         hasNote = true;
+        // note_img Blob ise object URL oluştur
+        let noteImgURL = createObjectURL(item.note_img);
         if (noteContent) noteContent += '<br>';
-        noteContent += `<img src="${item.note_img}" class="w-full h-auto object-contain rounded-lg mt-1">`;
+        noteContent += `<img src="${noteImgURL}" class="w-full h-auto object-contain rounded-lg mt-1">`;
+        // URL'yi revoke etmek için geçici bir referans tutalabilir; basitlik için şimdilik revoke etmiyoruz, modal kapanınca temizlenir.
     }
     if (!hasNote && item.note) {
         hasNote = true;
@@ -2767,7 +3053,6 @@ function renderReviewItem() {
     textInput.classList.add('hidden');
     recallInput.classList.add('hidden');
 
-    // Kutu rengine göre UI belirle
     if (currentBoxColor === 'red') {
         if (currentReviewMode === 'questions') {
             if (isAnsweredToday) {
@@ -2833,9 +3118,8 @@ function renderReviewItem() {
             }
         }
     } else {
-    // Sarı/yeşil pasif modda geri bildirim butonları gösterilmez
-    recallInput.classList.add('hidden');
-}
+        recallInput.classList.add('hidden');
+    }
 
     document.getElementById('btn-rev-prev').disabled = (currentReviewIndex === 0);
     document.getElementById('btn-rev-next').disabled = (currentReviewIndex === currentReviewQueue.length - 1);
@@ -2921,7 +3205,7 @@ function navigateReview(dir) {
     }
 }
 
-function submitQuestionAnswer(userAns) {
+async function submitQuestionAnswer(userAns) {
     let q = currentReviewQueue[currentReviewIndex];
     if (!q) return;
 
@@ -2934,18 +3218,17 @@ function submitQuestionAnswer(userAns) {
     q.userTodayAnswer = String(userAns).trim().toUpperCase();
     q.lastReviewedDate = todayStr;
 
-    saveState();
+    await saveQuestion(q);
     updateHomeStats();
     renderReviewItem();
 }
 
-function submitRecallStatus(status) {
+async function submitRecallStatus(status) {
     const item = currentReviewQueue[currentReviewIndex];
     if (!item) return;
 
     const todayStr = formatDate(getNowTR());
 
-    // Sarı/yeşil pasif mod
     if (currentBoxColor !== 'red') {
         if (status === 'forgot') {
             if (currentReviewMode === 'questions') {
@@ -2954,24 +3237,24 @@ function submitRecallStatus(status) {
             } else {
                 item.stage = 0;
             }
-            item.nextReview = todayStr; // bugüne çek, yarın değil
-            // lastReviewedDate'i güncelleme, böylece kırmızıya düşer
+            item.nextReview = todayStr;
             showToast("Kart kırmızı kutuya taşındı!");
         } else if (status === 'remembered') {
-            // Hiçbir şey değişmez
             showToast("Kart döngüsü korundu.");
         } else {
-            // partial yok sayılır
             showToast("Geçersiz işlem.");
             return;
         }
-        saveState();
+        if (currentReviewMode === 'questions') {
+            await saveQuestion(item);
+        } else {
+            await saveNote(item);
+        }
         updateHomeStats();
         closeReview();
         return;
     }
 
-    // Kırmızı kutu normal akış
     if (item.userRecallStatus) {
         return;
     }
@@ -2997,6 +3280,7 @@ function submitRecallStatus(status) {
         }
         let nextD = getNowTR(); nextD.setDate(nextD.getDate() + days);
         q.nextReview = formatDate(nextD);
+        await saveQuestion(q);
     } else {
         const n = item;
         let days;
@@ -3011,15 +3295,16 @@ function submitRecallStatus(status) {
         }
         let nextD = getNowTR(); nextD.setDate(nextD.getDate() + days);
         n.nextReview = formatDate(nextD);
+        await saveNote(n);
     }
 
-    saveState();
     updateHomeStats();
     renderReviewItem();
 }
 
 function closeReview() {
     document.getElementById('review-modal').classList.add('hidden');
+    if (reviewObjectURL) { revokeObjectURL(reviewObjectURL); reviewObjectURL = null; }
     updateHomeStats();
 }
 
@@ -3046,7 +3331,7 @@ function toggleArchiveFilters() {
     chevron.style.transform = container.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
 }
 
-function populateArchiveFilters() {
+async function populateArchiveFilters() {
     const courseDiv = document.getElementById('arch-course-filters');
     const topicDiv = document.getElementById('arch-topic-filters');
     if(!courseDiv || !topicDiv) return;
@@ -3060,17 +3345,18 @@ function populateArchiveFilters() {
         btn.type = 'button';
         btn.className = `px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase transition-all border ${active ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-slate-100 text-slate-600 border-slate-200'}`;
         btn.innerText = c;
-        btn.onclick = () => {
-    if(active) {
-        appState.archSelectedCourses = appState.archSelectedCourses.filter(x => x !== c);
-        appState.archSelectedTopics = appState.archSelectedTopics.filter(x => !x.startsWith(c + '::'));
-    } else {
-        appState.archSelectedCourses.push(c);
-        if(appState.categories[c]) appState.categories[c].forEach(t => appState.archSelectedTopics.push(c + '::' + t));
-    }
-    saveState();
-    populateArchiveFilters(); renderLibrary();
-};
+        btn.onclick = async () => {
+            if(active) {
+                appState.archSelectedCourses = appState.archSelectedCourses.filter(x => x !== c);
+                appState.archSelectedTopics = appState.archSelectedTopics.filter(x => !x.startsWith(c + '::'));
+            } else {
+                appState.archSelectedCourses.push(c);
+                if(appState.categories[c]) appState.categories[c].forEach(t => appState.archSelectedTopics.push(c + '::' + t));
+            }
+            await saveSettings();
+            populateArchiveFilters();
+            renderLibrary();
+        };
         courseDiv.appendChild(btn);
 
         if(active && appState.categories[c]) {
@@ -3081,23 +3367,35 @@ function populateArchiveFilters() {
                 tBtn.type = 'button';
                 tBtn.className = `px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase transition-all border ${tActive ? 'bg-amber-500 text-white border-amber-500' : 'bg-slate-100 text-slate-600 border-slate-200'}`;
                 tBtn.innerText = `${c} > ${t}`;
-                tBtn.onclick = () => {
-    if(tActive) appState.archSelectedTopics = appState.archSelectedTopics.filter(x => x !== tKey);
-    else appState.archSelectedTopics.push(tKey);
-    saveState();
-    populateArchiveFilters(); renderLibrary();
-};
+                tBtn.onclick = async () => {
+                    if(tActive) appState.archSelectedTopics = appState.archSelectedTopics.filter(x => x !== tKey);
+                    else appState.archSelectedTopics.push(tKey);
+                    await saveSettings();
+                    populateArchiveFilters();
+                    renderLibrary();
+                };
                 topicDiv.appendChild(tBtn);
             });
         }
     });
 }
 
-// YENİ: Arşiv için aktif renk filtresini ayarla ve arşive geç
 function goToLibraryWithFilter(color) {
     activeColorFilter = color;
     switchTab('library');
     renderLibrary();
+}
+
+function getCardColor(card, type) {
+    const today = formatDate(getNowTR());
+    if (!card.nextReview || card.nextReview <= today) return 'red';
+    if (type === 'question') {
+        if (card.is_mastered || card.level >= 4) return 'green';
+        return 'yellow';
+    } else {
+        if ((card.stage || 0) >= 4) return 'green';
+        return 'yellow';
+    }
 }
 
 function renderLibrary() {
@@ -3105,7 +3403,12 @@ function renderLibrary() {
     if (!container) return;
     container.innerHTML = '';
 
-    // Renk filtresi butonlarını oluştur
+    // Observer'ı sıfırla (eski observer varsa disconnect)
+    if (archiveObserver) {
+        archiveObserver.disconnect();
+        archiveObserver = null;
+    }
+
     const colorFilterDiv = document.getElementById('library-color-filters');
     if (colorFilterDiv) {
         const filters = [
@@ -3138,16 +3441,15 @@ function renderLibrary() {
         appState.archSelectedTopics.includes(item.course + '::' + item.topic)
     );
 
-    // Renk filtresini uygula
     if (activeColorFilter !== 'all') {
         filteredList = filteredList.filter(item => getCardColor(item, activeArchiveType) === activeColorFilter);
     }
 
     filteredList.sort((a, b) => {
-    const aSort = (a.sortOrder !== undefined && a.sortOrder !== null) ? a.sortOrder : a.id;
-    const bSort = (b.sortOrder !== undefined && b.sortOrder !== null) ? b.sortOrder : b.id;
-    return bSort - aSort;
-});
+        const aSort = (a.sortOrder !== undefined && a.sortOrder !== null) ? a.sortOrder : a.id;
+        const bSort = (b.sortOrder !== undefined && b.sortOrder !== null) ? b.sortOrder : b.id;
+        return bSort - aSort;
+    });
 
     const countDisplay = document.createElement('div');
     countDisplay.className = "text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 px-1";
@@ -3159,89 +3461,151 @@ function renderLibrary() {
         return;
     }
 
+    // Intersection Observer oluştur
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            const card = entry.target;
+            const img = card.querySelector('img[data-blob-id]');
+            if (!img) return;
+            if (entry.isIntersecting) {
+                // Görünür oldu, object URL oluştur
+                const blobId = img.getAttribute('data-blob-id');
+                const blob = getBlobById(blobId);
+                if (blob) {
+                    const url = createObjectURL(blob);
+                    img.src = url;
+                    img.removeAttribute('data-blob-id'); // Artık işlendi
+                    img.dataset.objectUrl = url;
+                }
+            } else {
+                // Görünürlükten çıktı, URL'yi kaldır
+                const url = img.dataset.objectUrl;
+                if (url) {
+                    revokeObjectURL(url);
+                    img.removeAttribute('src');
+                    img.removeAttribute('data-object-url');
+                    // Blob id'yi tekrar ekle, tekrar görünür olursa yeniden oluşturulabilir
+                    img.setAttribute('data-blob-id', img.getAttribute('data-original-blob-id') || '');
+                }
+            }
+        });
+    }, { rootMargin: '100px' });
+
     filteredList.forEach(item => {
-    const card = document.createElement('div');
-    
-    // Renk belirle
-    let itemColor = getCardColor(item, activeArchiveType);
-    let bgColorClass = 'bg-white';
-    let borderBarColor = 'bg-slate-300';
-    if (itemColor === 'red') {
-        bgColorClass = 'bg-red-50';
-        borderBarColor = 'bg-red-500';
-    } else if (itemColor === 'yellow') {
-        bgColorClass = 'bg-yellow-50';
-        borderBarColor = 'bg-yellow-500';
-    } else if (itemColor === 'green') {
-        bgColorClass = 'bg-green-50';
-        borderBarColor = 'bg-green-500';
-    }
-    
-    card.className = `${bgColorClass} border border-slate-200 p-3.5 rounded-2xl shadow-sm space-y-2 relative overflow-hidden cursor-pointer hover:border-indigo-300 transition-colors`;
-    
-    let contentHTML = '';
-    if(item.img) {
-        contentHTML += `<img src="${item.img}" class="w-full max-h-36 object-contain rounded-xl bg-slate-50 border border-slate-100 cursor-zoom-in" onclick="event.stopPropagation(); openLightbox('${item.img}')">`;
-    }
-    if(item.text_question) {
-        contentHTML += `<div class="text-xs font-bold text-slate-800 uppercase bg-slate-50 p-2.5 rounded-xl border border-slate-100">${item.text_question}</div>`;
-    }
-    if(item.note_text) {
-        contentHTML += `<div class="text-[11px] font-semibold text-amber-800 uppercase bg-amber-50 p-2 rounded-xl border border-amber-100">${item.note_text}</div>`;
-    }
-    if(item.note_img) {
-        contentHTML += `<img src="${item.note_img}" class="w-full max-h-36 object-contain rounded-xl bg-amber-50 border border-amber-100 cursor-zoom-in mt-1" onclick="event.stopPropagation(); openLightbox('${item.note_img}')">`;
-    }
-    if(!item.note_text && !item.note_img && item.note) {
-        contentHTML += `<div class="text-[11px] font-semibold text-amber-800 uppercase bg-amber-50 p-2 rounded-xl border border-amber-100">${item.note}</div>`;
-    }
+        const card = document.createElement('div');
+        
+        let itemColor = getCardColor(item, activeArchiveType);
+        let bgColorClass = 'bg-white';
+        let borderBarColor = 'bg-slate-300';
+        if (itemColor === 'red') {
+            bgColorClass = 'bg-red-50';
+            borderBarColor = 'bg-red-500';
+        } else if (itemColor === 'yellow') {
+            bgColorClass = 'bg-yellow-50';
+            borderBarColor = 'bg-yellow-500';
+        } else if (itemColor === 'green') {
+            bgColorClass = 'bg-green-50';
+            borderBarColor = 'bg-green-500';
+        }
+        
+        card.className = `${bgColorClass} border border-slate-200 p-3.5 rounded-2xl shadow-sm space-y-2 relative overflow-hidden cursor-pointer hover:border-indigo-300 transition-colors`;
+        
+        let contentHTML = '';
+        if(item.img) {
+            // Blob için geçici bir ID oluştur (kart üzerinde referans için)
+            const blobId = `blob-${Date.now()}-${Math.random()}`;
+            // Blob'u global bir map'te saklayalım (basitlik için)
+            if (!window.blobStore) window.blobStore = {};
+            window.blobStore[blobId] = item.img;
+            contentHTML += `<img src="" loading="lazy" data-blob-id="${blobId}" data-original-blob-id="${blobId}" class="w-full max-h-36 object-contain rounded-xl bg-slate-50 border border-slate-100 cursor-zoom-in" onclick="event.stopPropagation(); openLightboxFromBlob('${blobId}')">`;
+        }
+        if(item.text_question) {
+            contentHTML += `<div class="text-xs font-bold text-slate-800 uppercase bg-slate-50 p-2.5 rounded-xl border border-slate-100">${item.text_question}</div>`;
+        }
+        if(item.note_text) {
+            contentHTML += `<div class="text-[11px] font-semibold text-amber-800 uppercase bg-amber-50 p-2 rounded-xl border border-amber-100">${item.note_text}</div>`;
+        }
+        if(item.note_img) {
+            const blobId = `blob-${Date.now()}-${Math.random()}`;
+            if (!window.blobStore) window.blobStore = {};
+            window.blobStore[blobId] = item.note_img;
+            contentHTML += `<img src="" loading="lazy" data-blob-id="${blobId}" data-original-blob-id="${blobId}" class="w-full max-h-36 object-contain rounded-xl bg-amber-50 border border-amber-100 cursor-zoom-in mt-1" onclick="event.stopPropagation(); openLightboxFromBlob('${blobId}')">`;
+        }
+        if(!item.note_text && !item.note_img && item.note) {
+            contentHTML += `<div class="text-[11px] font-semibold text-amber-800 uppercase bg-amber-50 p-2 rounded-xl border border-amber-100">${item.note}</div>`;
+        }
 
-    let extraInfo = '';
-    if(activeArchiveType === 'question') {
-        extraInfo = `
-            <div class="flex justify-between items-center text-[10px] font-bold text-slate-500 border-t border-slate-100 pt-2">
-                <span>CEVAP: <strong class="text-indigo-600">${item.answer}</strong></span>
-                <span>DÖNGÜ: <strong class="text-indigo-600">${item.level + 1}</strong></span>
-                <span>SONRAKİ: <strong class="text-indigo-600">${item.nextReview}</strong></span>
+        let extraInfo = '';
+        if(activeArchiveType === 'question') {
+            extraInfo = `
+                <div class="flex justify-between items-center text-[10px] font-bold text-slate-500 border-t border-slate-100 pt-2">
+                    <span>CEVAP: <strong class="text-indigo-600">${item.answer}</strong></span>
+                    <span>DÖNGÜ: <strong class="text-indigo-600">${item.level + 1}</strong></span>
+                    <span>SONRAKİ: <strong class="text-indigo-600">${item.nextReview}</strong></span>
+                </div>
+            `;
+        } else {
+            extraInfo = `
+                <div class="flex justify-between items-center text-[10px] font-bold text-slate-500 border-t border-slate-100 pt-2">
+                    <span>DÖNGÜ: <strong class="text-amber-600">${(item.stage || 0) + 1}</strong></span>
+                    <span>SONRAKİ: <strong class="text-amber-600">${item.nextReview}</strong></span>
+                </div>
+            `;
+        }
+
+        let pushBtnHTML = '';
+        if (activeColorFilter === 'yellow' || activeColorFilter === 'green') {
+            pushBtnHTML = `<button onclick="event.stopPropagation(); pushToEnd('${activeArchiveType}', ${item.id})" class="bg-white/80 hover:bg-white text-slate-700 border border-slate-300 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase shadow-sm transition-colors" title="En sona at">En Alta Gönder</button>`;
+        }
+
+        card.innerHTML = `
+            <div class="absolute top-0 left-0 w-1.5 h-full ${borderBarColor}"></div>
+            <div class="flex justify-between items-center text-xs font-extrabold text-slate-700 uppercase">
+                <span>${item.course} > ${item.topic}</span>
+                <div class="flex items-center gap-2">
+                    <span class="text-[10px] text-slate-400 font-semibold">${item.createdDate || ''}</span>
+                    ${pushBtnHTML}
+                    <button onclick="event.stopPropagation(); deleteItem('${activeArchiveType}', ${item.id})" class="text-rose-500 hover:text-rose-700 p-1" title="Sil">
+                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                    </button>
+                </div>
             </div>
+            ${contentHTML}
+            ${extraInfo}
         `;
-    } else {
-        extraInfo = `
-            <div class="flex justify-between items-center text-[10px] font-bold text-slate-500 border-t border-slate-100 pt-2">
-                <span>DÖNGÜ: <strong class="text-amber-600">${(item.stage || 0) + 1}</strong></span>
-                <span>SONRAKİ: <strong class="text-amber-600">${item.nextReview}</strong></span>
-            </div>
-        `;
-    }
-
-    // pushBtnHTML'i burada tanımla
-    let pushBtnHTML = '';
-    if (activeColorFilter === 'yellow' || activeColorFilter === 'green') {
-        pushBtnHTML = `<button onclick="event.stopPropagation(); pushToEnd('${activeArchiveType}', ${item.id})" class="bg-white/80 hover:bg-white text-slate-700 border border-slate-300 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase shadow-sm transition-colors" title="En sona at">En Alta Gönder</button>`;
-    }
-
-    card.innerHTML = `
-        <div class="absolute top-0 left-0 w-1.5 h-full ${borderBarColor}"></div>
-        <div class="flex justify-between items-center text-xs font-extrabold text-slate-700 uppercase">
-            <span>${item.course} > ${item.topic}</span>
-            <div class="flex items-center gap-2">
-                <span class="text-[10px] text-slate-400 font-semibold">${item.createdDate || ''}</span>
-                ${pushBtnHTML}
-                <button onclick="event.stopPropagation(); deleteItem('${activeArchiveType}', ${item.id})" class="text-rose-500 hover:text-rose-700 p-1" title="Sil">
-                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
-                </button>
-            </div>
-        </div>
-        ${contentHTML}
-        ${extraInfo}
-    `;
+        
+        card.onclick = () => openArchiveItem(activeArchiveType, item.id);
+        container.appendChild(card);
+        observer.observe(card);
+    });
     
-    card.onclick = () => openArchiveItem(activeArchiveType, item.id);
-    container.appendChild(card);
-});
+    archiveObserver = observer;
 }
 
-// YENİ: Arşivden kart aç
+// Blob ID'ye göre Blob getir
+function getBlobById(blobId) {
+    if (window.blobStore) {
+        return window.blobStore[blobId] || null;
+    }
+    return null;
+}
+
+// Lightbox'ı Blob ID ile aç
+function openLightboxFromBlob(blobId) {
+    const blob = getBlobById(blobId);
+    if (blob) {
+        const url = createObjectURL(blob);
+        openLightbox(url);
+        // Lightbox kapanınca URL'yi revoke et
+        const lightbox = document.getElementById('lightbox');
+        const closeHandler = () => {
+            revokeObjectURL(url);
+            lightbox.removeEventListener('click', closeHandler);
+        };
+        lightbox.addEventListener('click', closeHandler, { once: true });
+    }
+}
+
 function openArchiveItem(type, id) {
     let item;
     if (type === 'question') {
@@ -3251,26 +3615,33 @@ function openArchiveItem(type, id) {
     }
     if (!item) return;
     let color = getCardColor(item, type);
-    // Pasif mod için startReview'ı item ile çağır
     startReview(type, color, item);
 }
 
-function deleteItem(type, id) {
-    showCustomConfirm("Bu kaydı silmek istediğinize emin misiniz?", () => {
+async function deleteItem(type, id) {
+    showCustomConfirm("Bu kaydı silmek istediğinize emin misiniz?", async () => {
         if (type === 'question') {
             appState.questions = appState.questions.filter(q => q.id !== id);
+            await deleteQuestion(id);
         } else {
             appState.notes = appState.notes.filter(n => n.id !== id);
+            await deleteNote(id);
         }
-        saveState(); renderLibrary(); updateHomeStats();
+        renderLibrary();
+        updateHomeStats();
     });
 }
-function pushToEnd(type, id) {
+
+async function pushToEnd(type, id) {
     let arr = type === 'question' ? appState.questions : appState.notes;
     let item = arr.find(x => x.id === id);
     if (item) {
-        item.sortOrder = -Date.now(); // Negatif yap, en alta at
-        saveState();
+        item.sortOrder = -Date.now();
+        if (type === 'question') {
+            await saveQuestion(item);
+        } else {
+            await saveNote(item);
+        }
         renderLibrary();
         updateHomeStats();
     }
@@ -3281,9 +3652,9 @@ function openCampSetup(type) {
     campMode = type;
     let list = (type === 'questions') ? appState.questions : appState.notes;
     list = list.filter(item => 
-    appState.archSelectedCourses.includes(item.course) && 
-    appState.archSelectedTopics.includes(item.course + '::' + item.topic)
-);
+        appState.archSelectedCourses.includes(item.course) && 
+        appState.archSelectedTopics.includes(item.course + '::' + item.topic)
+    );
     document.getElementById('camp-total-count').innerText = list.length;
     document.getElementById('camp-title').innerText = type === 'questions' ? "Rastgele Kamp" : "Rastgele Kamp";
     document.getElementById('camp-setup-modal').classList.remove('hidden');
@@ -3297,9 +3668,9 @@ function startCamp() {
     let count = parseInt(document.getElementById('camp-count-input').value) || 5;
     let list = (campMode === 'questions') ? [...appState.questions] : [...appState.notes];
     list = list.filter(item => 
-    appState.archSelectedCourses.includes(item.course) && 
-    appState.archSelectedTopics.includes(item.course + '::' + item.topic)
-);
+        appState.archSelectedCourses.includes(item.course) && 
+        appState.archSelectedTopics.includes(item.course + '::' + item.topic)
+    );
 
     if (list.length === 0) {
         showToast("Kamp için yeterli veri yok!", true); return;
@@ -3327,8 +3698,12 @@ function renderCampItem() {
     const qTextEl = document.getElementById('camp-review-question-text');
     const ansBox = document.getElementById('camp-review-answer-box');
 
+    // Önceki URL'yi temizle
+    if (campObjectURL) { revokeObjectURL(campObjectURL); campObjectURL = null; }
+
     if (item.img) {
-        imgEl.src = item.img;
+        campObjectURL = createObjectURL(item.img);
+        imgEl.src = campObjectURL;
         imgEl.classList.remove('hidden');
     } else {
         imgEl.src = '';
@@ -3361,7 +3736,10 @@ function revealCampAnswer() {
     if (campMode === 'questions') {
         let noteHtml = '';
         if (item.note_text) noteHtml = `<br><span class="text-amber-700 mt-1 block">${item.note_text}</span>`;
-        if (item.note_img) noteHtml += `<br><img src="${item.note_img}" class="max-h-32 object-contain rounded-lg mt-1 mx-auto">`;
+        if (item.note_img) {
+            const noteImgURL = createObjectURL(item.note_img);
+            noteHtml += `<br><img src="${noteImgURL}" class="max-h-32 object-contain rounded-lg mt-1 mx-auto">`;
+        }
         if (!noteHtml && item.note) noteHtml = `<br><span class="text-amber-700 mt-1 block">${item.note}</span>`;
         ansBox.innerHTML = `DOĞRU CEVAP: <strong>${item.answer}</strong>${noteHtml}`;
     } else {
@@ -3385,17 +3763,72 @@ function nextCampQuestion() {
 
 function closeCamp() {
     document.getElementById('camp-review-modal').classList.add('hidden');
+    if (campObjectURL) { revokeObjectURL(campObjectURL); campObjectURL = null; }
 }
 
 // --- LIGHTBOX ---
 function openLightbox(src) {
     if (!src) return;
+    // Önceki lightbox URL'sini temizle
+    if (lightboxObjectURL) { revokeObjectURL(lightboxObjectURL); lightboxObjectURL = null; }
     document.getElementById('lightbox-img').src = src;
     document.getElementById('lightbox').classList.remove('hidden');
 }
 
 function closeLightbox() {
     document.getElementById('lightbox').classList.add('hidden');
+    if (lightboxObjectURL) { revokeObjectURL(lightboxObjectURL); lightboxObjectURL = null; }
+}
+
+function updateFieldDisplay() {
+    const display = document.getElementById('current-field-display');
+    if (display) {
+        display.textContent = appState.field ? appState.field : '-';
+    }
+}
+
+function openFieldChangeModal() {
+    document.getElementById('field-change-modal').classList.remove('hidden');
+}
+
+function closeFieldChangeModal() {
+    document.getElementById('field-change-modal').classList.add('hidden');
+}
+
+async function changeField(field) {
+    if (!FIELD_DATA[field]) return;
+    appState.field = field;
+    appState.categories = JSON.parse(JSON.stringify(FIELD_DATA[field]));
+    
+    appState.selectedCourses = Object.keys(appState.categories);
+    appState.selectedTopics = [];
+    appState.selectedCourses.forEach(c => {
+        if (appState.categories[c]) {
+            appState.categories[c].forEach(t => appState.selectedTopics.push(c + '::' + t));
+        }
+    });
+
+    appState.archSelectedCourses = Object.keys(appState.categories);
+    appState.archSelectedTopics = [];
+    appState.archSelectedCourses.forEach(c => {
+        if (appState.categories[c]) {
+            appState.categories[c].forEach(t => appState.archSelectedTopics.push(c + '::' + t));
+        }
+    });
+
+    await saveSettings();
+    syncSystemUI();
+    updateFieldDisplay();
+    closeFieldChangeModal();
+    showToast(`Alan değiştirildi: ${field}`);
+    if (!appState.hasSeenOnboarding) {
+        if (currentOnboardingStep === 1) {
+            fieldSelectedInOnboarding = true;
+            nextOnboardingStep();
+        }
+    } else {
+        switchTab('add');
+    }
 }
     </script>
 
@@ -3420,7 +3853,7 @@ function closeLightbox() {
             return false;
         };
 
-        function checkPassword() {
+        async function checkPassword() {
             const errorDisplay = document.getElementById("error-msg");
             if (errorDisplay) {
                 errorDisplay.innerText = "Bağlantı kuruluyor, lütfen bekleyin...";
@@ -3435,11 +3868,11 @@ function closeLightbox() {
 
             const keyRef = window.database.ref("keys/" + enteredKey);
 
-            keyRef.once("value").then((snapshot) => {
+            keyRef.once("value").then(async (snapshot) => {
                 if (snapshot.val() === true) {
-                    keyRef.remove().then(() => {
+                    keyRef.remove().then(async () => {
                         appState.authState = "full";
-                        saveState();
+                        await saveSettings();
                         try {
                             localStorage.setItem("authorized", "true");
                         } catch (e) {}
@@ -3548,4 +3981,4 @@ function closeLightbox() {
         });
     </script>
 </body>
-</html>
+                        </html>
