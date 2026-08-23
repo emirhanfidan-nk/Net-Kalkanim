@@ -1786,13 +1786,13 @@ function selectChoice(val) {
 function finishCrop() {
     if (!cropperInstance) return;
     
-    const croppedCanvas = cropperInstance.getCroppedCanvas();
+    const croppedCanvas = cropperInstance.getCroppedCanvas({ maxWidth: 1600, maxHeight: 1600 });
     
     document.getElementById('cropper-container').classList.add('hidden');
     document.getElementById('canvas-container').classList.remove('hidden');
     
     const uImg = document.getElementById('upload-final-img');
-    uImg.src = croppedCanvas.toDataURL('image/jpeg', 0.92);
+    uImg.src = croppedCanvas.toDataURL('image/jpeg', 0.85);
     
     const uCanvas = document.getElementById('upload-canvas');
     uCanvas.width = croppedCanvas.width;
@@ -2487,7 +2487,7 @@ async function saveData() {
             mergeCanvas.width = canvas.width; mergeCanvas.height = canvas.height;
             const ctx = mergeCanvas.getContext('2d');
             ctx.drawImage(img, 0, 0); ctx.drawImage(canvas, 0, 0);
-            finalImage = mergeCanvas.toDataURL('image/jpeg', 0.92);
+            finalImage = mergeCanvas.toDataURL('image/jpeg', 0.85);
         }
 
         let textQ = document.getElementById('q-text-question').value.trim();
@@ -2544,7 +2544,7 @@ async function saveData() {
             mergeCanvas.width = canvas.width; mergeCanvas.height = canvas.height;
             const ctx = mergeCanvas.getContext('2d');
             ctx.drawImage(img, 0, 0); ctx.drawImage(canvas, 0, 0);
-            finalImage = mergeCanvas.toDataURL('image/jpeg', 0.92);
+            finalImage = mergeCanvas.toDataURL('image/jpeg', 0.85);
         }
 
         let noteText = document.getElementById('q-note').value.trim();
