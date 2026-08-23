@@ -1786,7 +1786,7 @@ function selectChoice(val) {
 function finishCrop() {
     if (!cropperInstance) return;
     
-    const croppedCanvas = cropperInstance.getCroppedCanvas({ maxWidth: 1200, maxHeight: 1200 });
+    const croppedCanvas = cropperInstance.getCroppedCanvas({ maxWidth: 200, maxHeight: 200 });
     
     document.getElementById('cropper-container').classList.add('hidden');
     document.getElementById('canvas-container').classList.remove('hidden');
@@ -3548,4 +3548,4 @@ function closeLightbox() {
         });
     </script>
 </body>
-                        </html>
+</html>
