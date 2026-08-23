@@ -2186,13 +2186,14 @@ function recalculateNoteDates() {
     });
 }
 
-function saveState() {
-    saveStateToDB(appState).then(() => {
-        updateHomeStats(); 
-    }).catch(e => {
+async function saveState() {
+    try {
+        await saveStateToDB(appState);
+        updateHomeStats();
+    } catch(e) {
         console.error(e);
-        showToast("SİSTEM HATASI: Veriler veritabanına kaydedilemedi!", true);
-    });
+        alert("Veriler kaydedilemedi! Lütfen uygulamayı kapatmayın ve tekrar deneyin. Hata: " + e.message);
+    }
 }
 
 // Günlük limitleri kaydet
