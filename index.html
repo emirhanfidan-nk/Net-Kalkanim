@@ -11,6 +11,7 @@
     <!-- Firebase Bağlantı Kütüphaneleri -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <style>
         body { background-color: #f8fafc; color: #1e293b; font-family: 'Inter', sans-serif; }
         
@@ -1283,6 +1284,9 @@ let lightboxObjectURL = null;
 let reviewObjectURL = null;
 let campObjectURL = null;
 let archiveObserver = null;
+// Eklenen global değişkenler (Hata 2 düzeltmesi)
+let reviewNoteObjectURL = null;
+let campNoteObjectURL = null;
 
 window.onload = async function() {
     try {
@@ -1533,7 +1537,7 @@ async function checkStorageUsage() {
         if (storageInfoEl) {
             const usedMB = (usage / (1024 * 1024)).toFixed(1);
             const quotaMB = (quota / (1024 * 1024)).toFixed(1);
-            storageInfoEl.textContent = `Kullanılan: ${usedMB} MB / Cihaz Kotası: ${quotaMB} MB (%${usagePercent.toFixed(1)})`;
+            storageInfoEl.textContent = `Kullanılan: ${usedMB} MB / Tarayıcı Kotası: ${quotaMB} MB (%${usagePercent.toFixed(1)})`;
         }
 
         if (usagePercent > 90) {
@@ -2436,6 +2440,8 @@ async function saveNoteIntervals() {
 async function recalculateQuestionDates() {
     const today = getNowTR();
     for (const q of appState.questions) {
+        // Hata 1 düzeltmesi: userRecallStatus'u sıfırla
+        q.userRecallStatus = null;
         if (!q.is_mastered) {
             if (q.level >= appState.intervals.length) {
                 q.is_mastered = true;
@@ -2454,6 +2460,8 @@ async function recalculateQuestionDates() {
 async function recalculateNoteDates() {
     const today = getNowTR();
     for (const n of appState.notes) {
+        // Hata 1 düzeltmesi: userRecallStatus'u sıfırla
+        n.userRecallStatus = null;
         const days = appState.noteIntervals[n.stage] !== undefined
             ? appState.noteIntervals[n.stage]
             : appState.noteIntervals[appState.noteIntervals.length - 1] || 1;
@@ -2723,18 +2731,15 @@ function selectTopic(topic) {
     closePicker();
 }
 
+// Hata 3 düzeltmesi: initCoursePicker içinde dolu kontrolü eklendi
 function initCoursePicker() {
-    const courses = Object.keys(appState.categories);
-    if (courses.length > 0) {
-        const defaultCourse = courses[0];
-        document.getElementById('q-course').value = defaultCourse;
-        document.getElementById('btn-pick-course-text').innerText = defaultCourse;
-        const firstTopic = (appState.categories[defaultCourse] || [])[0];
-        if (firstTopic) {
-            document.getElementById('q-topic').value = firstTopic;
-            document.getElementById('btn-pick-topic-text').innerText = firstTopic;
-        }
+    const courseInput = document.getElementById('q-course');
+    if (courseInput && courseInput.value) {
+        // Kullanıcı zaten bir ders seçmiş, dokunma
+        return;
     }
+    // Artık varsayılan ders ve konu atanmıyor, alanlar boş kalıyor.
+    // İsteğe bağlı olarak buton metinlerini sıfırlayabiliriz (zaten HTML'de yazıyor).
 }
 
 async function saveData() {
@@ -2744,11 +2749,12 @@ async function saveData() {
         return;
     }
 
-    const course = document.getElementById('q-course').value;
-    const topic = document.getElementById('q-topic').value || "GENEL";
-    const todayStr = formatDate(getNowTR());
+    const course = document.getElementById('q-course').value.trim();
+const topic = document.getElementById('q-topic').value.trim();
+const todayStr = formatDate(getNowTR());
 
-    if (!course) { showToast("Lütfen ders seçiniz!", true); return; }
+if (!course) { showToast("Lütfen ders seçiniz!", true); return; }
+if (!topic) { showToast("Lütfen konu seçiniz!", true); return; }
 
     if (currentEntryType === 'question') {
         let finalImage = null;
@@ -2862,11 +2868,13 @@ async function saveData() {
 }
 
 // --- İNCELEME / ÇÖZÜM MODAL VE AKIŞI ---
-function startReview(mode, boxColor = 'red', specificItem = null) {
+function startReview(mode, boxColor = 'red', specificItem = null, isArchiveMode = false) {
     // Önceki object URL'leri temizle
     if (reviewObjectURL) { revokeObjectURL(reviewObjectURL); reviewObjectURL = null; }
+    if (reviewNoteObjectURL) { revokeObjectURL(reviewNoteObjectURL); reviewNoteObjectURL = null; }
     
     currentReviewMode = mode;
+    currentArchiveMode = isArchiveMode;
     currentBoxColor = boxColor;
     let todayStr = formatDate(getNowTR());
 
@@ -2950,6 +2958,14 @@ function renderReviewItem() {
 
     const item = currentReviewQueue[currentReviewIndex];
     const todayStr = formatDate(getNowTR());
+    
+    // Hata 1 düzeltmesi: eğer userRecallStatus dolu ama bugün değilse sıfırla
+    if (item.userRecallStatus && item.lastReviewedDate !== todayStr) {
+        item.userRecallStatus = null;
+        // Bu değişiklik hemen kaydedilebilir ama render sırasında veritabanına yazmak maliyetli olabilir. 
+        // Yine de butonlar aktif olsun diye sıfırlıyoruz.
+    }
+    
     const isAnsweredToday = (item.lastReviewedDate === todayStr);
 
     document.getElementById('review-progress').innerText = `${currentReviewMode === 'questions' ? 'SORU' : 'NOT'} ${currentReviewIndex + 1}/${currentReviewQueue.length}`;
@@ -2996,11 +3012,12 @@ function renderReviewItem() {
     }
     if (item.note_img) {
         hasNote = true;
-        // note_img Blob ise object URL oluştur
+        // Önceki note URL'yi revoke et
+        if (reviewNoteObjectURL) { revokeObjectURL(reviewNoteObjectURL); reviewNoteObjectURL = null; }
         let noteImgURL = createObjectURL(item.note_img);
+        reviewNoteObjectURL = noteImgURL;
         if (noteContent) noteContent += '<br>';
         noteContent += `<img src="${noteImgURL}" class="w-full h-auto object-contain rounded-lg mt-1">`;
-        // URL'yi revoke etmek için geçici bir referans tutalabilir; basitlik için şimdilik revoke etmiyoruz, modal kapanınca temizlenir.
     }
     if (!hasNote && item.note) {
         hasNote = true;
@@ -3052,6 +3069,17 @@ function renderReviewItem() {
     choiceInput.classList.add('hidden');
     textInput.classList.add('hidden');
     recallInput.classList.add('hidden');
+    
+    // Arşiv modunda hiçbir giriş butonu gösterilmez
+if (currentArchiveMode) {
+    choiceInput.classList.add('hidden');
+    textInput.classList.add('hidden');
+    recallInput.classList.add('hidden');
+    document.getElementById('review-draw-tools').classList.add('hidden');
+    document.getElementById('btn-rev-prev').disabled = (currentReviewIndex === 0);
+    document.getElementById('btn-rev-next').disabled = (currentReviewIndex === currentReviewQueue.length - 1);
+    return; // Arşiv modunda buradan sonrasını çalıştırma
+}
 
     if (currentBoxColor === 'red') {
         if (currentReviewMode === 'questions') {
@@ -3223,11 +3251,17 @@ async function submitQuestionAnswer(userAns) {
     renderReviewItem();
 }
 
+// Hata 1 düzeltmesi: submitRecallStatus başına günlük sıfırlama eklendi
 async function submitRecallStatus(status) {
     const item = currentReviewQueue[currentReviewIndex];
     if (!item) return;
 
     const todayStr = formatDate(getNowTR());
+
+    // Hata 1 düzeltmesi: Yeni güne geçildiğinde userRecallStatus'u sıfırla
+    if (item.userRecallStatus && item.lastReviewedDate !== todayStr) {
+        item.userRecallStatus = null;
+    }
 
     if (currentBoxColor !== 'red') {
         if (status === 'forgot') {
@@ -3305,7 +3339,9 @@ async function submitRecallStatus(status) {
 function closeReview() {
     document.getElementById('review-modal').classList.add('hidden');
     if (reviewObjectURL) { revokeObjectURL(reviewObjectURL); reviewObjectURL = null; }
+    if (reviewNoteObjectURL) { revokeObjectURL(reviewNoteObjectURL); reviewNoteObjectURL = null; }
     updateHomeStats();
+    currentArchiveMode = false;
 }
 
 // --- ARŞİV KISMI ---
@@ -3398,10 +3434,14 @@ function getCardColor(card, type) {
     }
 }
 
+// Hata 2 düzeltmesi: renderLibrary başında blobStore sıfırlanıyor
 function renderLibrary() {
     const container = document.getElementById('library-list');
     if (!container) return;
     container.innerHTML = '';
+
+    // Hata 2 düzeltmesi: Eski blob referanslarını temizle
+    window.blobStore = {};
 
     // Observer'ı sıfırla (eski observer varsa disconnect)
     if (archiveObserver) {
@@ -3590,19 +3630,13 @@ function getBlobById(blobId) {
     return null;
 }
 
-// Lightbox'ı Blob ID ile aç
+// Lightbox'ı Blob ID ile aç - Hata 2 düzeltmesi: gereksiz listener kaldırıldı
 function openLightboxFromBlob(blobId) {
     const blob = getBlobById(blobId);
     if (blob) {
         const url = createObjectURL(blob);
         openLightbox(url);
-        // Lightbox kapanınca URL'yi revoke et
-        const lightbox = document.getElementById('lightbox');
-        const closeHandler = () => {
-            revokeObjectURL(url);
-            lightbox.removeEventListener('click', closeHandler);
-        };
-        lightbox.addEventListener('click', closeHandler, { once: true });
+        // Artık closeLightbox içinde lightboxObjectURL revoke edilecek
     }
 }
 
@@ -3615,7 +3649,7 @@ function openArchiveItem(type, id) {
     }
     if (!item) return;
     let color = getCardColor(item, type);
-    startReview(type, color, item);
+    startReview(type, color, item, true);   // <-- sona "true" ekledik
 }
 
 async function deleteItem(type, id) {
@@ -3733,11 +3767,15 @@ function revealCampAnswer() {
     const item = campQueue[campIndex];
     const ansBox = document.getElementById('camp-review-answer-box');
 
+    // Hata 2 düzeltmesi: note_img URL'sini yönet
+    if (campNoteObjectURL) { revokeObjectURL(campNoteObjectURL); campNoteObjectURL = null; }
+
     if (campMode === 'questions') {
         let noteHtml = '';
         if (item.note_text) noteHtml = `<br><span class="text-amber-700 mt-1 block">${item.note_text}</span>`;
         if (item.note_img) {
             const noteImgURL = createObjectURL(item.note_img);
+            campNoteObjectURL = noteImgURL;
             noteHtml += `<br><img src="${noteImgURL}" class="max-h-32 object-contain rounded-lg mt-1 mx-auto">`;
         }
         if (!noteHtml && item.note) noteHtml = `<br><span class="text-amber-700 mt-1 block">${item.note}</span>`;
@@ -3764,13 +3802,16 @@ function nextCampQuestion() {
 function closeCamp() {
     document.getElementById('camp-review-modal').classList.add('hidden');
     if (campObjectURL) { revokeObjectURL(campObjectURL); campObjectURL = null; }
+    if (campNoteObjectURL) { revokeObjectURL(campNoteObjectURL); campNoteObjectURL = null; }
 }
 
 // --- LIGHTBOX ---
+// Hata 2 düzeltmesi: openLightbox içine lightboxObjectURL ataması eklendi
 function openLightbox(src) {
     if (!src) return;
     // Önceki lightbox URL'sini temizle
     if (lightboxObjectURL) { revokeObjectURL(lightboxObjectURL); lightboxObjectURL = null; }
+    lightboxObjectURL = src;
     document.getElementById('lightbox-img').src = src;
     document.getElementById('lightbox').classList.remove('hidden');
 }
@@ -3833,64 +3874,68 @@ async function changeField(field) {
     </script>
 
     <script>
-        // Firebase Bağlantı Ayarları
-        const firebaseConfig = {
-            databaseURL: "https://hadiartik-60685-default-rtdb.europe-west1.firebasedatabase.app"
-        };
+    const firebaseConfig = {
+        databaseURL: "https://hadiartik-60685-default-rtdb.europe-west1.firebasedatabase.app"
+    };
 
-        if (typeof firebase !== 'undefined') {
-            firebase.initializeApp(firebaseConfig);
-            window.database = firebase.database();
-        } else {
-            console.error("Firebase yüklenemedi!");
-        }
+    firebase.initializeApp(firebaseConfig);
+    window.database = firebase.database();
 
-        window.onerror = function(message, source, lineno) {
-            const errorMsgEl = document.getElementById("error-msg");
-            if (errorMsgEl) {
-                errorMsgEl.innerHTML = "Sistem Hatası: " + message + "<br><small>Satır: " + lineno + "</small>";
-            }
-            return false;
-        };
-
-        async function checkPassword() {
-            const errorDisplay = document.getElementById("error-msg");
-            if (errorDisplay) {
-                errorDisplay.innerText = "Bağlantı kuruluyor, lütfen bekleyin...";
-            }
-
-            const enteredKey = document.getElementById("otp-input").value.trim();
-
-            if (!enteredKey) {
-                if (errorDisplay) errorDisplay.innerText = "Lütfen şifre alanını boş bırakmayın!";
-                return;
-            }
-
-            const keyRef = window.database.ref("keys/" + enteredKey);
-
-            keyRef.once("value").then(async (snapshot) => {
-                if (snapshot.val() === true) {
-                    keyRef.remove().then(async () => {
-                        appState.authState = "full";
-                        await saveSettings();
-                        try {
-                            localStorage.setItem("authorized", "true");
-                        } catch (e) {}
-                        const curtain = document.getElementById("login-screen");
-                        if (curtain) curtain.style.display = 'none';
-                        const codeBtn = document.getElementById("btn-code-enter");
-                        if (codeBtn) codeBtn.classList.add('hidden');
-                    }).catch((err) => {
-                        if (errorDisplay) errorDisplay.innerText = "Şifre silinirken hata oluştu: " + err.message;
-                    });
-                } else {
-                    if (errorDisplay) errorDisplay.innerText = "Geçersiz veya kullanılmış şifre!";
-                }
-            }).catch((error) => {
-                if (errorDisplay) errorDisplay.innerText = "Veritabanı Bağlantı Hatası: " + error.message;
+    // Anonim girişi başlat ve tamamlanınca authReady çözülsün
+    window.authReady = new Promise((resolve) => {
+        firebase.auth().signInAnonymously()
+            .then(() => {
+                console.log("Anonim giriş başarılı");
+                resolve(true);
+            })
+            .catch((error) => {
+                console.error("Anonim giriş hatası:", error);
+                resolve(false);
             });
+    });
+
+    async function checkPassword() {
+        const errorDisplay = document.getElementById("error-msg");
+        if (errorDisplay) {
+            errorDisplay.innerText = "Bağlantı kuruluyor, lütfen bekleyin...";
         }
-    </script>
+
+        const enteredKey = document.getElementById("otp-input").value.trim();
+
+        if (!enteredKey) {
+            if (errorDisplay) errorDisplay.innerText = "Lütfen şifre alanını boş bırakmayın!";
+            return;
+        }
+
+        // Anonim giriş tamamlanana kadar bekle
+        await window.authReady;
+
+        try {
+            const keyRef = window.database.ref("keys/" + enteredKey);
+            const snapshot = await keyRef.once("value");
+
+            if (snapshot.val() === true) {
+                try {
+                    await keyRef.remove();
+                    appState.authState = "full";
+                    await saveSettings();
+                    localStorage.setItem("authorized", "true");
+                    const curtain = document.getElementById("login-screen");
+                    if (curtain) curtain.style.display = 'none';
+                    const codeBtn = document.getElementById("btn-code-enter");
+                    if (codeBtn) codeBtn.classList.add('hidden');
+                    if (errorDisplay) errorDisplay.innerText = "Giriş başarılı!";
+                } catch (err) {
+                    if (errorDisplay) errorDisplay.innerText = "Şifre silinirken hata oluştu: " + err.message;
+                }
+            } else {
+                if (errorDisplay) errorDisplay.innerText = "Geçersiz veya kullanılmış şifre!";
+            }
+        } catch (error) {
+            if (errorDisplay) errorDisplay.innerText = "Veritabanı Bağlantı Hatası: " + error.message;
+        }
+    }
+</script>
 
     <script>
         // Ana Ekrana Ekle Prompt Yönetimi
@@ -3981,4 +4026,4 @@ async function changeField(field) {
         });
     </script>
 </body>
-                        </html>
+</html>
