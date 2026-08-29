@@ -195,6 +195,11 @@
     </style>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="logo.png">
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js');
+  }
+</script>
 </head>
 <body class="flex justify-center min-h-screen">
 <!-- ŞİFRE / SEÇİM EKRANI -->
@@ -878,9 +883,9 @@ const FIELD_DATA = {
             "Trigonometri","Logaritma","Diziler","Limit","Türev","İntegral"
         ],
         "AYT GEOMETRİ": [
-            "Doğruda ve Üçgende Açılar","Özel Üçgenler","Açıortay ve Kenarortay","Eşlik ve Benzerlik","Üçgende Alan",
-            "Açı-Kenar Bağıntıları","Çokgenler ve Özel Dörtgenler","Çember ve Daire","Analitik Geometri",
-            "Dönüşüm Geometrisi","Katı Cisimler","Çemberin Analitiği"
+            "Doğruda Açılar","Üçgende Açılar","Üçgende Kenarortay, Açıortay, Yükseklik","Üçgende Eşlik ve Benzerlik","Üçgende Alan",
+            "Çokgenler","Dörtgenler","Yamuk","Paralelkenar","Eşkenar Dörtgen","Dikdörtgen","Kare","Deltoid",
+            "Çember ve Daire","Analitik Geometri","Katı Cisimler","Çemberin Analitik İncelenmesi","Dönüşümlerle Geometri"
         ],
         "AYT FİZİK": [
             "Vektörler","Kuvvet, Tork ve Denge","Kütle Merkezi","Basit Makineler","Hareket",
@@ -911,9 +916,9 @@ const FIELD_DATA = {
         "TYT DİN KÜLTÜRÜ": ["Bilgi ve İnanç","İbadetler","Ahlak ve Değerler","Hz. Muhammed","Vahiy ve Akıl","İslam Düşüncesinde Yorumlar ve Mezhepler","Din, Kültür ve Medeniyet"],
         "TYT MATEMATİK": ["Temel Kavramlar","Sayı Basamakları","Bölme ve Bölünebilme","EBOB - EKOK","Rasyonel Sayılar","Basit Eşitsizlikler","Mutlak Değer","Üslü Sayılar","Köklü Sayılar","Çarpanlara Ayırma","Oran - Orantı","Denklem Çözme","Problemler","Kümeler ve Kartezyen Çarpım","Mantık","Fonksiyonlar","Polinomlar","İkinci Dereceden Denklemler","Permütasyon ve Kombinasyon","Olasılık","Veri ve İstatistik"],
         "TYT GEOMETRİ": [
-            "Doğruda ve Üçgende Açılar","Özel Üçgenler","Açıortay ve Kenarortay","Eşlik ve Benzerlik","Üçgende Alan",
-            "Açı-Kenar Bağıntıları","Çokgenler ve Özel Dörtgenler","Çember ve Daire","Analitik Geometri",
-            "Katı Cisimler"
+            "Doğruda Açılar","Üçgende Açılar","Üçgende Kenarortay, Açıortay, Yükseklik","Üçgende Eşlik ve Benzerlik","Üçgende Alan",
+            "Çokgenler","Dörtgenler","Yamuk","Paralelkenar","Eşkenar Dörtgen","Dikdörtgen","Kare","Deltoid",
+            "Çember ve Daire","Analitik Geometri","Katı Cisimler"
         ],
         "TYT FİZİK": ["Fizik Bilimine Giriş","Madde ve Özellikleri","Sıvıların Kaldırma Kuvveti","Basınç","Isı, Sıcaklık ve Genleşme","Hareket ve Kuvvet","Dinamik","İş, Güç ve Enerji","Elektrik","Manyetizma","Dalgalar","Optik"],
         "TYT KİMYA": ["Kimya Bilimi","Atom ve Periyodik Sistem","Kimyasal Türler Arası Etkileşimler","Maddenin Hâlleri","Doğa ve Kimya","Kimyanın Temel Kanunları","Kimyasal Hesaplamalar","Karışımlar","Asitler, Bazlar ve Tuzlar","Kimya Her Yerde"],
@@ -929,9 +934,9 @@ const FIELD_DATA = {
             "Trigonometri","Logaritma","Diziler","Limit","Türev","İntegral"
         ],
         "AYT GEOMETRİ": [
-            "Doğruda ve Üçgende Açılar","Özel Üçgenler","Açıortay ve Kenarortay","Eşlik ve Benzerlik","Üçgende Alan",
-            "Açı-Kenar Bağıntıları","Çokgenler ve Özel Dörtgenler","Çember ve Daire","Analitik Geometri",
-            "Dönüşüm Geometrisi","Katı Cisimler","Çemberin Analitiği"
+            "Doğruda Açılar","Üçgende Açılar","Üçgende Kenarortay, Açıortay, Yükseklik","Üçgende Eşlik ve Benzerlik","Üçgende Alan",
+            "Çokgenler","Dörtgenler","Yamuk","Paralelkenar","Eşkenar Dörtgen","Dikdörtgen","Kare","Deltoid",
+            "Çember ve Daire","Analitik Geometri","Katı Cisimler","Çemberin Analitik İncelenmesi","Dönüşümlerle Geometri"
         ],
         "AYT EDEBİYAT": ["Anlam Bilgisi","Dil Bilgisi","Güzel Sanatlar ve Edebiyat","Metinlerin Sınıflandırılması","Şiir Bilgisi","Edebi Sanatlar","Türk Edebiyatı Dönemleri","İslamiyet Öncesi Türk Edebiyatı ve Geçiş Dönemi","Halk Edebiyatı","Divan Edebiyatı","Tanzimat Edebiyatı","Servet-i Fünun Edebiyatı","Fecr-i Ati Edebiyatı","Milli Edebiyat","Cumhuriyet Dönemi Edebiyatı","Edebiyat Akımları","Dünya Edebiyatı"],
         "AYT TARİH": ["Tarih ve Zaman","İnsanlığın İlk Dönemleri","Orta Çağ’da Dünya","İlk ve Orta Çağlarda Türk Dünyası","İslam Medeniyetinin Doğuşu","Türklerin İslamiyet’i Kabulü ve İlk Türk İslam Devletleri","Yerleşme ve Devletleşme Sürecinde Selçuklu Türkiyesi","Beylikten Devlete Osmanlı Siyaseti","Devletleşme Sürecinde Savaşçılar ve Askerler","Beylikten Devlete Osmanlı Medeniyeti","Dünya Gücü Osmanlı","Sultan ve Osmanlı Merkez Teşkilatı","Klasik Çağda Osmanlı Toplum Düzeni","Değişen Dünya Dengeleri Karşısında Osmanlı Siyaseti","Değişim Çağında Avrupa ve Osmanlı","Uluslararası İlişkilerde Denge Stratejisi (1774-1914)","Devrimler Çağında Değişen Devlet-Toplum İlişkileri","Sermaye ve Emek","XIX. ve XX. Yüzyılda Değişen Gündelik Hayat","XX. Yüzyıl Başlarında Osmanlı Devleti ve Dünya","Milli Mücadele","Atatürkçülük ve Türk İnkılabı","İki Savaş Arasındaki Dönemde Türkiye ve Dünya","II. Dünya Savaşı Sürecinde Türkiye ve Dünya","II. Dünya Savaşı Sonrasında Türkiye ve Dünya","Toplumsal Devrim Çağında Dünya ve Türkiye","XXI. Yüzyılın Eşiğinde Türkiye ve Dünya"],
@@ -943,9 +948,9 @@ const FIELD_DATA = {
         "TYT DİN KÜLTÜRÜ": ["Bilgi ve İnanç","İbadetler","Ahlak ve Değerler","Hz. Muhammed","Vahiy ve Akıl","İslam Düşüncesinde Yorumlar ve Mezhepler","Din, Kültür ve Medeniyet"],
         "TYT MATEMATİK": ["Temel Kavramlar","Sayı Basamakları","Bölme ve Bölünebilme","EBOB - EKOK","Rasyonel Sayılar","Basit Eşitsizlikler","Mutlak Değer","Üslü Sayılar","Köklü Sayılar","Çarpanlara Ayırma","Oran - Orantı","Denklem Çözme","Problemler","Kümeler ve Kartezyen Çarpım","Mantık","Fonksiyonlar","Polinomlar","İkinci Dereceden Denklemler","Permütasyon ve Kombinasyon","Olasılık","Veri ve İstatistik"],
         "TYT GEOMETRİ": [
-            "Doğruda ve Üçgende Açılar","Özel Üçgenler","Açıortay ve Kenarortay","Eşlik ve Benzerlik","Üçgende Alan",
-            "Açı-Kenar Bağıntıları","Çokgenler ve Özel Dörtgenler","Çember ve Daire","Analitik Geometri",
-            "Katı Cisimler"
+            "Doğruda Açılar","Üçgende Açılar","Üçgende Kenarortay, Açıortay, Yükseklik","Üçgende Eşlik ve Benzerlik","Üçgende Alan",
+            "Çokgenler","Dörtgenler","Yamuk","Paralelkenar","Eşkenar Dörtgen","Dikdörtgen","Kare","Deltoid",
+            "Çember ve Daire","Analitik Geometri","Katı Cisimler"
         ],
         "TYT FİZİK": ["Fizik Bilimine Giriş","Madde ve Özellikleri","Sıvıların Kaldırma Kuvveti","Basınç","Isı, Sıcaklık ve Genleşme","Hareket ve Kuvvet","Dinamik","İş, Güç ve Enerji","Elektrik","Manyetizma","Dalgalar","Optik"],
         "TYT KİMYA": ["Kimya Bilimi","Atom ve Periyodik Sistem","Kimyasal Türler Arası Etkileşimler","Maddenin Hâlleri","Doğa ve Kimya","Kimyanın Temel Kanunları","Kimyasal Hesaplamalar","Karışımlar","Asitler, Bazlar ve Tuzlar","Kimya Her Yerde"],
@@ -964,9 +969,9 @@ const FIELD_DATA = {
         "TYT DİN KÜLTÜRÜ": ["Bilgi ve İnanç","İbadetler","Ahlak ve Değerler","Hz. Muhammed","Vahiy ve Akıl","İslam Düşüncesinde Yorumlar ve Mezhepler","Din, Kültür ve Medeniyet"],
         "TYT MATEMATİK": ["Temel Kavramlar","Sayı Basamakları","Bölme ve Bölünebilme","EBOB - EKOK","Rasyonel Sayılar","Basit Eşitsizlikler","Mutlak Değer","Üslü Sayılar","Köklü Sayılar","Çarpanlara Ayırma","Oran - Orantı","Denklem Çözme","Problemler","Kümeler ve Kartezyen Çarpım","Mantık","Fonksiyonlar","Polinomlar","İkinci Dereceden Denklemler","Permütasyon ve Kombinasyon","Olasılık","Veri ve İstatistik"],
         "TYT GEOMETRİ": [
-            "Doğruda ve Üçgende Açılar","Özel Üçgenler","Açıortay ve Kenarortay","Eşlik ve Benzerlik","Üçgende Alan",
-            "Açı-Kenar Bağıntıları","Çokgenler ve Özel Dörtgenler","Çember ve Daire","Analitik Geometri",
-            "Katı Cisimler"
+            "Doğruda Açılar","Üçgende Açılar","Üçgende Kenarortay, Açıortay, Yükseklik","Üçgende Eşlik ve Benzerlik","Üçgende Alan",
+            "Çokgenler","Dörtgenler","Yamuk","Paralelkenar","Eşkenar Dörtgen","Dikdörtgen","Kare","Deltoid",
+            "Çember ve Daire","Analitik Geometri","Katı Cisimler"
         ],
         "TYT FİZİK": ["Fizik Bilimine Giriş","Madde ve Özellikleri","Sıvıların Kaldırma Kuvveti","Basınç","Isı, Sıcaklık ve Genleşme","Hareket ve Kuvvet","Dinamik","İş, Güç ve Enerji","Elektrik","Manyetizma","Dalgalar","Optik"],
         "TYT KİMYA": ["Kimya Bilimi","Atom ve Periyodik Sistem","Kimyasal Türler Arası Etkileşimler","Maddenin Hâlleri","Doğa ve Kimya","Kimyanın Temel Kanunları","Kimyasal Hesaplamalar","Karışımlar","Asitler, Bazlar ve Tuzlar","Kimya Her Yerde"],
@@ -981,9 +986,9 @@ const FIELD_DATA = {
         "TYT DİN KÜLTÜRÜ": ["Bilgi ve İnanç","İbadetler","Ahlak ve Değerler","Hz. Muhammed","Vahiy ve Akıl","İslam Düşüncesinde Yorumlar ve Mezhepler","Din, Kültür ve Medeniyet"],
         "TYT MATEMATİK": ["Temel Kavramlar","Sayı Basamakları","Bölme ve Bölünebilme","EBOB - EKOK","Rasyonel Sayılar","Basit Eşitsizlikler","Mutlak Değer","Üslü Sayılar","Köklü Sayılar","Çarpanlara Ayırma","Oran - Orantı","Denklem Çözme","Problemler","Kümeler ve Kartezyen Çarpım","Mantık","Fonksiyonlar","Polinomlar","İkinci Dereceden Denklemler","Permütasyon ve Kombinasyon","Olasılık","Veri ve İstatistik"],
         "TYT GEOMETRİ": [
-            "Doğruda ve Üçgende Açılar","Özel Üçgenler","Açıortay ve Kenarortay","Eşlik ve Benzerlik","Üçgende Alan",
-            "Açı-Kenar Bağıntıları","Çokgenler ve Özel Dörtgenler","Çember ve Daire","Analitik Geometri",
-            "Katı Cisimler"
+            "Doğruda Açılar","Üçgende Açılar","Üçgende Kenarortay, Açıortay, Yükseklik","Üçgende Eşlik ve Benzerlik","Üçgende Alan",
+            "Çokgenler","Dörtgenler","Yamuk","Paralelkenar","Eşkenar Dörtgen","Dikdörtgen","Kare","Deltoid",
+            "Çember ve Daire","Analitik Geometri","Katı Cisimler"
         ],
         "TYT FİZİK": ["Fizik Bilimine Giriş","Madde ve Özellikleri","Sıvıların Kaldırma Kuvveti","Basınç","Isı, Sıcaklık ve Genleşme","Hareket ve Kuvvet","Dinamik","İş, Güç ve Enerji","Elektrik","Manyetizma","Dalgalar","Optik"],
         "TYT KİMYA": ["Kimya Bilimi","Atom ve Periyodik Sistem","Kimyasal Türler Arası Etkileşimler","Maddenin Hâlleri","Doğa ve Kimya","Kimyanın Temel Kanunları","Kimyasal Hesaplamalar","Karışımlar","Asitler, Bazlar ve Tuzlar","Kimya Her Yerde"],
@@ -1511,7 +1516,7 @@ async function migrateBase64ToBlob() {
 }
 
 // Canvas'tan Blob üret (WebP/JPEG)
-function canvasToBlob(canvas, quality = 0.8) {
+function canvasToBlob(canvas, quality = 0.85) {
     return new Promise((resolve, reject) => {
         const mimeType = supportsWebP ? 'image/webp' : 'image/jpeg';
         canvas.toBlob((blob) => {
@@ -1707,7 +1712,7 @@ async function submitCode() {
 
     errorMsg.innerText = "Kontrol ediliyor...";
 
-    const keyRef = window.database.ref("keys/" + code);
+    const keyRef = database.ref("keys/" + code);
     keyRef.once("value").then(async (snapshot) => {
         if (snapshot.val() === true) {
             keyRef.remove().then(async () => {
@@ -2794,7 +2799,7 @@ if (!topic) { showToast("Lütfen konu seçiniz!", true); return; }
             const ctx = mergeCanvas.getContext('2d');
             ctx.drawImage(img, 0, 0); ctx.drawImage(canvas, 0, 0);
             // Blob üret (WebP/JPEG)
-            finalImage = await canvasToBlob(mergeCanvas, 0.8);
+            finalImage = await canvasToBlob(mergeCanvas, 0.85);
         }
 
         let textQ = document.getElementById('q-text-question').value.trim();
@@ -2855,7 +2860,7 @@ if (!topic) { showToast("Lütfen konu seçiniz!", true); return; }
             mergeCanvas.width = canvas.width; mergeCanvas.height = canvas.height;
             const ctx = mergeCanvas.getContext('2d');
             ctx.drawImage(img, 0, 0); ctx.drawImage(canvas, 0, 0);
-            finalImage = await canvasToBlob(mergeCanvas, 0.8);
+            finalImage = await canvasToBlob(mergeCanvas, 0.85);
         }
 
         let noteText = document.getElementById('q-note').value.trim();
@@ -4057,4 +4062,4 @@ async function changeField(field) {
         });
     </script>
 </body>
-    </html>
+</html>
