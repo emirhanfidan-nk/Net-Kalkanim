@@ -581,24 +581,19 @@
     
     <div id="review-question-text" class="w-full bg-white border border-slate-200 p-2.5 text-xs text-slate-800 font-bold uppercase hidden tracking-wide text-center max-h-20 overflow-y-auto rounded-xl shadow-sm shrink-0"></div>
     
-    <div id="review-frame-box" class="relative max-w-full flex-1 min-h-[120px] max-h-[48vh] border border-slate-200 shadow-md bg-white w-full rounded-xl overflow-hidden" style="perspective: 1000px;">
-        <div id="review-flip-inner" class="review-flip-inner">
-            <div id="review-flip-front" class="review-flip-face review-flip-front p-1.5 bg-white">
-                <div id="review-zoom-wrapper" class="relative inline-block max-w-full max-h-full transition-transform duration-200 origin-center">
-                    <img id="review-img" src="" onclick="openLightbox(this.src)" class="max-w-full max-h-[45vh] object-contain cursor-zoom-in block pointer-events-auto rounded-lg">
-                    <canvas id="review-draw-canvas" class="absolute top-0 left-0 w-full h-full pointer-events-none"></canvas>
-                </div>
-            </div>
-            <div id="review-flip-back" class="review-flip-face review-flip-back p-3">
-                <div id="review-note-content" class="w-full text-xs font-semibold uppercase tracking-wide text-amber-800"></div>
+    <div id="review-frame-box" class="relative max-w-full flex-1 min-h-[300px] max-h-[70vh] border border-slate-200 shadow-md bg-white w-full rounded-xl overflow-hidden" style="perspective: 1000px;">
+    <div id="review-flip-inner" class="review-flip-inner">
+        <div id="review-flip-front" class="review-flip-face review-flip-front p-1.5 bg-white">
+            <div id="review-unified-board" class="relative w-full h-full" style="min-height: 300px; height: 100%; background: white; border: 2px dashed #e2e8f0;">
+                <img id="review-img" src="" onclick="openLightbox(this.src)" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 max-w-[80%] max-h-[80%] object-contain cursor-zoom-in pointer-events-auto rounded-lg">
+                <canvas id="review-draw-canvas" class="absolute top-0 left-0 w-full h-full cursor-crosshair"></canvas>
             </div>
         </div>
+        <div id="review-flip-back" class="review-flip-face review-flip-back p-3">
+            <div id="review-note-content" class="w-full text-xs font-semibold uppercase tracking-wide text-amber-800"></div>
+        </div>
     </div>
-
-    <!-- YENİ BOŞ ÇİZİM ALANI -->
-    <div id="review-drawing-area" class="w-full bg-white border border-slate-200 rounded-xl p-2 flex flex-col items-center justify-center min-h-[250px] max-h-[50vh] overflow-auto shadow-sm shrink-0">
-        <canvas id="review-draw-canvas-new" class="w-full" style="min-height: 250px; width: 100%;"></canvas>
-    </div>
+</div>
 
     <div id="review-draw-tools" class="flex flex-col gap-1.5 hidden items-center w-full shrink-0">
         <div class="flex gap-1.5 justify-center flex-wrap">
@@ -1312,7 +1307,7 @@ let currentOnboardingStep = 1;
 let fieldSelectedInOnboarding = false;
 
 let currentNoteInputType = 'text';
-let activeReviewCanvasId = 'review-draw-canvas-new';
+let activeReviewCanvasId = 'review-draw-canvas';
 let reviewUndoStack = [];
 let noteImageDataUrl = null;
 
@@ -2304,8 +2299,7 @@ function manualZoom(target, val) {
 }
 
 function setReviewDrawMode(mode) {
-    const canvasTop = document.getElementById('review-draw-canvas');
-    const canvasBottom = document.getElementById('review-draw-canvas-new');
+    const canvas = document.getElementById('review-draw-canvas');
     let mBtn = document.getElementById('rev-btn-move');
     let pBtn = document.getElementById('rev-btn-pen');
     let eBtn = document.getElementById('rev-btn-eraser');
@@ -2317,14 +2311,13 @@ function setReviewDrawMode(mode) {
     if(pBtn) pBtn.className = "bg-slate-200 text-slate-700 px-3 py-1 text-xs font-bold uppercase rounded-xl border border-slate-300 shadow-sm";
     if(eBtn) eBtn.className = "bg-slate-200 text-slate-700 px-3 py-1 text-xs font-bold uppercase rounded-xl border border-slate-300 shadow-sm";
 
-    [canvasTop, canvasBottom].forEach(canvas => {
-        if (!canvas) return;
+    if (canvas) {
         if (mode === 'move') {
             canvas.classList.add('pointer-events-none');
         } else {
             canvas.classList.remove('pointer-events-none');
         }
-    });
+    }
 
     if(mode === 'move') {
         if(mBtn) mBtn.className = "bg-amber-500 text-white px-3 py-1 text-xs font-bold uppercase rounded-xl border border-amber-500 shadow-sm";
@@ -2358,13 +2351,11 @@ function updateReviewSizeUI() {
 }
 
 function clearReviewCanvas() {
-    ['review-draw-canvas', 'review-draw-canvas-new'].forEach(id => {
-        const canvas = document.getElementById(id);
-        if(!canvas) return;
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        canvas.history = [ctx.getImageData(0, 0, canvas.width, canvas.height)];
-    });
+    const canvas = document.getElementById('review-draw-canvas');
+    if(!canvas) return;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    canvas.history = [ctx.getImageData(0, 0, canvas.width, canvas.height)];
 }
 
 function undoActiveReviewCanvas() {
@@ -2438,7 +2429,6 @@ function clearCampReviewCanvas() {
 
 setTimeout(() => {
     initCanvasDrawing('review-draw-canvas', () => reviewDrawMode, () => reviewPenSize);
-    initCanvasDrawing('review-draw-canvas-new', () => reviewDrawMode, () => reviewPenSize);
     initCanvasDrawing('camp-review-draw-canvas', () => campReviewDrawMode, () => campPenSize);
 }, 500);
 
@@ -3005,17 +2995,6 @@ function renderReviewItem() {
     }
 
     const item = currentReviewQueue[currentReviewIndex];
-    // Çizim alanını ve araçlarını moda göre göster/gizle
-const drawingArea = document.getElementById('review-drawing-area');
-const drawTools = document.getElementById('review-draw-tools');
-
-if (currentReviewMode === 'notes') {
-    if (drawingArea) drawingArea.classList.add('hidden');
-    if (drawTools) drawTools.classList.add('hidden');
-} else {
-    if (drawingArea) drawingArea.classList.remove('hidden');
-    if (drawTools) drawTools.classList.remove('hidden');
-}
     const todayStr = formatDate(getNowTR());
     
     // Hata 1 düzeltmesi: eğer userRecallStatus dolu ama bugün değilse sıfırla
@@ -3033,14 +3012,7 @@ if (currentReviewMode === 'notes') {
     const imgEl = document.getElementById('review-img');
     const qTextEl = document.getElementById('review-question-text');
     const frameBox = document.getElementById('review-frame-box');
-    // Üstteki çizim canvas'ını görsel boyutuna ayarla
-const topCanvas = document.getElementById('review-draw-canvas');
-if (topCanvas && imgEl.complete && imgEl.naturalWidth > 0) {
-    topCanvas.width = imgEl.naturalWidth;
-    topCanvas.height = imgEl.naturalHeight;
-    const ctx = topCanvas.getContext('2d');
-    topCanvas.history = [ctx.getImageData(0, 0, topCanvas.width, topCanvas.height)];
-}
+    
 reviewUndoStack = [];
 
     // Önceki URL'yi temizle
@@ -3219,13 +3191,15 @@ if (currentArchiveMode) {
 
     document.getElementById('btn-rev-prev').disabled = (currentReviewIndex === 0);
     document.getElementById('btn-rev-next').disabled = (currentReviewIndex === currentReviewQueue.length - 1);
-    // Yeni çizim alanı canvas boyutunu ayarla
-const newCanvas = document.getElementById('review-draw-canvas-new');
-if (newCanvas) {
-    newCanvas.width = newCanvas.clientWidth || 800;
-    newCanvas.height = 250;
-    const ctx = newCanvas.getContext('2d');
-    newCanvas.history = [ctx.getImageData(0, 0, newCanvas.width, newCanvas.height)];
+   // Çizim canvas'ını konteyner boyutuna ayarla
+const unifiedBoard = document.getElementById('review-unified-board');
+const canvas = document.getElementById('review-draw-canvas');
+if (unifiedBoard && canvas) {
+    canvas.width = unifiedBoard.clientWidth;
+    canvas.height = unifiedBoard.clientHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    canvas.history = [ctx.getImageData(0, 0, canvas.width, canvas.height)];
 }
 // Global geri alma yığınını sıfırla
 reviewUndoStack = [];
