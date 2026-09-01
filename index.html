@@ -536,11 +536,11 @@
                     <h3 class="font-bold text-xs text-cyan-600 uppercase tracking-wider">Günlük Limitler</h3>
                     <div class="space-y-3">
                         <div>
-                            <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Günlük Soru Limiti (0 = limitsiz)</label>
+                            <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Günlük Kırmızı Kutu Soru Sayısı Limiti (0 = limitsiz)</label>
                             <input type="number" id="setting-daily-limit-q" class="w-full bg-slate-50 p-3 border border-slate-300 font-mono text-center text-slate-700 font-bold outline-none focus:border-cyan-500 transition-colors rounded-xl">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Günlük Not Limiti (0 = limitsiz)</label>
+                            <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Günlük Kırmızı Kutu Not Sayısı Limiti (0 = limitsiz)</label>
                             <input type="number" id="setting-daily-limit-n" class="w-full bg-slate-50 p-3 border border-slate-300 font-mono text-center text-slate-700 font-bold outline-none focus:border-cyan-500 transition-colors rounded-xl">
                         </div>
                         <button onclick="saveDailyLimits()" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-3 font-bold text-xs uppercase rounded-xl transition-colors shadow-sm">Limitleri Kaydet</button>
@@ -617,15 +617,6 @@
         </div>
     </div>
 
-    <div id="review-nav-arrows" class="flex justify-between items-center w-full px-1 py-1 gap-3 shrink-0">
-        <button onclick="navigateReview(-1)" id="btn-rev-prev" class="flex-1 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 py-2.5 px-3 text-xs font-extrabold rounded-xl shadow-sm transition-colors flex items-center justify-center gap-2">
-            <span>◄</span> <span>Önceki</span>
-        </button>
-        <button onclick="navigateReview(1)" id="btn-rev-next" class="flex-1 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 py-2.5 px-3 text-xs font-extrabold rounded-xl shadow-sm transition-colors flex items-center justify-center gap-2">
-            <span>Sonraki</span> <span>►</span>
-        </button>
-    </div>
-
     <div id="review-feedback-box" class="w-full p-3 text-xs font-extrabold text-center rounded-xl hidden transition-colors shadow-sm shrink-0"></div>
 
     <div id="review-note-toggle-container" class="w-full flex justify-center shrink-0">
@@ -646,11 +637,19 @@
                     <input type="text" id="review-text-val" placeholder="METİN GİR..." class="flex-1 bg-slate-50 p-3 border border-slate-300 outline-none focus:border-indigo-600 text-slate-800 font-bold uppercase tracking-wider transition-colors rounded-xl shadow-sm text-xs">
                     <button onclick="submitQuestionAnswer(document.getElementById('review-text-val').value)" class="bg-indigo-600 text-white px-5 font-bold uppercase hover:bg-indigo-700 transition-colors rounded-xl shadow-sm text-xs">İlet</button>
                 </div>
-                <div id="review-recall-input" class="invisible w-full mt-3" style="min-height: 52px;">
+                <div id="review-nav-arrows" class="flex justify-between items-center w-full px-1 py-1 gap-3 shrink-0" style="z-index: 20; position: relative;">
+        <button type="button" onclick="navigateReview(-1)" id="btn-rev-prev" class="flex-1 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 py-2.5 px-3 text-xs font-extrabold rounded-xl shadow-sm transition-colors flex items-center justify-center gap-2">
+            <span>◄</span> <span>Önceki</span>
+        </button>
+        <button type="button" onclick="navigateReview(1)" id="btn-rev-next" class="flex-1 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 py-2.5 px-3 text-xs font-extrabold rounded-xl shadow-sm transition-colors flex items-center justify-center gap-2">
+            <span>Sonraki</span> <span>►</span>
+        </button>
+    </div>
+                <div id="review-recall-input" class="invisible w-full mt-3" style="min-height: 52px; z-index: 20; position: relative;">
                     <div class="flex gap-2 justify-center">
-                        <button id="recall-btn-forgot" onclick="submitRecallStatus('forgot')" class="flex-1 py-3 font-bold uppercase text-xs rounded-xl border-2 transition-all bg-rose-600 border-rose-600 text-white hover:bg-rose-700">Unuttum</button>
-                        <button id="recall-btn-partial" onclick="submitRecallStatus('partial')" class="flex-1 py-3 font-bold uppercase text-xs rounded-xl border-2 transition-all bg-amber-500 border-amber-500 text-white hover:bg-amber-600">Kısmen Hatırladım</button>
-                        <button id="recall-btn-remembered" onclick="submitRecallStatus('remembered')" class="flex-1 py-3 font-bold uppercase text-xs rounded-xl border-2 transition-all bg-emerald-600 border-emerald-600 text-white hover:bg-emerald-700">Hatırladım</button>
+                        <button type="button" id="recall-btn-forgot" onclick="submitRecallStatus('forgot')" class="flex-1 py-3 font-bold uppercase text-xs rounded-xl border-2 transition-all bg-rose-600 border-rose-600 text-white hover:bg-rose-700">Unuttum</button>
+                        <button type="button" id="recall-btn-partial" onclick="submitRecallStatus('partial')" class="flex-1 py-3 font-bold uppercase text-xs rounded-xl border-2 transition-all bg-amber-500 border-amber-500 text-white hover:bg-amber-600">Kısmen Hatırladım</button>
+                        <button type="button" id="recall-btn-remembered" onclick="submitRecallStatus('remembered')" class="flex-1 py-3 font-bold uppercase text-xs rounded-xl border-2 transition-all bg-emerald-600 border-emerald-600 text-white hover:bg-emerald-700">Hatırladım</button>
                     </div>
                 </div>
             </div>
