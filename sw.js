@@ -1,4 +1,4 @@
-const CACHE_NAME = 'net-kalkanim-v20';
+const CACHE_NAME = 'net-kalkanim-v21';
 
 // Mutlak yol (/) yerine göreceli yol (./) kullanarak alt klasör ve GitHub Pages uyumu sağlandı.
 const APP_SHELL = [
