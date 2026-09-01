@@ -3115,8 +3115,8 @@ if (currentArchiveMode) {
     textInput.classList.add('hidden');
     recallInput.classList.add('invisible');
     document.getElementById('review-draw-tools').classList.add('hidden');
-    document.getElementById('btn-rev-prev').disabled = (currentReviewIndex === 0);
-    document.getElementById('btn-rev-next').disabled = (currentReviewIndex === currentReviewQueue.length - 1);
+    // bu ikisi satırı şimdilik devre dışı bıraktık document.getElementById('btn-rev-prev').disabled = (currentReviewIndex === 0);
+    //bunu da document.getElementById('btn-rev-next').disabled = (currentReviewIndex === currentReviewQueue.length - 1);
     return; // Arşiv modunda buradan sonrasını çalıştırma
 }
 
@@ -3194,8 +3194,11 @@ if (currentArchiveMode) {
 const unifiedBoard = document.getElementById('review-unified-board');
 const canvas = document.getElementById('review-draw-canvas');
 if (unifiedBoard && canvas) {
-    canvas.width = unifiedBoard.clientWidth;
-    canvas.height = unifiedBoard.clientHeight;
+    // Görselsiz notlarda çizim alanı 0 genişlikte/yükseklikte olabiliyor;
+    // bu durumda getImageData hata fırlatıp render'ın geri kalanını (Önceki/Sonraki,
+    // Hatırladım/Kısmen Hatırladım/Unuttum butonlarını) bozuyordu. En az 1px kullanarak bunu önlüyoruz.
+    canvas.width = unifiedBoard.clientWidth || 1;
+    canvas.height = unifiedBoard.clientHeight || 1;
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     canvas.history = [ctx.getImageData(0, 0, canvas.width, canvas.height)];
@@ -3236,43 +3239,43 @@ function updateRecallButtons(status) {
 
     if (!forgotBtn || !partialBtn || !rememberedBtn) return;
 
-    const activeClasses = {
-        forgot: "flex-1 py-3 font-bold uppercase text-xs rounded-xl border-2 transition-all bg-rose-600 border-rose-600 text-white hover:bg-rose-700",
-        partial: "flex-1 py-3 font-bold uppercase text-xs rounded-xl border-2 transition-all bg-amber-500 border-amber-500 text-white hover:bg-amber-600",
-        remembered: "flex-1 py-3 font-bold uppercase text-xs rounded-xl border-2 transition-all bg-emerald-600 border-emerald-600 text-white hover:bg-emerald-700"
-    };
-
-    const disabledClasses = {
-        forgot: "flex-1 py-3 font-bold uppercase text-xs rounded-xl border-2 transition-all bg-slate-200 border-slate-300 text-slate-400 cursor-not-allowed",
-        partial: "flex-1 py-3 font-bold uppercase text-xs rounded-xl border-2 transition-all bg-slate-200 border-slate-300 text-slate-400 cursor-not-allowed",
-        remembered: "flex-1 py-3 font-bold uppercase text-xs rounded-xl border-2 transition-all bg-slate-200 border-slate-300 text-slate-400 cursor-not-allowed"
-    };
+    function setButtonStyle(btn, isActive, color) {
+        if (isActive) {
+            btn.disabled = false;
+            btn.style.backgroundColor = color;
+            btn.style.borderColor = color;
+            btn.style.color = 'white';
+            btn.style.opacity = '1';
+            btn.style.cursor = 'pointer';
+        } else {
+            btn.disabled = true;
+            btn.style.backgroundColor = '#e2e8f0'; // gri
+            btn.style.borderColor = '#cbd5e1';
+            btn.style.color = '#94a3b8';
+            btn.style.opacity = '0.7';
+            btn.style.cursor = 'not-allowed';
+        }
+    }
 
     if (status) {
-        forgotBtn.disabled = true;
-        partialBtn.disabled = true;
-        rememberedBtn.disabled = true;
-
         if (status === 'forgot') {
-            forgotBtn.className = activeClasses.forgot;
-            partialBtn.className = disabledClasses.partial;
-            rememberedBtn.className = disabledClasses.remembered;
+            setButtonStyle(forgotBtn, true, '#e11d48');   // kırmızı
+            setButtonStyle(partialBtn, false);
+            setButtonStyle(rememberedBtn, false);
         } else if (status === 'partial') {
-            forgotBtn.className = disabledClasses.forgot;
-            partialBtn.className = activeClasses.partial;
-            rememberedBtn.className = disabledClasses.remembered;
+            setButtonStyle(forgotBtn, false);
+            setButtonStyle(partialBtn, true, '#f59e0b');  // sarı
+            setButtonStyle(rememberedBtn, false);
         } else if (status === 'remembered') {
-            forgotBtn.className = disabledClasses.forgot;
-            partialBtn.className = disabledClasses.partial;
-            rememberedBtn.className = activeClasses.remembered;
+            setButtonStyle(forgotBtn, false);
+            setButtonStyle(partialBtn, false);
+            setButtonStyle(rememberedBtn, true, '#059669'); // yeşil
         }
     } else {
-        forgotBtn.disabled = false;
-        partialBtn.disabled = false;
-        rememberedBtn.disabled = false;
-        forgotBtn.className = activeClasses.forgot;
-        partialBtn.className = activeClasses.partial;
-        rememberedBtn.className = activeClasses.remembered;
+        // Hiçbiri seçilmediyse hepsi aktif
+        setButtonStyle(forgotBtn, true, '#e11d48');
+        setButtonStyle(partialBtn, true, '#f59e0b');
+        setButtonStyle(rememberedBtn, true, '#059669');
     }
 }
 
@@ -3280,7 +3283,12 @@ function navigateReview(dir) {
     let nextIdx = currentReviewIndex + dir;
     if (nextIdx >= 0 && nextIdx < currentReviewQueue.length) {
         currentReviewIndex = nextIdx;
-        renderReviewItem();
+        try {
+            renderReviewItem();
+        } catch(e) {
+            console.error("Render hatası:", e);
+            showToast("Bir hata oluştu, tekrar deneyin.", true);
+        }
     }
 }
 
