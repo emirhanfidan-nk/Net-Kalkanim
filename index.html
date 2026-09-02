@@ -1265,8 +1265,8 @@ let appState = {
     categories: {},
     questions: [],
     notes: [],
-    intervals: [1, 3, 7, 21, 45, 90, 180],
-    noteIntervals: [1, 3, 7, 21, 45, 90, 180],
+    intervals: [1, 3, 7, 21, 45],
+    noteIntervals: [1, 3, 7, 21, 45],
     selectedCourses: [], 
     selectedTopics: [],
     archSelectedCourses: [], 
@@ -1823,7 +1823,7 @@ function renderOnboardingStep() {
         btnNext.innerText = "Anladım, Devam";
     } else if (currentOnboardingStep === 4) {
         iconEl.innerHTML = `<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>`;
-        titleEl.innerText = "Kendi Soru Bankanı Oluştur";
+        titleEl.innerText = "Kendi Soru Defterini Oluştur";
         descEl.innerText = "Sorularının yanına çözümlerini ekle. Sorularının ve Notlarının tamamına bir yerden erişim sağla.";
         previewEl.innerHTML = `
             <div class="space-y-2">
