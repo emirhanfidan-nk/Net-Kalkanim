@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Net Kalkanım</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <!-- Firebase Bağlantı Kütüphaneleri -->
@@ -13,127 +13,38 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <style>
-        :root {
-            --ink: #14122C;
-            --ink-soft: #6A6482;
-            --paper: #FFFFFF;
-            --surface: #FFFFFF;
-            --line: #ECE9F7;
-
-            --primary: #5B4CE8;
-            --primary-dark: #4136BE;
-            --primary-light: #8B7CFF;
-            --primary-soft: #ECE8FF;
-            --primary-shadow: rgba(91, 76, 232, 0.38);
-
-            --green: #10A968;
-            --green-dark: #0B8654;
-            --green-soft: #E1F8EC;
-            --green-shadow: rgba(16, 169, 104, 0.35);
-
-            --red: #F03A57;
-            --red-dark: #C92B43;
-            --red-soft: #FDE7EB;
-            --red-shadow: rgba(240, 58, 87, 0.35);
-
-            --amber: #EFA333;
-            --amber-dark: #C57C10;
-            --amber-soft: #FCF0DA;
-            --amber-shadow: rgba(239, 163, 51, 0.35);
-
-            --cyan: #0FA6C4;
-            --cyan-dark: #0B7C93;
-            --cyan-soft: #DFF6FB;
-            --cyan-shadow: rgba(15, 166, 196, 0.32);
-
-            --violet: #9B4CE0;
-            --violet-dark: #7530B4;
-            --violet-soft: #F4E9FD;
-            --violet-shadow: rgba(155, 76, 224, 0.32);
-        }
-
-        * { -webkit-tap-highlight-color: transparent; }
-
-        body {
-            background-color: var(--paper);
-            color: var(--ink);
-            font-family: 'Plus Jakarta Sans', sans-serif;
-        }
-
-        .font-display { font-family: 'Sora', sans-serif; }
-
-        /* === TÜM BUTONLARDA BÜYÜK HARF ve FONT DEĞİŞİMİNİ ENGELLE === */
-        button, input, textarea, select {
-            text-transform: none !important;
-            font-family: 'Plus Jakarta Sans', sans-serif !important;
-        }
-        /* ============================================================= */
-
-        /* === GENEL BUTON YUVARLAKLIK AYARI === */
-        /* Tüm butonlar hafif yuvarlak köşeli olsun */
-        button {
-            border-radius: 14px !important;
-        }
-        /* Alt navigasyondaki artı butonu tam yuvarlak kalsın */
-        #nav-add {
-            border-radius: 999px !important;
-        }
-        /* Üst sekmeler hap şeklinde kalsın */
-        .pill-btn,
-        .pill-btn-active {
-            border-radius: 999px !important;
-        }
-        /* Şık seçim butonları hafif yuvarlak köşeli olsun */
-        .choice-btn {
-            border-radius: 14px !important;
-        }
-        /* ============================================================= */
-
+        body { background-color: #f8fafc; color: #1e293b; font-family: 'Inter', sans-serif; }
+        
         .tab-content { display: none; opacity: 0; }
-        .tab-content.active { display: block; animation: smoothFade 0.35s ease-out forwards; }
-
+        .tab-content.active { display: block; animation: smoothFade 0.3s ease-out forwards; }
+        
         @keyframes smoothFade {
             0% { opacity: 0; transform: translateY(10px); }
             100% { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes modalEnter {
-            0% { opacity: 0; transform: scale(0.94) translateY(6px); }
-            100% { opacity: 1; transform: scale(1) translateY(0); }
+            0% { opacity: 0; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1); }
         }
+        
+        .modal-animate:not(.hidden) { animation: modalEnter 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
-        .modal-animate:not(.hidden) { animation: modalEnter 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-
-        .btn-cyber { transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1); position: relative; font-weight: 700; }
-        .btn-cyber:hover { transform: translateY(-2px); }
-        .btn-cyber:active { transform: translateY(0) scale(0.97); }
-        .btn-cyber-red:hover { box-shadow: 0 16px 28px -10px var(--red-shadow); }
-        .btn-cyber-purple:hover { box-shadow: 0 16px 28px -10px var(--primary-shadow); }
-        .btn-cyber-yellow:hover { box-shadow: 0 16px 28px -10px var(--amber-shadow); }
+        .btn-cyber { transition: all 0.2s ease-out; position: relative; font-weight: 700; letter-spacing: 0.025em; }
+        .btn-cyber:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.25); }
+        .btn-cyber:active { transform: translateY(0); }
+        
+        .btn-cyber-red:hover { box-shadow: 0 10px 15px -3px rgba(225, 29, 72, 0.25); }
+        .btn-cyber-purple:hover { box-shadow: 0 10px 15px -3px rgba(147, 51, 234, 0.25); }
+        .btn-cyber-yellow:hover { box-shadow: 0 10px 15px -3px rgba(217, 119, 6, 0.25); }
 
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #D9D5EE; border-radius: 9999px; }
-        ::-webkit-scrollbar-thumb:hover { background: #B7B1DD; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
-
+        
         canvas { touch-action: none; }
-
-        /* === Kart / yüzey sistemi === */
-        .card-elevated {
-            background: var(--surface);
-            border-radius: 26px;
-            box-shadow: 0 1px 2px rgba(20, 18, 44, 0.04), 0 16px 32px -16px rgba(20, 18, 44, 0.16);
-        }
-        .press-scale { transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), filter 0.15s ease, box-shadow 0.15s ease; }
-        .press-scale:active { transform: scale(0.96); filter: brightness(0.96); }
-
-        .pill-track { background: #ECE9F8; border-radius: 999px; padding: 5px; display: flex; gap: 4px; }
-        .pill-btn { flex: 1; border-radius: 999px; padding: 10px 8px; font-size: 12px; font-weight: 700; text-align: center; transition: all 0.2s cubic-bezier(0.16,1,0.3,1); color: var(--ink-soft); }
-        .pill-btn-active { background: var(--surface); color: var(--primary); box-shadow: 0 6px 14px -4px rgba(20,18,44,0.18); }
-
-        .icon-badge { width: 38px; height: 38px; border-radius: 13px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .glow-blob { position: absolute; border-radius: 999px; filter: blur(46px); pointer-events: none; }
 
         /* === TOAST BİLDİRİM === */
         #toast-container {
@@ -149,13 +60,13 @@
             pointer-events: none;
         }
         .toast-msg {
-            background: var(--ink);
+            background: #1e293b;
             color: white;
-            padding: 12px 22px;
-            border-radius: 15px;
-            font-size: 13.5px;
+            padding: 12px 24px;
+            border-radius: 16px;
+            font-size: 14px;
             font-weight: 600;
-            box-shadow: 0 16px 36px rgba(20, 18, 44, 0.3);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
             animation: toastIn 0.4s cubic-bezier(0.16, 1, 0.3, 1), toastOut 0.3s ease-in forwards;
             animation-delay: 0s, 2.2s;
             pointer-events: auto;
@@ -164,7 +75,7 @@
             backdrop-filter: blur(8px);
         }
         .toast-error {
-            background: var(--red);
+            background: #dc2626;
         }
         @keyframes toastIn {
             0%   { opacity: 0; transform: translateY(-20px) scale(0.9); }
@@ -179,8 +90,8 @@
         .custom-confirm-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(20, 18, 44, 0.55);
-            backdrop-filter: blur(5px);
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
             z-index: 100000;
             display: flex;
             align-items: center;
@@ -188,25 +99,25 @@
             animation: fadeIn 0.2s ease;
         }
         .custom-confirm-box {
-            background: var(--surface);
+            background: white;
             border-radius: 24px;
             padding: 24px;
             max-width: 320px;
             width: 90%;
-            box-shadow: 0 28px 64px rgba(20, 18, 44, 0.32);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             text-align: center;
             animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .custom-confirm-box p {
             font-weight: 600;
             font-size: 15px;
-            color: var(--ink);
+            color: #1e293b;
             margin-bottom: 20px;
-            line-height: 1.5;
+            line-height: 1.4;
         }
         .custom-confirm-buttons {
             display: flex;
-            gap: 10px;
+            gap: 12px;
         }
         .custom-confirm-buttons button {
             flex: 1;
@@ -219,19 +130,18 @@
             transition: all 0.2s;
         }
         .btn-confirm-cancel {
-            background: var(--paper);
-            color: var(--ink-soft);
+            background: #f1f5f9;
+            color: #475569;
         }
         .btn-confirm-cancel:hover {
-            background: #E5E1F4;
+            background: #e2e8f0;
         }
         .btn-confirm-ok {
-            background: var(--primary);
+            background: #4f46e5;
             color: white;
-            box-shadow: 0 10px 20px -6px var(--primary-shadow);
         }
         .btn-confirm-ok:hover {
-            background: var(--primary-dark);
+            background: #4338ca;
         }
         @keyframes fadeIn {
             from { opacity: 0; } to { opacity: 1; }
@@ -240,51 +150,48 @@
             0% { transform: scale(0.9); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
-
         /* Flip Kart Stilleri */
-        .review-flip-inner {
-            transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
-            transform-style: preserve-3d;
-            position: relative;
-            width: 100%;
-            height: 100%;
-        }
-        .review-flip-inner.flipped {
-            transform: rotateY(180deg);
-        }
-        .review-flip-face {
-            backface-visibility: hidden;
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            overflow-y: auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .review-flip-front {
-            z-index: 2;
-        }
-        .review-flip-back {
-            transform: rotateY(180deg);
-            z-index: 1;
-            background: var(--amber-soft);
-            border-radius: 0.75rem;
-        }
-        #review-flip-back {
-            padding: 8px !important;
-        }
-        #review-flip-back img {
-            width: 100% !important;
-            height: auto !important;
-            max-height: 100% !important;
-            object-fit: contain !important;
-            border-radius: 0.5rem;
-        }
-
-        .nav-btn svg { transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
+.review-flip-inner {
+  transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+  transform-style: preserve-3d;
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.review-flip-inner.flipped {
+  transform: rotateY(180deg);
+}
+.review-flip-face {
+  backface-visibility: hidden;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.review-flip-front {
+  z-index: 2;
+}
+.review-flip-back {
+  transform: rotateY(180deg);
+  z-index: 1;
+  background: #fffbeb;
+  border-radius: 0.75rem;
+}
+#review-flip-back {
+  padding: 8px !important;
+}
+#review-flip-back img {
+  width: 100% !important;
+  height: auto !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  border-radius: 0.5rem;
+}
     </style>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="logo.png">
@@ -296,117 +203,111 @@
 </head>
 <body class="flex justify-center min-h-screen">
 <!-- ŞİFRE / SEÇİM EKRANI -->
-<div id="login-screen" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(120% 90% at 15% -10%, #7A67FF 0%, transparent 55%), radial-gradient(120% 90% at 110% 10%, #C24CE0 0%, transparent 50%), linear-gradient(165deg, #150F3B 0%, #2A1F72 45%, #4B37C4 100%); z-index: 999999; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; padding: 24px; text-align: center; overflow: hidden;">
-
-  <div style="position:absolute; width:280px; height:280px; border-radius:999px; background:#8B7CFF; filter:blur(90px); opacity:0.35; top:-60px; left:-80px;"></div>
-  <div style="position:absolute; width:260px; height:260px; border-radius:999px; background:#10A968; filter:blur(100px); opacity:0.28; bottom:-40px; right:-60px;"></div>
-
-  <div style="position:relative; width: 72px; height: 72px; border-radius: 24px; background: rgba(255,255,255,0.14); display: flex; align-items: center; justify-content: center; margin-bottom: 20px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.25); box-shadow: 0 20px 40px rgba(0,0,0,0.25);">
-    <svg style="width: 36px; height: 36px; fill: #ffffff;" viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm0 3.45l8.15 14.1H3.85L12 5.45zM11 10h2v4h-2zm0 5h2v2h-2z"/></svg>
-  </div>
-  <h2 style="position:relative; font-family: 'Sora', sans-serif; font-size: 23px; font-weight: 800; color: #ffffff; margin: 0; letter-spacing: -0.02em;">Net Kalkanım'a Giriş</h2>
-  <p style="position:relative; color: rgba(255,255,255,0.7); font-size: 13.5px; margin-top: 8px; max-width: 260px;">Uygulamayı kullanmak için bir seçenek belirle</p>
-
-  <button onclick="showLoginFields()" style="position:relative; padding: 15px 32px; font-size: 14.5px; font-weight: 800; background: #ffffff; color: #4B37C4; border: none; border-radius: 16px; cursor: pointer; margin-top: 28px; width: 270px; box-shadow: 0 16px 32px rgba(0,0,0,0.25);">Şifrem Var</button>
-
-  <button onclick="startTrial()" style="position:relative; padding: 15px 32px; font-size: 14.5px; font-weight: 800; background: linear-gradient(135deg, #17C983, #0B8654); color: #ffffff; border: none; border-radius: 16px; cursor: pointer; margin-top: 12px; width: 270px; box-shadow: 0 16px 32px rgba(11, 134, 84, 0.4);">Ücretsiz Dene (20 Soru/Not)</button>
-
-  <a href="https://wa.me/905518224339" target="_blank" style="position:relative; margin-top: 22px; color: #ffffff; text-decoration: none; font-size: 12.5px; font-weight: 700; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25); padding: 9px 18px; border-radius: 999px;">Şifre Satın Al · WhatsApp'tan Ulaş</a>
-
-  <div id="login-fields" style="position:relative; display: none; margin-top: 20px; width: 270px;">
-    <input type="text" id="otp-input" placeholder="Şifren..." style="padding: 14px; width: 100%; font-size: 15px; border: 1px solid rgba(255,255,255,0.3); border-radius: 15px; box-sizing: border-box; background: rgba(255,255,255,0.1); color: #fff; outline: none;"><br>
-    <button onclick="checkPassword()" style="padding: 14px 30px; font-size: 14.5px; font-weight: 800; background-color: #ffffff; color: #4B37C4; border: none; border-radius: 15px; cursor: pointer; margin-top: 12px; width: 100%; box-shadow: 0 14px 28px rgba(0,0,0,0.22);">Giriş Yap</button>
-    <p id="error-msg" style="color: #FFD3DA; font-weight: 700; margin-top: 16px; font-size: 13px;"></p>
+<div id="login-screen" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #ffffff; z-index: 999999; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: sans-serif; box-sizing: border-box; padding: 20px; text-align: center;">
+  <h2>Net Kalkanım'a Giriş</h2>
+  <p>Uygulamayı kullanmak için bir seçenek belirleyin:</p>
+  
+  <button onclick="showLoginFields()" style="padding: 12px 30px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 20px;">Şifrem Var</button>
+  <button onclick="startTrial()" style="padding: 12px 30px; font-size: 16px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px;">Ücretsiz Dene (20 Soru/Not)</button>
+  
+  <a href="https://wa.me/905518224339" target="_blank" style="margin-top: 20px; color: #6c757d; text-decoration: underline; font-size: 14px;">Şifre Satın Al (Whatsapp'tan Ulaş)</a>
+  
+  <div id="login-fields" style="display: none; margin-top: 20px;">
+    <input type="text" id="otp-input" placeholder="Şifreniz..." style="padding: 12px; width: 250px; font-size: 16px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"><br>
+    <button onclick="checkPassword()" style="padding: 12px 30px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px;">Giriş Yap</button>
+    <p id="error-msg" style="color: red; font-weight: bold; margin-top: 20px;"></p>
   </div>
 </div>
 
-    <div class="w-full max-w-md bg-[var(--paper)] h-screen flex flex-col relative overflow-hidden" style="box-shadow: 0 40px 90px -30px rgba(20,18,44,0.4);">
-
-        <!-- HEADER KALDIRILDI, AYARLAR SAĞ ÜSTTE -->
-        <div class="flex justify-end items-center gap-2 px-4 pt-3 pb-1">
-            <button onclick="openCodeModal()" id="btn-code-enter" class="hidden px-3.5 py-2 text-white text-xs font-bold rounded-xl transition-all press-scale" style="background: linear-gradient(135deg, #F4B75A, var(--amber)); box-shadow: 0 8px 16px -6px var(--amber-shadow);">
-                Kodu Gir
-            </button>
-            <button onclick="switchTab('profile')" id="nav-profile" title="Ayarlar" class="p-2 text-[var(--ink-soft)] hover:text-[var(--primary)] hover:bg-[var(--primary-soft)] transition-colors rounded-xl press-scale">
-                <svg style="width:22px;height:22px;" class="fill-current" viewBox="0 0 24 24">
+    <div class="w-full max-w-md bg-slate-50 h-screen flex flex-col relative border-x border-slate-200 shadow-xl overflow-hidden">
+        
+        <!-- HEADER -->
+        <header class="bg-white p-4 flex justify-between items-center border-b border-slate-200 shadow-sm relative z-10 rounded-b-2xl shrink-0">
+            <div class="flex items-center gap-2">
+                <button onclick="openCodeModal()" id="btn-code-enter" class="hidden px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold uppercase rounded-lg shadow-sm transition-colors">
+                    Kodu Gir
+                </button>
+            </div>
+            <button onclick="switchTab('profile')" id="nav-profile" title="Ayarlar" class="p-2 text-slate-400 hover:text-indigo-600 transition-colors rounded-xl">
+                <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
                     <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
                 </svg>
             </button>
-        </div>
+        </header>
 
-        <main class="flex-1 p-4 overflow-y-auto pb-6">
-
-            <div id="home" class="tab-content space-y-5">
-    <div>
-        <h2 class="font-display text-lg font-bold text-[var(--ink)] tracking-tight flex items-center gap-2">
-            <svg class="w-5 h-5 fill-current text-[var(--primary)]" viewBox="0 0 24 24"><path d="M17.65 6.35A7.95 7.95 0 0012 4a8 8 0 100 16 8 8 0 007.94-7h-2.02A6 6 0 1112 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
-            Günlük Tekrar
-        </h2>
-        <p class="text-xs text-[var(--ink-soft)] mt-0.5">Bugün için sıraya giren sorular ve notlar</p>
-    </div>
+        <main class="flex-1 p-5 overflow-y-auto pb-6">
+            
+            <div id="home" class="tab-content space-y-6">
+                <div class="border-l-4 border-indigo-600 bg-white p-4 rounded-r-2xl border border-slate-200 shadow-sm flex items-center gap-2 text-indigo-900">
+                    <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                    <h2 class="text-lg font-bold uppercase">Günlük Tekrar</h2>
+                </div>
 
                 <!-- KIRMIZI KUTU (BÜYÜK) -->
-                <div class="rounded-[28px] p-5 relative overflow-hidden" style="background: var(--red-soft); box-shadow: 0 10px 22px -12px var(--red-shadow);">
-                    <div class="glow-blob" style="width:160px;height:160px;background:#fff;opacity:0.15;top:-60px;right:-40px;"></div>
-                    <div class="flex items-center justify-between mb-1 relative">
-                        <h3 class="flex items-center gap-2 font-bold text-sm" style="color: var(--red-dark);">
-                            <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background: var(--red);"></span>
-                            Kırmızı Kutu
-                        </h3>
-                        <span class="text-xs font-bold px-2.5 py-1 rounded-full bg-white/80 text-[var(--red-dark)]">Bekleyen <span id="red-total-count">0</span></span>
+                <div class="bg-white border-2 border-rose-200 rounded-3xl p-5 shadow-lg relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-2 h-full bg-rose-500"></div>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-rose-600 font-extrabold text-sm uppercase tracking-wider">🔴 Kırmızı Kutu</h3>
+                        <span class="bg-rose-100 text-rose-800 text-xs font-bold px-3 py-1 rounded-full">Bekleyen: <span id="red-total-count">0</span></span>
                     </div>
-                    <p class="text-xs mb-4 relative" style="color: #3A3745;">Bugün halletmen gerekenler</p>
-                    <div class="grid grid-cols-2 gap-3 relative">
-                        <button onclick="startReview('questions')" class="press-scale bg-white hover:bg-white/90 text-[var(--red-dark)] py-4 rounded-2xl font-bold text-sm flex flex-col items-center justify-center gap-1 transition-all shadow-lg">
-                            <span>Soruları Başlat</span>
-                            <span class="text-xs opacity-70 font-semibold">[ <span id="red-question-count">0</span> ]</span>
+                    <p class="text-xs text-slate-500 font-medium mb-3">Bugün halletmen gerekenler</p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="startReview('questions')" class="btn-cyber btn-cyber-red bg-rose-600 hover:bg-rose-700 text-white py-4 rounded-2xl font-bold text-sm flex flex-col items-center justify-center gap-1 shadow-md">
+                            <span>SORULARI BAŞLAT</span>
+                            <span class="text-xs opacity-80">[ <span id="red-question-count">0</span> ]</span>
                         </button>
-                        <button onclick="startReview('notes')" class="press-scale bg-white hover:bg-white/90 text-[var(--red-dark)] py-4 rounded-2xl font-bold text-sm flex flex-col items-center justify-center gap-1 transition-all shadow-lg">
-                            <span>Notları Başlat</span>
-                            <span class="text-xs opacity-70 font-semibold">[ <span id="red-note-count">0</span> ]</span>
+                        <button onclick="startReview('notes')" class="btn-cyber btn-cyber-yellow bg-amber-500 hover:bg-amber-600 text-white py-4 rounded-2xl font-bold text-sm flex flex-col items-center justify-center gap-1 shadow-md">
+                            <span>NOTLARI BAŞLAT</span>
+                            <span class="text-xs opacity-80">[ <span id="red-note-count">0</span> ]</span>
                         </button>
                     </div>
                 </div>
 
                 <!-- SARI VE YEŞİL KUTULAR (YAN YANA) -->
-                <div class="grid grid-cols-2 gap-3">
-                    <button onclick="goToLibraryWithFilter('yellow')" class="press-scale rounded-2xl p-4 text-left transition-all" style="background: var(--amber-soft); box-shadow: 0 10px 22px -12px var(--amber-shadow);">
-    <div class="icon-badge mb-2.5" style="background: var(--amber); box-shadow: 0 6px 14px -6px var(--amber-shadow);">
-        <svg class="w-4.5 h-4.5 fill-white" style="width:18px;height:18px;" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
-    </div>
-    <h3 class="font-bold text-xs mb-1" style="color: var(--amber-dark);">Sarı Kutu</h3>
-    <p class="text-[11px] mb-3" style="color: #3A3745;">Ara sıra bakabilirsin</p>
-    <div class="text-xs font-bold space-y-1">
-        <div style="color: var(--amber-dark);">Soru: <span id="yellow-question-count">0</span></div>
-        <div style="color: var(--amber-dark);">Not: <span id="yellow-note-count">0</span></div>
-    </div>
-</button>
-
-                    <button onclick="goToLibraryWithFilter('green')" class="press-scale rounded-2xl p-4 text-left transition-all" style="background: var(--green-soft); box-shadow: 0 10px 22px -12px var(--green-shadow);">
-                        <div class="icon-badge mb-2.5" style="background: var(--green); box-shadow: 0 6px 14px -6px var(--green-shadow);">
-                            <svg class="w-4.5 h-4.5 fill-white" style="width:18px;height:18px;" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="goToLibraryWithFilter('yellow')" class="bg-white border-2 border-yellow-200 rounded-2xl p-4 shadow-sm hover:bg-yellow-50 transition-colors text-left">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-yellow-600 font-extrabold text-xs uppercase">🟡 Sarı Kutu</h3>
                         </div>
-                        <h3 class="font-bold text-xs mb-1" style="color: var(--green-dark);">Yeşil Kutu</h3>
-                        <p class="text-[11px] mb-3" style="color: #3A3745;">Ustalık, ayda bir göz at</p>
-                        <div class="text-xs font-bold space-y-1">
-                            <div style="color: var(--green-dark);">Soru: <span id="green-question-count">0</span></div>
-                            <div style="color: var(--green-dark);">Not: <span id="green-note-count">0</span></div>
+                        <p class="text-xs text-slate-500 font-medium mb-3">Ara sıra bakabilirsin</p>
+                        <div class="text-xs font-bold text-slate-700 space-y-1">
+                            <div>Soru: <span id="yellow-question-count">0</span></div>
+                            <div>Not: <span id="yellow-note-count">0</span></div>
+                        </div>
+                    </button>
+                    <button onclick="goToLibraryWithFilter('green')" class="bg-white border-2 border-green-200 rounded-2xl p-4 shadow-sm hover:bg-green-50 transition-colors text-left">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-green-600 font-extrabold text-xs uppercase">🟢 Yeşil Kutu</h3>
+                        </div>
+                        <p class="text-xs text-slate-500 font-medium mb-3">Ustalık, ayda bir göz at</p>
+                        <div class="text-xs font-bold text-slate-700 space-y-1">
+                            <div>Soru: <span id="green-question-count">0</span></div>
+                            <div>Not: <span id="green-note-count">0</span></div>
                         </div>
                     </button>
                 </div>
 
-    
+                <div class="space-y-3">
+                    <button onclick="toggleHomeFilters()" type="button" class="w-full bg-white border border-slate-200 p-3.5 rounded-2xl flex justify-between items-center text-xs font-bold text-slate-700 uppercase tracking-wider shadow-sm hover:bg-slate-50 transition-colors">
+                        <span class="flex items-center gap-2">
+                            <svg class="w-4 h-4 fill-current text-indigo-600" viewBox="0 0 24 24"><path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/></svg>
+                            Filtre
+                        </span>
+                        <span id="filter-chevron" class="text-slate-400 transition-transform duration-200">▼</span>
+                    </button>
+                    <div id="home-subject-filters" class="hidden flex flex-col gap-2.5 text-xs"></div>
+                </div>
             </div>
 
-            <div id="add" class="tab-content active space-y-5">
-                <div class="pill-track">
-                    <button type="button" onclick="setEntryType('question')" id="btn-entry-question" class="pill-btn pill-btn-active press-scale">Soru Ekle</button>
-                    <button type="button" onclick="setEntryType('note')" id="btn-entry-note" class="pill-btn press-scale">Not Ekle</button>
+            <div id="add" class="tab-content active space-y-6">
+                <div class="flex gap-3 mb-4 bg-slate-200 p-1.5 rounded-2xl">
+                    <button type="button" onclick="setEntryType('question')" id="btn-entry-question" class="flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold uppercase transition-all rounded-xl">Soru Ekle</button>
+                    <button type="button" onclick="setEntryType('note')" id="btn-entry-note" class="flex-1 text-slate-600 py-2 text-xs font-bold uppercase transition-all hover:text-amber-600 rounded-xl">Not Ekle</button>
                 </div>
 
-                <div id="question-type-toggle-area" class="pill-track">
-                    <button type="button" onclick="setQuestionInputType('image')" id="btn-qinput-image" class="pill-btn pill-btn-active press-scale">Görsel</button>
-                    <button type="button" onclick="setQuestionInputType('text')" id="btn-qinput-text" class="pill-btn press-scale">Yazı</button>
+                <div id="question-type-toggle-area" class="flex gap-3 mb-4 bg-slate-200 p-1.5 rounded-2xl">
+                    <button type="button" onclick="setQuestionInputType('image')" id="btn-qinput-image" class="flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold uppercase transition-all rounded-xl">Görsel</button>
+                    <button type="button" onclick="setQuestionInputType('text')" id="btn-qinput-text" class="flex-1 text-slate-600 py-2 text-xs font-bold uppercase transition-all hover:text-indigo-600 rounded-xl">Yazı</button>
                 </div>
 
                 <div class="space-y-4">
@@ -414,44 +315,44 @@
                     <input type="hidden" id="q-topic" value="">
 
                     <div>
-                        <label class="block text-xs font-bold text-[var(--ink-soft)] mb-2">Ders Seç</label>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Ders Seç</label>
                         <button type="button" id="btn-pick-course" onclick="openPicker('course')"
-                                class="w-full card-elevated p-3.5 text-left flex justify-between items-center text-sm font-semibold text-[var(--ink)] press-scale">
-                            <span id="btn-pick-course-text">Ders Seç</span>
-                            <svg class="w-4 h-4 fill-[var(--ink-soft)]" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+                                class="w-full bg-white p-3.5 border border-slate-300 rounded-xl shadow-sm text-left flex justify-between items-center uppercase text-sm font-semibold text-slate-700 hover:border-indigo-500 transition-colors">
+                            <span id="btn-pick-course-text">Ders Seçiniz</span>
+                            <svg class="w-4 h-4 fill-slate-400" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
                         </button>
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold text-[var(--ink-soft)] mb-2">Konu Seç</label>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Konu Seç</label>
                         <button type="button" id="btn-pick-topic" onclick="openPicker('topic')"
-                                class="w-full card-elevated p-3.5 text-left flex justify-between items-center text-sm font-semibold text-[var(--ink)] press-scale">
-                            <span id="btn-pick-topic-text">Önce Ders Seç</span>
-                            <svg class="w-4 h-4 fill-[var(--ink-soft)]" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+                                class="w-full bg-white p-3.5 border border-slate-300 rounded-xl shadow-sm text-left flex justify-between items-center uppercase text-sm font-semibold text-slate-700 hover:border-amber-500 transition-colors">
+                            <span id="btn-pick-topic-text">Önce Ders Seçin</span>
+                            <svg class="w-4 h-4 fill-slate-400" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
                         </button>
                     </div>
 
                     <div id="image-input-container">
                         <div class="relative w-full">
-                            <div id="upload-placeholder" class="w-full min-h-[11rem] bg-white border-2 border-dashed p-4 flex flex-col items-center justify-center transition-colors rounded-2xl" style="border-color: #D8D2F5;">
-                                <p class="text-xs font-bold text-[var(--ink-soft)] mb-4">Görsel kaynağını seç</p>
+                            <div id="upload-placeholder" class="w-full min-h-[11rem] bg-white border-2 border-dashed border-slate-300 p-4 flex flex-col items-center justify-center transition-colors rounded-2xl shadow-sm">
+                                <p class="text-xs uppercase font-bold tracking-wider text-slate-400 mb-4">Görsel kaynağını seç</p>
                                 <div class="flex gap-3 w-full max-w-[280px]">
-                                    <label class="flex-1 text-white py-3 flex justify-center items-center text-xs font-bold cursor-pointer transition-colors rounded-xl press-scale" style="background: linear-gradient(135deg,#FF6D7F,var(--red)); box-shadow: 0 10px 20px -8px var(--red-shadow);">
-                                        Galeri
+                                    <label class="flex-1 bg-rose-600 hover:bg-rose-700 text-white py-3 flex justify-center items-center text-xs font-bold uppercase cursor-pointer transition-colors rounded-xl shadow-sm">
+                                        GALERİ
                                         <input type="file" id="q-image-gallery" accept="image/*" class="hidden">
                                     </label>
-                                    <label class="flex-1 text-white py-3 flex justify-center items-center text-xs font-bold cursor-pointer transition-colors rounded-xl press-scale" style="background: linear-gradient(135deg,#3FC7DE,var(--cyan)); box-shadow: 0 10px 20px -8px var(--cyan-shadow);">
-                                        Kamera
+                                    <label class="flex-1 bg-cyan-500 hover:bg-cyan-600 text-white py-3 flex justify-center items-center text-xs font-bold uppercase cursor-pointer transition-colors rounded-xl shadow-sm">
+                                        KAMERA
                                         <input type="file" id="q-image-camera" accept="image/*" capture="environment" class="hidden">
                                     </label>
                                 </div>
                             </div>
 
-                            <div id="editor-area" class="hidden flex flex-col items-center bg-white border border-[var(--line)] mt-2 p-3 relative w-full rounded-2xl shadow-sm">
+                            <div id="editor-area" class="hidden flex flex-col items-center bg-white border border-slate-300 mt-2 p-3 relative w-full rounded-2xl shadow-sm">
                                 <div id="cropper-container" class="w-full flex justify-center max-h-64 rounded-xl overflow-hidden">
                                     <img id="image-to-crop" class="max-w-full block">
                                 </div>
-
+                                
                                 <div id="canvas-container" class="w-full hidden relative overflow-auto bg-slate-100 max-h-64 p-2 text-center rounded-xl">
                                     <div id="upload-zoom-wrapper" class="relative inline-block max-w-full transition-transform duration-200 origin-top">
                                         <img id="upload-final-img" class="max-w-full max-h-64 object-contain block pointer-events-none rounded-lg">
@@ -460,134 +361,136 @@
                                 </div>
 
                                 <div class="flex gap-2 w-full mt-3 justify-center flex-wrap">
-                                    <button type="button" id="btn-crop-ok" onclick="finishCrop()" class="text-white px-4 py-2 text-xs font-bold rounded-xl press-scale" style="background: linear-gradient(135deg,#17C983,var(--green)); box-shadow: 0 8px 16px -6px var(--green-shadow);">Kırpmayı Onayla</button>
-
+                                    <button type="button" id="btn-crop-ok" onclick="finishCrop()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 text-xs font-bold uppercase rounded-xl shadow-sm">Kırpmayı Onayla</button>
+                                    
                                     <div id="upload-zoom-ui" class="hidden flex-col items-center gap-2 w-full">
                                         <div class="flex gap-2 justify-center flex-wrap">
-                                            <button type="button" id="btn-up-move" onclick="setUploadDrawMode('move')" class="text-white px-4 py-2 text-xs font-bold rounded-xl border press-scale" style="background: var(--amber); border-color: var(--amber);">Kaydır</button>
-                                            <button type="button" id="btn-up-pen" onclick="setUploadDrawMode('pen')" class="text-white px-4 py-2 text-xs font-bold rounded-xl border press-scale" style="background: var(--primary); border-color: var(--primary);">
+                                            <button type="button" id="btn-up-move" onclick="setUploadDrawMode('move')" class="bg-amber-500 text-white px-4 py-2 text-xs font-bold uppercase rounded-xl border border-amber-500">Kaydır</button>
+                                            <button type="button" id="btn-up-pen" onclick="setUploadDrawMode('pen')" class="bg-indigo-600 text-white px-4 py-2 text-xs font-bold uppercase rounded-xl border border-indigo-600">
                                                 <svg class="w-4 h-4 fill-current inline-block" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
                                             </button>
-                                            <button type="button" id="btn-up-eraser" onclick="setUploadDrawMode('eraser')" class="bg-slate-100 text-[var(--ink-soft)] px-4 py-2 text-xs font-bold rounded-xl border border-[var(--line)] press-scale">
+                                            <button type="button" id="btn-up-eraser" onclick="setUploadDrawMode('eraser')" class="bg-slate-200 text-slate-700 px-4 py-2 text-xs font-bold uppercase rounded-xl border border-slate-300">
                                                 <svg class="w-4 h-4 fill-current inline-block" viewBox="0 0 24 24"><path d="M15.14 3c-.39 0-.75.15-1.03.42L2.34 15.19c-.58.58-.58 1.52 0 2.1l4.37 4.37c.28.28.64.44 1.03.44h11.26c.55 0 1-.45 1-1s-.45-1-1-1h-6.26l7.88-7.88c.58-.58.58-1.52 0-2.1l-4.37-4.37C15.89 3.15 15.53 3 15.14 3zM7.74 20l-3.3-3.3 8.7-8.7 3.3 3.3L7.74 20z"/></svg>
                                             </button>
-                                            <button type="button" id="btn-up-undo" onclick="undoCanvas('upload-canvas')" class="bg-[var(--ink)] text-white px-4 py-2 text-xs font-bold rounded-xl border border-[var(--ink)] press-scale">
+                                            <button type="button" id="btn-up-undo" onclick="undoCanvas('upload-canvas')" class="bg-slate-700 text-white px-4 py-2 text-xs font-bold uppercase rounded-xl border border-slate-700">
                                                 <svg class="w-4 h-4 fill-current inline-block" viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg>
                                             </button>
                                         </div>
                                     </div>
                                 </div>
                                 <div id="upload-pen-sizes" class="hidden flex gap-1 mt-2 justify-center">
-                                    <button type="button" onclick="setUploadPenSize(7)" id="btn-up-size-7" class="px-2.5 py-1.5 inline-flex items-center justify-center text-white border rounded-lg press-scale" style="background: var(--primary); border-color: var(--primary);"><span class="rounded-full bg-current w-[2px] h-[2px]"></span></button>
-                                    <button type="button" onclick="setUploadPenSize(15)" id="btn-up-size-15" class="px-2.5 py-1.5 inline-flex items-center justify-center bg-slate-100 text-[var(--ink-soft)] border border-[var(--line)] rounded-lg press-scale"><span class="rounded-full bg-current w-[4px] h-[4px]"></span></button>
-                                    <button type="button" onclick="setUploadPenSize(25)" id="btn-up-size-25" class="px-2.5 py-1.5 inline-flex items-center justify-center bg-slate-100 text-[var(--ink-soft)] border border-[var(--line)] rounded-lg press-scale"><span class="rounded-full bg-current w-[7px] h-[7px]"></span></button>
-                                    <button type="button" onclick="setUploadPenSize(40)" id="btn-up-size-40" class="px-2.5 py-1.5 inline-flex items-center justify-center bg-slate-100 text-[var(--ink-soft)] border border-[var(--line)] rounded-lg press-scale"><span class="rounded-full bg-current w-[11px] h-[11px]"></span></button>
+                                    <button type="button" onclick="setUploadPenSize(7)" id="btn-up-size-7" class="px-2.5 py-1.5 inline-flex items-center justify-center bg-indigo-600 text-white border border-indigo-600 rounded-lg"><span class="rounded-full bg-current w-[2px] h-[2px]"></span></button>
+                                    <button type="button" onclick="setUploadPenSize(15)" id="btn-up-size-15" class="px-2.5 py-1.5 inline-flex items-center justify-center bg-slate-200 text-slate-600 border border-slate-300 rounded-lg"><span class="rounded-full bg-current w-[4px] h-[4px]"></span></button>
+                                    <button type="button" onclick="setUploadPenSize(25)" id="btn-up-size-25" class="px-2.5 py-1.5 inline-flex items-center justify-center bg-slate-200 text-slate-600 border border-slate-300 rounded-lg"><span class="rounded-full bg-current w-[7px] h-[7px]"></span></button>
+                                    <button type="button" onclick="setUploadPenSize(40)" id="btn-up-size-40" class="px-2.5 py-1.5 inline-flex items-center justify-center bg-slate-200 text-slate-600 border border-slate-300 rounded-lg"><span class="rounded-full bg-current w-[11px] h-[11px]"></span></button>
                                 </div>
-                                <button type="button" id="clear-image-btn" onclick="clearSelectedImage()" class="absolute top-2 right-2 text-white w-8 h-8 flex items-center justify-center text-xs font-bold rounded-full z-10 press-scale" style="background: var(--red); box-shadow: 0 8px 16px -6px var(--red-shadow);">✕</button>
+                                <button type="button" id="clear-image-btn" onclick="clearSelectedImage()" class="absolute top-2 right-2 bg-rose-600 hover:bg-rose-700 text-white w-8 h-8 flex items-center justify-center text-xs font-bold rounded-full z-10 shadow-md">X</button>
                             </div>
                         </div>
                     </div>
 
                     <div id="q-text-question-container" class="hidden">
-                        <label class="block text-xs font-bold text-[var(--primary)] mb-2">Yazılı Soru Kutusu</label>
-                        <textarea id="q-text-question" placeholder="Soru metnini buraya yaz..." class="w-full card-elevated p-3.5 outline-none focus:ring-2 focus:ring-[var(--primary)] text-[var(--ink)] text-sm font-medium h-20 resize-none"></textarea>
+                        <label class="block text-xs font-bold text-indigo-700 uppercase mb-2">Yazılı Soru Kutusu</label>
+                        <textarea id="q-text-question" placeholder="SORU METNİNİ BURAYA YAZINIZ..." class="w-full bg-white p-3.5 border border-slate-300 outline-none focus:border-indigo-600 text-slate-800 text-xs font-semibold h-20 rounded-xl resize-none uppercase tracking-wide shadow-sm"></textarea>
                     </div>
 
                     <!-- YENİ NOT ALANI -->
                     <div>
-                        <label class="block text-xs font-bold text-[var(--ink-soft)] mb-2">Not</label>
-                        <div id="note-type-toggle" class="pill-track hidden">
-                            <button type="button" onclick="setNoteInputType('text')" id="btn-note-type-text" class="pill-btn pill-btn-active press-scale">Metin</button>
-                            <button type="button" onclick="setNoteInputType('image')" id="btn-note-type-image" class="pill-btn press-scale">Görsel</button>
+                        <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Not</label>
+                        <div id="note-type-toggle" class="flex gap-3 mb-2 bg-slate-200 p-1.5 rounded-2xl hidden">
+                            <button type="button" onclick="setNoteInputType('text')" id="btn-note-type-text" class="flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold uppercase transition-all rounded-xl">Metin</button>
+                            <button type="button" onclick="setNoteInputType('image')" id="btn-note-type-image" class="flex-1 text-slate-600 py-2 text-xs font-bold uppercase transition-all hover:text-indigo-600 rounded-xl">Görsel</button>
                         </div>
                         <div id="note-text-area">
-                            <textarea id="q-note" placeholder="Metin gir..." class="w-full card-elevated p-3.5 outline-none focus:ring-2 focus:ring-[var(--primary)] text-[var(--ink)] text-sm font-medium h-20 resize-none"></textarea>
+                            <textarea id="q-note" placeholder="METİN GİR..." class="w-full bg-white p-3.5 border border-slate-300 outline-none focus:border-indigo-600 text-slate-800 text-xs font-semibold h-20 rounded-xl resize-none uppercase tracking-wide shadow-sm"></textarea>
                         </div>
                         <div id="note-image-area" class="hidden">
                             <div class="relative w-full">
-                                <div id="note-upload-placeholder" class="w-full min-h-[8rem] bg-white border-2 border-dashed p-4 flex flex-col items-center justify-center transition-colors rounded-2xl" style="border-color: #D8D2F5;">
-                                    <p class="text-xs font-bold text-[var(--ink-soft)] mb-4">Not Görseli Yükle</p>
+                                <div id="note-upload-placeholder" class="w-full min-h-[8rem] bg-white border-2 border-dashed border-slate-300 p-4 flex flex-col items-center justify-center transition-colors rounded-2xl shadow-sm">
+                                    <p class="text-xs uppercase font-bold tracking-wider text-slate-400 mb-4">Not Görseli Yükle</p>
                                     <div class="flex gap-3 w-full max-w-[280px]">
-                                        <label class="flex-1 text-white py-3 flex justify-center items-center text-xs font-bold cursor-pointer transition-colors rounded-xl press-scale" style="background: linear-gradient(135deg,#FF6D7F,var(--red)); box-shadow: 0 10px 20px -8px var(--red-shadow);">
-                                            Galeri
+                                        <label class="flex-1 bg-rose-600 hover:bg-rose-700 text-white py-3 flex justify-center items-center text-xs font-bold uppercase cursor-pointer transition-colors rounded-xl shadow-sm">
+                                            GALERİ
                                             <input type="file" id="note-image-gallery" accept="image/*" class="hidden">
                                         </label>
-                                        <label class="flex-1 text-white py-3 flex justify-center items-center text-xs font-bold cursor-pointer transition-colors rounded-xl press-scale" style="background: linear-gradient(135deg,#3FC7DE,var(--cyan)); box-shadow: 0 10px 20px -8px var(--cyan-shadow);">
-                                            Kamera
+                                        <label class="flex-1 bg-cyan-500 hover:bg-cyan-600 text-white py-3 flex justify-center items-center text-xs font-bold uppercase cursor-pointer transition-colors rounded-xl shadow-sm">
+                                            KAMERA
                                             <input type="file" id="note-image-camera" accept="image/*" capture="environment" class="hidden">
                                         </label>
                                     </div>
                                 </div>
-                                <div id="note-image-preview-area" class="hidden flex flex-col items-center bg-white border border-[var(--line)] mt-2 p-3 relative w-full rounded-2xl shadow-sm">
+                                <div id="note-image-preview-area" class="hidden flex flex-col items-center bg-white border border-slate-300 mt-2 p-3 relative w-full rounded-2xl shadow-sm">
                                     <img id="note-image-preview" class="max-w-full max-h-48 object-contain rounded-lg" alt="Not Görseli">
-                                    <button type="button" onclick="clearNoteImage()" class="absolute top-2 right-2 text-white w-8 h-8 flex items-center justify-center text-xs font-bold rounded-full z-10 press-scale" style="background: var(--red); box-shadow: 0 8px 16px -6px var(--red-shadow);">✕</button>
+                                    <button type="button" onclick="clearNoteImage()" class="absolute top-2 right-2 bg-rose-600 hover:bg-rose-700 text-white w-8 h-8 flex items-center justify-center text-xs font-bold rounded-full z-10 shadow-md">X</button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div id="question-specific-area" class="space-y-4">
-                        <div class="pill-track">
-                            <button type="button" onclick="setAnsType('choice')" id="btn-type-choice" class="pill-btn pill-btn-active press-scale">Seçenek</button>
-                            <button type="button" onclick="setAnsType('text')" id="btn-type-text" class="pill-btn press-scale">Metin</button>
+                        <div>
+                            <div class="flex gap-3 bg-slate-200 p-1.5 rounded-2xl">
+                                <button type="button" onclick="setAnsType('choice')" id="btn-type-choice" class="flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold uppercase transition-all rounded-xl">Seçenek</button>
+                                <button type="button" onclick="setAnsType('text')" id="btn-type-text" class="flex-1 text-slate-600 py-2 text-xs font-bold uppercase transition-all hover:text-indigo-600 rounded-xl">Metin</button>
+                            </div>
                         </div>
 
                         <div id="ans-choice-area">
-                            <label class="block text-xs font-bold text-[var(--primary)] mb-2">Doğru Cevap</label>
+                            <label class="block text-xs font-bold text-indigo-700 uppercase mb-2">Doğru Cevap</label>
                             <div class="flex justify-between gap-2">
-                                <button type="button" onclick="selectChoice('A')" class="choice-btn w-12 h-12 bg-white border border-[var(--line)] font-bold text-[var(--ink-soft)] hover:border-[var(--primary)] hover:text-[var(--primary)] flex items-center justify-center transition-all rounded-xl shadow-sm press-scale">A</button>
-                                <button type="button" onclick="selectChoice('B')" class="choice-btn w-12 h-12 bg-white border border-[var(--line)] font-bold text-[var(--ink-soft)] hover:border-[var(--primary)] hover:text-[var(--primary)] flex items-center justify-center transition-all rounded-xl shadow-sm press-scale">B</button>
-                                <button type="button" onclick="selectChoice('C')" class="choice-btn w-12 h-12 bg-white border border-[var(--line)] font-bold text-[var(--ink-soft)] hover:border-[var(--primary)] hover:text-[var(--primary)] flex items-center justify-center transition-all rounded-xl shadow-sm press-scale">C</button>
-                                <button type="button" onclick="selectChoice('D')" class="choice-btn w-12 h-12 bg-white border border-[var(--line)] font-bold text-[var(--ink-soft)] hover:border-[var(--primary)] hover:text-[var(--primary)] flex items-center justify-center transition-all rounded-xl shadow-sm press-scale">D</button>
-                                <button type="button" onclick="selectChoice('E')" class="choice-btn w-12 h-12 bg-white border border-[var(--line)] font-bold text-[var(--ink-soft)] hover:border-[var(--primary)] hover:text-[var(--primary)] flex items-center justify-center transition-all rounded-xl shadow-sm press-scale">E</button>
+                                <button type="button" onclick="selectChoice('A')" class="choice-btn w-12 h-12 bg-white border border-slate-300 font-bold text-slate-600 hover:border-indigo-600 hover:text-indigo-600 flex items-center justify-center transition-all rounded-xl shadow-sm">A</button>
+                                <button type="button" onclick="selectChoice('B')" class="choice-btn w-12 h-12 bg-white border border-slate-300 font-bold text-slate-600 hover:border-indigo-600 hover:text-indigo-600 flex items-center justify-center transition-all rounded-xl shadow-sm">B</button>
+                                <button type="button" onclick="selectChoice('C')" class="choice-btn w-12 h-12 bg-white border border-slate-300 font-bold text-slate-600 hover:border-indigo-600 hover:text-indigo-600 flex items-center justify-center transition-all rounded-xl shadow-sm">C</button>
+                                <button type="button" onclick="selectChoice('D')" class="choice-btn w-12 h-12 bg-white border border-slate-300 font-bold text-slate-600 hover:border-indigo-600 hover:text-indigo-600 flex items-center justify-center transition-all rounded-xl shadow-sm">D</button>
+                                <button type="button" onclick="selectChoice('E')" class="choice-btn w-12 h-12 bg-white border border-slate-300 font-bold text-slate-600 hover:border-indigo-600 hover:text-indigo-600 flex items-center justify-center transition-all rounded-xl shadow-sm">E</button>
                             </div>
                         </div>
 
                         <div id="ans-text-area" class="hidden">
-                            <label class="block text-xs font-bold text-[var(--primary)] mb-2">Doğru Cevap</label>
-                            <input type="text" id="q-text-answer" placeholder="Metin gir..." class="w-full card-elevated p-3.5 outline-none focus:ring-2 focus:ring-[var(--primary)] text-[var(--ink)] font-bold placeholder-slate-400 transition-colors">
+                            <label class="block text-xs font-bold text-indigo-700 uppercase mb-2">Doğru Cevap</label>
+                            <input type="text" id="q-text-answer" placeholder="METİN GİR..." class="w-full bg-white p-3.5 border border-slate-300 outline-none focus:border-indigo-600 text-slate-800 uppercase font-bold placeholder-slate-400 transition-colors rounded-xl shadow-sm">
                         </div>
                     </div>
 
-                    <button onclick="saveData()" id="btn-save-data" class="btn-cyber btn-cyber-purple press-scale w-full text-white py-4 font-bold mt-6 rounded-2xl" style="background: linear-gradient(135deg, var(--primary-light), var(--primary)); box-shadow: 0 16px 30px -12px var(--primary-shadow);">Soruyu Kaydet</button>
+                    <button onclick="saveData()" id="btn-save-data" class="btn-cyber btn-cyber-purple w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 font-bold uppercase mt-6 rounded-2xl shadow-md">Soruyu Kaydet</button>
                 </div>
             </div>
 
             <div id="library" class="tab-content space-y-4">
-                <div class="flex justify-between items-center pb-1">
-                    <h2 class="font-display text-lg font-bold text-[var(--ink)] tracking-tight flex items-center gap-2">
-                        <svg class="w-5 h-5 fill-current text-[var(--primary)]" viewBox="0 0 24 24"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM6.24 5h11.52l.83 1H5.41l.83-1zM5 19V8h14v11H5zm11-5.5H8v-2h8v2z"/></svg>
-                        Arşiv &amp; Kamp
+                <div class="flex justify-between items-center border-b border-slate-200 pb-2">
+                    <h2 class="text-xl font-bold text-slate-800 uppercase flex items-center gap-2">
+                        <svg class="w-6 h-6 fill-current text-indigo-600" viewBox="0 0 24 24"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM6.24 5h11.52l.83 1H5.41l.83-1zM5 19V8h14v11H5zm11-5.5H8v-2h8v2z"/></svg>
+                        Arşiv & Kamp
                     </h2>
                 </div>
-
+                
                 <div class="mb-2">
-                    <button id="btn-random-camp" onclick="openCampSetup('questions')" class="w-full py-3.5 font-bold text-xs transition-all flex items-center justify-center gap-2 rounded-2xl text-white press-scale" style="background: linear-gradient(135deg, #F4B75A, var(--amber)); box-shadow: 0 14px 26px -12px var(--amber-shadow);">
+                    <button id="btn-random-camp" onclick="openCampSetup('questions')" class="w-full btn-cyber-yellow bg-amber-50 border border-amber-200 text-amber-600 hover:bg-amber-500 hover:text-white py-2.5 font-bold text-xs uppercase tracking-wider transition-colors flex items-center justify-center gap-2 rounded-xl shadow-sm">
                         Rastgele Kamp
                     </button>
                 </div>
 
-                <div class="pill-track">
-                    <button type="button" onclick="setArchiveDataType('question')" id="btn-arch-type-q" class="pill-btn pill-btn-active press-scale">Sorularım</button>
-                    <button type="button" onclick="setArchiveDataType('note')" id="btn-arch-type-n" class="pill-btn press-scale">Notlarım</button>
+                <div class="flex gap-2 bg-slate-200 p-1.5 rounded-2xl">
+                    <button type="button" onclick="setArchiveDataType('question')" id="btn-arch-type-q" class="flex-1 bg-white text-indigo-600 py-2 text-xs font-bold uppercase shadow-sm transition-all rounded-xl">Sorularım</button>
+                    <button type="button" onclick="setArchiveDataType('note')" id="btn-arch-type-n" class="flex-1 text-slate-600 py-2 text-xs font-bold uppercase transition-all hover:text-amber-600 rounded-xl">Notlarım</button>
                 </div>
 
                 <!-- RENK FİLTRELERİ -->
                 <div id="library-color-filters" class="flex gap-2 mb-2"></div>
 
                 <div class="space-y-3 mb-2">
-                    <button onclick="toggleArchiveFilters()" type="button" class="w-full card-elevated p-3.5 flex justify-between items-center text-xs font-bold text-[var(--ink)] hover:bg-slate-50 transition-colors press-scale">
+                    <button onclick="toggleArchiveFilters()" type="button" class="w-full bg-white border border-slate-200 p-3.5 rounded-2xl flex justify-between items-center text-xs font-bold text-slate-700 uppercase tracking-wider shadow-sm hover:bg-slate-50 transition-colors">
                         <span class="flex items-center gap-2">
-                            <svg class="w-4 h-4 fill-current text-[var(--primary)]" viewBox="0 0 24 24"><path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/></svg>
+                            <svg class="w-4 h-4 fill-current text-indigo-600" viewBox="0 0 24 24"><path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/></svg>
                             Filtre
                         </span>
-                        <span id="arch-filter-chevron" class="text-[var(--ink-soft)] transition-transform duration-200">▼</span>
+                        <span id="arch-filter-chevron" class="text-slate-400 transition-transform duration-200">▼</span>
                     </button>
-
-                    <div id="arch-filters-container" class="hidden card-elevated p-4 space-y-3">
-                        <div class="text-xs font-bold text-[var(--primary)] border-b border-[var(--line)] pb-1">Ders Filtresi (Çoklu)</div>
+                    
+                    <div id="arch-filters-container" class="hidden bg-white border border-slate-200 p-4 rounded-2xl space-y-3 shadow-sm">
+                        <div class="text-xs font-bold text-indigo-600 uppercase tracking-wider border-b border-slate-100 pb-1">Ders Filtresi (Çoklu)</div>
                         <div class="flex flex-wrap gap-1.5" id="arch-course-filters"></div>
-                        <div class="text-xs font-bold text-[var(--amber-dark)] border-b border-[var(--line)] pb-1 mt-2">Konu Filtresi (Çoklu)</div>
+                        <div class="text-xs font-bold text-amber-600 uppercase tracking-wider border-b border-slate-100 pb-1 mt-2">Konu Filtresi (Çoklu)</div>
                         <div class="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto pr-1" id="arch-topic-filters"></div>
                     </div>
                 </div>
@@ -595,206 +498,184 @@
                 <div id="library-list" class="space-y-3"></div>
             </div>
 
-            <div id="profile" class="tab-content space-y-4">
-
-            <div class="card-elevated p-5 space-y-2">
-    <div class="flex items-center gap-2.5 mb-1">
-        <div class="icon-badge" style="background: var(--green-soft);">
-            <svg class="w-4.5 h-4.5" style="width:18px;height:18px;fill:var(--green);" viewBox="0 0 24 24"><path d="M6 2c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6H6zm7 7V3.5L18.5 9H13z"/></svg>
-        </div>
-        <h3 class="font-bold text-xs" style="color: var(--green-dark);">Depolama Kullanımı</h3>
-    </div>
-    <p id="storage-usage-info" class="text-sm font-semibold text-[var(--ink)]"></p>
-    <p class="text-xs text-[var(--ink-soft)]">Fotoğraflarını kaybetmemek için hiçbir veriyi silme.</p>
+            <div id="profile" class="tab-content space-y-6">
+            
+            <div class="bg-white border border-slate-200 p-5 space-y-3 relative overflow-hidden rounded-2xl shadow-sm">
+    <div class="absolute top-0 left-0 w-1.5 h-full bg-emerald-500"></div>
+    <h3 class="font-bold text-xs text-emerald-600 uppercase tracking-wider">Depolama Kullanımı</h3>
+    <p id="storage-usage-info" class="text-sm font-semibold text-slate-700"></p>
+    <p class="text-xs text-slate-400">Fotoğraflarını kaybetmemek için hiçbir veriyi silme.</p>
 </div>
-
-                <div class="card-elevated p-5 space-y-3">
-                    <div class="flex items-center gap-2.5">
-                        <div class="icon-badge" style="background: var(--primary-soft);">
-                            <svg class="w-4.5 h-4.5" style="width:18px;height:18px;fill:var(--primary);" viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
-                        </div>
-                        <h3 class="font-bold text-xs" style="color: var(--primary);">Uygulama Rehberi</h3>
-                    </div>
-                    <button onclick="showOnboarding()" class="w-full py-3 font-bold text-xs rounded-xl transition-colors press-scale" style="background: var(--primary-soft); color: var(--primary);">
+                
+                <div class="bg-white border border-slate-200 p-5 space-y-4 relative overflow-hidden rounded-2xl shadow-sm">
+                    <div class="absolute top-0 left-0 w-1.5 h-full bg-indigo-600"></div>
+                    <h3 class="font-bold text-xs text-indigo-600 uppercase tracking-wider">Uygulama Rehberi</h3>
+                    <button onclick="showOnboarding()" class="w-full bg-indigo-50 border border-indigo-200 text-indigo-600 hover:bg-indigo-600 hover:text-white py-3 font-bold text-xs uppercase rounded-xl transition-colors shadow-sm">
                         Uygulama Tanıtımını Tekrar Gör
                     </button>
                 </div>
 
                 <!-- ALAN DEĞİŞTİRME BÖLÜMÜ (YENİ) -->
-                <div class="card-elevated p-5 space-y-3">
-                    <div class="flex items-center gap-2.5">
-                        <div class="icon-badge" style="background: var(--violet-soft);">
-                            <svg class="w-4.5 h-4.5" style="width:18px;height:18px;fill:var(--violet);" viewBox="0 0 24 24"><path d="M4 4h7v7H4V4zm9 0h7v7h-7V4zM4 13h7v7H4v-7zm9 0h7v7h-7v-7z"/></svg>
+                <div class="bg-white border border-slate-200 p-5 space-y-4 relative overflow-hidden rounded-2xl shadow-sm">
+                    <div class="absolute top-0 left-0 w-1.5 h-full bg-violet-500"></div>
+                    <h3 class="font-bold text-xs text-violet-600 uppercase tracking-wider">Alan Bilgisi</h3>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-bold text-slate-800 uppercase">Mevcut Alan: <span id="current-field-display" class="text-violet-600">-</span></p>
+                            <p class="text-xs text-slate-500 mt-1">Alan değiştirdiğinde ders ve konu listesi güncellenir, mevcut soru/notların silinmez.</p>
                         </div>
-                        <h3 class="font-bold text-xs" style="color: var(--violet);">Alan Bilgisi</h3>
                     </div>
-                    <div>
-                        <p class="text-sm font-bold text-[var(--ink)]">Mevcut Alan: <span id="current-field-display" style="color: var(--violet);">-</span></p>
-                        <p class="text-xs text-[var(--ink-soft)] mt-1">Alan değiştirdiğinde ders ve konu listesi güncellenir, mevcut soru/notların silinmez.</p>
-                    </div>
-                    <button onclick="openFieldChangeModal()" class="w-full text-white py-3 font-bold text-xs rounded-xl transition-colors press-scale" style="background: linear-gradient(135deg,#B36AF0,var(--violet)); box-shadow: 0 10px 20px -8px var(--violet-shadow);">
+                    <button onclick="openFieldChangeModal()" class="w-full bg-violet-600 hover:bg-violet-700 text-white py-3 font-bold text-xs uppercase rounded-xl transition-colors shadow-sm">
                         Alan Değiştir
                     </button>
                 </div>
 
                 <!-- GÜNLÜK LİMİTLER -->
-                <div class="card-elevated p-5 space-y-3">
-                    <div class="flex items-center gap-2.5">
-                        <div class="icon-badge" style="background: var(--cyan-soft);">
-                            <svg class="w-4.5 h-4.5" style="width:18px;height:18px;fill:var(--cyan);" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-6V7h1.5v4.5H17V13z"/></svg>
-                        </div>
-                        <h3 class="font-bold text-xs" style="color: var(--cyan-dark);">Günlük Limitler</h3>
-                    </div>
+                <div class="bg-white border border-slate-200 p-5 space-y-4 relative overflow-hidden rounded-2xl shadow-sm">
+                    <div class="absolute top-0 left-0 w-1.5 h-full bg-cyan-500"></div>
+                    <h3 class="font-bold text-xs text-cyan-600 uppercase tracking-wider">Günlük Limitler</h3>
                     <div class="space-y-3">
                         <div>
-                            <label class="block text-xs font-bold text-[var(--ink-soft)] mb-2">Günlük Kırmızı Kutu Soru Sayısı Limiti (0 = limitsiz)</label>
-                            <input type="number" id="setting-daily-limit-q" class="w-full bg-[var(--paper)] p-3 border border-[var(--line)] font-mono text-center text-[var(--ink)] font-bold outline-none focus:border-[var(--cyan)] transition-colors rounded-xl">
+                            <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Günlük Kırmızı Kutu Soru Sayısı Limiti (0 = limitsiz)</label>
+                            <input type="number" id="setting-daily-limit-q" class="w-full bg-slate-50 p-3 border border-slate-300 font-mono text-center text-slate-700 font-bold outline-none focus:border-cyan-500 transition-colors rounded-xl">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-[var(--ink-soft)] mb-2">Günlük Kırmızı Kutu Not Sayısı Limiti (0 = limitsiz)</label>
-                            <input type="number" id="setting-daily-limit-n" class="w-full bg-[var(--paper)] p-3 border border-[var(--line)] font-mono text-center text-[var(--ink)] font-bold outline-none focus:border-[var(--cyan)] transition-colors rounded-xl">
+                            <label class="block text-xs font-bold text-slate-600 uppercase mb-2">Günlük Kırmızı Kutu Not Sayısı Limiti (0 = limitsiz)</label>
+                            <input type="number" id="setting-daily-limit-n" class="w-full bg-slate-50 p-3 border border-slate-300 font-mono text-center text-slate-700 font-bold outline-none focus:border-cyan-500 transition-colors rounded-xl">
                         </div>
-                        <button onclick="saveDailyLimits()" class="w-full text-white py-3 font-bold text-xs rounded-xl transition-colors press-scale" style="background: linear-gradient(135deg,#3FC7DE,var(--cyan)); box-shadow: 0 10px 20px -8px var(--cyan-shadow);">Limitleri Kaydet</button>
+                        <button onclick="saveDailyLimits()" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-3 font-bold text-xs uppercase rounded-xl transition-colors shadow-sm">Limitleri Kaydet</button>
                     </div>
                 </div>
 
-                <div class="card-elevated p-5 space-y-3">
-                    <div class="flex items-center gap-2.5">
-                        <div class="icon-badge" style="background: var(--primary-soft);">
-                            <svg class="w-4.5 h-4.5" style="width:18px;height:18px;fill:var(--primary);" viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg>
-                        </div>
-                        <h3 class="font-bold text-xs" style="color: var(--primary);">Algoritma Döngüsü (Sorular)</h3>
-                    </div>
-                    <input type="text" id="setting-intervals" class="w-full bg-[var(--paper)] p-3 border border-[var(--line)] font-mono text-center font-bold outline-none focus:border-[var(--primary)] transition-colors rounded-xl" style="color: var(--primary);">
-                    <button onclick="saveIntervals()" class="btn-cyber btn-cyber-purple press-scale w-full text-white py-3 text-xs font-bold rounded-xl" style="background: linear-gradient(135deg, var(--primary-light), var(--primary)); box-shadow: 0 10px 20px -8px var(--primary-shadow);">Geriye Dönük Güncelle</button>
+                <div class="bg-white border border-slate-200 p-5 space-y-4 relative overflow-hidden rounded-2xl shadow-sm">
+                    <div class="absolute top-0 left-0 w-1.5 h-full bg-purple-600"></div>
+                    <h3 class="font-bold text-xs text-purple-600 uppercase tracking-wider">Algoritma Döngüsü (Sorular)</h3>
+                    <input type="text" id="setting-intervals" class="w-full bg-slate-50 p-3 border border-slate-300 font-mono text-center text-purple-700 font-bold outline-none focus:border-purple-500 transition-colors rounded-xl">
+                    <button onclick="saveIntervals()" class="btn-cyber btn-cyber-purple w-full bg-purple-600 hover:bg-purple-700 text-white py-3 text-xs font-bold uppercase rounded-xl shadow-sm">Geriye Dönük Güncelle</button>
                 </div>
 
-                <div class="card-elevated p-5 space-y-3">
-                    <div class="flex items-center gap-2.5">
-                        <div class="icon-badge" style="background: var(--amber-soft);">
-                            <svg class="w-4.5 h-4.5" style="width:18px;height:18px;fill:var(--amber-dark);" viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg>
-                        </div>
-                        <h3 class="font-bold text-xs" style="color: var(--amber-dark);">Algoritma Döngüsü (Notlar)</h3>
-                    </div>
-                    <input type="text" id="setting-note-intervals" class="w-full bg-[var(--paper)] p-3 border border-[var(--line)] font-mono text-center font-bold outline-none focus:border-[var(--amber)] transition-colors rounded-xl" style="color: var(--amber-dark);">
-                    <button onclick="saveNoteIntervals()" class="btn-cyber btn-cyber-yellow press-scale w-full text-white py-3 text-xs font-bold rounded-xl" style="background: linear-gradient(135deg, #F4B75A, var(--amber)); box-shadow: 0 10px 20px -8px var(--amber-shadow);">Geriye Dönük Güncelle</button>
-                </div>
+                <div class="bg-white border border-slate-200 p-5 space-y-4 relative overflow-hidden rounded-2xl shadow-sm">
+                    <div class="absolute top-0 left-0 w-1.5 h-full bg-amber-500"></div>
+                    <h3 class="font-bold text-xs text-amber-600 uppercase tracking-wider">Algoritma Döngüsü (Notlar)</h3>
+                    <input type="text" id="setting-note-intervals" class="w-full bg-slate-50 p-3 border border-slate-300 font-mono text-center text-amber-700 font-bold outline-none focus:border-amber-500 transition-colors rounded-xl">
+                    <button onclick="saveNoteIntervals()" class="btn-cyber btn-cyber-yellow w-full bg-slate-800 hover:bg-slate-900 text-white py-3 text-xs font-bold uppercase rounded-xl shadow-sm">Geriye Dönük Güncelle</button>
+                </div>           
             </div>
 
         </main>
 
         <!-- Soru Modalı -->
-        <div id="review-modal" class="modal-animate absolute inset-0 bg-[var(--paper)] z-50 hidden flex flex-col rounded-none h-full overflow-hidden transition-colors duration-300">
-            <div class="flex justify-between items-center bg-white px-4 py-3 shrink-0" id="review-header" style="box-shadow: 0 1px 0 var(--line);">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-2.5 h-2.5 rounded-full animate-pulse" style="background: var(--red);"></div>
-                    <span id="review-progress" class="text-xs font-extrabold text-[var(--primary)] tracking-wide">TEST 1/5</span>
+        <div id="review-modal" class="modal-animate absolute inset-0 bg-slate-50 z-50 hidden flex flex-col rounded-none h-full overflow-hidden transition-colors duration-300">
+            <div class="flex justify-between items-center bg-white px-4 py-3 border-b border-indigo-100 shadow-sm shrink-0" id="review-header">
+                <div class="flex items-center gap-3">
+                    <div class="w-2.5 h-2.5 bg-rose-500 rounded-full animate-pulse"></div>
+                    <span id="review-progress" class="text-xs font-extrabold text-indigo-600 tracking-wider uppercase">TEST 1/5</span>
                 </div>
                 <div class="flex items-center gap-4">
-                    <button onclick="closeReview()" class="text-[var(--ink-soft)] hover:text-[var(--primary)] transition-colors press-scale"><span class="text-xs font-bold">Kapat</span></button>
+                    <button onclick="closeReview()" class="text-slate-500 hover:text-indigo-600 transition-colors"><span class="text-xs font-bold">KAPAT</span></button>
                 </div>
             </div>
-
-            <div class="flex-1 flex flex-col justify-start items-center p-3 overflow-y-auto gap-2 min-h-0">
-    <div class="text-[11px] text-[var(--ink-soft)] font-bold text-center" id="review-breadcrumbs">MATEMATİK &gt; TÜREV</div>
-
-    <div id="review-question-text" class="w-full bg-white p-2.5 text-xs text-[var(--ink)] font-bold hidden text-center max-h-20 overflow-y-auto rounded-xl shadow-sm shrink-0"></div>
-
-    <div id="review-frame-box" class="relative max-w-full flex-1 min-h-[300px] max-h-[70vh] bg-white w-full rounded-2xl overflow-hidden" style="perspective: 1000px; box-shadow: 0 1px 2px rgba(20,18,44,0.04), 0 16px 32px -16px rgba(20,18,44,0.16);">
+            
+            <div class="flex-1 flex flex-col justify-start items-center p-3 bg-slate-100/50 overflow-y-auto gap-2 min-h-0">
+    <div class="text-[11px] text-slate-500 font-bold uppercase tracking-wider text-center" id="review-breadcrumbs">MATEMATİK > TÜREV</div>
+    
+    <div id="review-question-text" class="w-full bg-white border border-slate-200 p-2.5 text-xs text-slate-800 font-bold uppercase hidden tracking-wide text-center max-h-20 overflow-y-auto rounded-xl shadow-sm shrink-0"></div>
+    
+    <div id="review-frame-box" class="relative max-w-full flex-1 min-h-[300px] max-h-[70vh] border border-slate-200 shadow-md bg-white w-full rounded-xl overflow-hidden" style="perspective: 1000px;">
     <div id="review-flip-inner" class="review-flip-inner">
         <div id="review-flip-front" class="review-flip-face review-flip-front p-1.5 bg-white">
-            <div id="review-unified-board" class="relative w-full h-full" style="min-height: 300px; height: 100%; background: white; border: 2px dashed var(--line); border-radius: 14px;">
+            <div id="review-unified-board" class="relative w-full h-full" style="min-height: 300px; height: 100%; background: white; border: 2px dashed #e2e8f0;">
                 <img id="review-img" src="" onclick="openLightbox(this.src)" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 max-w-[80%] max-h-[80%] object-contain cursor-zoom-in pointer-events-auto rounded-lg">
                 <canvas id="review-draw-canvas" class="absolute top-0 left-0 w-full h-full cursor-crosshair"></canvas>
             </div>
         </div>
         <div id="review-flip-back" class="review-flip-face review-flip-back p-3">
-            <div id="review-note-content" class="w-full text-xs font-semibold tracking-wide" style="color: #8A5A12;"></div>
+            <div id="review-note-content" class="w-full text-xs font-semibold uppercase tracking-wide text-amber-800"></div>
         </div>
     </div>
 </div>
 
     <div id="review-draw-tools" class="flex flex-col gap-1.5 hidden items-center w-full shrink-0">
         <div class="flex gap-1.5 justify-center flex-wrap">
-            <button onclick="setReviewDrawMode('move')" id="rev-btn-move" class="text-white px-3 py-1 text-xs font-bold rounded-xl border press-scale" style="background: var(--amber); border-color: var(--amber);">Kaydır</button>
-            <button onclick="setReviewDrawMode('pen')" id="rev-btn-pen" class="text-white px-3 py-1 text-xs font-bold rounded-xl border press-scale" style="background: var(--primary); border-color: var(--primary);">
+            <button onclick="setReviewDrawMode('move')" id="rev-btn-move" class="bg-amber-500 text-white px-3 py-1 text-xs font-bold uppercase rounded-xl border border-amber-500 shadow-sm">Kaydır</button>
+            <button onclick="setReviewDrawMode('pen')" id="rev-btn-pen" class="bg-indigo-600 text-white px-3 py-1 text-xs font-bold uppercase rounded-xl border border-indigo-600 shadow-sm">
                 <svg class="w-3.5 h-3.5 fill-current inline-block" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
             </button>
-            <button onclick="setReviewDrawMode('eraser')" id="rev-btn-eraser" class="bg-slate-100 text-[var(--ink-soft)] px-3 py-1 text-xs font-bold rounded-xl border border-[var(--line)] press-scale">
+            <button onclick="setReviewDrawMode('eraser')" id="rev-btn-eraser" class="bg-slate-200 text-slate-700 px-3 py-1 text-xs font-bold uppercase rounded-xl border border-slate-300 shadow-sm">
                 <svg class="w-3.5 h-3.5 fill-current inline-block" viewBox="0 0 24 24"><path d="M15.14 3c-.39 0-.75.15-1.03.42L2.34 15.19c-.58.58-.58 1.52 0 2.1l4.37 4.37c.28.28.64.44 1.03.44h11.26c.55 0 1-.45 1-1s-.45-1-1-1h-6.26l7.88-7.88c.58-.58.58-1.52 0-2.1l-4.37-4.37C15.89 3.15 15.53 3 15.14 3zM7.74 20l-3.3-3.3 8.7-8.7 3.3 3.3L7.74 20z"/></svg>
             </button>
-            <button onclick="undoActiveReviewCanvas()" class="bg-[var(--ink)] text-white px-3 py-1 text-xs font-bold rounded-xl border border-[var(--ink)] press-scale">
+            <button onclick="undoActiveReviewCanvas()" class="bg-slate-700 text-white px-3 py-1 text-xs font-bold uppercase rounded-xl border border-slate-700 shadow-sm">
                 <svg class="w-3.5 h-3.5 fill-current inline-block" viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg>
             </button>
-            <button onclick="clearReviewCanvas()" class="text-white px-3 py-1 text-xs font-bold rounded-xl border press-scale" style="background: var(--red); border-color: var(--red);">Temizle</button>
+            <button onclick="clearReviewCanvas()" class="bg-rose-500 text-white px-3 py-1 text-xs font-bold uppercase rounded-xl border border-rose-500 shadow-sm">Temizle</button>
         </div>
         <div id="review-pen-sizes" class="hidden flex gap-1 justify-center">
-            <button type="button" onclick="setReviewPenSize(2)" id="btn-rev-size-2" class="px-2 py-0.5 inline-flex items-center justify-center text-white border rounded-lg press-scale" style="background: var(--primary); border-color: var(--primary);"><span class="rounded-full bg-current w-[2px] h-[2px]"></span></button>
-            <button type="button" onclick="setReviewPenSize(4)" id="btn-rev-size-4" class="px-2 py-0.5 inline-flex items-center justify-center bg-slate-100 text-[var(--ink-soft)] border border-[var(--line)] rounded-lg press-scale"><span class="rounded-full bg-current w-[4px] h-[4px]"></span></button>
-            <button type="button" onclick="setReviewPenSize(7)" id="btn-rev-size-7" class="px-2 py-0.5 inline-flex items-center justify-center bg-slate-100 text-[var(--ink-soft)] border border-[var(--line)] rounded-lg press-scale"><span class="rounded-full bg-current w-[7px] h-[7px]"></span></button>
-            <button type="button" onclick="setReviewPenSize(12)" id="btn-rev-size-12" class="px-2 py-0.5 inline-flex items-center justify-center bg-slate-100 text-[var(--ink-soft)] border border-[var(--line)] rounded-lg press-scale"><span class="rounded-full bg-current w-[12px] h-[12px]"></span></button>
+            <button type="button" onclick="setReviewPenSize(2)" id="btn-rev-size-2" class="px-2 py-0.5 inline-flex items-center justify-center bg-indigo-600 text-white border border-indigo-600 rounded-lg"><span class="rounded-full bg-current w-[2px] h-[2px]"></span></button>
+            <button type="button" onclick="setReviewPenSize(4)" id="btn-rev-size-4" class="px-2 py-0.5 inline-flex items-center justify-center bg-slate-200 text-slate-600 border border-slate-300 rounded-lg"><span class="rounded-full bg-current w-[4px] h-[4px]"></span></button>
+            <button type="button" onclick="setReviewPenSize(7)" id="btn-rev-size-7" class="px-2 py-0.5 inline-flex items-center justify-center bg-slate-200 text-slate-600 border border-slate-300 rounded-lg"><span class="rounded-full bg-current w-[7px] h-[7px]"></span></button>
+            <button type="button" onclick="setReviewPenSize(12)" id="btn-rev-size-12" class="px-2 py-0.5 inline-flex items-center justify-center bg-slate-200 text-slate-600 border border-slate-300 rounded-lg"><span class="rounded-full bg-current w-[12px] h-[12px]"></span></button>
         </div>
     </div>
 
     <div id="review-feedback-box" class="w-full p-3 text-xs font-extrabold text-center rounded-xl hidden transition-colors shadow-sm shrink-0"></div>
 
     <div id="review-note-toggle-container" class="w-full flex justify-center shrink-0">
-        <button id="review-note-toggle-btn" onclick="toggleReviewNote()" class="border px-4 py-2 rounded-xl text-xs font-bold shadow-sm hidden press-scale" style="background: var(--amber-soft); color: #8A5A12; border-color: #F1DFB4;">Notu Göster</button>
+        <button id="review-note-toggle-btn" onclick="toggleReviewNote()" class="bg-amber-100 text-amber-800 border border-amber-300 px-4 py-2 rounded-xl text-xs font-bold uppercase shadow-sm hidden">Notu Göster</button>
     </div>
-    <div id="review-note-box" class="w-full p-2.5 text-xs font-semibold hidden overflow-y-auto max-h-40 rounded-xl text-center shadow-sm shrink-0" style="background: var(--amber-soft); border: 1px solid #F1DFB4; color: #8A5A12;"></div>
+    <div id="review-note-box" class="w-full bg-amber-50 border border-amber-200 p-2.5 text-xs text-amber-800 font-semibold uppercase hidden tracking-wide overflow-y-auto max-h-40 rounded-xl text-center shadow-sm shrink-0"></div>
 </div>
 
-            <div class="bg-white p-3 shrink-0 space-y-3" style="box-shadow: 0 -1px 0 var(--line);">
+            <div class="bg-white p-3 border-t border-slate-200 shrink-0 space-y-3">
                 <div id="review-choice-input" class="flex justify-center gap-2 hidden">
-                    <button id="choice-btn-A" onclick="submitQuestionAnswer('A')" class="w-11 h-11 bg-[var(--paper)] border border-[var(--line)] hover:bg-[var(--primary)] hover:border-[var(--primary)] hover:text-white font-extrabold text-base transition-all rounded-xl shadow-sm press-scale">A</button>
-                    <button id="choice-btn-B" onclick="submitQuestionAnswer('B')" class="w-11 h-11 bg-[var(--paper)] border border-[var(--line)] hover:bg-[var(--primary)] hover:border-[var(--primary)] hover:text-white font-extrabold text-base transition-all rounded-xl shadow-sm press-scale">B</button>
-                    <button id="choice-btn-C" onclick="submitQuestionAnswer('C')" class="w-11 h-11 bg-[var(--paper)] border border-[var(--line)] hover:bg-[var(--primary)] hover:border-[var(--primary)] hover:text-white font-extrabold text-base transition-all rounded-xl shadow-sm press-scale">C</button>
-                    <button id="choice-btn-D" onclick="submitQuestionAnswer('D')" class="w-11 h-11 bg-[var(--paper)] border border-[var(--line)] hover:bg-[var(--primary)] hover:border-[var(--primary)] hover:text-white font-extrabold text-base transition-all rounded-xl shadow-sm press-scale">D</button>
-                    <button id="choice-btn-E" onclick="submitQuestionAnswer('E')" class="w-11 h-11 bg-[var(--paper)] border border-[var(--line)] hover:bg-[var(--primary)] hover:border-[var(--primary)] hover:text-white font-extrabold text-base transition-all rounded-xl shadow-sm press-scale">E</button>
+                    <button id="choice-btn-A" onclick="submitQuestionAnswer('A')" class="w-11 h-11 bg-slate-50 border border-slate-300 hover:bg-indigo-600 hover:border-indigo-600 hover:text-white font-extrabold text-base transition-all rounded-xl shadow-sm">A</button>
+                    <button id="choice-btn-B" onclick="submitQuestionAnswer('B')" class="w-11 h-11 bg-slate-50 border border-slate-300 hover:bg-indigo-600 hover:border-indigo-600 hover:text-white font-extrabold text-base transition-all rounded-xl shadow-sm">B</button>
+                    <button id="choice-btn-C" onclick="submitQuestionAnswer('C')" class="w-11 h-11 bg-slate-50 border border-slate-300 hover:bg-indigo-600 hover:border-indigo-600 hover:text-white font-extrabold text-base transition-all rounded-xl shadow-sm">C</button>
+                    <button id="choice-btn-D" onclick="submitQuestionAnswer('D')" class="w-11 h-11 bg-slate-50 border border-slate-300 hover:bg-indigo-600 hover:border-indigo-600 hover:text-white font-extrabold text-base transition-all rounded-xl shadow-sm">D</button>
+                    <button id="choice-btn-E" onclick="submitQuestionAnswer('E')" class="w-11 h-11 bg-slate-50 border border-slate-300 hover:bg-indigo-600 hover:border-indigo-600 hover:text-white font-extrabold text-base transition-all rounded-xl shadow-sm">E</button>
                 </div>
                 <div id="review-text-input" class="flex gap-2 hidden">
-                    <input type="text" id="review-text-val" placeholder="Metin gir..." class="flex-1 bg-[var(--paper)] p-3 border border-[var(--line)] outline-none focus:border-[var(--primary)] text-[var(--ink)] font-bold tracking-wide transition-colors rounded-xl shadow-sm text-xs">
-                    <button onclick="submitQuestionAnswer(document.getElementById('review-text-val').value)" class="text-white px-5 font-bold transition-colors rounded-xl text-xs press-scale" style="background: var(--primary); box-shadow: 0 8px 16px -6px var(--primary-shadow);">İlet</button>
+                    <input type="text" id="review-text-val" placeholder="METİN GİR..." class="flex-1 bg-slate-50 p-3 border border-slate-300 outline-none focus:border-indigo-600 text-slate-800 font-bold uppercase tracking-wider transition-colors rounded-xl shadow-sm text-xs">
+                    <button onclick="submitQuestionAnswer(document.getElementById('review-text-val').value)" class="bg-indigo-600 text-white px-5 font-bold uppercase hover:bg-indigo-700 transition-colors rounded-xl shadow-sm text-xs">İlet</button>
                 </div>
                 <div id="review-nav-arrows" class="flex justify-between items-center w-full px-1 py-1 gap-3 shrink-0" style="z-index: 20; position: relative;">
-        <button type="button" onclick="navigateReview(-1)" id="btn-rev-prev" class="flex-1 bg-white hover:bg-slate-50 border border-[var(--line)] text-[var(--ink)] py-2.5 px-3 text-xs font-extrabold rounded-xl shadow-sm transition-colors flex items-center justify-center gap-2 press-scale">
+        <button type="button" onclick="navigateReview(-1)" id="btn-rev-prev" class="flex-1 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 py-2.5 px-3 text-xs font-extrabold rounded-xl shadow-sm transition-colors flex items-center justify-center gap-2">
             <span>◄</span> <span>Önceki</span>
         </button>
-        <button type="button" onclick="navigateReview(1)" id="btn-rev-next" class="flex-1 bg-white hover:bg-slate-50 border border-[var(--line)] text-[var(--ink)] py-2.5 px-3 text-xs font-extrabold rounded-xl shadow-sm transition-colors flex items-center justify-center gap-2 press-scale">
+        <button type="button" onclick="navigateReview(1)" id="btn-rev-next" class="flex-1 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 py-2.5 px-3 text-xs font-extrabold rounded-xl shadow-sm transition-colors flex items-center justify-center gap-2">
             <span>Sonraki</span> <span>►</span>
         </button>
     </div>
                 <div id="review-recall-input" class="invisible w-full mt-3" style="min-height: 52px; z-index: 20; position: relative;">
                     <div class="flex gap-2 justify-center">
-                        <button type="button" id="recall-btn-forgot" onclick="submitRecallStatus('forgot')" class="flex-1 py-3 font-bold text-xs rounded-xl border-2 transition-all text-white press-scale" style="background: linear-gradient(135deg,#FF6D7F,var(--red)); border-color: var(--red); box-shadow: 0 10px 20px -8px var(--red-shadow);">Unuttum</button>
-                        <button type="button" id="recall-btn-partial" onclick="submitRecallStatus('partial')" class="flex-1 py-3 font-bold text-xs rounded-xl border-2 transition-all text-white press-scale" style="background: linear-gradient(135deg,#F4B75A,var(--amber)); border-color: var(--amber); box-shadow: 0 10px 20px -8px var(--amber-shadow);">Kısmen Hatırladım</button>
-                        <button type="button" id="recall-btn-remembered" onclick="submitRecallStatus('remembered')" class="flex-1 py-3 font-bold text-xs rounded-xl border-2 transition-all text-white press-scale" style="background: linear-gradient(135deg,#17C983,var(--green)); border-color: var(--green); box-shadow: 0 10px 20px -8px var(--green-shadow);">Hatırladım</button>
+                        <button type="button" id="recall-btn-forgot" onclick="submitRecallStatus('forgot')" class="flex-1 py-3 font-bold uppercase text-xs rounded-xl border-2 transition-all bg-rose-600 border-rose-600 text-white hover:bg-rose-700">Unuttum</button>
+                        <button type="button" id="recall-btn-partial" onclick="submitRecallStatus('partial')" class="flex-1 py-3 font-bold uppercase text-xs rounded-xl border-2 transition-all bg-amber-500 border-amber-500 text-white hover:bg-amber-600">Kısmen Hatırladım</button>
+                        <button type="button" id="recall-btn-remembered" onclick="submitRecallStatus('remembered')" class="flex-1 py-3 font-bold uppercase text-xs rounded-xl border-2 transition-all bg-emerald-600 border-emerald-600 text-white hover:bg-emerald-700">Hatırladım</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div id="camp-setup-modal" class="fixed inset-0 bg-[var(--ink)]/50 backdrop-blur-sm z-[70] hidden flex justify-center items-center p-4">
-            <div class="modal-animate bg-white w-full max-w-sm p-6 space-y-5 rounded-3xl" id="camp-modal-box" style="box-shadow: 0 30px 70px -20px rgba(20,18,44,0.4);">
-                <h3 id="camp-title" class="font-display text-[var(--primary)] font-bold text-base text-center border-b border-[var(--line)] pb-3">Kamp Ayarı</h3>
+        <div id="camp-setup-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[70] hidden flex justify-center items-center p-4">
+            <div class="modal-animate bg-white border border-slate-200 w-full max-w-sm p-6 space-y-5 shadow-2xl rounded-3xl" id="camp-modal-box">
+                <h3 id="camp-title" class="text-indigo-600 font-bold text-base uppercase text-center border-b border-indigo-100 pb-3 tracking-wider">Camp Ayarı</h3>
                 <div class="text-center space-y-3">
-                    <p class="text-[var(--ink-soft)] text-xs">Mevcut <span id="camp-total-count" class="font-bold text-[var(--primary)]">0</span> soru bulundu</p>
-                    <label class="block text-xs font-bold text-[var(--ink)] mb-2">Kaç Soru Çözmek İstersin?</label>
-                    <input type="number" id="camp-count-input" min="1" value="5" class="w-full bg-[var(--paper)] p-3.5 border border-[var(--line)] text-center outline-none focus:border-[var(--primary)] text-[var(--ink)] font-bold text-xl transition-colors rounded-2xl shadow-sm">
+                    <p class="text-slate-500 text-xs uppercase tracking-wide">Mevcut <span id="camp-total-count" class="font-bold text-indigo-600">0</span> soru bulundu</p>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-2">Kaç Soru Çözmek İstersin?</label>
+                    <input type="number" id="camp-count-input" min="1" value="5" class="w-full bg-slate-50 p-3.5 border border-slate-300 text-center outline-none focus:border-indigo-600 text-slate-800 font-bold text-xl transition-colors rounded-2xl shadow-sm">
                 </div>
                 <div class="flex gap-3">
-                    <button onclick="closeCampSetup()" class="flex-1 bg-[var(--paper)] text-[var(--ink-soft)] py-3 font-bold hover:bg-slate-100 transition-colors rounded-xl press-scale">İptal</button>
-                    <button id="camp-start-btn" onclick="startCamp()" class="flex-1 text-white py-3 font-bold transition-colors rounded-xl press-scale" style="background: linear-gradient(135deg, var(--primary-light), var(--primary)); box-shadow: 0 10px 20px -8px var(--primary-shadow);">Başlat</button>
+                    <button onclick="closeCampSetup()" class="flex-1 bg-slate-100 border border-slate-300 text-slate-600 py-3 font-bold uppercase hover:bg-slate-200 transition-colors rounded-xl shadow-sm">İptal</button>
+                    <button id="camp-start-btn" onclick="startCamp()" class="flex-1 bg-indigo-600 text-white py-3 font-bold uppercase hover:bg-indigo-700 transition-colors rounded-xl shadow-sm">Başlat</button>
                 </div>
             </div>
         </div>
 
         <!-- Ders/Konu Seçim Penceresi -->
-        <div id="picker-modal" class="modal-animate absolute inset-0 bg-white/70 backdrop-blur-sm z-50 hidden flex flex-col items-center justify-center p-4">
-            <div class="bg-white w-full max-w-xs rounded-3xl p-5 flex flex-col max-h-[70vh]" style="box-shadow: 0 30px 70px -20px rgba(20,18,44,0.4);">
-                <div class="flex justify-between items-center border-b border-[var(--line)] pb-3 mb-3">
-                    <h3 id="picker-title" class="text-[var(--primary)] font-extrabold text-sm tracking-wide">Seçim Yap</h3>
-                    <button onclick="closePicker()" class="text-[var(--ink-soft)] hover:text-[var(--ink)] p-1 press-scale">
+        <div id="picker-modal" class="modal-animate absolute inset-0 bg-slate-100/80 backdrop-blur-sm z-50 hidden flex flex-col items-center justify-center p-4">
+            <div class="bg-white w-full max-w-xs rounded-3xl shadow-2xl p-5 flex flex-col max-h-[70vh]">
+                <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-3">
+                    <h3 id="picker-title" class="text-indigo-700 font-extrabold text-sm uppercase tracking-wider">Seçim Yap</h3>
+                    <button onclick="closePicker()" class="text-slate-400 hover:text-slate-600 p-1">
                         <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
                     </button>
                 </div>
@@ -802,20 +683,20 @@
             </div>
         </div>
 
-        <div id="camp-review-modal" class="modal-animate absolute inset-0 bg-[var(--paper)] z-50 hidden flex flex-col rounded-none">
-            <div class="flex justify-between items-center bg-white p-4" id="camp-header" style="box-shadow: 0 1px 0 var(--line);">
+        <div id="camp-review-modal" class="modal-animate absolute inset-0 bg-slate-50 z-50 hidden flex flex-col rounded-none">
+            <div class="flex justify-between items-center bg-white p-4 border-b border-indigo-100 shadow-sm" id="camp-header">
                 <div class="flex items-center gap-3">
-                    <span id="camp-review-progress" class="text-xs font-extrabold text-[var(--primary)] tracking-wide">KAMP 1/5</span>
+                    <span id="camp-review-progress" class="text-xs font-extrabold text-indigo-600 tracking-wider uppercase">KAMP 1/5</span>
                 </div>
-                <button onclick="closeCamp()" class="text-[var(--ink-soft)] hover:text-[var(--primary)] transition-colors press-scale"><span class="text-xs font-bold">Kapat</span></button>
+                <button onclick="closeCamp()" class="text-slate-500 hover:text-indigo-600 transition-colors"><span class="text-xs font-bold">KAPAT</span></button>
             </div>
-
-            <div class="flex-1 flex flex-col justify-center items-center p-4 overflow-hidden">
-                <div class="text-xs text-[var(--ink-soft)] mb-2 font-bold" id="camp-breadcrumbs">MATEMATİK &gt; TÜREV</div>
-
-                <div id="camp-review-question-text" class="w-full bg-white p-3 mb-3 text-sm text-[var(--ink)] font-bold hidden text-center max-h-24 overflow-y-auto rounded-2xl shadow-sm"></div>
-
-                <div class="relative max-w-full max-h-[60%] bg-white overflow-auto w-full p-2 text-center rounded-2xl" style="box-shadow: 0 1px 2px rgba(20,18,44,0.04), 0 16px 32px -16px rgba(20,18,44,0.16);">
+            
+            <div class="flex-1 flex flex-col justify-center items-center p-4 bg-slate-100/50 overflow-hidden">
+                <div class="text-xs text-slate-500 mb-2 font-bold uppercase tracking-wider" id="camp-breadcrumbs">MATEMATİK > TÜREV</div>
+                
+                <div id="camp-review-question-text" class="w-full bg-white border border-slate-200 p-3 mb-3 text-sm text-slate-800 font-bold uppercase hidden tracking-wide text-center max-h-24 overflow-y-auto rounded-2xl shadow-sm"></div>
+                
+                <div class="relative max-w-full max-h-[60%] border border-slate-200 shadow-xl bg-white overflow-auto w-full p-2 text-center rounded-2xl">
                     <div id="camp-zoom-wrapper" class="relative inline-block max-w-full max-h-full transition-transform duration-200 origin-top">
                         <img id="camp-review-img" src="" onclick="openLightbox(this.src)" class="max-w-full max-h-full object-contain cursor-zoom-in block pointer-events-auto rounded-xl">
                         <canvas id="camp-review-draw-canvas" class="absolute top-0 left-0 w-full h-full pointer-events-none"></canvas>
@@ -824,112 +705,112 @@
 
                 <div id="camp-review-draw-tools" class="flex flex-col gap-2 mt-3 items-center w-full">
                     <div class="flex gap-1.5 justify-center flex-wrap">
-                        <button onclick="setCampReviewDrawMode('move')" id="camp-rev-btn-move" class="text-white px-3 py-1.5 text-xs font-bold rounded-xl border press-scale" style="background: var(--amber); border-color: var(--amber);">Kaydır</button>
-                        <button onclick="setCampReviewDrawMode('pen')" id="camp-rev-btn-pen" class="bg-slate-100 text-[var(--ink-soft)] px-3 py-1.5 text-xs font-bold rounded-xl border border-[var(--line)] press-scale">
+                        <button onclick="setCampReviewDrawMode('move')" id="camp-rev-btn-move" class="bg-amber-500 text-white px-3 py-1.5 text-xs font-bold uppercase rounded-xl border border-amber-500 shadow-sm">Kaydır</button>
+                        <button onclick="setCampReviewDrawMode('pen')" id="camp-rev-btn-pen" class="bg-slate-200 text-slate-700 px-3 py-1.5 text-xs font-bold uppercase rounded-xl border border-slate-300 shadow-sm">
                             <svg class="w-4 h-4 fill-current inline-block" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
                         </button>
-                        <button onclick="setCampReviewDrawMode('eraser')" id="camp-rev-btn-eraser" class="bg-slate-100 text-[var(--ink-soft)] px-3 py-1.5 text-xs font-bold rounded-xl border border-[var(--line)] press-scale">
+                        <button onclick="setCampReviewDrawMode('eraser')" id="camp-rev-btn-eraser" class="bg-slate-200 text-slate-700 px-3 py-1.5 text-xs font-bold uppercase rounded-xl border border-slate-300 shadow-sm">
                             <svg class="w-4 h-4 fill-current inline-block" viewBox="0 0 24 24"><path d="M15.14 3c-.39 0-.75.15-1.03.42L2.34 15.19c-.58.58-.58 1.52 0 2.1l4.37 4.37c.28.28.64.44 1.03.44h11.26c.55 0 1-.45 1-1s-.45-1-1-1h-6.26l7.88-7.88c.58-.58.58-1.52 0-2.1l-4.37-4.37C15.89 3.15 15.53 3 15.14 3zM7.74 20l-3.3-3.3 8.7-8.7 3.3 3.3L7.74 20z"/></svg>
                         </button>
-                        <button onclick="undoCanvas('camp-review-draw-canvas')" class="bg-[var(--ink)] text-white px-3 py-1.5 text-xs font-bold rounded-xl border border-[var(--ink)] press-scale">
+                        <button onclick="undoCanvas('camp-review-draw-canvas')" class="bg-slate-700 text-white px-3 py-1.5 text-xs font-bold uppercase rounded-xl border border-slate-700 shadow-sm">
                             <svg class="w-4 h-4 fill-current inline-block" viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg>
                         </button>
-                        <button onclick="clearCampReviewCanvas()" class="text-white px-3 py-1.5 text-xs font-bold rounded-xl border press-scale" style="background: var(--red); border-color: var(--red);">Temizle</button>
+                        <button onclick="clearCampReviewCanvas()" class="bg-rose-500 text-white px-3 py-1.5 text-xs font-bold uppercase rounded-xl border border-rose-500 shadow-sm">Temizle</button>
                     </div>
                     <div id="camp-pen-sizes" class="hidden flex gap-1 justify-center mt-1">
-                        <button type="button" onclick="setCampPenSize(2)" id="btn-camp-size-2" class="px-2.5 py-1 inline-flex items-center justify-center text-white border rounded-lg press-scale" style="background: var(--primary); border-color: var(--primary);"><span class="rounded-full bg-current w-[2px] h-[2px]"></span></button>
-                        <button type="button" onclick="setCampPenSize(4)" id="btn-camp-size-4" class="px-2.5 py-1 inline-flex items-center justify-center bg-slate-100 text-[var(--ink-soft)] border border-[var(--line)] rounded-lg press-scale"><span class="rounded-full bg-current w-[4px] h-[4px]"></span></button>
-                        <button type="button" onclick="setCampPenSize(7)" id="btn-camp-size-7" class="px-2.5 py-1 inline-flex items-center justify-center bg-slate-100 text-[var(--ink-soft)] border border-[var(--line)] rounded-lg press-scale"><span class="rounded-full bg-current w-[7px] h-[7px]"></span></button>
-                        <button type="button" onclick="setCampPenSize(12)" id="btn-camp-size-12" class="px-2.5 py-1 inline-flex items-center justify-center bg-slate-100 text-[var(--ink-soft)] border border-[var(--line)] rounded-lg press-scale"><span class="rounded-full bg-current w-[12px] h-[12px]"></span></button>
+                        <button type="button" onclick="setCampPenSize(2)" id="btn-camp-size-2" class="px-2.5 py-1 inline-flex items-center justify-center bg-indigo-600 text-white border border-indigo-600 rounded-lg"><span class="rounded-full bg-current w-[2px] h-[2px]"></span></button>
+                        <button type="button" onclick="setCampPenSize(4)" id="btn-camp-size-4" class="px-2.5 py-1 inline-flex items-center justify-center bg-slate-200 text-slate-600 border border-slate-300 rounded-lg"><span class="rounded-full bg-current w-[4px] h-[4px]"></span></button>
+                        <button type="button" onclick="setCampPenSize(7)" id="btn-camp-size-7" class="px-2.5 py-1 inline-flex items-center justify-center bg-slate-200 text-slate-600 border border-slate-300 rounded-lg"><span class="rounded-full bg-current w-[7px] h-[7px]"></span></button>
+                        <button type="button" onclick="setCampPenSize(12)" id="btn-camp-size-12" class="px-2.5 py-1 inline-flex items-center justify-center bg-slate-200 text-slate-600 border border-slate-300 rounded-lg"><span class="rounded-full bg-current w-[12px] h-[12px]"></span></button>
                     </div>
                 </div>
-
-                <div id="camp-review-answer-box" class="w-full p-3.5 mt-3 text-xs font-semibold hidden overflow-y-auto max-h-32 rounded-2xl text-center shadow-sm" style="background: var(--primary-soft); border: 1px solid #DCD7FF; color: var(--primary-dark);"></div>
+                
+                <div id="camp-review-answer-box" class="w-full bg-indigo-50 border border-indigo-100 p-3.5 mt-3 text-xs font-semibold uppercase hidden tracking-wide overflow-y-auto max-h-32 rounded-2xl text-center text-indigo-900 shadow-sm"></div>
             </div>
 
-            <div class="bg-white p-5 flex justify-center gap-4" style="box-shadow: 0 -1px 0 var(--line);">
-                <button id="camp-reveal-btn" onclick="revealCampAnswer()" class="w-full max-w-xs btn-cyber press-scale text-white py-3.5 font-bold text-sm rounded-xl" style="background: linear-gradient(135deg, var(--primary-light), var(--primary)); box-shadow: 0 16px 30px -12px var(--primary-shadow);">Cevabı Gör</button>
-                <button id="camp-next-btn" onclick="nextCampQuestion()" class="w-full max-w-xs btn-cyber hidden press-scale text-white py-3.5 font-bold text-sm rounded-xl" style="background: linear-gradient(135deg,#17C983,var(--green)); box-shadow: 0 16px 30px -12px var(--green-shadow);">Anladım, Geç</button>
+            <div class="bg-white p-5 border-t border-slate-200 flex justify-center gap-4">
+                <button id="camp-reveal-btn" onclick="revealCampAnswer()" class="w-full max-w-xs btn-cyber bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 font-bold text-sm uppercase tracking-wider rounded-2xl shadow-md">Cevabı Gör</button>
+                <button id="camp-next-btn" onclick="nextCampQuestion()" class="w-full max-w-xs btn-cyber hidden bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 font-bold text-sm uppercase tracking-wider rounded-2xl shadow-md">Anladım, Geç</button>
             </div>
         </div>
 
-        <div id="lightbox" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[80] hidden flex justify-center items-center p-4" onclick="closeLightbox()">
-            <button class="absolute top-4 right-4 text-gray-900 text-sm font-bold transition-colors bg-white/90 hover:bg-white px-4 py-2 rounded-full shadow-lg press-scale">✕ Kapat</button>
-            <img id="lightbox-img" src="" class="max-w-full max-h-full object-contain rounded-2xl shadow-2xl">
+        <div id="lightbox" class="fixed inset-0 bg-slate-900/90 z-[80] hidden flex justify-center items-center p-4" onclick="closeLightbox()">
+            <button class="absolute top-4 right-4 text-white hover:text-indigo-300 text-xs font-bold transition-colors bg-slate-800/80 px-4 py-2 rounded-full">KAPAT</button>
+            <img id="lightbox-img" src="" class="max-w-full max-h-full object-contain border border-slate-700 rounded-2xl shadow-2xl">
         </div>
 
         <!-- İLK GİRİŞ TANITIM (ONBOARDING) MODAL -->
-        <div id="onboarding-modal" class="fixed inset-0 bg-[var(--ink)]/80 backdrop-blur-md z-[100] hidden flex justify-center items-center p-4">
-            <div class="modal-animate bg-white w-full max-w-sm p-6 rounded-3xl flex flex-col items-center text-center relative overflow-hidden" style="box-shadow: 0 30px 70px -20px rgba(20,18,44,0.4);">
-
-                <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-4" style="background: linear-gradient(145deg, var(--primary-light), var(--primary)); box-shadow: 0 12px 24px -8px var(--primary-shadow);">
-                    <svg id="onboarding-icon" class="w-8 h-8 fill-white" viewBox="0 0 24 24"></svg>
+        <div id="onboarding-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[100] hidden flex justify-center items-center p-4">
+            <div class="modal-animate bg-white border border-slate-200 w-full max-w-sm p-6 rounded-3xl shadow-2xl flex flex-col items-center text-center relative overflow-hidden">
+                
+                <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mb-4 shadow-inner">
+                    <svg id="onboarding-icon" class="w-8 h-8 fill-current" viewBox="0 0 24 24"></svg>
                 </div>
 
                 <div class="flex gap-2 mb-4">
-                    <div id="dot-step-1" class="w-4 h-1.5 rounded-full transition-all" style="background: var(--primary);"></div>
-                    <div id="dot-step-2" class="w-1.5 h-1.5 rounded-full bg-slate-200 transition-all"></div>
-                    <div id="dot-step-3" class="w-1.5 h-1.5 rounded-full bg-slate-200 transition-all"></div>
-                    <div id="dot-step-4" class="w-1.5 h-1.5 rounded-full bg-slate-200 transition-all"></div>
-                    <div id="dot-step-5" class="w-1.5 h-1.5 rounded-full bg-slate-200 transition-all"></div>
-                    <div id="dot-step-6" class="w-1.5 h-1.5 rounded-full bg-slate-200 transition-all"></div>
-                    <div id="dot-step-7" class="w-1.5 h-1.5 rounded-full bg-slate-200 transition-all"></div>
+                    <div id="dot-step-1" class="w-4 h-1.5 rounded-full bg-indigo-600 transition-all"></div>
+                    <div id="dot-step-2" class="w-1.5 h-1.5 rounded-full bg-slate-300 transition-all"></div>
+                    <div id="dot-step-3" class="w-1.5 h-1.5 rounded-full bg-slate-300 transition-all"></div>
+                    <div id="dot-step-4" class="w-1.5 h-1.5 rounded-full bg-slate-300 transition-all"></div>
+                    <div id="dot-step-5" class="w-1.5 h-1.5 rounded-full bg-slate-300 transition-all"></div>
+                    <div id="dot-step-6" class="w-1.5 h-1.5 rounded-full bg-slate-300 transition-all"></div>
+                    <div id="dot-step-7" class="w-1.5 h-1.5 rounded-full bg-slate-300 transition-all"></div>
                 </div>
 
-                <h3 id="onboarding-title" class="font-display text-[var(--ink)] font-extrabold text-lg tracking-tight mb-2"></h3>
-                <p id="onboarding-desc" class="text-[var(--ink-soft)] text-xs leading-relaxed font-medium mb-5"></p>
+                <h3 id="onboarding-title" class="text-indigo-950 font-extrabold text-lg uppercase tracking-tight mb-2"></h3>
+                <p id="onboarding-desc" class="text-slate-600 text-xs leading-relaxed font-medium mb-5"></p>
 
-                <div id="onboarding-preview" class="w-full bg-[var(--paper)] p-4 rounded-2xl mb-6 text-left"></div>
+                <div id="onboarding-preview" class="w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl mb-6 text-left"></div>
 
                 <div class="w-full flex gap-3">
-                    <button onclick="finishOnboarding()" id="btn-onboarding-skip" class="flex-1 bg-[var(--paper)] hover:bg-slate-100 text-[var(--ink-soft)] py-3.5 font-bold text-xs rounded-xl transition-colors press-scale">Atla</button>
-                    <button id="btn-onboarding-next" onclick="nextOnboardingStep()" class="flex-1 text-white py-3.5 font-bold text-xs rounded-xl transition-all press-scale" style="background: linear-gradient(135deg, var(--primary-light), var(--primary)); box-shadow: 0 12px 24px -10px var(--primary-shadow);">Devam Et</button>
+                    <button onclick="finishOnboarding()" id="btn-onboarding-skip" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-500 py-3.5 font-bold text-xs uppercase rounded-xl transition-colors">Atla</button>
+                    <button id="btn-onboarding-next" onclick="nextOnboardingStep()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 font-bold text-xs uppercase rounded-xl shadow-md transition-all">Devam Et</button>
                 </div>
             </div>
         </div>
-
+        
         <!-- ALAN DEĞİŞTİRME MODALI -->
-        <div id="field-change-modal" class="fixed inset-0 bg-[var(--ink)]/80 backdrop-blur-md z-[95] hidden flex justify-center items-center p-4">
-            <div class="modal-animate bg-white w-full max-w-sm p-6 rounded-3xl flex flex-col items-center text-center relative overflow-hidden" style="box-shadow: 0 30px 70px -20px rgba(20,18,44,0.4);">
-                <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-4" style="background: linear-gradient(145deg,#B36AF0,var(--violet)); box-shadow: 0 12px 24px -8px var(--violet-shadow);">
-                    <svg class="w-8 h-8 fill-white" viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm0 3.45l8.15 14.1H3.85L12 5.45zM11 10h2v4h-2zm0 5h2v2h-2z"/></svg>
+        <div id="field-change-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[95] hidden flex justify-center items-center p-4">
+            <div class="modal-animate bg-white border border-slate-200 w-full max-w-sm p-6 rounded-3xl shadow-2xl flex flex-col items-center text-center relative overflow-hidden">
+                <div class="w-16 h-16 bg-violet-100 text-violet-600 rounded-full flex items-center justify-center mb-4 shadow-inner">
+                    <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm0 3.45l8.15 14.1H3.85L12 5.45zM11 10h2v4h-2zm0 5h2v2h-2z"/></svg>
                 </div>
-                <h3 class="font-display text-[var(--ink)] font-extrabold text-lg tracking-tight mb-2">Alanını Değiştir</h3>
-                <p class="text-[var(--ink-soft)] text-xs leading-relaxed font-medium mb-5">Yeni alanını seç, ders ve konu listen güncellensin.</p>
+                <h3 class="text-violet-950 font-extrabold text-lg uppercase tracking-tight mb-2">Alanını Değiştir</h3>
+                <p class="text-slate-600 text-xs leading-relaxed font-medium mb-5">Yeni alanını seç, ders ve konu listen güncellensin.</p>
                 <div class="grid grid-cols-2 gap-3 w-full">
-                    <button onclick="changeField('SAYISAL')" class="field-btn py-4 font-bold text-sm rounded-xl transition-all press-scale" style="background: var(--violet-soft); color: var(--violet-dark);">Sayısal</button>
-                    <button onclick="changeField('EŞİT AĞIRLIK')" class="field-btn py-4 font-bold text-sm rounded-xl transition-all press-scale" style="background: var(--violet-soft); color: var(--violet-dark);">Eşit Ağırlık</button>
-                    <button onclick="changeField('SÖZEL')" class="field-btn py-4 font-bold text-sm rounded-xl transition-all press-scale" style="background: var(--violet-soft); color: var(--violet-dark);">Sözel</button>
-                    <button onclick="changeField('DİL')" class="field-btn py-4 font-bold text-sm rounded-xl transition-all press-scale" style="background: var(--violet-soft); color: var(--violet-dark);">Dil</button>
+                    <button onclick="changeField('SAYISAL')" class="field-btn bg-violet-50 border border-violet-200 text-violet-700 py-4 font-bold text-sm uppercase rounded-xl hover:bg-violet-600 hover:text-white transition-all shadow-sm">Sayısal</button>
+                    <button onclick="changeField('EŞİT AĞIRLIK')" class="field-btn bg-violet-50 border border-violet-200 text-violet-700 py-4 font-bold text-sm uppercase rounded-xl hover:bg-violet-600 hover:text-white transition-all shadow-sm">Eşit Ağırlık</button>
+                    <button onclick="changeField('SÖZEL')" class="field-btn bg-violet-50 border border-violet-200 text-violet-700 py-4 font-bold text-sm uppercase rounded-xl hover:bg-violet-600 hover:text-white transition-all shadow-sm">Sözel</button>
+                    <button onclick="changeField('DİL')" class="field-btn bg-violet-50 border border-violet-200 text-violet-700 py-4 font-bold text-sm uppercase rounded-xl hover:bg-violet-600 hover:text-white transition-all shadow-sm">Dil</button>
                 </div>
-                <button onclick="closeFieldChangeModal()" class="mt-4 w-full bg-[var(--paper)] hover:bg-slate-100 text-[var(--ink-soft)] py-3 font-bold text-xs rounded-xl transition-colors press-scale">Vazgeç</button>
+                <button onclick="closeFieldChangeModal()" class="mt-4 w-full bg-slate-100 hover:bg-slate-200 text-slate-500 py-3 font-bold text-xs uppercase rounded-xl transition-colors">Vazgeç</button>
             </div>
         </div>
 
         <!-- ANA EKRANA EKLE MODALI -->
-        <div id="install-modal" class="fixed inset-0 bg-[var(--ink)]/80 backdrop-blur-md z-[90] hidden flex justify-center items-center p-4">
-            <div class="modal-animate bg-white w-full max-w-sm p-6 rounded-3xl flex flex-col items-center text-center relative overflow-hidden" style="box-shadow: 0 30px 70px -20px rgba(20,18,44,0.4);">
-
-                <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-4" style="background: linear-gradient(145deg, var(--primary-light), var(--primary)); box-shadow: 0 12px 24px -8px var(--primary-shadow);">
-                    <svg class="w-8 h-8 fill-white" viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm0 3.45l8.15 14.1H3.85L12 5.45zM11 10h2v4h-2zm0 5h2v2h-2z"/></svg>
+        <div id="install-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[90] hidden flex justify-center items-center p-4">
+            <div class="modal-animate bg-white border border-slate-200 w-full max-w-sm p-6 rounded-3xl shadow-2xl flex flex-col items-center text-center relative overflow-hidden">
+                
+                <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mb-4 shadow-inner">
+                    <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm0 3.45l8.15 14.1H3.85L12 5.45zM11 10h2v4h-2zm0 5h2v2h-2z"/></svg>
                 </div>
 
-                <h3 id="install-title" class="font-display text-[var(--ink)] font-extrabold text-lg tracking-tight mb-2">Ana Ekrana Ekle</h3>
-                <p id="install-desc" class="text-[var(--ink-soft)] text-xs leading-relaxed font-medium mb-5">
+                <h3 id="install-title" class="text-indigo-950 font-extrabold text-lg uppercase tracking-tight mb-2">Ana Ekrana Ekle</h3>
+                <p id="install-desc" class="text-slate-600 text-xs leading-relaxed font-medium mb-5">
                     Uygulamayı ana ekranına ekleyerek daha hızlı erişebilirsin.
                 </p>
 
-                <div id="install-preview" class="w-full bg-[var(--paper)] p-4 rounded-2xl mb-6 text-left"></div>
+                <div id="install-preview" class="w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl mb-6 text-left"></div>
 
                 <div class="w-full flex flex-col gap-2">
-                    <button id="btn-install-accept" class="w-full text-white py-3.5 font-bold text-xs rounded-xl transition-all press-scale" style="background: linear-gradient(135deg, var(--primary-light), var(--primary)); box-shadow: 0 12px 24px -10px var(--primary-shadow);">
+                    <button id="btn-install-accept" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 font-bold text-xs uppercase rounded-xl shadow-md transition-all">
                         Ana Ekrana Ekle
                     </button>
                     <div class="flex gap-2">
-                        <button id="btn-install-cancel" class="flex-1 bg-[var(--paper)] hover:bg-slate-100 text-[var(--ink-soft)] py-3 font-bold text-xs rounded-xl transition-colors press-scale">
+                        <button id="btn-install-cancel" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-500 py-3 font-bold text-xs uppercase rounded-xl transition-colors">
                             İptal
                         </button>
-                        <button id="btn-install-never" class="flex-1 py-3 font-bold text-xs rounded-xl transition-colors press-scale" style="background: var(--red-soft); color: var(--red-dark);">
+                        <button id="btn-install-never" class="flex-1 bg-rose-100 hover:bg-rose-200 text-rose-600 py-3 font-bold text-xs uppercase rounded-xl transition-colors">
                             Bir Daha Gösterme
                         </button>
                     </div>
@@ -939,17 +820,17 @@
         </div>
 
         <!-- SABİT ALT NAVİGASYON -->
-        <nav id="bottom-nav" class="bg-white/90 backdrop-blur-xl h-[78px] flex items-center justify-around z-20 shrink-0 relative" style="box-shadow: 0 -12px 30px -18px rgba(20,18,44,0.25), 0 -1px 0 var(--line);">
-            <button onclick="switchTab('home')" class="nav-btn flex-1 h-full flex flex-col items-center justify-center gap-1 text-[var(--ink-soft)] hover:text-[var(--primary)] transition-colors duration-200 press-scale" id="nav-home" title="Günlük Tekrar">
-                <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24"><path d="M17.65 6.35A7.95 7.95 0 0012 4a8 8 0 100 16 8 8 0 007.94-7h-2.02A6 6 0 1112 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+        <nav id="bottom-nav" class="bg-white border-t border-slate-200 h-[76px] flex items-center justify-around z-20 rounded-t-2xl shadow-lg shrink-0 relative">
+            <button onclick="switchTab('home')" class="nav-btn flex-1 h-full flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all duration-300 ease-in-out hover:scale-105 rounded-tl-2xl" id="nav-home" title="Günlük Tekrar">
+                <svg class="w-9 h-9 fill-current" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
             </button>
 
-            <button onclick="switchTab('add')" class="nav-btn flex items-center justify-center text-white w-[68px] h-[68px] rounded-full transition-all duration-300 ease-in-out active:scale-95 -translate-y-6 border-4 border-white shrink-0 z-30 press-scale" id="nav-add" title="Veri Ekle" style="background: linear-gradient(150deg, #8B7CFF 0%, var(--primary) 55%, #4136BE 100%); box-shadow: 0 18px 32px -10px var(--primary-shadow);">
-                <svg class="w-9 h-9 fill-current" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            <button onclick="switchTab('add')" class="nav-btn flex items-center justify-center text-white bg-indigo-600 hover:bg-indigo-700 w-20 h-20 rounded-full shadow-2xl transition-all duration-300 ease-in-out scale-110 active:scale-95 -translate-y-6 border-4 border-indigo-600 ring-4 ring-indigo-100 shrink-0 z-30" id="nav-add" title="Veri Ekle">
+                <svg class="w-12 h-12 fill-current" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
             </button>
 
-            <button onclick="switchTab('library')" class="nav-btn flex-1 h-full flex flex-col items-center justify-center gap-1 text-[var(--ink-soft)] hover:text-[var(--primary)] transition-colors duration-200 press-scale" id="nav-library" title="Arşiv & Kamp">
-                <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM6.24 5h11.52l.83 1H5.41l.83-1zM5 19V8h14v11H5zm11-5.5H8v-2h8v2z"/></svg>
+            <button onclick="switchTab('library')" class="nav-btn flex-1 h-full flex items-center justify-center text-slate-400 hover:text-slate-600 transition-all duration-300 ease-in-out rounded-tr-2xl" id="nav-library" title="Arşiv & Kamp">
+                <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM6.24 5h11.52l.83 1H5.41l.83-1zM5 19V8h14v11H5zm11-5.5H8v-2h8v2z"/></svg>
             </button>
         </nav>
 
@@ -970,26 +851,25 @@
     </div>
 
     <!-- KODU GİR MODAL -->
-    <div id="code-modal" class="fixed inset-0 bg-[var(--ink)]/60 backdrop-blur-sm z-[110] hidden flex justify-center items-center p-4">
-        <div class="modal-animate bg-white w-full max-w-sm p-6 rounded-3xl flex flex-col items-center text-center" style="box-shadow: 0 30px 70px -20px rgba(20,18,44,0.4);">
-            <h3 class="font-display text-[var(--primary)] font-bold text-base mb-3">Tam Sürüme Geç</h3>
-            <p class="text-[var(--ink-soft)] text-xs mb-4">Whatsapp'tan şifre aldıysan buradan gir</p>
-
-            <a href="https://wa.me/905518224339" target="_blank" class="mb-4 px-4 py-2 font-bold text-xs rounded-xl transition-colors press-scale" style="background: var(--amber-soft); color: var(--amber-dark);">
+    <div id="code-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[110] hidden flex justify-center items-center p-4">
+        <div class="modal-animate bg-white border border-slate-200 w-full max-w-sm p-6 rounded-3xl shadow-2xl flex flex-col items-center text-center">
+            <h3 class="text-indigo-600 font-bold text-base uppercase mb-3">Tam Sürüme Geç</h3>
+            <p class="text-slate-500 text-xs uppercase tracking-wide mb-4">Whatsapp'tan şifre aldıysan buradan gir</p>
+            
+            <a href="https://wa.me/905518224339" target="_blank" class="mb-4 px-4 py-2 bg-amber-100 text-amber-700 font-bold text-xs uppercase rounded-xl hover:bg-amber-200 transition-colors">
                 Şifre Satın Al (Whatsapp'tan Ulaş)
             </a>
-
-            <input type="text" id="code-input" placeholder="Şifren..." class="w-full bg-[var(--paper)] p-3.5 border border-[var(--line)] outline-none focus:border-[var(--primary)] text-[var(--ink)] font-bold tracking-wide transition-colors rounded-xl shadow-sm mb-3">
+            
+            <input type="text" id="code-input" placeholder="Şifreniz..." class="w-full bg-slate-50 p-3.5 border border-slate-300 outline-none focus:border-indigo-600 text-slate-800 font-bold uppercase tracking-wider transition-colors rounded-xl shadow-sm mb-3">
             <div class="flex gap-3 w-full">
-                <button onclick="closeCodeModal()" class="flex-1 bg-[var(--paper)] text-[var(--ink-soft)] py-3 font-bold hover:bg-slate-100 transition-colors rounded-xl press-scale">Vazgeç</button>
-                <button onclick="submitCode()" class="flex-1 text-white py-3 font-bold transition-colors rounded-xl press-scale" style="background: linear-gradient(135deg, var(--primary-light), var(--primary)); box-shadow: 0 10px 20px -8px var(--primary-shadow);">Giriş Yap</button>
+                <button onclick="closeCodeModal()" class="flex-1 bg-slate-100 border border-slate-300 text-slate-600 py-3 font-bold uppercase hover:bg-slate-200 transition-colors rounded-xl shadow-sm">Vazgeç</button>
+                <button onclick="submitCode()" class="flex-1 bg-indigo-600 text-white py-3 font-bold uppercase hover:bg-indigo-700 transition-colors rounded-xl shadow-sm">Giriş Yap</button>
             </div>
-            <p id="code-error-msg" style="color: #E0405A; font-weight: bold; margin-top: 10px;"></p>
+            <p id="code-error-msg" style="color: red; font-weight: bold; margin-top: 10px;"></p>
         </div>
     </div>
 
     <script>
-        
 // ==================== HAZIR DERS/KONU LİSTESİ ====================
 const FIELD_DATA = {
     "SAYISAL": {
@@ -2842,7 +2722,7 @@ function openPicker(type) {
     listDiv.innerHTML = '';
 
     if (type === 'course') {
-        title.innerText = 'Ders Seç';
+        title.innerText = 'Ders Seçiniz';
         const courses = Object.keys(appState.categories);
         courses.forEach(course => {
             const btn = document.createElement('button');
@@ -2854,7 +2734,7 @@ function openPicker(type) {
     } else if (type === 'topic') {
         const selectedCourse = document.getElementById('q-course').value;
         if (!selectedCourse) {
-            showToast('Lütfen önce bir ders seç!', true);
+            showToast('Lütfen önce bir ders seçin!', true);
             return;
         }
         title.innerText = `${selectedCourse} › Konu Seç`;
@@ -3774,17 +3654,17 @@ function renderLibrary() {
 
         let pushBtnHTML = '';
         if (activeColorFilter === 'yellow' || activeColorFilter === 'green') {
-            pushBtnHTML = `<button onclick="event.stopPropagation(); pushToEnd('${activeArchiveType}', ${item.id})" class="flex-shrink-0 bg-white/80 hover:bg-white text-slate-700 border border-slate-300 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase shadow-sm transition-colors" title="En sona at">En Alta Gönder</button>`;
+            pushBtnHTML = `<button onclick="event.stopPropagation(); pushToEnd('${activeArchiveType}', ${item.id})" class="bg-white/80 hover:bg-white text-slate-700 border border-slate-300 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase shadow-sm transition-colors" title="En sona at">En Alta Gönder</button>`;
         }
 
         card.innerHTML = `
             <div class="absolute top-0 left-0 w-1.5 h-full ${borderBarColor}"></div>
-            <div class="flex justify-between items-center text-xs font-extrabold text-slate-700">
+            <div class="flex justify-between items-center text-xs font-extrabold text-slate-700 uppercase">
                 <span>${item.course} > ${item.topic}</span>
                 <div class="flex items-center gap-2">
-                    <span class="text-[10px] text-slate-400 font-semibold whitespace-nowrap">${item.createdDate || ''}</span>
+                    <span class="text-[10px] text-slate-400 font-semibold">${item.createdDate || ''}</span>
                     ${pushBtnHTML}
-                    <button onclick="event.stopPropagation(); deleteItem('${activeArchiveType}', ${item.id})" class="flex-shrink-0 text-rose-500 hover:text-rose-700 p-1" title="Sil">
+                    <button onclick="event.stopPropagation(); deleteItem('${activeArchiveType}', ${item.id})" class="text-rose-500 hover:text-rose-700 p-1" title="Sil">
                         <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
                     </button>
                 </div>
