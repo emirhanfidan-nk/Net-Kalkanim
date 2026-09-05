@@ -2575,7 +2575,7 @@ function switchTab(tabId) {
 }
 
 function getEstimatedTime(count) {
-     if (count = 0) return "0 dk";
+     if (count <= 0) return "0 dk";
     else if (count <= 3) return "1 dk";
     else if (count <= 5) return "3 dk";
     else if (count <= 15) return "5 dk";
