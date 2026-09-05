@@ -256,7 +256,10 @@
                     <div class="absolute top-0 left-0 w-2 h-full" style="background-color: #C92B43;"></div>
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="font-semibold text-sm tracking-wider" style="color: #C92B43;">Kırmızı Kutu</h3>
-                        <span class="text-xs font-semibold px-3 py-1 rounded-full" style="background-color: #FDE7EB; color: #C92B43; border: 1px solid #C92B43;">Bekleyen: <span id="red-total-count">0</span></span>
+                        <span class="text-xs font-semibold px-3 py-1 rounded-full" style="background-color: #FDE7EB; color: #C92B43; border: 1px solid #C92B43; display: inline-block; text-align: center;">
+    Bekleyen: <span id="red-total-count">0</span><br>
+    <span id="red-estimated-time" style="font-size: 10px; opacity: 0.9;">tahmini ...</span>
+</span>
                     </div>
                     <p class="text-xs font-medium mb-3" style="color: #3A3745;">Bugün halletmen gerekenler</p>
                     <div class="grid grid-cols-2 gap-3">
@@ -1398,15 +1401,7 @@ window.onload = async function() {
                 }
             });
         }
-        if (appState.archSelectedCourses.length === 0 && Object.keys(appState.categories).length > 0) {
-            appState.archSelectedCourses = Object.keys(appState.categories);
-            appState.archSelectedTopics = [];
-            appState.archSelectedCourses.forEach(c => {
-                if (appState.categories[c]) {
-                    appState.categories[c].forEach(t => appState.archSelectedTopics.push(c + '::' + t));
-                }
-            });
-        }
+        
         
         // Eksik alanları düzelt
         appState.questions.forEach(q => { if(!q.topic) q.topic = "GENEL"; if(!q.text_question) q.text_question = ""; if(!q.sortOrder) q.sortOrder = q.id; });
@@ -1913,13 +1908,7 @@ async function selectFieldAndContinue(field) {
         }
     });
 
-    appState.archSelectedCourses = Object.keys(appState.categories);
-    appState.archSelectedTopics = [];
-    appState.archSelectedCourses.forEach(c => {
-        if (appState.categories[c]) {
-            appState.categories[c].forEach(t => appState.archSelectedTopics.push(c + '::' + t));
-        }
-    });
+    
 
     await saveSettings();
     syncSystemUI();
@@ -2104,8 +2093,8 @@ function selectChoice(val) {
 function finishCrop() {
     if (!cropperInstance) return;
     
-    // Kırpma sonrası maksimum 1600px sınırı
-    const croppedCanvas = cropperInstance.getCroppedCanvas({ maxWidth: 1200, maxHeight: 1200 });
+    // Kırpma sonrası maksimum 1000px sınırı
+    const croppedCanvas = cropperInstance.getCroppedCanvas({ maxWidth: 1000, maxHeight: 1000 });
     
     document.getElementById('cropper-container').classList.add('hidden');
     document.getElementById('canvas-container').classList.remove('hidden');
@@ -2585,6 +2574,19 @@ function switchTab(tabId) {
     if(tabId === 'home') { updateHomeStats(); }
 }
 
+function getEstimatedTime(count) {
+    if (count <= 5) return "3 dk";
+    else if (count <= 15) return "5 dk";
+    else if (count <= 25) return "10 dk";
+    else if (count <= 35) return "15 dk";
+    else if (count <= 45) return "20 dk";
+    else if (count <= 55) return "25 dk";
+    else if (count <= 70) return "30 dk";
+    else if (count <= 100) return "40 dk";
+    else if (count <= 130) return "50 dk";
+    else return "1 saat";
+}
+
 // Güncellenmiş ana ekran istatistikleri
 function updateHomeStats() {
     const todayStr = formatDate(getNowTR());
@@ -2625,6 +2627,7 @@ function updateHomeStats() {
     const totalRed = redQuestions.length + redNotes.length;
 
     document.getElementById('red-total-count').innerText = totalRed;
+    document.getElementById('red-estimated-time').innerText = "Tahmini " + getEstimatedTime(totalRed);
     document.getElementById('red-question-count').innerText = redQuestions.length;
     document.getElementById('red-note-count').innerText = redNotes.length;
 
@@ -3543,10 +3546,15 @@ function renderLibrary() {
     }
 
     let filteredList = (activeArchiveType === 'question') ? appState.questions : appState.notes;
-    filteredList = filteredList.filter(item => 
-        appState.archSelectedCourses.includes(item.course) && 
-        appState.archSelectedTopics.includes(item.course + '::' + item.topic)
-    );
+    // Ders filtresi: hiç ders seçili değilse tüm dersleri göster
+if (appState.archSelectedCourses.length > 0) {
+    filteredList = filteredList.filter(item => appState.archSelectedCourses.includes(item.course));
+}
+
+// Konu filtresi: hiç konu seçili değilse tüm konuları göster
+if (appState.archSelectedTopics.length > 0) {
+    filteredList = filteredList.filter(item => appState.archSelectedTopics.includes(item.course + '::' + item.topic));
+}
 
     if (activeColorFilter !== 'all') {
         filteredList = filteredList.filter(item => getCardColor(item, activeArchiveType) === activeColorFilter);
@@ -3916,13 +3924,7 @@ async function changeField(field) {
         }
     });
 
-    appState.archSelectedCourses = Object.keys(appState.categories);
-    appState.archSelectedTopics = [];
-    appState.archSelectedCourses.forEach(c => {
-        if (appState.categories[c]) {
-            appState.categories[c].forEach(t => appState.archSelectedTopics.push(c + '::' + t));
-        }
-    });
+    
 
     await saveSettings();
     syncSystemUI();
