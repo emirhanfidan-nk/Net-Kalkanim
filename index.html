@@ -2094,13 +2094,13 @@ function finishCrop() {
     if (!cropperInstance) return;
     
     // Kırpma sonrası maksimum 1000px sınırı
-    const croppedCanvas = cropperInstance.getCroppedCanvas({ maxWidth: 1000, maxHeight: 1000 });
+    const croppedCanvas = cropperInstance.getCroppedCanvas({ maxWidth: 1400, maxHeight: 1400 });
     
     document.getElementById('cropper-container').classList.add('hidden');
     document.getElementById('canvas-container').classList.remove('hidden');
     
     const uImg = document.getElementById('upload-final-img');
-    uImg.src = croppedCanvas.toDataURL('image/jpeg', 0.8);
+    uImg.src = croppedCanvas.toDataURL('image/jpeg', 0.85);
     
     const uCanvas = document.getElementById('upload-canvas');
     uCanvas.width = croppedCanvas.width;
