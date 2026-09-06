@@ -684,23 +684,23 @@
             <div class="flex-1 flex flex-col justify-start items-center p-3 bg-slate-100/50 overflow-y-auto gap-2 min-h-0">
     <div class="text-[11px] text-slate-500 font-semibold tracking-wider text-center" id="review-breadcrumbs">MATEMATİK > TÜREV</div>
 
-    <div id="review-question-text" class="w-full bg-white border border-slate-200 p-2.5 text-xs text-slate-800 font-semibold hidden tracking-wide text-center max-h-20 overflow-y-auto rounded-xl shadow-sm shrink-0"></div>
+    <div id="review-question-text" class="w-full bg-white border border-slate-200 p-2.5 text-xs text-slate-800 font-semibold hidden tracking-wide text-center max-h-20 overflow-y-auto rounded-xl shadow-sm shrink-0 whitespace-pre-wrap"></div>
 
     <div id="review-frame-box" class="relative max-w-full flex-1 min-h-[300px] max-h-[70vh] border border-slate-200 shadow-md bg-white w-full rounded-xl overflow-hidden" style="perspective: 1000px;">
     <div id="review-flip-inner" class="review-flip-inner">
         <div id="review-flip-front" class="review-flip-face review-flip-front p-1.5 bg-white">
             <div id="review-unified-board" class="relative w-full h-full" style="min-height: 300px; height: 100%; background: white; border: 2px dashed #e2e8f0;">
                 <img id="review-img" src="" onclick="openLightbox(this.src)" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 max-w-[80%] max-h-[80%] object-contain cursor-zoom-in pointer-events-auto rounded-lg">
-                <div id="review-unified-text" class="hidden absolute inset-0 flex items-center justify-center p-5 text-sm sm:text-base font-semibold leading-relaxed tracking-wide text-slate-800 text-center overflow-y-auto pointer-events-none"></div>
+                <div id="review-unified-text" class="hidden absolute inset-0 flex items-center justify-center p-5 text-sm sm:text-base font-semibold leading-relaxed tracking-wide text-slate-800 text-center overflow-y-auto pointer-events-none whitespace-pre-wrap"></div>
                 <canvas id="review-draw-canvas" class="absolute top-0 left-0 w-full h-full cursor-crosshair"></canvas>
             </div>
             <div id="review-note-front-board" class="hidden w-full h-full flex-col items-center justify-center gap-3 p-5 text-center overflow-y-auto">
                 <img id="review-note-front-img" src="" onclick="openLightbox(this.src)" class="hidden max-w-[90%] max-h-[50%] object-contain cursor-zoom-in rounded-xl shadow-md border border-slate-100">
-                <div id="review-note-front-text" class="w-full max-w-[95%] mx-auto text-sm sm:text-base font-semibold leading-relaxed tracking-wide text-slate-800"></div>
+                <div id="review-note-front-text" class="w-full max-w-[95%] mx-auto text-sm sm:text-base font-semibold leading-relaxed tracking-wide text-slate-800 whitespace-pre-wrap"></div>
             </div>
         </div>
         <div id="review-flip-back" class="review-flip-face review-flip-back p-3">
-            <div id="review-note-content" class="w-full h-full max-w-[95%] mx-auto flex flex-col items-center justify-center gap-1 text-sm sm:text-base font-semibold leading-relaxed tracking-wide text-amber-800 text-center overflow-y-auto"></div>
+            <div id="review-note-content" class="w-full h-full max-w-[95%] mx-auto flex flex-col items-center justify-center gap-1 text-sm sm:text-base font-semibold leading-relaxed tracking-wide text-amber-800 text-center overflow-y-auto whitespace-pre-wrap"></div>
         </div>
     </div>
 </div>
@@ -732,7 +732,7 @@
     <div id="review-note-toggle-container" class="w-full flex justify-center shrink-0">
         <button id="review-note-toggle-btn" onclick="toggleReviewNote()" class="bg-amber-100 text-amber-800 border border-amber-300 px-4 py-2 rounded-xl text-xs font-semibold shadow-sm invisible">Notu Göster</button>
     </div>
-    <div id="review-note-box" class="w-full bg-amber-50 border border-amber-200 p-2.5 text-xs text-amber-800 font-medium hidden tracking-wide overflow-y-auto max-h-40 rounded-xl text-center shadow-sm shrink-0"></div>
+    <div id="review-note-box" class="w-full bg-amber-50 border border-amber-200 p-2.5 text-xs text-amber-800 font-medium hidden tracking-wide overflow-y-auto max-h-40 rounded-xl text-center shadow-sm shrink-0 whitespace-pre-wrap"></div>
 </div>
 
             <div class="bg-white p-3 border-t border-slate-200 shrink-0 space-y-3">
@@ -804,7 +804,7 @@
             <div class="flex-1 flex flex-col justify-center items-center p-4 bg-slate-100/50 overflow-hidden">
                 <div class="text-xs text-slate-500 mb-2 font-semibold tracking-wider" id="camp-breadcrumbs">MATEMATİK > TÜREV</div>
 
-                <div id="camp-review-question-text" class="w-full bg-white border border-slate-200 p-3 mb-3 text-sm text-slate-800 font-semibold hidden tracking-wide text-center max-h-24 overflow-y-auto rounded-2xl shadow-sm"></div>
+                <div id="camp-review-question-text" class="w-full bg-white border border-slate-200 p-3 mb-3 text-sm text-slate-800 font-semibold hidden tracking-wide text-center max-h-24 overflow-y-auto rounded-2xl shadow-sm whitespace-pre-wrap"></div>
 
                 <div class="relative max-w-full max-h-[60%] border border-slate-200 shadow-xl bg-white overflow-auto w-full p-2 text-center rounded-2xl">
                     <div id="camp-zoom-wrapper" class="relative inline-block max-w-full max-h-full transition-transform duration-200 origin-top">
@@ -835,7 +835,7 @@
                     </div>
                 </div>
 
-                <div id="camp-review-answer-box" class="w-full bg-indigo-50 border border-indigo-100 p-3.5 mt-3 text-xs font-medium hidden tracking-wide overflow-y-auto max-h-32 rounded-2xl text-center text-indigo-900 shadow-sm"></div>
+                <div id="camp-review-answer-box" class="w-full bg-indigo-50 border border-indigo-100 p-3.5 mt-3 text-xs font-medium hidden tracking-wide overflow-y-auto max-h-32 rounded-2xl text-center text-indigo-900 shadow-sm whitespace-pre-wrap"></div>
             </div>
 
             <div class="bg-white p-5 border-t border-slate-200 flex justify-center gap-4">
@@ -1958,7 +1958,7 @@ function renderOnboardingStep() {
         btnNext.classList.add('opacity-50', 'cursor-not-allowed');
     } else if (currentOnboardingStep === 2) {
         iconEl.innerHTML = `<path d="M12 2L1 21h22L12 2zm0 3.45l8.15 14.1H3.85L12 5.45zM11 10h2v4h-2zm0 5h2v2h-2z"/>`;
-        titleEl.innerText = "Öğrendiklerini Neden Unutuyorsun?";
+        titleEl.innerText = "Bilgi Neden Kalıcı Olmuyor?";
         descEl.innerText = "Tekrar edilmeyen bilgilerin büyük bölümü kısa sürede unutulur. Net Kalkanım, bu kaybın önüne geçmek için tasarlandı.";
         previewEl.innerHTML = `
             <div class="space-y-3">
@@ -2754,18 +2754,13 @@ function switchTab(tabId) {
 }
 
 function getEstimatedTime(count) {
-     if (count <= 0) return "0 dk";
-    else if (count <= 3) return "1 dk";
-    else if (count <= 5) return "3 dk";
-    else if (count <= 15) return "5 dk";
-    else if (count <= 25) return "10 dk";
-    else if (count <= 35) return "15 dk";
-    else if (count <= 45) return "20 dk";
-    else if (count <= 55) return "25 dk";
-    else if (count <= 70) return "30 dk";
-    else if (count <= 100) return "40 dk";
-    else if (count <= 130) return "50 dk";
-    else return "1 saat";
+    // 0 -> 0dk, 1 -> 1dk, sonrasında 3'erli aralıklar: aralığın bitişinin 2/3'ü kadar dakika.
+    // Örn: 2-3 -> 2dk, 4-6 -> 4dk, 7-9 -> 6dk, 10-12 -> 8dk, ... 100'e kadar bu örüntüyle devam eder.
+    if (count <= 0) return "0 dk";
+    if (count === 1) return "1 dk";
+    const intervalEnd = Math.ceil(count / 3) * 3;
+    const minutes = Math.round(intervalEnd * 2 / 3);
+    return minutes + " dk";
 }
 
 // Güncellenmiş ana ekran istatistikleri
