@@ -186,14 +186,67 @@
             border-radius: 0.75rem;
         }
         #review-flip-back {
-            padding: 8px !important;
+            padding: 12px !important;
         }
         #review-flip-back img {
-            width: 100% !important;
+            max-width: 96% !important;
+            width: auto !important;
             height: auto !important;
-            max-height: 100% !important;
+            max-height: 60% !important;
             object-fit: contain !important;
-            border-radius: 0.5rem;
+            border-radius: 0.75rem;
+            display: block;
+            margin: 0 auto 0.65rem auto !important;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        /* Görsel arka yüzde tek başınaysa (metin eşlik etmiyorsa), kaydırmaya gerek kalmadan
+           uzun kenarı kutunun sınırına kadar büyüsün. */
+        #review-flip-back img:only-child {
+            max-width: 98% !important;
+            max-height: 92% !important;
+            margin: 0 auto !important;
+        }
+        #review-note-front-text img {
+            max-width: 96% !important;
+            width: auto !important;
+            height: auto !important;
+            max-height: 60% !important;
+            object-fit: contain !important;
+            border-radius: 0.75rem;
+            display: block;
+            margin: 0 auto 0.65rem auto !important;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        #review-note-front-text img:only-child {
+            max-width: 98% !important;
+            max-height: 92% !important;
+            margin: 0 auto !important;
+        }
+        .face-section-heading {
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            padding: 0.4rem 0.75rem;
+            border-radius: 0.75rem;
+            margin-top: 0.5rem;
+        }
+        .face-heading-front {
+            color: #4338ca;
+            background: #eef2ff;
+            border: 1px solid #c7d2fe;
+        }
+        .face-heading-back {
+            color: #b45309;
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+        }
+        .archive-back-tag {
+            font-size: 0.6rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            color: #b45309;
         }
     </style>
     <link rel="manifest" href="manifest.json">
@@ -340,10 +393,11 @@
                         </button>
                     </div>
 
+                    <div id="note-front-heading" class="face-section-heading face-heading-front hidden">Ön Yüz / Soru</div>
                     <div id="image-input-container">
                         <div class="relative w-full">
                             <div id="upload-placeholder" class="w-full min-h-[11rem] bg-white border-2 border-dashed border-slate-300 p-4 flex flex-col items-center justify-center transition-colors rounded-2xl shadow-sm">
-                                <p class="text-xs font-semibold tracking-wider text-slate-400 mb-4">Görsel kaynağını seç</p>
+                                <p class="text-xs font-semibold tracking-wider text-slate-400 mb-4">Görsel yükle</p>
                                 <div class="flex gap-3 w-full max-w-[280px]">
                                     <label class="flex-1 bg-rose-600 hover:bg-rose-700 text-white py-3 flex justify-center items-center text-xs font-semibold cursor-pointer transition-colors rounded-xl shadow-sm">
                                         Galeri
@@ -404,7 +458,7 @@
 
                     <!-- YENİ NOT ALANI -->
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-2">Not</label>
+                        <label class="block text-xs font-semibold text-slate-600 mb-2">Çözüm / Not</label>
                         <div id="note-type-toggle" class="flex gap-3 mb-2 bg-slate-200 p-1.5 rounded-2xl hidden">
                             <button type="button" onclick="setNoteInputType('text')" id="btn-note-type-text" class="flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-semibold transition-all rounded-xl">Metin</button>
                             <button type="button" onclick="setNoteInputType('image')" id="btn-note-type-image" class="flex-1 text-slate-600 py-2 text-xs font-semibold transition-all hover:text-indigo-600 rounded-xl">Görsel</button>
@@ -435,11 +489,54 @@
                         </div>
                     </div>
 
+                    <!-- ARKA YÜZ (CEVAP) - OPSİYONEL: sadece bağımsız Not Ekle modunda gösterilir -->
+                    <div id="note-back-section" class="hidden space-y-3">
+                        <div class="face-section-heading face-heading-back">Arka Yüz / Cevap (Opsiyonel)</div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-2">Cevap Metni</label>
+                            <textarea id="q-note-back" placeholder="Cevap metnini gir..." class="w-full bg-white p-3.5 border border-slate-300 outline-none focus:border-amber-500 text-slate-800 text-xs font-medium h-20 rounded-xl resize-none tracking-wide shadow-sm"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-2">Cevap Görseli</label>
+                            <div class="relative w-full">
+                                <div id="note-back-upload-placeholder" class="w-full min-h-[8rem] bg-white border-2 border-dashed border-slate-300 p-4 flex flex-col items-center justify-center transition-colors rounded-2xl shadow-sm">
+                                    <p class="text-xs font-semibold tracking-wider text-slate-400 mb-4">Görsel yükle</p>
+                                    <div class="flex gap-3 w-full max-w-[280px]">
+                                        <label class="flex-1 bg-rose-500 hover:bg-amber-600 text-white py-3 flex justify-center items-center text-xs font-semibold cursor-pointer transition-colors rounded-xl shadow-sm">
+                                            Galeri
+                                            <input type="file" id="note-image-gallery-back" accept="image/*" class="hidden">
+                                        </label>
+                                        <label class="flex-1 bg-cyan-500 hover:bg-cyan-600 text-white py-3 flex justify-center items-center text-xs font-semibold cursor-pointer transition-colors rounded-xl shadow-sm">
+                                            Kamera
+                                            <input type="file" id="note-image-camera-back" accept="image/*" capture="environment" class="hidden">
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div id="note-back-editor-area" class="hidden flex flex-col items-center bg-white border border-slate-300 mt-2 p-3 relative w-full rounded-2xl shadow-sm">
+                                    <div id="note-back-cropper-container" class="w-full flex justify-center max-h-64 rounded-xl overflow-hidden">
+                                        <img id="note-back-image-to-crop" class="max-w-full block">
+                                    </div>
+                                    <div class="flex gap-2 w-full mt-3 justify-center">
+                                        <button type="button" onclick="finishCropBack()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 text-xs font-semibold rounded-xl shadow-sm">Kırpmayı Onayla</button>
+                                    </div>
+                                </div>
+
+                                <div id="note-back-image-preview-area" class="hidden flex flex-col items-center bg-white border border-slate-300 mt-2 p-3 relative w-full rounded-2xl shadow-sm">
+                                    <img id="note-back-image-preview" class="max-w-full max-h-48 object-contain rounded-lg" alt="Cevap Görseli">
+                                    <button type="button" onclick="clearBackImage()" class="absolute top-2 right-2 bg-rose-600 hover:bg-rose-700 text-white w-8 h-8 flex items-center justify-center text-xs font-semibold rounded-full z-10 shadow-md">X</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div id="question-specific-area" class="space-y-4">
                         <div>
                             <div class="flex gap-3 bg-slate-200 p-1.5 rounded-2xl">
-                                <button type="button" onclick="setAnsType('choice')" id="btn-type-choice" class="flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-semibold transition-all rounded-xl">SEÇENEK</button>
-                                <button type="button" onclick="setAnsType('text')" id="btn-type-text" class="flex-1 text-slate-600 py-2 text-xs font-semibold transition-all hover:text-indigo-600 rounded-xl">METİN</button>
+                                <button type="button" onclick="setAnsType('choice')" id="btn-type-choice" class="flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-semibold transition-all rounded-xl">Seçenek</button>
+                                <button type="button" onclick="setAnsType('text')" id="btn-type-text" class="flex-1 text-slate-600 py-2 text-xs font-semibold transition-all hover:text-indigo-600 rounded-xl">Metin</button>
                             </div>
                         </div>
 
@@ -594,11 +691,16 @@
         <div id="review-flip-front" class="review-flip-face review-flip-front p-1.5 bg-white">
             <div id="review-unified-board" class="relative w-full h-full" style="min-height: 300px; height: 100%; background: white; border: 2px dashed #e2e8f0;">
                 <img id="review-img" src="" onclick="openLightbox(this.src)" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 max-w-[80%] max-h-[80%] object-contain cursor-zoom-in pointer-events-auto rounded-lg">
+                <div id="review-unified-text" class="hidden absolute inset-0 flex items-center justify-center p-5 text-sm sm:text-base font-semibold leading-relaxed tracking-wide text-slate-800 text-center overflow-y-auto pointer-events-none"></div>
                 <canvas id="review-draw-canvas" class="absolute top-0 left-0 w-full h-full cursor-crosshair"></canvas>
+            </div>
+            <div id="review-note-front-board" class="hidden w-full h-full flex-col items-center justify-center gap-3 p-5 text-center overflow-y-auto">
+                <img id="review-note-front-img" src="" onclick="openLightbox(this.src)" class="hidden max-w-[90%] max-h-[50%] object-contain cursor-zoom-in rounded-xl shadow-md border border-slate-100">
+                <div id="review-note-front-text" class="w-full max-w-[95%] mx-auto text-sm sm:text-base font-semibold leading-relaxed tracking-wide text-slate-800"></div>
             </div>
         </div>
         <div id="review-flip-back" class="review-flip-face review-flip-back p-3">
-            <div id="review-note-content" class="w-full text-xs font-medium tracking-wide text-amber-800"></div>
+            <div id="review-note-content" class="w-full h-full max-w-[95%] mx-auto flex flex-col items-center justify-center gap-1 text-sm sm:text-base font-semibold leading-relaxed tracking-wide text-amber-800 text-center overflow-y-auto"></div>
         </div>
     </div>
 </div>
@@ -617,7 +719,7 @@
             </button>
             <button onclick="clearReviewCanvas()" class="bg-rose-500 text-white px-3 py-1 text-xs font-semibold rounded-xl border border-rose-500 shadow-sm">Temizle</button>
         </div>
-        <div id="review-pen-sizes" class="hidden flex gap-1 justify-center">
+        <div id="review-pen-sizes" class="invisible flex gap-1 justify-center">
             <button type="button" onclick="setReviewPenSize(2)" id="btn-rev-size-2" class="px-2 py-0.5 inline-flex items-center justify-center bg-indigo-600 text-white border border-indigo-600 rounded-lg"><span class="rounded-full bg-current w-[2px] h-[2px]"></span></button>
             <button type="button" onclick="setReviewPenSize(4)" id="btn-rev-size-4" class="px-2 py-0.5 inline-flex items-center justify-center bg-slate-200 text-slate-600 border border-slate-300 rounded-lg"><span class="rounded-full bg-current w-[4px] h-[4px]"></span></button>
             <button type="button" onclick="setReviewPenSize(7)" id="btn-rev-size-7" class="px-2 py-0.5 inline-flex items-center justify-center bg-slate-200 text-slate-600 border border-slate-300 rounded-lg"><span class="rounded-full bg-current w-[7px] h-[7px]"></span></button>
@@ -628,7 +730,7 @@
     <div id="review-feedback-box" class="w-full p-3 text-xs font-extrabold text-center rounded-xl hidden transition-colors shadow-sm shrink-0"></div>
 
     <div id="review-note-toggle-container" class="w-full flex justify-center shrink-0">
-        <button id="review-note-toggle-btn" onclick="toggleReviewNote()" class="bg-amber-100 text-amber-800 border border-amber-300 px-4 py-2 rounded-xl text-xs font-semibold shadow-sm hidden">Notu Göster</button>
+        <button id="review-note-toggle-btn" onclick="toggleReviewNote()" class="bg-amber-100 text-amber-800 border border-amber-300 px-4 py-2 rounded-xl text-xs font-semibold shadow-sm invisible">Notu Göster</button>
     </div>
     <div id="review-note-box" class="w-full bg-amber-50 border border-amber-200 p-2.5 text-xs text-amber-800 font-medium hidden tracking-wide overflow-y-auto max-h-40 rounded-xl text-center shadow-sm shrink-0"></div>
 </div>
@@ -749,20 +851,17 @@
 
         <!-- İLK GİRİŞ TANITIM (ONBOARDING) MODAL -->
         <div id="onboarding-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[100] hidden flex justify-center items-center p-4">
-            <div class="modal-animate bg-white border border-slate-200 w-full max-w-sm p-6 rounded-3xl shadow-2xl flex flex-col items-center text-center relative overflow-hidden">
+            <div class="modal-animate bg-white border border-slate-200 w-full max-w-sm p-6 sm:p-7 rounded-3xl shadow-2xl flex flex-col items-center text-center relative overflow-hidden">
 
-                <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mb-4 shadow-inner">
-                    <svg id="onboarding-icon" class="w-8 h-8 fill-current" viewBox="0 0 24 24"></svg>
+                <div class="w-full flex items-center gap-3 mb-6">
+                    <div class="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                        <div id="onboarding-progress-fill" class="h-full bg-indigo-600 rounded-full transition-all duration-300 ease-out" style="width: 14%"></div>
+                    </div>
+                    <span id="onboarding-step-label" class="text-[11px] font-bold text-slate-400 tabular-nums whitespace-nowrap">1 / 7</span>
                 </div>
 
-                <div class="flex gap-2 mb-4">
-                    <div id="dot-step-1" class="w-4 h-1.5 rounded-full bg-indigo-600 transition-all"></div>
-                    <div id="dot-step-2" class="w-1.5 h-1.5 rounded-full bg-slate-300 transition-all"></div>
-                    <div id="dot-step-3" class="w-1.5 h-1.5 rounded-full bg-slate-300 transition-all"></div>
-                    <div id="dot-step-4" class="w-1.5 h-1.5 rounded-full bg-slate-300 transition-all"></div>
-                    <div id="dot-step-5" class="w-1.5 h-1.5 rounded-full bg-slate-300 transition-all"></div>
-                    <div id="dot-step-6" class="w-1.5 h-1.5 rounded-full bg-slate-300 transition-all"></div>
-                    <div id="dot-step-7" class="w-1.5 h-1.5 rounded-full bg-slate-300 transition-all"></div>
+                <div class="w-16 h-16 bg-gradient-to-br from-indigo-50 to-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mb-5 border border-indigo-100">
+                    <svg id="onboarding-icon" class="w-8 h-8 fill-current" viewBox="0 0 24 24"></svg>
                 </div>
 
                 <h3 id="onboarding-title" class="text-indigo-950 font-display font-bold text-lg tracking-tight mb-2"></h3>
@@ -1330,6 +1429,12 @@ let archiveObserver = null;
 let reviewNoteObjectURL = null;
 let campNoteObjectURL = null;
 
+// --- Not Arka Yüz (Flashcard Cevap) için global değişkenler ---
+let cropperInstanceBack = null;      // Arka yüz görseli için bağımsız Cropper.js instance'ı
+let backImageBlob = null;            // Kırpılmış arka yüz görseli (Blob)
+let backImagePreviewURL = null;      // Arka yüz önizleme object URL'i
+let reviewNoteBackObjectURL = null;  // Review modalında arka yüz görseli için object URL
+
 window.onload = async function() {
     try {
         await initDB();
@@ -1425,6 +1530,11 @@ window.onload = async function() {
         const noteCameraInput = document.getElementById('note-image-camera');
         if (noteGalleryInput) noteGalleryInput.addEventListener('change', handleNoteImageUpload);
         if (noteCameraInput) noteCameraInput.addEventListener('change', handleNoteImageUpload);
+
+        const noteBackGalleryInput = document.getElementById('note-image-gallery-back');
+        const noteBackCameraInput = document.getElementById('note-image-camera-back');
+        if (noteBackGalleryInput) noteBackGalleryInput.addEventListener('change', handleImageUploadBack);
+        if (noteBackCameraInput) noteBackCameraInput.addEventListener('change', handleImageUploadBack);
         
         initCanvasDrawing('upload-canvas', () => uploadDrawMode, () => uploadPenSize);
         
@@ -1447,6 +1557,8 @@ window.onload = async function() {
             } else {
                 switchTab('add');
             }
+            // Kullanıcı tanıtım turunu daha önce tamamlamış; "Ana Ekrana Ekle" penceresi gösterilebilir.
+            if (window.openInstallPromptGate) window.openInstallPromptGate();
         }
         
         // Depolama kotası kontrolü
@@ -1639,6 +1751,66 @@ function clearNoteImage() {
     document.getElementById('note-image-camera').value = '';
 }
 
+// --- Not Arka Yüz (Cevap) Görsel Yükleme/Kırpma ---
+// Ön yüzdeki editörden tamamen bağımsız çalışır: kendi Cropper.js instance'ı (cropperInstanceBack),
+// kendi DOM elemanları ve kendi state'i vardır.
+function handleImageUploadBack(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            document.getElementById('note-back-upload-placeholder').classList.add('hidden');
+            document.getElementById('note-back-image-preview-area').classList.add('hidden');
+            document.getElementById('note-back-editor-area').classList.remove('hidden');
+
+            let image = document.getElementById('note-back-image-to-crop');
+
+            if (cropperInstanceBack) {
+                cropperInstanceBack.destroy();
+                cropperInstanceBack = null;
+            }
+
+            image.onload = function() {
+                cropperInstanceBack = new Cropper(image, { viewMode: 1, autoCropArea: 1 });
+            };
+
+            image.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+        e.target.value = '';
+    }
+}
+
+async function finishCropBack() {
+    if (!cropperInstanceBack) return;
+
+    const croppedCanvas = cropperInstanceBack.getCroppedCanvas({ maxWidth: 1400, maxHeight: 1400 });
+    backImageBlob = await canvasToBlob(croppedCanvas, 0.85);
+
+    if (backImagePreviewURL) { revokeObjectURL(backImagePreviewURL); backImagePreviewURL = null; }
+    backImagePreviewURL = createObjectURL(backImageBlob);
+
+    document.getElementById('note-back-image-preview').src = backImagePreviewURL;
+    document.getElementById('note-back-editor-area').classList.add('hidden');
+    document.getElementById('note-back-image-preview-area').classList.remove('hidden');
+
+    cropperInstanceBack.destroy();
+    cropperInstanceBack = null;
+}
+
+function clearBackImage() {
+    backImageBlob = null;
+    if (backImagePreviewURL) { revokeObjectURL(backImagePreviewURL); backImagePreviewURL = null; }
+    if (cropperInstanceBack) { cropperInstanceBack.destroy(); cropperInstanceBack = null; }
+
+    document.getElementById('note-back-upload-placeholder').classList.remove('hidden');
+    document.getElementById('note-back-editor-area').classList.add('hidden');
+    document.getElementById('note-back-image-preview-area').classList.add('hidden');
+    document.getElementById('note-back-image-preview').src = '';
+    document.getElementById('note-image-gallery-back').value = '';
+    document.getElementById('note-image-camera-back').value = '';
+}
+
 function setNoteInputType(type) {
     currentNoteInputType = type;
     const btnText = document.getElementById('btn-note-type-text');
@@ -1647,13 +1819,13 @@ function setNoteInputType(type) {
     const imageArea = document.getElementById('note-image-area');
 
     if (type === 'text') {
-        btnText.className = "flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold uppercase transition-all rounded-xl";
-        btnImage.className = "flex-1 text-slate-600 py-2 text-xs font-bold uppercase transition-all hover:text-indigo-600 rounded-xl";
+        btnText.className = "flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold transition-all rounded-xl";
+        btnImage.className = "flex-1 text-slate-600 py-2 text-xs font-bold transition-all hover:text-indigo-600 rounded-xl";
         textArea.classList.remove('hidden');
         imageArea.classList.add('hidden');
     } else {
-        btnText.className = "flex-1 text-slate-600 py-2 text-xs font-bold uppercase transition-all hover:text-indigo-600 rounded-xl";
-        btnImage.className = "flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold uppercase transition-all rounded-xl";
+        btnText.className = "flex-1 text-slate-600 py-2 text-xs font-bold transition-all hover:text-indigo-600 rounded-xl";
+        btnImage.className = "flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold transition-all rounded-xl";
         textArea.classList.add('hidden');
         imageArea.classList.remove('hidden');
     }
@@ -1663,14 +1835,20 @@ function updateNoteInputVisibility() {
     const noteTypeToggle = document.getElementById('note-type-toggle');
     const noteTextArea = document.getElementById('note-text-area');
     const noteImageArea = document.getElementById('note-image-area');
+    const frontHeading = document.getElementById('note-front-heading');
+    const backSection = document.getElementById('note-back-section');
 
     if (currentEntryType === 'question') {
         noteTypeToggle.classList.remove('hidden');
         setNoteInputType(currentNoteInputType);
+        if (frontHeading) frontHeading.classList.add('hidden');
+        if (backSection) backSection.classList.add('hidden');
     } else {
         noteTypeToggle.classList.add('hidden');
         noteTextArea.classList.remove('hidden');
         noteImageArea.classList.add('hidden');
+        if (frontHeading) frontHeading.classList.remove('hidden');
+        if (backSection) backSection.classList.remove('hidden');
     }
 }
 
@@ -1691,6 +1869,7 @@ async function startTrial() {
         } else {
             switchTab('add');
         }
+        if (window.openInstallPromptGate) window.openInstallPromptGate();
     }
 }
 
@@ -1755,27 +1934,22 @@ function renderOnboardingStep() {
     const btnNext = document.getElementById('btn-onboarding-next');
     const btnSkip = document.getElementById('btn-onboarding-skip');
 
-    for (let i = 1; i <= 7; i++) {
-        const dot = document.getElementById(`dot-step-${i}`);
-        if (dot) {
-            if (i === currentOnboardingStep) {
-                dot.className = "w-4 h-1.5 rounded-full bg-indigo-600 transition-all";
-            } else {
-                dot.className = "w-1.5 h-1.5 rounded-full bg-slate-300 transition-all";
-            }
-        }
-    }
+    const totalOnboardingSteps = 7;
+    const progressFill = document.getElementById('onboarding-progress-fill');
+    const stepLabel = document.getElementById('onboarding-step-label');
+    if (progressFill) progressFill.style.width = ((currentOnboardingStep / totalOnboardingSteps) * 100) + '%';
+    if (stepLabel) stepLabel.textContent = `${currentOnboardingStep} / ${totalOnboardingSteps}`;
 
     if (currentOnboardingStep === 1) {
-        iconEl.innerHTML = `<path d="M12 2L1 21h22L12 2zm0 3.45l8.15 14.1H3.85L12 5.45zM11 10h2v4h-2zm0 5h2v2h-2z"/>`;
-        titleEl.innerText = "Alanını Seç";
-        descEl.innerText = "Sınava hazırlık alanını seç, ders ve konuların otomatik yüklensin.";
+        iconEl.innerHTML = `<path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z"/>`;
+        titleEl.innerText = "Hangi Alana Hazırlanıyorsun?";
+        descEl.innerText = "Seçtiğin alana göre dersler ve konular otomatik olarak senin için tanımlanır. İstersen bunu daha sonra ayarlardan değiştirebilirsin.";
         previewEl.innerHTML = `
             <div class="grid grid-cols-2 gap-3">
-                <button onclick="selectFieldAndContinue('SAYISAL')" class="field-btn bg-indigo-50 border border-indigo-200 text-indigo-700 py-3 font-bold text-sm uppercase rounded-xl hover:bg-indigo-600 hover:text-white transition-all shadow-sm">Sayısal</button>
-                <button onclick="selectFieldAndContinue('EŞİT AĞIRLIK')" class="field-btn bg-indigo-50 border border-indigo-200 text-indigo-700 py-3 font-bold text-sm uppercase rounded-xl hover:bg-indigo-600 hover:text-white transition-all shadow-sm">Eşit Ağırlık</button>
-                <button onclick="selectFieldAndContinue('SÖZEL')" class="field-btn bg-indigo-50 border border-indigo-200 text-indigo-700 py-3 font-bold text-sm uppercase rounded-xl hover:bg-indigo-600 hover:text-white transition-all shadow-sm">Sözel</button>
-                <button onclick="selectFieldAndContinue('DİL')" class="field-btn bg-indigo-50 border border-indigo-200 text-indigo-700 py-3 font-bold text-sm uppercase rounded-xl hover:bg-indigo-600 hover:text-white transition-all shadow-sm">Dil</button>
+                <button onclick="selectFieldAndContinue('SAYISAL')" class="field-btn bg-indigo-50 border border-indigo-200 text-indigo-700 py-3 font-bold text-sm rounded-xl hover:bg-indigo-600 hover:text-white transition-all shadow-sm">Sayısal</button>
+                <button onclick="selectFieldAndContinue('EŞİT AĞIRLIK')" class="field-btn bg-indigo-50 border border-indigo-200 text-indigo-700 py-3 font-bold text-sm rounded-xl hover:bg-indigo-600 hover:text-white transition-all shadow-sm">Eşit Ağırlık</button>
+                <button onclick="selectFieldAndContinue('SÖZEL')" class="field-btn bg-indigo-50 border border-indigo-200 text-indigo-700 py-3 font-bold text-sm rounded-xl hover:bg-indigo-600 hover:text-white transition-all shadow-sm">Sözel</button>
+                <button onclick="selectFieldAndContinue('DİL')" class="field-btn bg-indigo-50 border border-indigo-200 text-indigo-700 py-3 font-bold text-sm rounded-xl hover:bg-indigo-600 hover:text-white transition-all shadow-sm">Dil</button>
             </div>
         `;
         btnNext.innerText = "Devam Et";
@@ -1785,7 +1959,7 @@ function renderOnboardingStep() {
     } else if (currentOnboardingStep === 2) {
         iconEl.innerHTML = `<path d="M12 2L1 21h22L12 2zm0 3.45l8.15 14.1H3.85L12 5.45zM11 10h2v4h-2zm0 5h2v2h-2z"/>`;
         titleEl.innerText = "Öğrendiklerini Neden Unutuyorsun?";
-        descEl.innerText = "Tekrar edilmeyen bilgilerin %66'sı 1 gün içinde unutulur. 1 ay sonra ise yalnızca %21'i hafızada kalır";
+        descEl.innerText = "Tekrar edilmeyen bilgilerin büyük bölümü kısa sürede unutulur. Net Kalkanım, bu kaybın önüne geçmek için tasarlandı.";
         previewEl.innerHTML = `
             <div class="space-y-3">
                 <div>
@@ -1802,14 +1976,14 @@ function renderOnboardingStep() {
                 </div>
             </div>
         `;
-        btnNext.innerText = "Bu Sorunu Çözelim";
+        btnNext.innerText = "Devam Et";
         btnSkip.classList.remove('hidden');
         btnNext.disabled = false;
         btnNext.classList.remove('opacity-50', 'cursor-not-allowed');
     } else if (currentOnboardingStep === 3) {
         iconEl.innerHTML = `<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>`;
-        titleEl.innerText = "Akıllı Tekrar Sistemi Nasıl Çalışır?";
-        descEl.innerText = "Net Kalkanım, bilgiyi tam unutmadan hemen önce hatırlatır. Daha akıllıca çalışarak bilgiyi uzun hafızaya yerleştirmeni sağlar.";
+        titleEl.innerText = "Akıllı Tekrar Sistemi";
+        descEl.innerText = "Net Kalkanım, bilgiyi tam unutmadan hemen önce sana hatırlatır. Böylece bilgi, kalıcı hafızana daha az tekrarla yerleşir.";
         previewEl.innerHTML = `
             <div class="flex items-center justify-between text-[10px] font-bold text-center gap-1">
                 <div class="flex-1 p-2 bg-indigo-100 text-indigo-800 rounded-lg">1 Gün</div>
@@ -1823,11 +1997,11 @@ function renderOnboardingStep() {
                 <div class="flex-1 p-2 bg-indigo-600 text-white rounded-lg">45 Gün</div>
             </div>
         `;
-        btnNext.innerText = "Anladım, Devam";
+        btnNext.innerText = "Devam Et";
     } else if (currentOnboardingStep === 4) {
         iconEl.innerHTML = `<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>`;
-        titleEl.innerText = "Kendi Soru Defterini Oluştur";
-        descEl.innerText = "Sorularının yanına çözümlerini ekle. Sorularının ve Notlarının tamamına bir yerden erişim sağla.";
+        titleEl.innerText = "Soru Arşivini Oluştur";
+        descEl.innerText = "Çözemediğin soruları görseliyle kaydet, doğru cevabı işaretle. Tüm sorularına tek bir yerden ulaş.";
         previewEl.innerHTML = `
             <div class="space-y-2">
                 <div class="bg-slate-200 p-2 rounded-lg text-[10px] font-bold text-slate-600">DERS SEÇ</div>
@@ -1845,39 +2019,42 @@ function renderOnboardingStep() {
         btnNext.innerText = "Devam Et";
     } else if (currentOnboardingStep === 5) {
         iconEl.innerHTML = `<path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>`;
-        titleEl.innerText = "Notların da Unutulmasın";
-        descEl.innerText = "Notların da aynı algoritmayla tekrar edilir.";
+        titleEl.innerText = "Notların da Aynı Sistemle Tekrarlansın";
+        descEl.innerText = "Ders çalışırken aldığın notlar, sorularınla birlikte aynı akıllı tekrar algoritmasıyla zamanında karşına çıkar.";
         previewEl.innerHTML = `
             <div class="bg-amber-100 border border-amber-200 p-4 rounded-xl">
                 <div class="flex justify-between items-center mb-2">
                     <span class="text-[10px] font-bold text-amber-800">TYT BİYOLOJİ</span>
-                    <span class="text-[10px] font-bold text-amber-600">📅 21.08.2026</span>
+                    <span class="text-[10px] font-bold text-amber-600">21.08.2026</span>
                 </div>
-                <p class="text-[11px] font-semibold text-amber-900 uppercase">Mitoz bölünme evreleri: Profaz, Metafaz, Anafaz, Telofaz</p>
+                <p class="text-[11px] font-semibold text-amber-900">Mitoz bölünme evreleri: Profaz, Metafaz, Anafaz, Telofaz</p>
             </div>
         `;
         btnNext.innerText = "Devam Et";
     } else if (currentOnboardingStep === 6) {
         iconEl.innerHTML = `<path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>`;
-        titleEl.innerText = "Kutu Sistemi ile Tekrar";
-        descEl.innerText = "Kırmızı kutu bugün çözmen gerekenleri, sarı kutu yaklaşanları, yeşil kutu ise ustalaştıklarını gösterir. Her gün girmek zorunda değilsin, gecikenler kırmızı kutuda birikir.";
+        titleEl.innerText = "Kutu Sistemiyle Takip Et";
+        descEl.innerText = "Kırmızı kutu bugün tekrar etmen gerekenleri, sarı kutu yaklaşanları, yeşil kutu ise ustalaştığın konuları gösterir. Her gün giriş yapmak zorunda değilsin; gecikenler kırmızı kutuda seni bekler.";
         previewEl.innerHTML = `
             <div class="space-y-2">
                 <div class="bg-rose-50 border border-rose-200 p-3 rounded-xl">
-                    <div class="flex justify-between text-[10px] font-bold text-rose-600 mb-1"><span>🔴 KIRMIZI KUTU</span><span>Bekleyen: 12</span></div>
-                    <div class="text-[10px] text-slate-600">Bugün halletmen gerekenler</div>
+                    <div class="flex justify-between items-center text-[10px] font-bold text-rose-600 mb-1">
+                        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-rose-500 inline-block"></span>KIRMIZI KUTU</span>
+                        <span>Bekleyen: 12</span>
+                    </div>
+                    <div class="text-[10px] text-slate-600">Bugün tekrar etmen gerekenler</div>
                 </div>
                 <div class="flex gap-2">
-                    <div class="flex-1 bg-yellow-50 border border-yellow-200 p-2 rounded-lg text-center text-[10px] font-bold text-yellow-600">🟡 Sarı</div>
-                    <div class="flex-1 bg-green-50 border border-green-200 p-2 rounded-lg text-center text-[10px] font-bold text-green-600">🟢 Yeşil</div>
+                    <div class="flex-1 bg-yellow-50 border border-yellow-200 p-2 rounded-lg text-center text-[10px] font-bold text-yellow-600 flex items-center justify-center gap-1.5"><span class="w-2 h-2 rounded-full bg-yellow-500 inline-block"></span>Sarı Kutu</div>
+                    <div class="flex-1 bg-green-50 border border-green-200 p-2 rounded-lg text-center text-[10px] font-bold text-green-600 flex items-center justify-center gap-1.5"><span class="w-2 h-2 rounded-full bg-green-500 inline-block"></span>Yeşil Kutu</div>
                 </div>
             </div>
         `;
-        btnNext.innerText = "Devam et";
+        btnNext.innerText = "Devam Et";
     } else if (currentOnboardingStep === 7) {
         iconEl.innerHTML = `<path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM6.24 5h11.52l.83 1H5.41l.83-1zM5 19V8h14v11H5zm11-5.5H8v-2h8v2z"/>`;
-        titleEl.innerText = "Arşiv & Kamp Modu";
-        descEl.innerText = "'Arşiv' sekmesinden bütün soru ve notlarına erişim sağlayabilir ve istediğin konulardan rastgele soru kampı yapabilirsin.";
+        titleEl.innerText = "Arşiv ve Kamp Modu";
+        descEl.innerText = "Arşiv sekmesinden bugüne kadar eklediğin bütün soru ve notlara ulaşabilir, istediğin konulardan rastgele kamp yaparak kendini sınayabilirsin.";
         previewEl.innerHTML = `
             <div class="space-y-2">
                 <div class="flex gap-2 mb-1">
@@ -1885,13 +2062,13 @@ function renderOnboardingStep() {
                     <div class="flex-1 bg-slate-50 border border-slate-200 p-2 rounded-lg text-center text-[10px] font-bold text-slate-400">NOTLARIM</div>
                 </div>
                 <div class="bg-white border border-slate-200 p-3 rounded-xl">
-                    <div class="flex justify-between items-center text-[10px] font-bold text-slate-600 mb-1"><span>TYT MATEMATİK</span><span>📅 20.08.2026</span></div>
+                    <div class="flex justify-between items-center text-[10px] font-bold text-slate-600 mb-1"><span>TYT MATEMATİK</span><span>20.08.2026</span></div>
                     <p class="text-[11px] font-semibold text-slate-800">Üslü sayılar sorusu</p>
                 </div>
                 <div class="bg-amber-50 border border-amber-200 p-2 rounded-xl text-center text-[11px] font-bold text-amber-600">RASTGELE KAMP</div>
             </div>
         `;
-        btnNext.innerText = "Hadi Başlayalım 🚀";
+        btnNext.innerText = "Hadi Başlayalım!";
     }
 }
 
@@ -1987,6 +2164,8 @@ async function finishOnboarding() {
     } else {
         switchTab('add');
     }
+    // Tanıtım turu artık bitti; "Ana Ekrana Ekle" penceresi bundan sonra gösterilebilir.
+    if (window.openInstallPromptGate) window.openInstallPromptGate();
 }
 
 function setEntryType(type) {
@@ -1999,27 +2178,27 @@ function setEntryType(type) {
     const labelImgUpload = document.getElementById('label-q-image-upload');
 
     if (type === 'question') {
-        btnQ.className = "flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold uppercase transition-all rounded-xl";
-        btnN.className = "flex-1 text-slate-600 py-2 text-xs font-bold uppercase transition-all hover:text-amber-600 rounded-xl";
+        btnQ.className = "flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold transition-all rounded-xl";
+        btnN.className = "flex-1 text-slate-600 py-2 text-xs font-bold transition-all hover:text-amber-600 rounded-xl";
         if (qSpecificArea) qSpecificArea.classList.remove('hidden');
         if (btnSave) {
             btnSave.innerText = "SORUYU KAYDET";
-            btnSave.className = "btn-cyber btn-cyber-purple w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 font-bold uppercase mt-6 rounded-2xl shadow-md";
+            btnSave.className = "btn-cyber btn-cyber-purple w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 font-bold mt-6 rounded-2xl shadow-md";
         }
         if (labelImgUpload) {
-            labelImgUpload.className = "flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3 flex justify-center items-center text-xs font-bold uppercase cursor-pointer transition-colors border border-indigo-600 rounded-xl shadow-sm";
+            labelImgUpload.className = "flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3 flex justify-center items-center text-xs font-bold cursor-pointer transition-colors border border-indigo-600 rounded-xl shadow-sm";
         }
         if (labelNoteText) labelNoteText.innerText = "Çözüm Notu / Açıklama";
     } else {
-        btnN.className = "flex-1 bg-white text-amber-600 shadow-sm py-2 text-xs font-bold uppercase transition-all rounded-xl";
-        btnQ.className = "flex-1 text-slate-600 py-2 text-xs font-bold uppercase transition-all hover:text-indigo-600 rounded-xl";
+        btnN.className = "flex-1 bg-white text-amber-600 shadow-sm py-2 text-xs font-bold transition-all rounded-xl";
+        btnQ.className = "flex-1 text-slate-600 py-2 text-xs font-bold transition-all hover:text-indigo-600 rounded-xl";
         if (qSpecificArea) qSpecificArea.classList.add('hidden');
         if (btnSave) {
             btnSave.innerText = "NOTU KAYDET";
-            btnSave.className = "btn-cyber btn-cyber-yellow w-full bg-amber-500 hover:bg-amber-600 text-white py-4 font-bold uppercase mt-6 rounded-2xl shadow-md";
+            btnSave.className = "btn-cyber btn-cyber-yellow w-full bg-amber-500 hover:bg-amber-600 text-white py-4 font-bold mt-6 rounded-2xl shadow-md";
         }
         if (labelImgUpload) {
-            labelImgUpload.className = "flex-1 bg-amber-500 hover:bg-amber-600 text-white py-3 flex justify-center items-center text-xs font-bold uppercase cursor-pointer transition-colors border border-amber-500 rounded-xl shadow-sm";
+            labelImgUpload.className = "flex-1 bg-amber-500 hover:bg-amber-600 text-white py-3 flex justify-center items-center text-xs font-bold cursor-pointer transition-colors border border-amber-500 rounded-xl shadow-sm";
         }
         if (labelNoteText) labelNoteText.innerText = "Not Metni";
     }
@@ -2042,13 +2221,13 @@ function updateQuestionInputVisibility() {
     if (currentEntryType === 'question') {
         if (qTypeToggle) qTypeToggle.classList.remove('hidden');
         if (currentQuestionInputType === 'image') {
-            if (btnImg) btnImg.className = "flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold uppercase transition-all rounded-xl";
-            if (btnText) btnText.className = "flex-1 text-slate-600 py-2 text-xs font-bold uppercase transition-all hover:text-indigo-600 rounded-xl";
+            if (btnImg) btnImg.className = "flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold transition-all rounded-xl";
+            if (btnText) btnText.className = "flex-1 text-slate-600 py-2 text-xs font-bold transition-all hover:text-indigo-600 rounded-xl";
             if (imgContainer) imgContainer.classList.remove('hidden');
             if (textQuestionContainer) textQuestionContainer.classList.add('hidden');
         } else {
-            if (btnImg) btnImg.className = "flex-1 text-slate-600 py-2 text-xs font-bold uppercase transition-all hover:text-indigo-600 rounded-xl";
-            if (btnText) btnText.className = "flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold uppercase transition-all rounded-xl";
+            if (btnImg) btnImg.className = "flex-1 text-slate-600 py-2 text-xs font-bold transition-all hover:text-indigo-600 rounded-xl";
+            if (btnText) btnText.className = "flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold transition-all rounded-xl";
             if (imgContainer) imgContainer.classList.add('hidden');
             if (textQuestionContainer) textQuestionContainer.classList.remove('hidden');
         }
@@ -2067,13 +2246,13 @@ function setAnsType(type) {
     const tArea = document.getElementById('ans-text-area');
 
     if (type === 'choice') {
-        btnC.className = "flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold uppercase transition-all rounded-xl";
-        btnT.className = "flex-1 text-slate-600 py-2 text-xs font-bold uppercase transition-all hover:text-indigo-600 rounded-xl";
+        btnC.className = "flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold transition-all rounded-xl";
+        btnT.className = "flex-1 text-slate-600 py-2 text-xs font-bold transition-all hover:text-indigo-600 rounded-xl";
         if(cArea) cArea.classList.remove('hidden');
         if(tArea) tArea.classList.add('hidden');
     } else {
-        btnT.className = "flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold uppercase transition-all rounded-xl";
-        btnC.className = "flex-1 text-slate-600 py-2 text-xs font-bold uppercase transition-all hover:text-indigo-600 rounded-xl";
+        btnT.className = "flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold transition-all rounded-xl";
+        btnC.className = "flex-1 text-slate-600 py-2 text-xs font-bold transition-all hover:text-indigo-600 rounded-xl";
         if(cArea) cArea.classList.add('hidden');
         if(tArea) tArea.classList.remove('hidden');
     }
@@ -2131,22 +2310,22 @@ function setUploadDrawMode(mode) {
     let sDiv = document.getElementById('upload-pen-sizes');
     let canvas = document.getElementById('upload-canvas');
     
-    if (mBtn) mBtn.className = "bg-slate-200 text-slate-700 px-4 py-2 text-xs font-bold uppercase rounded-xl border border-slate-300";
-    if (pBtn) pBtn.className = "bg-slate-200 text-slate-700 px-4 py-2 text-xs font-bold uppercase rounded-xl border border-slate-300";
-    if (eBtn) eBtn.className = "bg-slate-200 text-slate-700 px-4 py-2 text-xs font-bold uppercase rounded-xl border border-slate-300";
+    if (mBtn) mBtn.className = "bg-slate-200 text-slate-700 px-4 py-2 text-xs font-bold rounded-xl border border-slate-300";
+    if (pBtn) pBtn.className = "bg-slate-200 text-slate-700 px-4 py-2 text-xs font-bold rounded-xl border border-slate-300";
+    if (eBtn) eBtn.className = "bg-slate-200 text-slate-700 px-4 py-2 text-xs font-bold rounded-xl border border-slate-300";
     
     if (canvas) {
         if(mode === 'move') {
             canvas.classList.add('pointer-events-none');
-            if (mBtn) mBtn.className = "bg-amber-500 text-white px-4 py-2 text-xs font-bold uppercase rounded-xl border border-amber-500 shadow-sm";
+            if (mBtn) mBtn.className = "bg-amber-500 text-white px-4 py-2 text-xs font-bold rounded-xl border border-amber-500 shadow-sm";
             if(sDiv) sDiv.classList.add('hidden');
         } else if(mode === 'pen') {
             canvas.classList.remove('pointer-events-none');
-            if (pBtn) pBtn.className = "bg-indigo-600 text-white px-4 py-2 text-xs font-bold uppercase rounded-xl border border-indigo-600 shadow-sm";
+            if (pBtn) pBtn.className = "bg-indigo-600 text-white px-4 py-2 text-xs font-bold rounded-xl border border-indigo-600 shadow-sm";
             if(sDiv) sDiv.classList.remove('hidden');
         } else if(mode === 'eraser') {
             canvas.classList.remove('pointer-events-none');
-            if (eBtn) eBtn.className = "bg-indigo-600 text-white px-4 py-2 text-xs font-bold uppercase rounded-xl border border-indigo-600 shadow-sm";
+            if (eBtn) eBtn.className = "bg-indigo-600 text-white px-4 py-2 text-xs font-bold rounded-xl border border-indigo-600 shadow-sm";
             if(sDiv) sDiv.classList.add('hidden');
         }
     }
@@ -2303,9 +2482,9 @@ function setReviewDrawMode(mode) {
     
     reviewDrawMode = mode;
     
-    if(mBtn) mBtn.className = "bg-slate-200 text-slate-700 px-3 py-1 text-xs font-bold uppercase rounded-xl border border-slate-300 shadow-sm";
-    if(pBtn) pBtn.className = "bg-slate-200 text-slate-700 px-3 py-1 text-xs font-bold uppercase rounded-xl border border-slate-300 shadow-sm";
-    if(eBtn) eBtn.className = "bg-slate-200 text-slate-700 px-3 py-1 text-xs font-bold uppercase rounded-xl border border-slate-300 shadow-sm";
+    if(mBtn) mBtn.className = "bg-slate-200 text-slate-700 px-3 py-1 text-xs font-bold rounded-xl border border-slate-300 shadow-sm";
+    if(pBtn) pBtn.className = "bg-slate-200 text-slate-700 px-3 py-1 text-xs font-bold rounded-xl border border-slate-300 shadow-sm";
+    if(eBtn) eBtn.className = "bg-slate-200 text-slate-700 px-3 py-1 text-xs font-bold rounded-xl border border-slate-300 shadow-sm";
 
     if (canvas) {
         if (mode === 'move') {
@@ -2316,15 +2495,15 @@ function setReviewDrawMode(mode) {
     }
 
     if(mode === 'move') {
-        if(mBtn) mBtn.className = "bg-amber-500 text-white px-3 py-1 text-xs font-bold uppercase rounded-xl border border-amber-500 shadow-sm";
-        if(sDiv) sDiv.classList.add('hidden');
+        if(mBtn) mBtn.className = "bg-amber-500 text-white px-3 py-1 text-xs font-bold rounded-xl border border-amber-500 shadow-sm";
+        if(sDiv) sDiv.classList.add('invisible');
     } else if(mode === 'pen') {
-        if(pBtn) pBtn.className = "bg-indigo-600 text-white px-3 py-1 text-xs font-bold uppercase rounded-xl border border-indigo-600 shadow-sm";
-        if(sDiv) sDiv.classList.remove('hidden');
+        if(pBtn) pBtn.className = "bg-indigo-600 text-white px-3 py-1 text-xs font-bold rounded-xl border border-indigo-600 shadow-sm";
+        if(sDiv) sDiv.classList.remove('invisible');
         updateReviewSizeUI();
     } else if(mode === 'eraser') {
-        if(eBtn) eBtn.className = "bg-indigo-600 text-white px-3 py-1 text-xs font-bold uppercase rounded-xl border border-indigo-600 shadow-sm";
-        if(sDiv) sDiv.classList.add('hidden');
+        if(eBtn) eBtn.className = "bg-indigo-600 text-white px-3 py-1 text-xs font-bold rounded-xl border border-indigo-600 shadow-sm";
+        if(sDiv) sDiv.classList.add('invisible');
     }
 }
 
@@ -2370,9 +2549,9 @@ function setCampReviewDrawMode(mode) {
     
     campReviewDrawMode = mode;
     
-    if(mBtn) mBtn.className = "bg-slate-200 text-slate-700 px-3 py-1.5 text-xs font-bold uppercase rounded-xl border border-slate-300";
-    if(pBtn) pBtn.className = "bg-slate-200 text-slate-700 px-3 py-1.5 text-xs font-bold uppercase rounded-xl border border-slate-300";
-    if(eBtn) eBtn.className = "bg-slate-200 text-slate-700 px-3 py-1.5 text-xs font-bold uppercase rounded-xl border border-slate-300";
+    if(mBtn) mBtn.className = "bg-slate-200 text-slate-700 px-3 py-1.5 text-xs font-bold rounded-xl border border-slate-300";
+    if(pBtn) pBtn.className = "bg-slate-200 text-slate-700 px-3 py-1.5 text-xs font-bold rounded-xl border border-slate-300";
+    if(eBtn) eBtn.className = "bg-slate-200 text-slate-700 px-3 py-1.5 text-xs font-bold rounded-xl border border-slate-300";
 
     if(img && canvas && img.naturalWidth > 0 && canvas.width !== img.naturalWidth) { 
         canvas.width = img.naturalWidth; 
@@ -2383,16 +2562,16 @@ function setCampReviewDrawMode(mode) {
 
     if(mode === 'move') { 
         if(canvas) canvas.classList.add('pointer-events-none');
-        if(mBtn) mBtn.className = "bg-amber-500 text-white px-3 py-1.5 text-xs font-bold uppercase rounded-xl border border-amber-500 shadow-sm";
+        if(mBtn) mBtn.className = "bg-amber-500 text-white px-3 py-1.5 text-xs font-bold rounded-xl border border-amber-500 shadow-sm";
         if(sDiv) sDiv.classList.add('hidden');
     } else if(mode === 'pen') { 
         if(canvas) canvas.classList.remove('pointer-events-none');
-        if(pBtn) pBtn.className = "bg-indigo-600 text-white px-3 py-1.5 text-xs font-bold uppercase rounded-xl border border-indigo-600 shadow-sm";
+        if(pBtn) pBtn.className = "bg-indigo-600 text-white px-3 py-1.5 text-xs font-bold rounded-xl border border-indigo-600 shadow-sm";
         if(sDiv) sDiv.classList.remove('hidden');
         updateCampSizeUI();
     } else if(mode === 'eraser') { 
         if(canvas) canvas.classList.remove('pointer-events-none');
-        if(eBtn) eBtn.className = "bg-indigo-600 text-white px-3 py-1.5 text-xs font-bold uppercase rounded-xl border border-indigo-600 shadow-sm";
+        if(eBtn) eBtn.className = "bg-indigo-600 text-white px-3 py-1.5 text-xs font-bold rounded-xl border border-indigo-600 shadow-sm";
         if(sDiv) sDiv.classList.add('hidden');
     }
 }
@@ -2673,7 +2852,7 @@ function buildHomeFilters() {
         }
 
         cBox.innerHTML = `
-            <label class="flex items-center justify-between cursor-pointer hover:text-indigo-600 transition-colors uppercase font-bold text-xs text-slate-800">
+            <label class="flex items-center justify-between cursor-pointer hover:text-indigo-600 transition-colors font-bold text-xs text-slate-800">
                 <span>${course}</span>
                 <input type="checkbox" value="${course}" ${cChecked ? 'checked' : ''} onchange="toggleCourseFilter(this)" class="accent-indigo-600 rounded w-4 h-4">
             </label>
@@ -2739,7 +2918,7 @@ function openPicker(type) {
         const courses = Object.keys(appState.categories);
         courses.forEach(course => {
             const btn = document.createElement('button');
-            btn.className = "w-full text-left px-4 py-3 rounded-xl text-sm font-bold uppercase text-slate-700 bg-slate-50 border border-slate-200 hover:bg-indigo-50 hover:border-indigo-300 transition-colors";
+            btn.className = "w-full text-left px-4 py-3 rounded-xl text-sm font-bold text-slate-700 bg-slate-50 border border-slate-200 hover:bg-indigo-50 hover:border-indigo-300 transition-colors";
             btn.innerText = course;
             btn.onclick = () => selectCourse(course);
             listDiv.appendChild(btn);
@@ -2754,7 +2933,7 @@ function openPicker(type) {
         const topics = appState.categories[selectedCourse] || [];
         topics.forEach(topic => {
             const btn = document.createElement('button');
-            btn.className = "w-full text-left px-4 py-3 rounded-xl text-sm font-bold uppercase text-slate-700 bg-slate-50 border border-slate-200 hover:bg-amber-50 hover:border-amber-300 transition-colors";
+            btn.className = "w-full text-left px-4 py-3 rounded-xl text-sm font-bold text-slate-700 bg-slate-50 border border-slate-200 hover:bg-amber-50 hover:border-amber-300 transition-colors";
             btn.innerText = topic;
             btn.onclick = () => selectTopic(topic);
             listDiv.appendChild(btn);
@@ -2884,6 +3063,17 @@ if (!topic) { showToast("Lütfen konu seç!", true); return; }
         }
 
         let noteText = document.getElementById('q-note').value.trim();
+        let backText = document.getElementById('q-note-back').value.trim();
+
+        // Ön yüz (metin veya görsel) zorunlu
+        if (!noteText && !finalImage) {
+            if (backText || backImageBlob) {
+                showToast("Ön yüz olmadan arka yüz eklenemez.", true);
+            } else {
+                showToast("Not metni veya görsel ekleyin!", true);
+            }
+            return;
+        }
 
         let days = appState.noteIntervals[0] || 1;
         let nextD = getNowTR(); nextD.setDate(nextD.getDate() + days);
@@ -2894,6 +3084,8 @@ if (!topic) { showToast("Lütfen konu seç!", true); return; }
             topic: topic,
             img: finalImage,
             note: noteText,
+            note_back: backText || null,
+            note_back_img: backImageBlob || null,
             stage: 0,
             nextReview: formatDate(nextD),
             lastReviewedDate: "",
@@ -2908,12 +3100,14 @@ if (!topic) { showToast("Lütfen konu seç!", true); return; }
     }
 
     document.getElementById('q-note').value = '';
+    document.getElementById('q-note-back').value = '';
     document.getElementById('q-text-question').value = '';
     document.getElementById('q-text-answer').value = '';
     selectedChoiceAnswer = '';
     selectChoice('');
     clearSelectedImage();
     clearNoteImage();
+    clearBackImage();
     switchTab('home');
 }
 
@@ -2922,6 +3116,7 @@ function startReview(mode, boxColor = 'red', specificItem = null, isArchiveMode 
     // Önceki object URL'leri temizle
     if (reviewObjectURL) { revokeObjectURL(reviewObjectURL); reviewObjectURL = null; }
     if (reviewNoteObjectURL) { revokeObjectURL(reviewNoteObjectURL); reviewNoteObjectURL = null; }
+    if (reviewNoteBackObjectURL) { revokeObjectURL(reviewNoteBackObjectURL); reviewNoteBackObjectURL = null; }
     
     currentReviewMode = mode;
     currentArchiveMode = isArchiveMode;
@@ -3023,31 +3218,109 @@ function renderReviewItem() {
 
     const imgEl = document.getElementById('review-img');
     const qTextEl = document.getElementById('review-question-text');
+    const unifiedTextEl = document.getElementById('review-unified-text');
     const frameBox = document.getElementById('review-frame-box');
-    
+    const unifiedBoardEl = document.getElementById('review-unified-board');
+    const noteFrontBoard = document.getElementById('review-note-front-board');
+    const noteFrontImg = document.getElementById('review-note-front-img');
+    const noteFrontText = document.getElementById('review-note-front-text');
+    const isNoteFrontUI = (currentReviewMode !== 'questions');
+    const hasTextQuestion = !isNoteFrontUI && !!item.text_question;
+
 reviewUndoStack = [];
 
     // Önceki URL'yi temizle
     if (reviewObjectURL) { revokeObjectURL(reviewObjectURL); reviewObjectURL = null; }
 
-    if (item.img) {
-        // Blob'dan object URL oluştur
-        reviewObjectURL = createObjectURL(item.img);
-        imgEl.src = reviewObjectURL;
-        imgEl.classList.remove('hidden');
-        frameBox.classList.remove('hidden');
-    } else {
+    // Görsel olmasa bile, flip ile gösterilecek bir arka yüz içeriği varsa
+    // (soru modunda çözüm notu, not modunda cevap) kartı tamamen gizlememeliyiz;
+    // aksi halde "Cevabı Göster"/"Notu Göster" butonu görsel-olmayan flip içeriğini
+    // hiçbir zaman gösteremez (kutu display:none olduğu için).
+    const willHaveFlipBack = (currentReviewMode === 'questions')
+        ? !!(item.note_text || item.note_img)
+        : !!(item.note_back || item.note_back_img);
+
+    if (isNoteFrontUI) {
+        // Not modu: çizim tahtası yerine, görsel ve not aynı kutuda, ortalanmış olarak gösterilir; çizim yapılamaz.
+        if (unifiedBoardEl) { unifiedBoardEl.classList.add('hidden'); unifiedBoardEl.style.display = 'none'; }
         imgEl.src = '';
         imgEl.classList.add('hidden');
-        frameBox.classList.add('hidden');
+        if (noteFrontBoard) {
+            noteFrontBoard.classList.remove('hidden');
+            noteFrontBoard.style.display = 'flex';
+            noteFrontBoard.style.justifyContent = 'center';
+        }
+
+        if (item.img) {
+            reviewObjectURL = createObjectURL(item.img);
+            if (noteFrontImg) {
+                noteFrontImg.src = reviewObjectURL;
+                noteFrontImg.classList.remove('hidden');
+                // Görsel bu kutudaki tek içerikse (not metni/eki yoksa), kutunun sınırına kadar büyüsün.
+                const frontImgAlone = !(item.note_text || item.note_img || item.note);
+                noteFrontImg.style.maxWidth = frontImgAlone ? '98%' : '90%';
+                noteFrontImg.style.maxHeight = frontImgAlone ? '92%' : '50%';
+            }
+        } else {
+            if (noteFrontImg) {
+                noteFrontImg.src = '';
+                noteFrontImg.classList.add('hidden');
+                noteFrontImg.style.maxWidth = '';
+                noteFrontImg.style.maxHeight = '';
+            }
+        }
+        frameBox.classList.remove('hidden');
+        frameBox.style.minHeight = '';
+    } else {
+        if (noteFrontBoard) { noteFrontBoard.classList.add('hidden'); noteFrontBoard.style.display = 'none'; }
+        if (unifiedBoardEl) { unifiedBoardEl.classList.remove('hidden'); unifiedBoardEl.style.display = ''; }
+
+        if (item.img) {
+            // Blob'dan object URL oluştur
+            reviewObjectURL = createObjectURL(item.img);
+            imgEl.src = reviewObjectURL;
+            imgEl.classList.remove('hidden');
+            frameBox.classList.remove('hidden');
+            frameBox.style.minHeight = '';
+            if (unifiedBoardEl) unifiedBoardEl.style.minHeight = '300px';
+        } else {
+            imgEl.src = '';
+            imgEl.classList.add('hidden');
+            if (hasTextQuestion) {
+                // Görsel yok ama soru metni var: metni çizim kutusunun tam ortasına yerleştiriyoruz.
+                // Böylece kutu her zaman aynı yükseklikte kalır ve altındaki kalem seti zıplamaz.
+                frameBox.classList.remove('hidden');
+                frameBox.style.minHeight = '300px';
+                if (unifiedBoardEl) unifiedBoardEl.style.minHeight = '300px';
+            } else if (willHaveFlipBack) {
+                // Görselsiz ama arka yüzü olan kart: kutuyu küçük tutarak yine de göster.
+                frameBox.classList.remove('hidden');
+                frameBox.style.minHeight = '160px';
+                if (unifiedBoardEl) unifiedBoardEl.style.minHeight = '0px';
+            } else {
+                frameBox.classList.add('hidden');
+                frameBox.style.minHeight = '';
+            }
+        }
     }
 
-    if (item.text_question) {
+    if (hasTextQuestion && !item.img) {
+        // Soru sadece metinse: üstteki ayrı kutu yerine, çizim kutusunun ortasında göster.
+        qTextEl.innerText = '';
+        qTextEl.classList.add('hidden');
+        if (unifiedTextEl) {
+            unifiedTextEl.innerText = item.text_question;
+            unifiedTextEl.classList.remove('hidden');
+        }
+    } else if (item.text_question) {
+        // Görselle birlikte soru metni varsa, üstteki ayrı kutuda göstermeye devam ediyoruz.
         qTextEl.innerText = item.text_question;
         qTextEl.classList.remove('hidden');
+        if (unifiedTextEl) { unifiedTextEl.innerText = ''; unifiedTextEl.classList.add('hidden'); }
     } else {
         qTextEl.innerText = '';
         qTextEl.classList.add('hidden');
+        if (unifiedTextEl) { unifiedTextEl.innerText = ''; unifiedTextEl.classList.add('hidden'); }
     }
 
     const noteToggleBtn = document.getElementById('review-note-toggle-btn');
@@ -3057,6 +3330,7 @@ reviewUndoStack = [];
 
     let hasNote = false;
     let noteContent = '';
+    let noteHasBack = false; // Not modunda arka yüz var mı? (recall butonlarının aktifliği için kullanılır)
 
     if (item.note_text) {
         hasNote = true;
@@ -3068,8 +3342,8 @@ reviewUndoStack = [];
         if (reviewNoteObjectURL) { revokeObjectURL(reviewNoteObjectURL); reviewNoteObjectURL = null; }
         let noteImgURL = createObjectURL(item.note_img);
         reviewNoteObjectURL = noteImgURL;
-        if (noteContent) noteContent += '<br>';
-        noteContent += `<img src="${noteImgURL}" class="w-full h-auto object-contain rounded-lg mt-1">`;
+        const noteImgTag = `<img src="${noteImgURL}" class="max-w-[90%] max-h-[45%] h-auto object-contain rounded-xl shadow-md border border-slate-100 mx-auto mb-2 block">`;
+        noteContent = noteContent ? (noteImgTag + noteContent) : noteImgTag;
     }
     if (!hasNote && item.note) {
         hasNote = true;
@@ -3086,29 +3360,64 @@ reviewUndoStack = [];
     if (currentReviewMode === 'questions') {
         if (noteContentDiv) noteContentDiv.innerHTML = noteContent;
         if (hasNote) {
-            noteToggleBtn.classList.remove('hidden');
-            noteToggleBtn.style.display = '';
+            noteToggleBtn.classList.remove('invisible');
+            noteToggleBtn.disabled = false;
             noteToggleBtn.textContent = 'Notu Göster';
         } else {
-            noteToggleBtn.classList.add('hidden');
-            noteToggleBtn.style.display = 'none';
+            noteToggleBtn.classList.add('invisible');
+            noteToggleBtn.disabled = true;
         }
     } else {
-        noteToggleBtn.classList.add('hidden');
-        noteToggleBtn.style.display = 'none';
-        if (hasNote) {
-            if (noteBox) {
-                noteBox.innerHTML = noteContent;
-                noteBox.classList.remove('hidden');
-                noteBox.style.display = '';
-            }
+        // Not modu: ön yüz (item.note) artık ayrı bir kutuda değil, görselle aynı kutuda gösterilir.
+        if (noteBox) {
+            noteBox.innerHTML = '';
+            noteBox.classList.add('hidden');
+            noteBox.style.display = 'none';
+        }
+        if (noteFrontText) {
+            noteFrontText.innerHTML = hasNote ? noteContent : '';
+        }
+
+        // Arka yüz (Cevap): sadece note_back veya note_back_img doluysa flip butonu gösterilir.
+        // Eski notlarda bu alanlar undefined olacağından hasBack güvenle false kalır.
+        let hasBack = false;
+        let backContent = '';
+
+        if (item.note_back) {
+            hasBack = true;
+            backContent = item.note_back;
+        }
+        if (item.note_back_img) {
+            hasBack = true;
+            if (reviewNoteBackObjectURL) { revokeObjectURL(reviewNoteBackObjectURL); reviewNoteBackObjectURL = null; }
+            const backImgURL = createObjectURL(item.note_back_img);
+            reviewNoteBackObjectURL = backImgURL;
+            const backImgTag = `<img src="${backImgURL}" class="max-w-[90%] max-h-[45%] h-auto object-contain rounded-xl shadow-md border border-slate-100 mx-auto mb-2 block">`;
+            backContent = backContent ? (backImgTag + backContent) : backImgTag;
+        }
+
+        if (noteContentDiv) noteContentDiv.innerHTML = backContent;
+
+        noteHasBack = hasBack;
+
+        if (hasBack) {
+            noteToggleBtn.classList.remove('invisible');
+            noteToggleBtn.disabled = false;
+            noteToggleBtn.textContent = 'Cevabı Göster';
+        } else {
+            noteToggleBtn.classList.add('invisible');
+            noteToggleBtn.disabled = true;
         }
     }
 
     manualZoom('review', 1);
     clearReviewCanvas();
-    document.getElementById('review-draw-tools').classList.remove('hidden');
-    setReviewDrawMode('pen');
+    if (isNoteFrontUI) {
+        document.getElementById('review-draw-tools').classList.add('hidden');
+    } else {
+        document.getElementById('review-draw-tools').classList.remove('hidden');
+        setReviewDrawMode('pen');
+    }
 
     const choiceInput = document.getElementById('review-choice-input');
     const textInput = document.getElementById('review-text-input');
@@ -3159,9 +3468,9 @@ if (currentArchiveMode) {
                     textInputEl.disabled = true;
                     const isCorrect = (item.userTodayAnswer === item.answer);
                     if (isCorrect) {
-                        textInputEl.className = "flex-1 bg-green-50 p-3 border-2 border-green-500 outline-none text-slate-800 font-bold uppercase tracking-wider transition-colors rounded-xl shadow-sm text-xs";
+                        textInputEl.className = "flex-1 bg-green-50 p-3 border-2 border-green-500 outline-none text-slate-800 font-bold tracking-wider transition-colors rounded-xl shadow-sm text-xs";
                     } else {
-                        textInputEl.className = "flex-1 bg-red-50 p-3 border-2 border-red-500 outline-none text-slate-800 font-bold uppercase tracking-wider transition-colors rounded-xl shadow-sm text-xs";
+                        textInputEl.className = "flex-1 bg-red-50 p-3 border-2 border-red-500 outline-none text-slate-800 font-bold tracking-wider transition-colors rounded-xl shadow-sm text-xs";
                     }
                     feedbackBox.innerHTML = `Doğru Cevap: <strong>${item.answer}</strong>`;
                     feedbackBox.className = `w-full p-3 text-xs font-extrabold text-center rounded-xl transition-colors shadow-sm shrink-0 ${isCorrect ? 'bg-green-100 text-green-800 border border-green-300' : 'bg-red-100 text-red-800 border border-red-300'}`;
@@ -3185,16 +3494,23 @@ if (currentArchiveMode) {
                     const textInputEl = document.getElementById('review-text-val');
                     textInputEl.value = '';
                     textInputEl.disabled = false;
-                    textInputEl.className = "flex-1 bg-slate-50 p-3 border border-slate-300 outline-none focus:border-indigo-600 text-slate-800 font-bold uppercase tracking-wider transition-colors rounded-xl shadow-sm text-xs";
+                    textInputEl.className = "flex-1 bg-slate-50 p-3 border border-slate-300 outline-none focus:border-indigo-600 text-slate-800 font-bold tracking-wider transition-colors rounded-xl shadow-sm text-xs";
                 }
                 recallInput.classList.add('invisible');
             }
         } else {
-            recallInput.classList.remove('invisible');
-            if (isAnsweredToday) {
-                updateRecallButtons(item.userRecallStatus);
+            // Not modu: arka yüz varsa, kullanıcı "Cevabı Göster" ile flip yapana kadar
+            // hatırlama butonları pasif kalır (toggleReviewNote içinde aktifleştirilir).
+            // Arka yüz yoksa (veya eski not ise) mevcut davranış aynen devam eder: direkt aktif.
+            if (noteHasBack) {
+                recallInput.classList.add('invisible');
             } else {
-                updateRecallButtons(null);
+                recallInput.classList.remove('invisible');
+                if (isAnsweredToday) {
+                    updateRecallButtons(item.userRecallStatus);
+                } else {
+                    updateRecallButtons(null);
+                }
             }
         }
     } else {
@@ -3225,23 +3541,38 @@ function updateRecallButtonsPassive() {
     const rememberedBtn = document.getElementById('recall-btn-remembered');
     if (forgotBtn) {
         forgotBtn.disabled = false;
-        forgotBtn.className = "flex-1 py-3 font-bold uppercase text-xs rounded-xl border-2 transition-all bg-rose-600 border-rose-600 text-white hover:bg-rose-700";
+        forgotBtn.className = "flex-1 py-3 font-bold text-xs rounded-xl border-2 transition-all bg-rose-600 border-rose-600 text-white hover:bg-rose-700";
     }
     if (rememberedBtn) {
         rememberedBtn.disabled = false;
-        rememberedBtn.className = "flex-1 py-3 font-bold uppercase text-xs rounded-xl border-2 transition-all bg-emerald-600 border-emerald-600 text-white hover:bg-emerald-700";
+        rememberedBtn.className = "flex-1 py-3 font-bold text-xs rounded-xl border-2 transition-all bg-emerald-600 border-emerald-600 text-white hover:bg-emerald-700";
     }
 }
 
 function toggleReviewNote() {
     const flipInner = document.getElementById('review-flip-inner');
     const btn = document.getElementById('review-note-toggle-btn');
+    const isNoteMode = (currentReviewMode !== 'questions');
+
     if (flipInner.classList.contains('flipped')) {
         flipInner.classList.remove('flipped');
-        btn.textContent = 'Notu Göster';
+        btn.textContent = isNoteMode ? 'Cevabı Göster' : 'Notu Göster';
     } else {
         flipInner.classList.add('flipped');
-        btn.textContent = 'Soruyu Göster';
+        btn.textContent = isNoteMode ? 'Ön Yüzü Göster' : 'Soruyu Göster';
+
+        // Not modunda: arka yüz (cevap) ilk kez gösterildiğinde hatırlama butonlarını aktifleştir.
+        if (isNoteMode && currentBoxColor === 'red' && !currentArchiveMode) {
+            const item = currentReviewQueue[currentReviewIndex];
+            const todayStr = formatDate(getNowTR());
+            const recallInput = document.getElementById('review-recall-input');
+            if (recallInput) recallInput.classList.remove('invisible');
+            if (item && item.lastReviewedDate === todayStr) {
+                updateRecallButtons(item.userRecallStatus);
+            } else {
+                updateRecallButtons(null);
+            }
+        }
     }
 }
 
@@ -3412,6 +3743,7 @@ function closeReview() {
     document.getElementById('review-modal').classList.add('hidden');
     if (reviewObjectURL) { revokeObjectURL(reviewObjectURL); reviewObjectURL = null; }
     if (reviewNoteObjectURL) { revokeObjectURL(reviewNoteObjectURL); reviewNoteObjectURL = null; }
+    if (reviewNoteBackObjectURL) { revokeObjectURL(reviewNoteBackObjectURL); reviewNoteBackObjectURL = null; }
     updateHomeStats();
     currentArchiveMode = false;
 }
@@ -3423,11 +3755,11 @@ function setArchiveDataType(type) {
     const btnN = document.getElementById('btn-arch-type-n');
 
     if (type === 'question') {
-        btnQ.className = "flex-1 bg-white text-indigo-600 py-2 text-xs font-bold uppercase shadow-sm transition-all rounded-xl";
-        btnN.className = "flex-1 text-slate-600 py-2 text-xs font-bold uppercase transition-all hover:text-amber-600 rounded-xl";
+        btnQ.className = "flex-1 bg-white text-indigo-600 py-2 text-xs font-bold shadow-sm transition-all rounded-xl";
+        btnN.className = "flex-1 text-slate-600 py-2 text-xs font-bold transition-all hover:text-amber-600 rounded-xl";
     } else {
-        btnN.className = "flex-1 bg-white text-amber-600 py-2 text-xs font-bold uppercase shadow-sm transition-all rounded-xl";
-        btnQ.className = "flex-1 text-slate-600 py-2 text-xs font-bold uppercase transition-all hover:text-indigo-600 rounded-xl";
+        btnN.className = "flex-1 bg-white text-amber-600 py-2 text-xs font-bold shadow-sm transition-all rounded-xl";
+        btnQ.className = "flex-1 text-slate-600 py-2 text-xs font-bold transition-all hover:text-indigo-600 rounded-xl";
     }
     renderLibrary();
 }
@@ -3451,7 +3783,7 @@ async function populateArchiveFilters() {
         let active = appState.archSelectedCourses.includes(c);
         let btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = `px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase transition-all border ${active ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-slate-100 text-slate-600 border-slate-200'}`;
+        btn.className = `px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all border ${active ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-slate-100 text-slate-600 border-slate-200'}`;
         btn.innerText = c;
         btn.onclick = async () => {
             if(active) {
@@ -3473,7 +3805,7 @@ async function populateArchiveFilters() {
                 let tActive = appState.archSelectedTopics.includes(tKey);
                 let tBtn = document.createElement('button');
                 tBtn.type = 'button';
-                tBtn.className = `px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase transition-all border ${tActive ? 'bg-amber-500 text-white border-amber-500' : 'bg-slate-100 text-slate-600 border-slate-200'}`;
+                tBtn.className = `px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all border ${tActive ? 'bg-amber-500 text-white border-amber-500' : 'bg-slate-100 text-slate-600 border-slate-200'}`;
                 tBtn.innerText = `${c} > ${t}`;
                 tBtn.onclick = async () => {
                     if(tActive) appState.archSelectedTopics = appState.archSelectedTopics.filter(x => x !== tKey);
@@ -3533,7 +3865,7 @@ function renderLibrary() {
         filters.forEach(f => {
             const btn = document.createElement('button');
             btn.type = 'button';
-            btn.className = `px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all border ${
+            btn.className = `px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all border ${
                 activeColorFilter === f.key 
                 ? 'bg-slate-800 text-white border-slate-800 shadow' 
                 : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
@@ -3569,12 +3901,12 @@ if (appState.archSelectedTopics.length > 0) {
     });
 
     const countDisplay = document.createElement('div');
-    countDisplay.className = "text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 px-1";
+    countDisplay.className = "text-xs font-bold text-slate-500 tracking-wider mb-2 px-1";
     countDisplay.textContent = `Bulunan ${activeArchiveType === 'question' ? 'Soru' : 'Not'}: ${filteredList.length}`;
     container.appendChild(countDisplay);
 
     if (filteredList.length === 0) {
-        container.innerHTML = `<div class="p-8 text-center text-slate-400 font-bold text-xs uppercase bg-white rounded-2xl border border-slate-200 shadow-sm">Arşivde Kayıt Bulunamadı.</div>`;
+        container.innerHTML = `<div class="p-8 text-center text-slate-400 font-bold text-xs bg-white rounded-2xl border border-slate-200 shadow-sm">Arşivde Kayıt Bulunamadı.</div>`;
         return;
     }
 
@@ -3582,29 +3914,32 @@ if (appState.archSelectedTopics.length > 0) {
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             const card = entry.target;
-            const img = card.querySelector('img[data-blob-id]');
-            if (!img) return;
-            if (entry.isIntersecting) {
-                // Görünür oldu, object URL oluştur
-                const blobId = img.getAttribute('data-blob-id');
-                const blob = getBlobById(blobId);
-                if (blob) {
-                    const url = createObjectURL(blob);
-                    img.src = url;
-                    img.removeAttribute('data-blob-id'); // Artık işlendi
-                    img.dataset.objectUrl = url;
+            const imgs = card.querySelectorAll('img[data-blob-id], img[data-original-blob-id]');
+            if (!imgs || imgs.length === 0) return;
+            imgs.forEach((img) => {
+                if (entry.isIntersecting) {
+                    // Görünür oldu, object URL oluştur
+                    const blobId = img.getAttribute('data-blob-id');
+                    if (!blobId) return;
+                    const blob = getBlobById(blobId);
+                    if (blob) {
+                        const url = createObjectURL(blob);
+                        img.src = url;
+                        img.removeAttribute('data-blob-id'); // Artık işlendi
+                        img.dataset.objectUrl = url;
+                    }
+                } else {
+                    // Görünürlükten çıktı, URL'yi kaldır
+                    const url = img.dataset.objectUrl;
+                    if (url) {
+                        revokeObjectURL(url);
+                        img.removeAttribute('src');
+                        img.removeAttribute('data-object-url');
+                        // Blob id'yi tekrar ekle, tekrar görünür olursa yeniden oluşturulabilir
+                        img.setAttribute('data-blob-id', img.getAttribute('data-original-blob-id') || '');
+                    }
                 }
-            } else {
-                // Görünürlükten çıktı, URL'yi kaldır
-                const url = img.dataset.objectUrl;
-                if (url) {
-                    revokeObjectURL(url);
-                    img.removeAttribute('src');
-                    img.removeAttribute('data-object-url');
-                    // Blob id'yi tekrar ekle, tekrar görünür olursa yeniden oluşturulabilir
-                    img.setAttribute('data-blob-id', img.getAttribute('data-original-blob-id') || '');
-                }
-            }
+            });
         });
     }, { rootMargin: '100px' });
 
@@ -3637,10 +3972,10 @@ if (appState.archSelectedTopics.length > 0) {
             contentHTML += `<img src="" loading="lazy" data-blob-id="${blobId}" data-original-blob-id="${blobId}" class="w-full max-h-36 object-contain rounded-xl bg-slate-50 border border-slate-100 cursor-zoom-in" onclick="event.stopPropagation(); openLightboxFromBlob('${blobId}')">`;
         }
         if(item.text_question) {
-            contentHTML += `<div class="text-xs font-bold text-slate-800 uppercase bg-slate-50 p-2.5 rounded-xl border border-slate-100">${item.text_question}</div>`;
+            contentHTML += `<div class="text-xs font-bold text-slate-800 bg-slate-50 p-2.5 rounded-xl border border-slate-100">${item.text_question}</div>`;
         }
         if(item.note_text) {
-            contentHTML += `<div class="text-[11px] font-semibold text-amber-800 uppercase bg-amber-50 p-2 rounded-xl border border-amber-100">${item.note_text}</div>`;
+            contentHTML += `<div class="text-[11px] font-semibold text-amber-800 bg-amber-50 p-2 rounded-xl border border-amber-100">${item.note_text}</div>`;
         }
         if(item.note_img) {
             const blobId = `blob-${Date.now()}-${Math.random()}`;
@@ -3649,7 +3984,22 @@ if (appState.archSelectedTopics.length > 0) {
             contentHTML += `<img src="" loading="lazy" data-blob-id="${blobId}" data-original-blob-id="${blobId}" class="w-full max-h-36 object-contain rounded-xl bg-amber-50 border border-amber-100 cursor-zoom-in mt-1" onclick="event.stopPropagation(); openLightboxFromBlob('${blobId}')">`;
         }
         if(!item.note_text && !item.note_img && item.note) {
-            contentHTML += `<div class="text-[11px] font-semibold text-amber-800 uppercase bg-amber-50 p-2 rounded-xl border border-amber-100">${item.note}</div>`;
+            contentHTML += `<div class="text-[11px] font-semibold text-amber-800 bg-amber-50 p-2 rounded-xl border border-amber-100">${item.note}</div>`;
+        }
+
+        // Not arka yüzü (Cevap): sadece doluysa gösterilir, otomatik açık (flip gerekmez).
+        // Eski notlarda note_back/note_back_img undefined olduğu için bu blok hiç render edilmez.
+        if (item.note_back || item.note_back_img) {
+            contentHTML += `<div class="archive-back-tag pt-1">Cevap:</div>`;
+            if (item.note_back) {
+                contentHTML += `<div class="text-[11px] font-semibold text-amber-900 bg-amber-100/70 p-2 rounded-xl border border-amber-200">${item.note_back}</div>`;
+            }
+            if (item.note_back_img) {
+                const backBlobId = `blob-${Date.now()}-${Math.random()}`;
+                if (!window.blobStore) window.blobStore = {};
+                window.blobStore[backBlobId] = item.note_back_img;
+                contentHTML += `<img src="" loading="lazy" data-blob-id="${backBlobId}" data-original-blob-id="${backBlobId}" class="w-full max-h-36 object-contain rounded-xl bg-amber-100/70 border border-amber-200 cursor-zoom-in mt-1" onclick="event.stopPropagation(); openLightboxFromBlob('${backBlobId}')">`;
+            }
         }
 
         let extraInfo = '';
@@ -3672,12 +4022,12 @@ if (appState.archSelectedTopics.length > 0) {
 
         let pushBtnHTML = '';
         if (activeColorFilter === 'yellow' || activeColorFilter === 'green') {
-            pushBtnHTML = `<button onclick="event.stopPropagation(); pushToEnd('${activeArchiveType}', ${item.id})" class="bg-white/80 hover:bg-white text-slate-700 border border-slate-300 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase shadow-sm transition-colors" title="En sona at">En Alta Gönder</button>`;
+            pushBtnHTML = `<button onclick="event.stopPropagation(); pushToEnd('${activeArchiveType}', ${item.id})" class="bg-white/80 hover:bg-white text-slate-700 border border-slate-300 px-3 py-1.5 rounded-lg text-[10px] font-bold shadow-sm transition-colors" title="En sona at">En Alta Gönder</button>`;
         }
 
         card.innerHTML = `
             <div class="absolute top-0 left-0 w-1.5 h-full ${borderBarColor}"></div>
-            <div class="flex justify-between items-center text-xs font-extrabold text-slate-700 uppercase">
+            <div class="flex justify-between items-center text-xs font-extrabold text-slate-700">
                 <span>${item.course} > ${item.topic}</span>
                 <div class="flex items-center gap-2">
                     <span class="text-[10px] text-slate-400 font-semibold">${item.createdDate || ''}</span>
@@ -3763,8 +4113,8 @@ function openCampSetup(type) {
     campMode = type;
     let list = (type === 'questions') ? appState.questions : appState.notes;
     list = list.filter(item => 
-        appState.archSelectedCourses.includes(item.course) && 
-        appState.archSelectedTopics.includes(item.course + '::' + item.topic)
+        (appState.archSelectedCourses.length === 0 || appState.archSelectedCourses.includes(item.course)) && 
+        (appState.archSelectedTopics.length === 0 || appState.archSelectedTopics.includes(item.course + '::' + item.topic))
     );
     document.getElementById('camp-total-count').innerText = list.length;
     document.getElementById('camp-title').innerText = type === 'questions' ? "Rastgele Kamp" : "Rastgele Kamp";
@@ -3779,8 +4129,8 @@ function startCamp() {
     let count = parseInt(document.getElementById('camp-count-input').value) || 5;
     let list = (campMode === 'questions') ? [...appState.questions] : [...appState.notes];
     list = list.filter(item => 
-        appState.archSelectedCourses.includes(item.course) && 
-        appState.archSelectedTopics.includes(item.course + '::' + item.topic)
+        (appState.archSelectedCourses.length === 0 || appState.archSelectedCourses.includes(item.course)) && 
+        (appState.archSelectedTopics.length === 0 || appState.archSelectedTopics.includes(item.course + '::' + item.topic))
     );
 
     if (list.length === 0) {
@@ -4002,6 +4352,7 @@ async function changeField(field) {
                     const codeBtn = document.getElementById("btn-code-enter");
                     if (codeBtn) codeBtn.classList.add('hidden');
                     if (errorDisplay) errorDisplay.innerText = "Giriş başarılı!";
+                    if (window.openInstallPromptGate) window.openInstallPromptGate();
                 } catch (err) {
                     if (errorDisplay) errorDisplay.innerText = "Şifre silinirken hata oluştu: " + err.message;
                 }
@@ -4016,7 +4367,17 @@ async function changeField(field) {
 
     <script>
         // Ana Ekrana Ekle Prompt Yönetimi
+        // NOT: Bu pencere, tanıtım turu (onboarding) veya giriş ekranı açıkken KESİNLİKLE gösterilmez.
+        // Tarayıcı bu isteği (beforeinstallprompt / load) sayfa açılır açılmaz, uygulama henüz
+        // hangi ekranı göstereceğine karar vermeden tetikleyebiliyor. Bu yüzden isteği burada
+        // sadece "not ediyoruz"; asıl gösterme kararını tryShowInstallPrompt() veriyor ve bu
+        // fonksiyon yalnızca ana script tanıtım turunu kapattığında (openInstallPromptGate)
+        // devreye giriyor. Böylece iki pencere asla üst üste binmiyor.
         let deferredPrompt = null;
+        let androidInstallPending = false;
+        let iosInstallPending = false;
+        let installPromptGateOpen = false;
+
         const installModal = document.getElementById('install-modal');
         const installTitle = document.getElementById('install-title');
         const installDesc = document.getElementById('install-desc');
@@ -4062,20 +4423,49 @@ async function changeField(field) {
             btnInstallAccept.innerText = 'Ana Ekrana Ekle';
         }
 
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
+        function isAppFlowBlocking() {
+            const onboardingModal = document.getElementById('onboarding-modal');
+            const loginScreen = document.getElementById('login-screen');
+            const fieldModal = document.getElementById('field-change-modal');
+            if (onboardingModal && !onboardingModal.classList.contains('hidden')) return true;
+            if (loginScreen && loginScreen.style.display && loginScreen.style.display !== 'none') return true;
+            if (fieldModal && !fieldModal.classList.contains('hidden')) return true;
+            return false;
+        }
 
-            if (!getInstallDismissed() && !isStandalone) {
+        function tryShowInstallPrompt() {
+            if (isStandalone || getInstallDismissed()) return;
+            if (!installPromptGateOpen) return;
+            if (!installModal.classList.contains('hidden')) return;
+            if (isAppFlowBlocking()) return;
+
+            if (isIOS && iosInstallPending) {
+                showIOSInstructions();
+                installModal.classList.remove('hidden');
+            } else if (androidInstallPending && deferredPrompt) {
                 showAndroidInstall();
                 installModal.classList.remove('hidden');
             }
+        }
+
+        // Ana uygulama script'i, tanıtım turu / giriş akışı tamamen bittiğinde bunu çağırır.
+        window.openInstallPromptGate = function() {
+            installPromptGateOpen = true;
+            // Kapanış animasyonu rahatça tamamlansın diye ufak bir gecikme bırakıyoruz.
+            setTimeout(tryShowInstallPrompt, 700);
+        };
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            androidInstallPending = true;
+            tryShowInstallPrompt();
         });
 
         window.addEventListener('load', () => {
             if (isIOS && !isStandalone && !getInstallDismissed()) {
-                showIOSInstructions();
-                installModal.classList.remove('hidden');
+                iosInstallPending = true;
+                tryShowInstallPrompt();
             }
         });
 
