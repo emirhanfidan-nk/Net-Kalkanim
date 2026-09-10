@@ -248,227 +248,6 @@
             letter-spacing: 0.05em;
             color: #b45309;
         }
-
-        /* ==================== KARANLIK MOD ==================== */
-        /* Ana sayfadaki kırmızı/sarı/yeşil kutular ve içindeki butonlar inline style ile
-           renklendirildiği için, bunları CSS değişkenleri (variable) üzerinden yönetiyoruz.
-           Karanlık modda bu değişkenler otomatik olarak koyu tonlara dönüyor. */
-        :root {
-            --box-red-bg: #FDE7EB;
-            --box-red-accent: #C92B43;
-            --box-yellow-bg: #FCF0DA;
-            --box-yellow-accent: #C57C10;
-            --box-green-bg: #E1F8EC;
-            --box-green-accent: #0B8654;
-            --box-inner-bg: #FFFFFF;
-            --box-desc-text: #3A3745;
-            --board-bg: #FFFFFF;
-            --board-border: #e2e8f0;
-        }
-        /* Tasarım notu: karanlık mod, açık temanın rengi siyaha boyanmış hali değil — kendi
-           paleti var. Nötr, yumuşak koyu gri yüzeyler (bordo/zeytin gibi ağır doygun tonlar
-           yok) + kategori renklerinin canlı/hafif fosforlu vurgu versiyonları kullanılıyor. */
-        body.dark-mode {
-            --box-red-bg: #2a2029;
-            --box-red-accent: #ff7a8a;
-            --box-yellow-bg: #2a2621;
-            --box-yellow-accent: #ffd166;
-            --box-green-bg: #1f2926;
-            --box-green-accent: #5eeba0;
-            --box-inner-bg: #262733;
-            --box-desc-text: #a6a7b3;
-            --board-bg: #16171d;
-            --board-border: #35363f;
-        }
-
-        /* Tüm sayfa Tailwind utility class'larıyla yazıldığı için, her elemana tek tek
-           dokunmak yerine en sık kullanılan renk class'larını burada geçersiz kılıyoruz. */
-        body.dark-mode {
-            background-color: #131319;
-            /* Kendi text-color class'ı olmayan elemanlar (ör. bazı butonlar) için taban renk */
-            color: #e7e7ec;
-        }
-        body.dark-mode .bg-white,
-        body.dark-mode .bg-slate-50 {
-            background-color: #1d1e26 !important;
-        }
-        body.dark-mode .bg-slate-100 {
-            background-color: #17181f !important;
-        }
-        body.dark-mode .bg-slate-200,
-        body.dark-mode .bg-slate-300 {
-            background-color: #34353f !important;
-        }
-        body.dark-mode .text-slate-800,
-        body.dark-mode .text-slate-700 {
-            color: #f0f0f4 !important;
-        }
-        body.dark-mode .text-slate-600 {
-            color: #c6c7d1 !important;
-        }
-        body.dark-mode .text-slate-500,
-        body.dark-mode .text-slate-400 {
-            color: #93949f !important;
-        }
-        body.dark-mode .border-slate-100,
-        body.dark-mode .border-slate-200,
-        body.dark-mode .border-slate-300 {
-            border-color: #34353f !important;
-        }
-        body.dark-mode .divide-slate-100 > :not([hidden]) ~ :not([hidden]) {
-            border-color: #34353f !important;
-        }
-        /* Tailwind'in opaklıklı (opacity) varyantları farklı bir class ismi ürettiği için
-           yukarıdaki kurallar bunları yakalamıyor, ayrıca burada geçersiz kılıyoruz. */
-        body.dark-mode .bg-white\/80 {
-            background-color: #1d1e26 !important;
-        }
-        body.dark-mode .bg-slate-100\/50,
-        body.dark-mode .bg-slate-100\/80 {
-            background-color: #17181f !important;
-        }
-        body.dark-mode .bg-indigo-50\/80 {
-            background-color: rgba(129, 140, 248, 0.24) !important;
-        }
-        body.dark-mode .bg-amber-100\/70 {
-            background-color: rgba(255, 209, 102, 0.12) !important;
-        }
-        body.dark-mode .bg-amber-100 {
-            background-color: rgba(255, 209, 102, 0.16) !important;
-        }
-        body.dark-mode .border-amber-200,
-        body.dark-mode .border-amber-300 {
-            border-color: rgba(255, 209, 102, 0.35) !important;
-        }
-        body.dark-mode .text-amber-700 {
-            color: #ffd166 !important;
-        }
-        body.dark-mode .hover\:bg-amber-200:hover {
-            background-color: rgba(255, 209, 102, 0.26) !important;
-        }
-        /* Doğru/Yanlış geri bildirim rozeti (soru cevaplandığında) */
-        body.dark-mode .bg-green-100 {
-            background-color: rgba(94, 235, 160, 0.16) !important;
-        }
-        body.dark-mode .text-green-800 {
-            color: #5eeba0 !important;
-        }
-        body.dark-mode .border-green-300 {
-            border-color: rgba(94, 235, 160, 0.35) !important;
-        }
-        body.dark-mode .bg-red-100 {
-            background-color: rgba(255, 122, 138, 0.16) !important;
-        }
-        body.dark-mode .text-red-800 {
-            color: #ff9aa6 !important;
-        }
-        body.dark-mode .border-red-300 {
-            border-color: rgba(255, 122, 138, 0.35) !important;
-        }
-        /* İndigo rozet/örnek kutuları (tanıtım ekranı vb.) */
-        body.dark-mode .bg-indigo-100 {
-            background-color: rgba(129, 140, 248, 0.18) !important;
-        }
-        body.dark-mode .bg-indigo-200 {
-            background-color: rgba(129, 140, 248, 0.28) !important;
-        }
-        body.dark-mode .text-indigo-700,
-        body.dark-mode .text-indigo-800,
-        body.dark-mode .text-indigo-900 {
-            color: #b4bafc !important;
-        }
-        /* Gül kurusu (rose) rozet/buton arka planları */
-        body.dark-mode .bg-rose-100 {
-            background-color: rgba(255, 122, 138, 0.16) !important;
-        }
-        body.dark-mode .bg-rose-200,
-        body.dark-mode .hover\:bg-rose-200:hover {
-            background-color: rgba(255, 122, 138, 0.26) !important;
-        }
-        /* Mor (violet) ve zümrüt (emerald) rozet arka planları */
-        body.dark-mode .bg-violet-100 {
-            background-color: rgba(167, 139, 250, 0.18) !important;
-        }
-        body.dark-mode .hover\:bg-emerald-100:hover {
-            background-color: rgba(94, 235, 160, 0.18) !important;
-        }
-        body.dark-mode .text-amber-900,
-        body.dark-mode .text-amber-800 {
-            color: #ffd166 !important;
-        }
-        body.dark-mode .custom-confirm-box {
-            background: #1d1e26 !important;
-        }
-        body.dark-mode .custom-confirm-box p {
-            color: #f0f0f4 !important;
-        }
-        body.dark-mode .btn-confirm-cancel {
-            background: #34353f !important;
-            color: #e7e7ec !important;
-        }
-        body.dark-mode .btn-confirm-cancel:hover {
-            background: #40414c !important;
-        }
-        body.dark-mode .review-flip-back {
-            background: #221e14 !important;
-        }
-        body.dark-mode .face-heading-front {
-            background: rgba(129, 140, 248, 0.16) !important;
-            color: #b4bafc !important;
-            border-color: rgba(129, 140, 248, 0.35) !important;
-        }
-        body.dark-mode .face-heading-back {
-            background: rgba(255, 209, 102, 0.14) !important;
-            color: #ffd166 !important;
-            border-color: rgba(255, 209, 102, 0.3) !important;
-        }
-        body.dark-mode .archive-back-tag {
-            color: #ffd166 !important;
-        }
-        body.dark-mode #review-unified-board {
-            border-color: #35363f !important;
-        }
-        /* Pastel kategori panelleri: tek düze gri yerine her birine kendi renginden hafif,
-           "fosforlu" bir parıltı veriyoruz. */
-        body.dark-mode .bg-indigo-50 { background-color: rgba(129, 140, 248, 0.14) !important; }
-        body.dark-mode .bg-violet-50 { background-color: rgba(167, 139, 250, 0.14) !important; }
-        body.dark-mode .bg-purple-50 { background-color: rgba(192, 132, 252, 0.14) !important; }
-        body.dark-mode .bg-emerald-50 { background-color: rgba(94, 235, 160, 0.12) !important; }
-        body.dark-mode .bg-green-50 { background-color: rgba(94, 235, 160, 0.12) !important; }
-        body.dark-mode .bg-cyan-50 { background-color: rgba(94, 217, 235, 0.12) !important; }
-        body.dark-mode .bg-amber-50 { background-color: rgba(255, 209, 102, 0.12) !important; }
-        body.dark-mode .bg-yellow-50 { background-color: rgba(255, 209, 102, 0.12) !important; }
-        body.dark-mode .bg-orange-50 { background-color: rgba(255, 167, 102, 0.12) !important; }
-        body.dark-mode .bg-rose-50 { background-color: rgba(255, 122, 138, 0.12) !important; }
-        body.dark-mode .bg-red-50 { background-color: rgba(255, 122, 138, 0.12) !important; }
-        body.dark-mode .bg-blue-50 { background-color: rgba(122, 168, 255, 0.12) !important; }
-        body.dark-mode input,
-        body.dark-mode textarea,
-        body.dark-mode select {
-            background-color: #17181f !important;
-            color: #f0f0f4 !important;
-            border-color: #35363f !important;
-        }
-        body.dark-mode .shadow-sm,
-        body.dark-mode .shadow-md,
-        body.dark-mode .shadow-lg,
-        body.dark-mode .shadow-xl,
-        body.dark-mode .shadow-2xl {
-            box-shadow: none !important;
-        }
-
-        /* ==================== SERİ (STREAK) ANİMASYONU ==================== */
-        @keyframes flame-flicker {
-            0%, 100% { transform: scale(1) rotate(-3deg); }
-            25% { transform: scale(1.08) rotate(3deg); }
-            50% { transform: scale(0.95) rotate(-2deg); }
-            75% { transform: scale(1.04) rotate(2deg); }
-        }
-        .streak-flame {
-            display: inline-block;
-            animation: flame-flicker 1.6s ease-in-out infinite;
-            transform-origin: center bottom;
-        }
     </style>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="logo.png">
@@ -479,19 +258,6 @@
 </script>
 </head>
 <body class="flex justify-center min-h-screen">
-    <script>
-        // Karanlık mod tercihini, tüm veri (IndexedDB) yüklenmeden önce localStorage'dan
-        // hemen uygula — böylece sayfa açılırken kısa bir "aydınlık" yanıp sönmesi olmaz.
-        try {
-            const backup = localStorage.getItem('yks_sr_settings_backup');
-            if (backup) {
-                const parsed = JSON.parse(backup);
-                if (parsed && parsed.darkMode) {
-                    document.body.classList.add('dark-mode');
-                }
-            }
-        } catch(e) {}
-    </script>
 <!-- ŞİFRE / SEÇİM EKRANI -->
 <div id="login-screen" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #ffffff; z-index: 999999; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; padding: 20px; text-align: center;">
   <h2 style="font-family: 'Sora', sans-serif;">Net Kalkanım'a Giriş</h2>
@@ -536,31 +302,25 @@
                         </svg>
                         Günlük Tekrar
                     </h2>
-                    <div id="home-streak-badge" class="hidden items-center gap-1.5 bg-white border border-slate-200 px-3 py-1.5 rounded-full shadow-sm shrink-0">
-                        <svg class="streak-flame w-4 h-4" viewBox="0 0 24 24" fill="none">
-                            <path d="M12.5 2.5c1.2 3-2.3 4.4-2.3 7.6a2.8 2.8 0 005.6 0c0-1-.4-1.9-1-2.8 2 1.1 3.2 3.3 3.2 5.6a5.5 5.5 0 11-11 0c0-4.6 3.5-6.7 5.5-10.4z" fill="#F97316"/>
-                        </svg>
-                        <span id="home-streak-count" class="text-sm font-bold text-slate-800">0</span>
-                    </div>
                 </div>
 
                 <!-- KIRMIZI KUTU (BÜYÜK) -->
-                <div class="rounded-3xl p-5 shadow-lg relative overflow-hidden" style="background-color: var(--box-red-bg); border: 2px solid var(--box-red-bg);">
-                    <div class="absolute top-0 left-0 w-2 h-full" style="background-color: var(--box-red-accent);"></div>
+                <div class="rounded-3xl p-5 shadow-lg relative overflow-hidden" style="background-color: #FDE7EB; border: 2px solid #FDE7EB;">
+                    <div class="absolute top-0 left-0 w-2 h-full" style="background-color: #C92B43;"></div>
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="font-semibold text-sm tracking-wider" style="color: var(--box-red-accent);">Kırmızı Kutu</h3>
-                        <span class="text-xs font-semibold px-3 py-1 rounded-full" style="background-color: var(--box-red-bg); color: var(--box-red-accent); border: 1px solid var(--box-red-accent); display: inline-block; text-align: center;">
+                        <h3 class="font-semibold text-sm tracking-wider" style="color: #C92B43;">Kırmızı Kutu</h3>
+                        <span class="text-xs font-semibold px-3 py-1 rounded-full" style="background-color: #FDE7EB; color: #C92B43; border: 1px solid #C92B43; display: inline-block; text-align: center;">
     Bekleyen: <span id="red-total-count">0</span><br>
     <span id="red-estimated-time" style="font-size: 10px; opacity: 0.9;">tahmini ...</span>
 </span>
                     </div>
-                    <p class="text-xs font-medium mb-3" style="color: var(--box-desc-text);">Bugün halletmen gerekenler</p>
+                    <p class="text-xs font-medium mb-3" style="color: #3A3745;">Bugün halletmen gerekenler</p>
                     <div class="grid grid-cols-2 gap-3">
-                        <button onclick="startReview('questions')" class="btn-cyber btn-cyber-red py-4 rounded-2xl font-semibold text-sm flex flex-col items-center justify-center gap-1 shadow-md" style="background-color: var(--box-inner-bg); color: var(--box-red-accent);">
+                        <button onclick="startReview('questions')" class="btn-cyber btn-cyber-red py-4 rounded-2xl font-semibold text-sm flex flex-col items-center justify-center gap-1 shadow-md" style="background-color: #FFFFFF; color: #C92B43;">
                             <span>Soruları Başlat</span>
                             <span class="text-xs opacity-80">[ <span id="red-question-count">0</span> ]</span>
                         </button>
-                        <button onclick="startReview('notes')" class="btn-cyber btn-cyber-yellow py-4 rounded-2xl font-semibold text-sm flex flex-col items-center justify-center gap-1 shadow-md" style="background-color: var(--box-inner-bg); color: var(--box-red-accent);">
+                        <button onclick="startReview('notes')" class="btn-cyber btn-cyber-yellow py-4 rounded-2xl font-semibold text-sm flex flex-col items-center justify-center gap-1 shadow-md" style="background-color: #FFFFFF; color: #C92B43;">
                             <span>Notları Başlat</span>
                             <span class="text-xs opacity-80">[ <span id="red-note-count">0</span> ]</span>
                         </button>
@@ -569,29 +329,29 @@
 
                 <!-- SARI VE YEŞİL KUTULAR (YAN YANA) -->
                 <div class="grid grid-cols-2 gap-4">
-                    <button onclick="goToLibraryWithFilter('yellow')" class="rounded-2xl p-4 shadow-sm transition-colors text-left" style="background-color: var(--box-yellow-bg); border: 2px solid var(--box-yellow-bg);">
+                    <button onclick="goToLibraryWithFilter('yellow')" class="rounded-2xl p-4 shadow-sm transition-colors text-left" style="background-color: #FCF0DA; border: 2px solid #FCF0DA;">
                         <div class="flex items-center justify-between mb-2">
-                            <h3 class="font-semibold text-xs" style="color: var(--box-yellow-accent);">Sarı Kutu</h3>
+                            <h3 class="font-semibold text-xs" style="color: #C57C10;">Sarı Kutu</h3>
                         </div>
-                        <p class="text-xs font-medium mb-3" style="color: var(--box-desc-text);">Ara sıra bakabilirsin</p>
-                        <div class="text-xs font-semibold space-y-1" style="color: var(--box-yellow-accent);">
+                        <p class="text-xs font-medium mb-3" style="color: #3A3745;">Ara sıra bakabilirsin</p>
+                        <div class="text-xs font-semibold space-y-1" style="color: #C57C10;">
                             <div>Soru: <span id="yellow-question-count">0</span></div>
                             <div>Not: <span id="yellow-note-count">0</span></div>
                         </div>
-                        <div class="mt-3 pt-2 border-t border-white/40 flex items-center justify-center gap-1 text-xs font-bold rounded-xl py-2" style="background-color: var(--box-yellow-accent); color: #FFFFFF;">
+                        <div class="mt-3 pt-2 border-t border-white/40 flex items-center justify-center gap-1 text-xs font-bold rounded-xl py-2" style="background-color: #C57C10; color: #FFFFFF;">
                             Göz At <span></span>
                         </div>
                     </button>
-                    <button onclick="goToLibraryWithFilter('green')" class="rounded-2xl p-4 shadow-sm transition-colors text-left" style="background-color: var(--box-green-bg); border: 2px solid var(--box-green-bg);">
+                    <button onclick="goToLibraryWithFilter('green')" class="rounded-2xl p-4 shadow-sm transition-colors text-left" style="background-color: #E1F8EC; border: 2px solid #E1F8EC;">
                         <div class="flex items-center justify-between mb-2">
-                            <h3 class="font-semibold text-xs" style="color: var(--box-green-accent);">Yeşil Kutu</h3>
+                            <h3 class="font-semibold text-xs" style="color: #0B8654;">Yeşil Kutu</h3>
                         </div>
-                        <p class="text-xs font-medium mb-3" style="color: var(--box-desc-text);">Ustalık, ayda bir göz at</p>
-                        <div class="text-xs font-semibold space-y-1" style="color: var(--box-green-accent);">
+                        <p class="text-xs font-medium mb-3" style="color: #3A3745;">Ustalık, ayda bir göz at</p>
+                        <div class="text-xs font-semibold space-y-1" style="color: #0B8654;">
                             <div>Soru: <span id="green-question-count">0</span></div>
                             <div>Not: <span id="green-note-count">0</span></div>
                         </div>
-                        <div class="mt-3 pt-2 border-t border-white/40 flex items-center justify-center gap-1 text-xs font-bold rounded-xl py-2" style="background-color: var(--box-green-accent); color: #FFFFFF;">
+                        <div class="mt-3 pt-2 border-t border-white/40 flex items-center justify-center gap-1 text-xs font-bold rounded-xl py-2" style="background-color: #0B8654; color: #FFFFFF;">
                             Göz At <span></span>
                         </div>
                     </button>
@@ -843,115 +603,84 @@
                 <div id="library-list" class="space-y-3"></div>
             </div>
 
-            <div id="profile" class="tab-content space-y-5">
+            <div id="profile" class="tab-content space-y-6">
 
-                <!-- Ayarlar başlığı (diğer sekmelerle aynı stil) -->
-                <div class="flex justify-between items-center border-b border-slate-200 pb-2">
-                    <h2 class="text-xl font-semibold text-slate-800 flex items-center gap-2 font-display">
-                        <svg class="w-6 h-6 fill-current text-indigo-600" viewBox="0 0 24 24">
-                            <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
-                        </svg>
-                        Ayarlar
-                    </h2>
+            <div class="bg-white border border-slate-200 p-5 space-y-3 relative overflow-hidden rounded-2xl shadow-sm">
+    <div class="absolute top-0 left-0 w-1.5 h-full bg-emerald-500"></div>
+    <h3 class="font-semibold text-xs text-emerald-600 tracking-wider">Depolama Kullanımı</h3>
+    <p id="storage-usage-info" class="text-sm font-medium text-slate-700"></p>
+    <p class="text-xs text-slate-400">Fotoğraflarını kaybetmemek için hiçbir veriyi silme.</p>
+</div>
+
+
+                <div class="bg-white border border-slate-200 p-5 space-y-4 relative overflow-hidden rounded-2xl shadow-sm">
+                    <div class="absolute top-0 left-0 w-1.5 h-full bg-indigo-600"></div>
+                    <h3 class="font-semibold text-xs text-indigo-600 tracking-wider">Uygulama Rehberi</h3>
+                    <button onclick="showOnboarding()" class="w-full bg-indigo-50 border border-indigo-200 text-indigo-600 hover:bg-indigo-600 hover:text-white py-3 font-semibold text-xs rounded-xl transition-colors shadow-sm">
+                        Uygulama Tanıtımını Tekrar Gör
+                    </button>
                 </div>
 
-                <!-- Tek bir liste halinde, sade "satır" görünümü -->
-                <div class="bg-white border border-slate-200 rounded-2xl shadow-sm divide-y divide-slate-100 overflow-hidden">
+                <!-- ALAN DEĞİŞTİRME BÖLÜMÜ (YENİ) -->
+                <div class="bg-white border border-slate-200 p-5 space-y-4 relative overflow-hidden rounded-2xl shadow-sm">
+                    <div class="absolute top-0 left-0 w-1.5 h-full bg-violet-500"></div>
+                    <h3 class="font-semibold text-xs text-violet-600 tracking-wider">Alan Bilgisi</h3>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-slate-800">Mevcut Alan: <span id="current-field-display" class="text-violet-600">-</span></p>
+                            <p class="text-xs text-slate-500 mt-1">Alan değiştirdiğinde ders ve konu listesi güncellenir, mevcut soru/notların silinmez.</p>
+                        </div>
+                    </div>
+                    <button onclick="openFieldChangeModal()" class="w-full bg-violet-600 hover:bg-violet-700 text-white py-3 font-semibold text-xs rounded-xl transition-colors shadow-sm">
+                        Alan Değiştir
+                    </button>
+                </div>
 
-                    <!-- Karanlık Mod -->
-                    <div class="p-4 flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center shrink-0">
-                            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M9.37 5.51A7.35 7.35 0 0 0 9.1 7.5c0 4.08 3.32 7.4 7.4 7.4.68 0 1.35-.09 1.99-.27A7.014 7.014 0 0 1 12 19c-3.86 0-7-3.14-7-7 0-2.93 1.81-5.45 4.37-6.49zM12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-5.4-5.4c0-1.71.86-3.22 2.16-4.12A9.032 9.032 0 0 0 12 3z"/></svg>
+                <!-- GRUP BOYUTU (MOLA NOKTALARI) -->
+                <div class="bg-white border border-slate-200 p-5 space-y-4 relative overflow-hidden rounded-2xl shadow-sm">
+                    <div class="absolute top-0 left-0 w-1.5 h-full bg-cyan-500"></div>
+                    <h3 class="font-semibold text-xs text-cyan-600 tracking-wider">Grup Boyutu (Mola Noktaları)</h3>
+                    <p class="text-[11px] text-slate-500 -mt-2">Tekrar sırasında kaç soru/nottan sonra bir mola ekranı çıksın? Hiçbir şey silinmez/atlanmaz, sadece ara verip devam etme şansı sunar. (0 = mola verme, hepsini tek seferde göster)</p>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-2">Soru Tekrarında Grup Boyutu (0 = mola verme)</label>
+                            <input type="number" id="setting-daily-limit-q" class="w-full bg-slate-50 p-3 border border-slate-300 font-mono text-center text-slate-700 font-medium outline-none focus:border-cyan-500 transition-colors rounded-xl">
                         </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium text-slate-800">Karanlık Mod</p>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-2">Not Tekrarında Grup Boyutu (0 = mola verme)</label>
+                            <input type="number" id="setting-daily-limit-n" class="w-full bg-slate-50 p-3 border border-slate-300 font-mono text-center text-slate-700 font-medium outline-none focus:border-cyan-500 transition-colors rounded-xl">
                         </div>
-                        <button id="dark-mode-toggle" onclick="toggleDarkMode()" class="relative w-12 h-7 rounded-full transition-colors bg-slate-300 shrink-0">
-                            <span id="dark-mode-toggle-knob" class="absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow-md transition-transform"></span>
+                        <button onclick="saveDailyLimits()" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-3 font-semibold text-xs rounded-xl transition-colors shadow-sm">Kaydet</button>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-slate-200 p-5 space-y-4 relative overflow-hidden rounded-2xl shadow-sm">
+                    <div class="absolute top-0 left-0 w-1.5 h-full bg-purple-600"></div>
+                    <h3 class="font-semibold text-xs text-purple-600 tracking-wider">Algoritma Döngüsü (Sorular)</h3>
+                    <input type="text" id="setting-intervals" class="w-full bg-slate-50 p-3 border border-slate-300 font-mono text-center text-purple-700 font-medium outline-none focus:border-purple-500 transition-colors rounded-xl">
+                    <button onclick="saveIntervals()" class="btn-cyber btn-cyber-purple w-full bg-purple-600 hover:bg-purple-700 text-white py-3 text-xs font-semibold rounded-xl shadow-sm">Geriye Dönük Güncelle</button>
+                </div>
+
+                <div class="bg-white border border-slate-200 p-5 space-y-4 relative overflow-hidden rounded-2xl shadow-sm">
+                    <div class="absolute top-0 left-0 w-1.5 h-full bg-amber-500"></div>
+                    <h3 class="font-semibold text-xs text-amber-600 tracking-wider">Algoritma Döngüsü (Notlar)</h3>
+                    <input type="text" id="setting-note-intervals" class="w-full bg-slate-50 p-3 border border-slate-300 font-mono text-center text-amber-700 font-medium outline-none focus:border-amber-500 transition-colors rounded-xl">
+                    <button onclick="saveNoteIntervals()" class="btn-cyber btn-cyber-yellow w-full bg-amber-500 hover:bg-amber-600 text-white py-3 text-xs font-semibold rounded-xl shadow-sm">Geriye Dönük Güncelle</button>
+                </div>
+
+                <!-- YEDEKLEME BÖLÜMÜ -->
+                <div class="bg-white border border-slate-200 p-5 space-y-3 relative overflow-hidden rounded-2xl shadow-sm">
+                    <div class="absolute top-0 left-0 w-1.5 h-full bg-rose-500"></div>
+                    <h3 class="font-semibold text-xs text-rose-600 tracking-wider">Yedekleme</h3>
+                    <p class="text-xs text-slate-500">Tüm soruların, notların ve ayarların tek bir dosyaya inebilir. Telefon değişirse ya da uygulama silinirse bu dosyayla her şeyi geri getirebilirsin.</p>
+                    <div class="space-y-2">
+                        <button onclick="exportBackupToFile()" class="w-full bg-rose-600 hover:bg-rose-700 text-white py-3 font-semibold text-xs rounded-xl transition-colors shadow-sm">
+                            Yedek Al (Dosyaya İndir)
                         </button>
-                    </div>
-
-                    <!-- Alan Bilgisi -->
-                    <div class="p-4 flex items-start gap-3">
-                        <div class="w-9 h-9 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center shrink-0">
-                            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium text-slate-800">Alan: <span id="current-field-display" class="text-violet-600">-</span></p>
-                            <p class="text-xs text-slate-500 mt-0.5">Değiştirdiğinde ders/konu listesi güncellenir, sorularının silinmez.</p>
-                            <button onclick="openFieldChangeModal()" class="mt-2 bg-violet-50 hover:bg-violet-100 text-violet-600 px-3 py-1.5 font-semibold text-xs rounded-lg transition-colors">
-                                Alan Değiştir
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Uygulama Rehberi -->
-                    <div class="p-4 flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
-                            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium text-slate-800">Uygulama Rehberi</p>
-                        </div>
-                        <button onclick="showOnboarding()" class="text-indigo-600 text-xs font-semibold shrink-0">Tekrar Gör</button>
-                    </div>
-
-                    <!-- Depolama Kullanımı -->
-                    <div class="p-4 flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-                            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 3.79 2 6v12c0 2.21 4.48 4 10 4s10-1.79 10-4V6c0-2.21-4.48-4-10-4zm8 16c0 .5-2.86 2-8 2s-8-1.5-8-2v-2.4c1.68.98 4.42 1.4 8 1.4s6.32-.42 8-1.4V18zm0-5c0 .5-2.86 2-8 2s-8-1.5-8-2v-2.4c1.68.98 4.42 1.4 8 1.4s6.32-.42 8-1.4V13zm-8-3c-5.14 0-8-1.5-8-2s2.86-2 8-2 8 1.5 8 2-2.86 2-8 2z"/></svg>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium text-slate-800">Depolama</p>
-                            <p id="storage-usage-info" class="text-xs text-slate-500 mt-0.5"></p>
-                        </div>
-                    </div>
-
-                    <!-- Yedekleme -->
-                    <div class="p-4 flex items-start gap-3">
-                        <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-                            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 16l5-5h-3V4h-4v7H7l5 5zm-7 2h14v2H5v-2z"/></svg>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium text-slate-800">Yedekleme</p>
-                            <p class="text-xs text-slate-500 mt-0.5">Telefon değişirse ya da uygulama silinirse her şeyi geri getirir.</p>
-                            <div class="flex gap-2 mt-2">
-                                <button onclick="exportBackupToFile()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 font-semibold text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5">
-                                    <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 16l5-5h-3V4h-4v7H7l5 5zm-7 2h14v2H5v-2z"/></svg>
-                                    Yedek Al
-                                </button>
-                                <button onclick="triggerBackupImport()" class="flex-1 bg-emerald-50 border border-emerald-200 text-emerald-600 hover:bg-emerald-100 px-3 py-2 font-semibold text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5">
-                                    <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 4l-5 5h3v7h4v-7h3l-5-5zM5 18h14v2H5v-2z"/></svg>
-                                    Geri Yükle
-                                </button>
-                                <input type="file" id="backup-import-input" accept="application/json,.json" class="hidden" onchange="handleBackupFileSelected(event)">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Gelişmiş Ayarlar (katlanır, varsayılan kapalı) -->
-                    <div>
-                        <button onclick="toggleAdvancedSettings()" class="w-full p-4 flex items-center gap-3 text-left">
-                            <div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-500 flex items-center justify-center shrink-0">
-                                <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></svg>
-                            </div>
-                            <span class="flex-1 text-sm font-medium text-slate-600">Gelişmiş Ayarlar</span>
-                            <svg id="advanced-settings-chevron" class="w-4 h-4 fill-current text-slate-400 transition-transform shrink-0" viewBox="0 0 24 24" style="transform: rotate(0deg);">
-                                <path d="M7 10l5 5 5-5z"/>
-                            </svg>
+                        <button onclick="triggerBackupImport()" class="w-full bg-rose-50 border border-rose-200 text-rose-600 hover:bg-rose-100 py-3 font-semibold text-xs rounded-xl transition-colors shadow-sm">
+                            Yedekten Geri Yükle
                         </button>
-                        <div id="advanced-settings-content" class="hidden px-4 pb-4 space-y-3">
-                            <div class="bg-slate-50 border border-slate-200 p-4 space-y-3 rounded-xl">
-                                <p class="text-xs font-semibold text-slate-600">Algoritma Döngüsü (Sorular)</p>
-                                <input type="text" id="setting-intervals" class="w-full bg-white p-2.5 border border-slate-300 font-mono text-center text-sm text-slate-700 font-medium outline-none focus:border-purple-500 transition-colors rounded-lg">
-                                <button onclick="saveIntervals()" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2.5 text-xs font-semibold rounded-lg shadow-sm">Geriye Dönük Güncelle</button>
-                            </div>
-                            <div class="bg-slate-50 border border-slate-200 p-4 space-y-3 rounded-xl">
-                                <p class="text-xs font-semibold text-slate-600">Algoritma Döngüsü (Notlar)</p>
-                                <input type="text" id="setting-note-intervals" class="w-full bg-white p-2.5 border border-slate-300 font-mono text-center text-sm text-slate-700 font-medium outline-none focus:border-amber-500 transition-colors rounded-lg">
-                                <button onclick="saveNoteIntervals()" class="w-full bg-amber-500 hover:bg-amber-600 text-white py-2.5 text-xs font-semibold rounded-lg shadow-sm">Geriye Dönük Güncelle</button>
-                            </div>
-                        </div>
+                        <input type="file" id="backup-import-input" accept="application/json,.json" class="hidden" onchange="handleBackupFileSelected(event)">
                     </div>
                 </div>
             </div>
@@ -960,6 +689,16 @@
 
         <!-- Soru Modalı -->
         <div id="review-modal" class="modal-animate absolute inset-0 bg-slate-50 z-50 hidden flex flex-col rounded-none h-full overflow-hidden transition-colors duration-300">
+            <div id="review-checkpoint-overlay" class="hidden absolute inset-0 bg-slate-900/50 backdrop-blur-sm z-[60] flex items-center justify-center p-5">
+                <div class="bg-white w-full max-w-xs rounded-3xl shadow-2xl p-6 space-y-4 text-center">
+                    <div class="text-3xl">🎉</div>
+                    <p id="review-checkpoint-text" class="text-sm font-semibold text-slate-700 leading-relaxed"></p>
+                    <div class="flex flex-col gap-2 pt-1">
+                        <button id="review-checkpoint-continue" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 font-semibold text-sm rounded-xl shadow-sm transition-colors">Devam Et</button>
+                        <button id="review-checkpoint-stop" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 py-3 font-semibold text-sm rounded-xl transition-colors">Kalanını Yarın Yaparım</button>
+                    </div>
+                </div>
+            </div>
             <div class="flex justify-between items-center bg-white px-4 py-3 border-b border-indigo-100 shadow-sm shrink-0" id="review-header">
                 <div class="flex items-center gap-3">
                     <div class="w-2.5 h-2.5 bg-rose-500 rounded-full animate-pulse"></div>
@@ -978,7 +717,7 @@
     <div id="review-frame-box" class="relative max-w-full flex-1 min-h-[300px] max-h-[70vh] border border-slate-200 shadow-md bg-white w-full rounded-xl overflow-hidden" style="perspective: 1000px;">
     <div id="review-flip-inner" class="review-flip-inner">
         <div id="review-flip-front" class="review-flip-face review-flip-front p-1.5 bg-white">
-            <div id="review-unified-board" class="relative w-full h-full" style="min-height: 300px; height: 100%; background: var(--board-bg); border: 2px dashed var(--board-border);">
+            <div id="review-unified-board" class="relative w-full h-full" style="min-height: 300px; height: 100%; background: white; border: 2px dashed #e2e8f0;">
                 <img id="review-img" src="" onclick="openLightbox(this.src)" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 max-w-[80%] max-h-[80%] object-contain cursor-zoom-in pointer-events-auto rounded-lg">
                 <div id="review-unified-text" class="hidden absolute inset-0 flex items-center justify-center p-5 text-sm sm:text-base font-semibold leading-relaxed tracking-wide text-slate-800 text-center overflow-y-auto pointer-events-none whitespace-pre-wrap"></div>
                 <canvas id="review-draw-canvas" class="absolute top-0 left-0 w-full h-full cursor-crosshair"></canvas>
@@ -1059,17 +798,6 @@
                 <h3 id="camp-title" class="text-indigo-600 font-display font-bold text-base text-center border-b border-indigo-100 pb-3 tracking-wider">Kamp Ayarı</h3>
                 <div class="text-center space-y-3">
                     <p class="text-slate-500 text-xs tracking-wide">Mevcut <span id="camp-total-count" class="font-semibold text-indigo-600">0</span> soru bulundu</p>
-                    <div class="flex justify-center gap-2">
-                        <button id="camp-color-all" onclick="setCampColorFilter('all')" class="camp-color-chip px-3.5 py-2 rounded-full text-xs font-bold border-2 transition-all flex items-center gap-1.5">
-                            <span class="w-2.5 h-2.5 rounded-full bg-slate-400 shrink-0"></span>Tümü
-                        </button>
-                        <button id="camp-color-yellow" onclick="setCampColorFilter('yellow')" class="camp-color-chip px-3.5 py-2 rounded-full text-xs font-bold border-2 transition-all flex items-center gap-1.5">
-                            <span class="w-2.5 h-2.5 rounded-full bg-yellow-500 shrink-0"></span>Sarı
-                        </button>
-                        <button id="camp-color-green" onclick="setCampColorFilter('green')" class="camp-color-chip px-3.5 py-2 rounded-full text-xs font-bold border-2 transition-all flex items-center gap-1.5">
-                            <span class="w-2.5 h-2.5 rounded-full bg-green-500 shrink-0"></span>Yeşil
-                        </button>
-                    </div>
                     <label class="block text-xs font-semibold text-slate-700 mb-2">Kaç Soru Çözmek İstersin?</label>
                     <input type="number" id="camp-count-input" min="1" value="5" class="w-full bg-slate-50 p-3.5 border border-slate-300 text-center outline-none focus:border-indigo-600 text-slate-800 font-semibold text-xl transition-colors rounded-2xl shadow-sm">
                 </div>
@@ -1615,9 +1343,7 @@ function saveSettings() {
         selectedTopics: appState.selectedTopics,
         archSelectedCourses: appState.archSelectedCourses,
         archSelectedTopics: appState.archSelectedTopics,
-        hasSeenOnboarding: appState.hasSeenOnboarding,
-        activityDays: appState.activityDays,
-        darkMode: appState.darkMode
+        hasSeenOnboarding: appState.hasSeenOnboarding
     };
     return new Promise((resolve, reject) => {
         const tx = db.transaction(STORE_NAMES.settings, 'readwrite');
@@ -1687,9 +1413,7 @@ let appState = {
     hasSeenOnboarding: false,
     authState: "none",
     dailyLimitQ: 20,
-    dailyLimitN: 20,
-    activityDays: [],
-    darkMode: false
+    dailyLimitN: 20
 };
 
 let currentEntryType = 'question'; 
@@ -1699,16 +1423,13 @@ let selectedChoiceAnswer = '';
 let currentReviewMode = 'questions'; 
 let currentReviewQueue = [];
 let currentReviewIndex = 0;
+let reviewCheckpointBaselineFloor = 0; // Bugün o ana kadar kaç grup tamamlandığını takip eder (pozisyona değil, gerçek çözüm sayısına göre)
 let currentBoxColor = 'red';
 let activeArchiveType = 'question'; 
 let activeColorFilter = 'all';
 let campMode = ''; 
 let campQueue = [];
 let campIndex = 0;
-let campColorFilter = 'all';
-let isCampMode = false;
-let campCompletedIndices = new Set(); // Kampta gerçekten "tamamlanan" (cevaplanan/görülen) soru indexleri
-let campAnswers = {}; // Kamp oturumuna özel cevaplar (index -> harf) — gerçek veriye hiç dokunmaz
 
 let cropperInstance = null;
 let uploadDrawMode = 'pen'; 
@@ -1716,7 +1437,7 @@ let reviewDrawMode = 'pen';
 let campReviewDrawMode = 'pen';
 
 let uploadPenSize = 3;
-let reviewPenSize = 4;
+let reviewPenSize = 3;
 let campPenSize = 3;
 
 let zoomLevels = { upload: 1, review: 1, camp: 1 };
@@ -1824,7 +1545,6 @@ window.onload = async function() {
         await migrateBase64ToBlob();
         
         syncSystemUI();
-        applyDarkMode(!!appState.darkMode);
         updateQuestionInputVisibility();
         updateNoteInputVisibility();
         updateFieldDisplay();
@@ -3152,11 +2872,26 @@ async function saveState() {
     await saveSettings();
 }
 
+// Grup boyutunu (mola noktalarını) kaydet
+async function saveDailyLimits() {
+    let qVal = parseInt(document.getElementById('setting-daily-limit-q').value) || 0;
+    let nVal = parseInt(document.getElementById('setting-daily-limit-n').value) || 0;
+    if (qVal < 0) qVal = 0;
+    if (nVal < 0) nVal = 0;
+    appState.dailyLimitQ = qVal;
+    appState.dailyLimitN = nVal;
+    await saveSettings();
+    syncSystemUI();
+    showToast("Grup boyutu güncellendi!");
+}
+
 function syncSystemUI() {
     buildHomeFilters(); populateCategoryDropdowns(); populateArchiveFilters(); updateHomeStats();
     renderLibrary();
     document.getElementById('setting-intervals').value = appState.intervals.join(',');
     document.getElementById('setting-note-intervals').value = appState.noteIntervals.join(',');
+    document.getElementById('setting-daily-limit-q').value = appState.dailyLimitQ;
+    document.getElementById('setting-daily-limit-n').value = appState.dailyLimitN;
     updateFieldDisplay();
     // Depolama bilgisi güncelle
     checkStorageUsage();
@@ -3249,12 +2984,6 @@ function updateHomeStats() {
 
     const totalRed = redQuestions.length + redNotes.length;
 
-    // Eğer bugün hiç bekleyen soru/not yoksa (yapılacak bir şey yoksa), bu günü de
-    // "aktif gün" sayıyoruz ki kullanıcı sadece elinde iş olmadığı için serisini kaybetmesin.
-    if (totalRed === 0) {
-        recordActivityToday();
-    }
-
     document.getElementById('red-total-count').innerText = totalRed;
     document.getElementById('red-estimated-time').innerText = "Tahmini " + getEstimatedTime(totalRed);
     document.getElementById('red-question-count').innerText = redQuestions.length;
@@ -3264,7 +2993,6 @@ function updateHomeStats() {
     document.getElementById('yellow-note-count').innerText = yellowNotes.length;
     document.getElementById('green-question-count').innerText = greenQuestions.length;
     document.getElementById('green-note-count').innerText = greenNotes.length;
-    updateStreakDisplay();
 }
 
 function toggleHomeFilters() {
@@ -3603,6 +3331,18 @@ function startReview(mode, boxColor = 'red', specificItem = null, isArchiveMode 
             return;
         }
 
+        // Eskiden burada sert bir günlük limit uygulanıp kalan sorular gizleniyordu.
+        // Artık hiçbir şey gizlenmiyor: kullanıcıya toplam sayı + tahmini süre gösteriliyor,
+        // gerçek "mola" ise navigateReview() içinde, bugün gerçekten çözülen soru/not sayısına
+        // göre araya giriyor (kaçıncı soruda olunduğuna göre değil).
+        const totalCount = currentReviewQueue.length;
+        const estTime = getEstimatedTime(totalCount);
+        showToast("Bugün " + totalCount + " " + (mode === 'questions' ? "soru" : "not") + " tekrarın var (~" + estTime + "). Hadi başlayalım!");
+
+        const groupSizeForBaseline = (mode === 'questions') ? appState.dailyLimitQ : appState.dailyLimitN;
+        const solvedTodayForBaseline = getSolvedTodayCount(mode);
+        reviewCheckpointBaselineFloor = groupSizeForBaseline > 0 ? Math.floor(solvedTodayForBaseline / groupSizeForBaseline) : 0;
+
         currentReviewIndex = 0;
         document.getElementById('review-modal').classList.remove('hidden');
         renderReviewItem();
@@ -3647,14 +3387,9 @@ function renderReviewItem() {
         // Yine de butonlar aktif olsun diye sıfırlıyoruz.
     }
     
-    // Kamp modunda "bugün cevaplandı mı" ve "kullanıcının cevabı" gerçek veriden değil,
-    // sadece bu kamp oturumuna özel takipten okunur (gerçek Günlük Tekrar durumu sızmasın diye).
-    const isAnsweredToday = isCampMode
-        ? campCompletedIndices.has(currentReviewIndex)
-        : (item.lastReviewedDate === todayStr);
-    const effectiveUserAnswer = isCampMode ? campAnswers[currentReviewIndex] : item.userTodayAnswer;
+    const isAnsweredToday = (item.lastReviewedDate === todayStr);
 
-    document.getElementById('review-progress').innerText = `${isCampMode ? 'KAMP' : (currentReviewMode === 'questions' ? 'SORU' : 'NOT')} ${currentReviewIndex + 1}/${currentReviewQueue.length}`;
+    document.getElementById('review-progress').innerText = `${currentReviewMode === 'questions' ? 'SORU' : 'NOT'} ${currentReviewIndex + 1}/${currentReviewQueue.length}`;
     document.getElementById('review-breadcrumbs').innerText = `${item.course} > ${item.topic}`;
 
     const imgEl = document.getElementById('review-img');
@@ -3844,7 +3579,7 @@ reviewUndoStack = [];
         if (hasBack) {
             noteToggleBtn.classList.remove('invisible');
             noteToggleBtn.disabled = false;
-            noteToggleBtn.textContent = 'Arka Yüzü Göster';
+            noteToggleBtn.textContent = 'Cevabı Göster';
         } else {
             noteToggleBtn.classList.add('invisible');
             noteToggleBtn.disabled = true;
@@ -3872,12 +3607,12 @@ reviewUndoStack = [];
     textInput.classList.add('hidden');
     recallInput.classList.add('invisible');
     
-    // Arşiv modunda cevap/hatırlama giriş butonları gösterilmez, ama çizim yapılabilsin diye
-    // çizim araçlarına dokunmuyoruz (birazcık yukarıda isNoteFrontUI'a göre zaten ayarlandı).
+    // Arşiv modunda hiçbir giriş butonu gösterilmez
 if (currentArchiveMode) {
     choiceInput.classList.add('hidden');
     textInput.classList.add('hidden');
     recallInput.classList.add('invisible');
+    document.getElementById('review-draw-tools').classList.add('hidden');
     // bu ikisi satırı şimdilik devre dışı bıraktık document.getElementById('btn-rev-prev').disabled = (currentReviewIndex === 0);
     //bunu da document.getElementById('btn-rev-next').disabled = (currentReviewIndex === currentReviewQueue.length - 1);
     return; // Arşiv modunda buradan sonrasını çalıştırma
@@ -3895,7 +3630,7 @@ if (currentArchiveMode) {
                             btn.classList.remove('hover:bg-indigo-600', 'hover:border-indigo-600', 'hover:text-white');
                             if (letter === item.answer) {
                                 btn.className = "w-11 h-11 bg-green-500 border border-green-500 text-white font-extrabold text-base transition-all rounded-xl shadow-sm opacity-100";
-                            } else if (letter === effectiveUserAnswer) {
+                            } else if (letter === item.userTodayAnswer) {
                                 btn.className = "w-11 h-11 bg-red-500 border border-red-500 text-white font-extrabold text-base transition-all rounded-xl shadow-sm opacity-100";
                             } else {
                                 btn.className = "w-11 h-11 bg-slate-100 border border-slate-300 text-slate-400 font-extrabold text-base transition-all rounded-xl shadow-sm opacity-50 cursor-not-allowed";
@@ -3905,9 +3640,9 @@ if (currentArchiveMode) {
                 } else {
                     textInput.classList.remove('hidden');
                     const textInputEl = document.getElementById('review-text-val');
-                    textInputEl.value = effectiveUserAnswer || '';
+                    textInputEl.value = item.userTodayAnswer || '';
                     textInputEl.disabled = true;
-                    const isCorrect = (effectiveUserAnswer === item.answer);
+                    const isCorrect = (item.userTodayAnswer === item.answer);
                     if (isCorrect) {
                         textInputEl.className = "flex-1 bg-green-50 p-3 border-2 border-green-500 outline-none text-slate-800 font-bold tracking-wider transition-colors rounded-xl shadow-sm text-xs";
                     } else {
@@ -3958,12 +3693,6 @@ if (currentArchiveMode) {
         recallInput.classList.add('invisible');
     }
 
-    // Kamp modunda (isCampMode) hatırlama butonları (Unuttum/Kısmen/Hatırladım) hiçbir zaman
-    // gösterilmez — kamp sadece serbest pratik amaçlıdır, spaced-repetition takibini etkilemez.
-    if (isCampMode) {
-        recallInput.classList.add('invisible');
-    }
-
     document.getElementById('btn-rev-prev').disabled = (currentReviewIndex === 0);
     document.getElementById('btn-rev-next').disabled = (currentReviewIndex === currentReviewQueue.length - 1);
    // Çizim canvas'ını konteyner boyutuna ayarla
@@ -4008,14 +3737,8 @@ function toggleReviewNote() {
         flipInner.classList.add('flipped');
         btn.textContent = isNoteMode ? 'Ön Yüzü Göster' : 'Soruyu Göster';
 
-        // Kamp modunda: arka yüzü (cevabı/notu) gördüğünde bu kart "tamamlandı" sayılır.
-        if (isCampMode) {
-            campCompletedIndices.add(currentReviewIndex);
-        }
-
         // Not modunda: arka yüz (cevap) ilk kez gösterildiğinde hatırlama butonlarını aktifleştir.
-        // Kamp modunda hatırlama butonları hiçbir zaman gösterilmez.
-        if (isNoteMode && currentBoxColor === 'red' && !currentArchiveMode && !isCampMode) {
+        if (isNoteMode && currentBoxColor === 'red' && !currentArchiveMode) {
             const item = currentReviewQueue[currentReviewIndex];
             const todayStr = formatDate(getNowTR());
             const recallInput = document.getElementById('review-recall-input');
@@ -4076,9 +3799,33 @@ function updateRecallButtons(status) {
     }
 }
 
+function getSolvedTodayCount(mode) {
+    const todayStr = formatDate(getNowTR());
+    return (mode === 'questions')
+        ? appState.questions.filter(q => q.lastReviewedDate === todayStr).length
+        : appState.notes.filter(n => n.lastReviewedDate === todayStr).length;
+}
+
 function navigateReview(dir) {
     let nextIdx = currentReviewIndex + dir;
     if (nextIdx >= 0 && nextIdx < currentReviewQueue.length) {
+        // Kırmızı kutu tekrarında, ayarlanan grup boyutu tamamlanınca bir mola ekranı gösteriyoruz.
+        // Kaç sorudan sonra mola verileceği, "kaçıncı soruda olduğuna" değil, bugün ALTTAKI
+        // RECALL BUTONLARINA (Unuttum/Kısmen/Hatırladım) basılarak gerçekten kaç soru/not
+        // bitirildiğine bakılarak hesaplanıyor. Böylece ileri-geri gezinmek veya cevaplamadan
+        // atlamak sayacı yanıltmıyor.
+        if (dir === 1 && currentBoxColor === 'red') {
+            const groupSize = (currentReviewMode === 'questions') ? appState.dailyLimitQ : appState.dailyLimitN;
+            if (groupSize > 0) {
+                const solvedToday = getSolvedTodayCount(currentReviewMode);
+                const currentFloor = Math.floor(solvedToday / groupSize);
+                if (currentFloor > reviewCheckpointBaselineFloor) {
+                    reviewCheckpointBaselineFloor = currentFloor;
+                    showReviewCheckpoint(nextIdx, solvedToday);
+                    return;
+                }
+            }
+        }
         currentReviewIndex = nextIdx;
         try {
             renderReviewItem();
@@ -4089,20 +3836,32 @@ function navigateReview(dir) {
     }
 }
 
+function showReviewCheckpoint(nextIdx, solvedToday) {
+    const overlay = document.getElementById('review-checkpoint-overlay');
+    const remaining = currentReviewQueue.length - nextIdx;
+    const itemWord = (currentReviewMode === 'questions') ? 'soru' : 'not';
+    const timeLeft = getEstimatedTime(remaining);
+    document.getElementById('review-checkpoint-text').innerText =
+        "Bugün toplam " + solvedToday + " " + itemWord + " çözdün! 👏 Kalan " + remaining + " " + itemWord + " (~" + timeLeft + ") var.";
+
+    const continueBtn = document.getElementById('review-checkpoint-continue');
+    const stopBtn = document.getElementById('review-checkpoint-stop');
+    continueBtn.onclick = function() {
+        overlay.classList.add('hidden');
+        currentReviewIndex = nextIdx;
+        renderReviewItem();
+    };
+    stopBtn.onclick = function() {
+        overlay.classList.add('hidden');
+        closeReview();
+        showToast("Harika iş çıkardın! Kalanlar yarın seni bekliyor.");
+    };
+    overlay.classList.remove('hidden');
+}
+
 async function submitQuestionAnswer(userAns) {
     let q = currentReviewQueue[currentReviewIndex];
     if (!q) return;
-
-    // Kamp modu: gerçek soru verisine (userTodayAnswer/lastReviewedDate) HİÇ dokunmuyoruz.
-    // Böylece o soru bugün gerçek Günlük Tekrar'da zaten cevaplanmış olsa bile, kampta
-    // her zaman sıfırdan/boş bir soru gibi görünür ve kendi cevabını kamp-özel olarak saklarız.
-    if (isCampMode) {
-        if (campAnswers[currentReviewIndex] !== undefined) return; // kampta zaten cevaplanmış
-        campAnswers[currentReviewIndex] = String(userAns).trim().toUpperCase();
-        campCompletedIndices.add(currentReviewIndex);
-        renderReviewItem();
-        return;
-    }
 
     let todayStr = formatDate(getNowTR());
 
@@ -4119,83 +3878,9 @@ async function submitQuestionAnswer(userAns) {
 }
 
 // Hata 1 düzeltmesi: submitRecallStatus başına günlük sıfırlama eklendi
-function toggleAdvancedSettings() {
-    const content = document.getElementById('advanced-settings-content');
-    const chevron = document.getElementById('advanced-settings-chevron');
-    content.classList.toggle('hidden');
-    chevron.style.transform = content.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
-}
-
-function applyDarkMode(isDark) {
-    document.body.classList.toggle('dark-mode', isDark);
-    const toggle = document.getElementById('dark-mode-toggle');
-    const knob = document.getElementById('dark-mode-toggle-knob');
-    if (toggle && knob) {
-        if (isDark) {
-            toggle.classList.remove('bg-slate-300');
-            toggle.classList.add('bg-indigo-600');
-            knob.style.transform = 'translateX(20px)';
-        } else {
-            toggle.classList.add('bg-slate-300');
-            toggle.classList.remove('bg-indigo-600');
-            knob.style.transform = 'translateX(0px)';
-        }
-    }
-}
-
-async function toggleDarkMode() {
-    appState.darkMode = !appState.darkMode;
-    applyDarkMode(appState.darkMode);
-    await saveSettings();
-}
-
-function recordActivityToday() {
-    const todayStr = formatDate(getNowTR());
-    if (!appState.activityDays) appState.activityDays = [];
-    if (!appState.activityDays.includes(todayStr)) {
-        appState.activityDays.push(todayStr);
-        saveSettings();
-        updateStreakDisplay();
-    }
-}
-
-function calculateStreak() {
-    const days = new Set(appState.activityDays || []);
-    if (days.size === 0) return 0;
-    const todayStr = formatDate(getNowTR());
-    let cursor = getNowTR();
-    if (!days.has(todayStr)) {
-        cursor.setDate(cursor.getDate() - 1);
-    }
-    let streak = 0;
-    while (days.has(formatDate(cursor))) {
-        streak++;
-        cursor.setDate(cursor.getDate() - 1);
-    }
-    return streak;
-}
-
-function updateStreakDisplay() {
-    const streak = calculateStreak();
-    const badge = document.getElementById('home-streak-badge');
-    if (!badge) return;
-    if (streak > 0) {
-        badge.classList.remove('hidden');
-        badge.classList.add('flex');
-        document.getElementById('home-streak-count').innerText = streak;
-    } else {
-        badge.classList.add('hidden');
-        badge.classList.remove('flex');
-    }
-}
-
 async function submitRecallStatus(status) {
-    if (isCampMode) return; // Kamp modunda hatırlama butonları zaten gizli, ekstra güvenlik
-
     const item = currentReviewQueue[currentReviewIndex];
     if (!item) return;
-
-    recordActivityToday();
 
     const todayStr = formatDate(getNowTR());
 
@@ -4284,17 +3969,6 @@ function closeReview() {
     if (reviewNoteBackObjectURL) { revokeObjectURL(reviewNoteBackObjectURL); reviewNoteBackObjectURL = null; }
     updateHomeStats();
     currentArchiveMode = false;
-    if (isCampMode) {
-        const total = currentReviewQueue.length;
-        const done = campCompletedIndices.size;
-        isCampMode = false;
-        campCompletedIndices = new Set();
-        campAnswers = {};
-        // Sadece kamptaki TÜM sorular/notlar gerçekten tamamlandıysa tebrik mesajı göster.
-        if (total > 0 && done >= total) {
-            showToast("Kamp tamamlandı! Tebrikler 🎉");
-        }
-    }
 }
 
 // --- ARŞİV KISMI ---
@@ -4571,24 +4245,21 @@ if (appState.archSelectedTopics.length > 0) {
 
         let pushBtnHTML = '';
         if (activeColorFilter === 'yellow' || activeColorFilter === 'green') {
-            pushBtnHTML = `<button onclick="event.stopPropagation(); pushToEnd('${activeArchiveType}', ${item.id})" class="inline-flex items-center gap-1 bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 px-2.5 py-1 rounded-lg text-[10px] font-bold transition-colors" title="En sona at">
-                <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M11 4h2v10.17l3.59-3.58L18 12l-6 6-6-6 1.41-1.41L11 14.17V4zM5 18h14v2H5z"/></svg>
-                En Alta Gönder
-            </button>`;
+            pushBtnHTML = `<button onclick="event.stopPropagation(); pushToEnd('${activeArchiveType}', ${item.id})" class="bg-white/80 hover:bg-white text-slate-700 border border-slate-300 px-3 py-1.5 rounded-lg text-[10px] font-bold shadow-sm transition-colors" title="En sona at">En Alta Gönder</button>`;
         }
 
         card.innerHTML = `
             <div class="absolute top-0 left-0 w-1.5 h-full ${borderBarColor}"></div>
-            <div class="flex justify-between items-start gap-2 text-xs font-extrabold text-slate-700">
-                <span class="truncate min-w-0 flex-1">${item.course} > ${item.topic}</span>
-                <div class="flex items-center gap-2 shrink-0">
-                    <span class="text-[10px] text-slate-400 font-semibold whitespace-nowrap">${item.createdDate || ''}</span>
-                    <button onclick="event.stopPropagation(); deleteItem('${activeArchiveType}', ${item.id})" class="text-rose-500 hover:text-rose-700 p-1 shrink-0" title="Sil">
+            <div class="flex justify-between items-center text-xs font-extrabold text-slate-700">
+                <span>${item.course} > ${item.topic}</span>
+                <div class="flex items-center gap-2">
+                    <span class="text-[10px] text-slate-400 font-semibold">${item.createdDate || ''}</span>
+                    ${pushBtnHTML}
+                    <button onclick="event.stopPropagation(); deleteItem('${activeArchiveType}', ${item.id})" class="text-rose-500 hover:text-rose-700 p-1" title="Sil">
                         <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
                     </button>
                 </div>
             </div>
-            ${pushBtnHTML ? `<div class="flex justify-end">${pushBtnHTML}</div>` : ''}
             ${contentHTML}
             ${extraInfo}
         `;
@@ -4628,11 +4299,7 @@ function openArchiveItem(type, id) {
     }
     if (!item) return;
     let color = getCardColor(item, type);
-    // ÖNEMLİ: startReview 'questions'/'notes' (çoğul) bekliyor, activeArchiveType ise
-    // 'question'/'note' (tekil) — bu eşleşmezlik yüzünden sorular yanlışlıkla not
-    // arayüzüyle (isNoteFrontUI) render ediliyordu. Burada doğru forma çeviriyoruz.
-    let modePlural = (type === 'question') ? 'questions' : 'notes';
-    startReview(modePlural, color, item, true);
+    startReview(type, color, item, true);   // <-- sona "true" ekledik
 }
 
 async function deleteItem(type, id) {
@@ -4665,41 +4332,15 @@ async function pushToEnd(type, id) {
 }
 
 // --- KAMP SİSTEMİ (FİLTRELİ) ---
-function getCampFilteredList() {
-    let list = (campMode === 'questions') ? appState.questions : appState.notes;
-    const colorType = (campMode === 'questions') ? 'question' : 'note';
-    return list.filter(item => 
-        (appState.archSelectedCourses.length === 0 || appState.archSelectedCourses.includes(item.course)) && 
-        (appState.archSelectedTopics.length === 0 || appState.archSelectedTopics.includes(item.course + '::' + item.topic)) &&
-        // Kırmızı kutu kamp havuzuna hiç girmez — kırmızı zaten Günlük Tekrar'da ayrı gösteriliyor.
-        getCardColor(item, colorType) !== 'red' &&
-        (campColorFilter === 'all' || getCardColor(item, colorType) === campColorFilter)
-    );
-}
-
-const CAMP_COLOR_CHIP_STYLES = {
-    all:    { selected: 'bg-slate-700 border-slate-700 text-white',   unselected: 'bg-white border-slate-200 text-slate-500' },
-    yellow: { selected: 'bg-yellow-500 border-yellow-500 text-white', unselected: 'bg-white border-slate-200 text-slate-500' },
-    green:  { selected: 'bg-green-600 border-green-600 text-white',   unselected: 'bg-white border-slate-200 text-slate-500' }
-};
-
-function setCampColorFilter(color) {
-    campColorFilter = color;
-    Object.keys(CAMP_COLOR_CHIP_STYLES).forEach(key => {
-        const btn = document.getElementById('camp-color-' + key);
-        if (!btn) return;
-        const style = (key === color) ? CAMP_COLOR_CHIP_STYLES[key].selected : CAMP_COLOR_CHIP_STYLES[key].unselected;
-        btn.className = 'camp-color-chip px-3.5 py-2 rounded-full text-xs font-bold border-2 transition-all flex items-center gap-1.5 ' + style;
-    });
-    document.getElementById('camp-total-count').innerText = getCampFilteredList().length;
-}
-
 function openCampSetup(type) {
     campMode = type;
-    campColorFilter = 'all';
-    document.getElementById('camp-total-count').innerText = getCampFilteredList().length;
-    document.getElementById('camp-title').innerText = "Rastgele Kamp";
-    setCampColorFilter('all');
+    let list = (type === 'questions') ? appState.questions : appState.notes;
+    list = list.filter(item => 
+        (appState.archSelectedCourses.length === 0 || appState.archSelectedCourses.includes(item.course)) && 
+        (appState.archSelectedTopics.length === 0 || appState.archSelectedTopics.includes(item.course + '::' + item.topic))
+    );
+    document.getElementById('camp-total-count').innerText = list.length;
+    document.getElementById('camp-title').innerText = type === 'questions' ? "Rastgele Kamp" : "Rastgele Kamp";
     document.getElementById('camp-setup-modal').classList.remove('hidden');
 }
 
@@ -4709,31 +4350,23 @@ function closeCampSetup() {
 
 function startCamp() {
     let count = parseInt(document.getElementById('camp-count-input').value) || 5;
-    let list = getCampFilteredList();
+    let list = (campMode === 'questions') ? [...appState.questions] : [...appState.notes];
+    list = list.filter(item => 
+        (appState.archSelectedCourses.length === 0 || appState.archSelectedCourses.includes(item.course)) && 
+        (appState.archSelectedTopics.length === 0 || appState.archSelectedTopics.includes(item.course + '::' + item.topic))
+    );
 
     if (list.length === 0) {
         showToast("Kamp için yeterli veri yok!", true); return;
     }
 
     list.sort(() => Math.random() - 0.5);
-    const queue = list.slice(0, Math.min(count, list.length));
+    campQueue = list.slice(0, Math.min(count, list.length));
+    campIndex = 0;
 
     closeCampSetup();
-
-    // Kamp artık normal "Soruları Başlat" ekranıyla birebir aynı arayüzü (çizim kutusu,
-    // şıklar, notu göster vb.) kullanıyor — sadece hatırlama (Unuttum/Hatırladım) butonları
-    // olmadan. Bu yüzden aynı review-modal'ı, isCampMode bayrağıyla açıyoruz.
-    isCampMode = true;
-    currentArchiveMode = false;
-    currentReviewMode = campMode; // 'questions' ya da 'notes'
-    currentReviewQueue = queue;
-    currentReviewIndex = 0;
-    currentBoxColor = 'red'; // Şıklar/metin giriş alanları bu moda bağlı gösteriliyor
-    campCompletedIndices = new Set();
-    campAnswers = {};
-
-    document.getElementById('review-modal').classList.remove('hidden');
-    renderReviewItem();
+    document.getElementById('camp-review-modal').classList.remove('hidden');
+    renderCampItem();
 }
 
 function renderCampItem() {
