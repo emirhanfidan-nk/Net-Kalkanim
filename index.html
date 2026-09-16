@@ -446,6 +446,31 @@
         body.dark-mode .archive-back-tag {
             color: #ffd166 !important;
         }
+        /* Modal başlıklarında kullanılan çok koyu (900/950) tonlar açık zemin için tasarlanmış;
+           karanlık kart yüzeyinde neredeyse görünmez kalıyordu — bunları açık tonlara çeviriyoruz. */
+        body.dark-mode .text-indigo-950 {
+            color: #c7cbfe !important;
+        }
+        body.dark-mode .text-violet-600,
+        body.dark-mode .text-violet-700 {
+            color: #c4b0fa !important;
+        }
+        body.dark-mode .text-violet-900,
+        body.dark-mode .text-violet-950 {
+            color: #ded1ff !important;
+        }
+        body.dark-mode .text-emerald-600 {
+            color: #5eeba0 !important;
+        }
+        body.dark-mode .border-violet-200 {
+            border-color: rgba(167, 139, 250, 0.35) !important;
+        }
+        body.dark-mode .border-emerald-200 {
+            border-color: rgba(94, 235, 160, 0.35) !important;
+        }
+        body.dark-mode .border-indigo-100 {
+            border-color: rgba(129, 140, 248, 0.25) !important;
+        }
         body.dark-mode #review-unified-board {
             border-color: #35363f !important;
         }
@@ -578,7 +603,6 @@
                 <!-- KIRMIZI KUTU (BÜYÜK) -->
                 <div class="rounded-3xl p-5 shadow-lg relative overflow-hidden" style="background-color: var(--box-red-bg); border: 2px solid var(--box-red-bg);">
                     <div class="absolute top-0 left-0 w-2 h-full" style="background-color: var(--box-red-accent);"></div>
-                    <div class="absolute bottom-0 left-0 w-full h-1" style="background-color: var(--box-red-accent);"></div>
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="font-semibold text-sm tracking-wider" style="color: var(--box-red-accent);">Kırmızı Kutu</h3>
                         <span class="text-xs font-semibold px-3 py-1 rounded-full" style="background-color: var(--box-red-bg); color: var(--box-red-accent); border: 1px solid var(--box-red-accent); display: inline-block; text-align: center;">
@@ -588,11 +612,11 @@
                     </div>
                     <p class="text-xs font-medium mb-3" style="color: var(--box-desc-text);">Bugün halletmen gerekenler</p>
                     <div class="grid grid-cols-2 gap-3">
-                        <button onclick="startReview('questions')" class="btn-cyber btn-cyber-red py-4 rounded-2xl font-semibold text-sm flex flex-col items-center justify-center gap-1 shadow-md" style="background-color: var(--box-inner-bg); color: var(--box-red-accent);">
+                        <button onclick="startReview('questions')" class="btn-cyber btn-cyber-red py-4 rounded-2xl font-semibold text-sm flex flex-col items-center justify-center gap-1 shadow-md" style="background-color: var(--box-inner-bg); color: var(--box-red-accent); border-bottom: 3px solid var(--box-red-accent);">
                             <span>Soruları Başlat</span>
                             <span class="text-xs opacity-80">[ <span id="red-question-count">0</span> ]</span>
                         </button>
-                        <button onclick="startReview('notes')" class="btn-cyber btn-cyber-yellow py-4 rounded-2xl font-semibold text-sm flex flex-col items-center justify-center gap-1 shadow-md" style="background-color: var(--box-inner-bg); color: var(--box-red-accent);">
+                        <button onclick="startReview('notes')" class="btn-cyber btn-cyber-yellow py-4 rounded-2xl font-semibold text-sm flex flex-col items-center justify-center gap-1 shadow-md" style="background-color: var(--box-inner-bg); color: var(--box-red-accent); border-bottom: 3px solid var(--box-red-accent);">
                             <span>Notları Başlat</span>
                             <span class="text-xs opacity-80">[ <span id="red-note-count">0</span> ]</span>
                         </button>
@@ -602,7 +626,6 @@
                 <!-- SARI VE YEŞİL KUTULAR (YAN YANA) -->
                 <div class="grid grid-cols-2 gap-4">
                     <button onclick="goToLibraryWithFilter('yellow')" class="rounded-2xl p-4 shadow-sm transition-colors text-left relative overflow-hidden" style="background-color: var(--box-yellow-bg); border: 2px solid var(--box-yellow-bg);">
-                        <div class="absolute bottom-0 left-0 w-full h-1" style="background-color: var(--box-yellow-accent);"></div>
                         <div class="flex items-center justify-between mb-2">
                             <h3 class="font-semibold text-xs" style="color: var(--box-yellow-accent);">Sarı Kutu</h3>
                         </div>
@@ -611,12 +634,11 @@
                             <div>Soru: <span id="yellow-question-count">0</span></div>
                             <div>Not: <span id="yellow-note-count">0</span></div>
                         </div>
-                        <div class="mt-3 flex items-center justify-center gap-1 text-xs font-bold rounded-xl py-2 shadow-md" style="background-color: var(--box-inner-bg); color: var(--box-yellow-accent);">
+                        <div class="mt-3 flex items-center justify-center gap-1 text-xs font-bold rounded-xl py-2 shadow-md" style="background-color: var(--box-inner-bg); color: var(--box-yellow-accent); border-bottom: 3px solid var(--box-yellow-accent);">
                             Göz At <span></span>
                         </div>
                     </button>
                     <button onclick="goToLibraryWithFilter('green')" class="rounded-2xl p-4 shadow-sm transition-colors text-left relative overflow-hidden" style="background-color: var(--box-green-bg); border: 2px solid var(--box-green-bg);">
-                        <div class="absolute bottom-0 left-0 w-full h-1" style="background-color: var(--box-green-accent);"></div>
                         <div class="flex items-center justify-between mb-2">
                             <h3 class="font-semibold text-xs" style="color: var(--box-green-accent);">Yeşil Kutu</h3>
                         </div>
@@ -625,7 +647,7 @@
                             <div>Soru: <span id="green-question-count">0</span></div>
                             <div>Not: <span id="green-note-count">0</span></div>
                         </div>
-                        <div class="mt-3 flex items-center justify-center gap-1 text-xs font-bold rounded-xl py-2 shadow-md" style="background-color: var(--box-inner-bg); color: var(--box-green-accent);">
+                        <div class="mt-3 flex items-center justify-center gap-1 text-xs font-bold rounded-xl py-2 shadow-md" style="background-color: var(--box-inner-bg); color: var(--box-green-accent); border-bottom: 3px solid var(--box-green-accent);">
                             Göz At <span></span>
                         </div>
                     </button>
@@ -1780,6 +1802,7 @@ let cropperInstanceBack = null;      // Arka yüz görseli için bağımsız Cro
 let backImageBlob = null;            // Kırpılmış arka yüz görseli (Blob)
 let backImagePreviewURL = null;      // Arka yüz önizleme object URL'i
 let reviewNoteBackObjectURL = null;  // Review modalında arka yüz görseli için object URL
+let preserveFlipState = false;       // Recall sonrası yeniden render edilirken flip durumunun korunup korunmayacağı
 
 window.onload = async function() {
     try {
@@ -3437,7 +3460,8 @@ function openPicker(type) {
     } else if (type === 'topic') {
         const selectedCourse = document.getElementById('q-course').value;
         if (!selectedCourse) {
-            showToast('Lütfen önce bir ders seç!', true);
+            showToast('Önce ders seçmelisin, ders menüsünü açıyorum...', true);
+            openPicker('course');
             return;
         }
         title.innerText = `${selectedCourse} › Konu Seç`;
@@ -3462,7 +3486,9 @@ function selectCourse(course) {
     document.getElementById('btn-pick-course-text').innerText = course;
     document.getElementById('q-topic').value = '';
     document.getElementById('btn-pick-topic-text').innerText = 'Konu Seç';
-    closePicker();
+    // Sürtünmeyi azaltmak için: ders seçilir seçilmez aynı pencere içinde
+    // konu listesine geçiyoruz (kapat-aç titremesi olmadan, akıcı bir geçiş).
+    openPicker('topic');
 }
 
 function selectTopic(topic) {
@@ -3733,6 +3759,8 @@ function renderReviewItem() {
         ? campCompletedIndices.has(currentReviewIndex)
         : (item.lastReviewedDate === todayStr);
     const effectiveUserAnswer = isCampMode ? campAnswers[currentReviewIndex] : item.userTodayAnswer;
+    const shouldKeepFlip = preserveFlipState;
+    preserveFlipState = false;
 
     document.getElementById('review-progress').innerText = `${isCampMode ? 'KAMP' : (currentReviewMode === 'questions' ? 'SORU' : 'NOT')} ${currentReviewIndex + 1}/${currentReviewQueue.length}`;
     document.getElementById('review-breadcrumbs').innerText = `${item.course} > ${item.topic}`;
@@ -3871,7 +3899,13 @@ reviewUndoStack = [];
         noteContent = item.note;
     }
 
-    if (flipInner) flipInner.classList.remove('flipped');
+    if (flipInner) {
+        if (shouldKeepFlip) {
+            flipInner.classList.add('flipped');
+        } else {
+            flipInner.classList.remove('flipped');
+        }
+    }
     if (noteBox) {
         noteBox.innerHTML = '';
         noteBox.classList.add('hidden');
@@ -3883,7 +3917,7 @@ reviewUndoStack = [];
         if (hasNote) {
             noteToggleBtn.classList.remove('invisible');
             noteToggleBtn.disabled = false;
-            noteToggleBtn.textContent = 'Notu Göster';
+            noteToggleBtn.textContent = shouldKeepFlip ? 'Soruyu Göster' : 'Notu Göster';
         } else {
             noteToggleBtn.classList.add('invisible');
             noteToggleBtn.disabled = true;
@@ -3900,7 +3934,7 @@ reviewUndoStack = [];
         }
 
         // Arka yüz (Cevap): sadece note_back veya note_back_img doluysa flip butonu gösterilir.
-        // Eski notlarda bu alanlar undefined olacağından hasBack güvenle false kalır.
+        // Eski notlarda bu alanlar undefined olduğundan hasBack güvenle false kalır.
         let hasBack = false;
         let backContent = '';
 
@@ -3924,7 +3958,7 @@ reviewUndoStack = [];
         if (hasBack) {
             noteToggleBtn.classList.remove('invisible');
             noteToggleBtn.disabled = false;
-            noteToggleBtn.textContent = 'Cevabı Göster';
+            noteToggleBtn.textContent = shouldKeepFlip ? 'Ön Yüzü Göster' : 'Cevabı Göster';
         } else {
             noteToggleBtn.classList.add('invisible');
             noteToggleBtn.disabled = true;
@@ -4024,7 +4058,12 @@ if (currentArchiveMode) {
             // hatırlama butonları pasif kalır (toggleReviewNote içinde aktifleştirilir).
             // Arka yüz yoksa (veya eski not ise) mevcut davranış aynen devam eder: direkt aktif.
             if (noteHasBack) {
-                recallInput.classList.add('invisible');
+                if (shouldKeepFlip) {
+                    recallInput.classList.remove('invisible');
+                    updateRecallButtons(item.userRecallStatus);
+                } else {
+                    recallInput.classList.add('invisible');
+                }
             } else {
                 recallInput.classList.remove('invisible');
                 if (isAnsweredToday) {
@@ -4365,6 +4404,12 @@ async function submitRecallStatus(status) {
         await saveNote(n);
     }
 
+    // Bu, aynı kartın (soru/not) tekrar render edilmesi — kullanıcı arka yüzü zaten
+    // görüyorsa (flip açıksa), recall'a bastıktan sonra render sırasında ön yüze
+    // sıçramasın diye mevcut flip durumunu koruyoruz.
+    const flipEl = document.getElementById('review-flip-inner');
+    preserveFlipState = !!(flipEl && flipEl.classList.contains('flipped'));
+
     updateHomeStats();
     renderReviewItem();
 }
@@ -4467,13 +4512,26 @@ function goToLibraryWithFilter(color) {
     renderLibrary();
 }
 
+// İki YYYY-MM-DD tarihi arasındaki gün farkını hesaplar (saat dilimi kaymasından etkilenmemesi
+// için UTC gün sayılarıyla karşılaştırır).
+function daysBetweenDates(fromStr, toStr) {
+    const toUTCDays = (s) => {
+        const [y, m, d] = s.split('-').map(Number);
+        return Date.UTC(y, m - 1, d) / 86400000;
+    };
+    return Math.round(toUTCDays(toStr) - toUTCDays(fromStr));
+}
+
 function getCardColor(card, type) {
     const today = formatDate(getNowTR());
     // ÖNEMLİ: Tamamlanmış (is_mastered) kartlar için önce bu kontrol yapılır — böylece
     // eski bir nextReview tarihi geçmiş olsa bile bir daha asla kırmızıya dönmezler.
     if (card.is_mastered) return 'green';
     if (!card.nextReview || card.nextReview <= today) return 'red';
-    return 'yellow';
+    // Kırmızıdan çıkmış bir kart: sonraki tekrarına 21 günden az kaldıysa sarı kutuda,
+    // 21 gün veya daha fazla kaldıysa yeşil kutuda kalır.
+    const daysLeft = daysBetweenDates(today, card.nextReview);
+    return daysLeft >= 21 ? 'green' : 'yellow';
 }
 
 // Hata 2 düzeltmesi: renderLibrary başında blobStore sıfırlanıyor
@@ -4646,20 +4704,34 @@ if (appState.archSelectedTopics.length > 0) {
             }
         }
 
+        const chipCheckIcon = `<svg class="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`;
+        const chipCycleIcon = `<svg class="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46A7.93 7.93 0 0020 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74A7.93 7.93 0 004 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>`;
+        const chipCalendarIcon = `<svg class="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM5 7V6h14v1H5z"/></svg>`;
+
         let extraInfo = '';
         if(activeArchiveType === 'question') {
             extraInfo = `
-                <div class="flex justify-between items-center text-[10px] font-bold text-slate-500 border-t border-slate-100 pt-2">
-                    <span>Cevap: <strong class="text-indigo-600">${item.answer}</strong></span>
-                    <span>Döngü: <strong class="text-indigo-600">${item.level + 1}</strong></span>
-                    <span>Sonraki: <strong class="text-indigo-600">${item.nextReview}</strong></span>
+                <div class="flex flex-wrap items-center gap-1.5 border-t border-slate-100 pt-2 mt-1">
+                    <span class="inline-flex items-center gap-1 bg-indigo-50 text-indigo-700 text-[10px] font-bold px-2 py-1 rounded-lg">
+                        ${chipCheckIcon} Cevap: ${item.answer}
+                    </span>
+                    <span class="inline-flex items-center gap-1 bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-1 rounded-lg">
+                        ${chipCycleIcon} Döngü ${item.level + 1}
+                    </span>
+                    <span class="inline-flex items-center gap-1 bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-1 rounded-lg ml-auto">
+                        ${chipCalendarIcon} ${item.nextReview}
+                    </span>
                 </div>
             `;
         } else {
             extraInfo = `
-                <div class="flex justify-between items-center text-[10px] font-bold text-slate-500 border-t border-slate-100 pt-2">
-                    <span>Döngü: <strong class="text-amber-600">${(item.stage || 0) + 1}</strong></span>
-                    <span>Sonraki: <strong class="text-amber-600">${item.nextReview}</strong></span>
+                <div class="flex flex-wrap items-center gap-1.5 border-t border-slate-100 pt-2 mt-1">
+                    <span class="inline-flex items-center gap-1 bg-amber-50 text-amber-700 text-[10px] font-bold px-2 py-1 rounded-lg">
+                        ${chipCycleIcon} Döngü ${(item.stage || 0) + 1}
+                    </span>
+                    <span class="inline-flex items-center gap-1 bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-1 rounded-lg ml-auto">
+                        ${chipCalendarIcon} ${item.nextReview}
+                    </span>
                 </div>
             `;
         }
@@ -4980,7 +5052,7 @@ async function changeField(field) {
     </script>
 
     <script>
-    const firebaseConfig = {
+        const firebaseConfig = {
   apiKey: "AIzaSyDWD2RqdFiEq4cva5kEjF1FK8_Y7DLA6aQ",
   authDomain: "hadiartik-60685.firebaseapp.com",
   databaseURL: "https://hadiartik-60685-default-rtdb.europe-west1.firebasedatabase.app",
