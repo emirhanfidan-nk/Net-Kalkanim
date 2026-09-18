@@ -2,7 +2,12 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#f8fafc" id="meta-theme-color">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" id="meta-apple-status-bar">
+    <meta name="format-detection" content="telephone=no">
     <title>Net Kalkanım</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -25,13 +30,67 @@
             display: none; /* Chrome, Safari, yeni Edge */
         }
 
+        /* ==================== NATIVE APP HİSSİ ==================== */
+        html, body {
+            overscroll-behavior-y: none; /* Sayfayı aşağı/yukarı çekince tarayıcı "lastik" efekti yapmasın */
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+        }
+        * {
+            -webkit-tap-highlight-color: transparent; /* Android'de dokunuşta çıkan gri flaş kutuyu kaldır */
+            -webkit-touch-callout: none;
+        }
+        button, a, .nav-btn, [onclick] {
+            touch-action: manipulation; /* çift dokunmayla yakınlaştırmayı ve 300ms gecikmeyi engelle */
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        input, textarea {
+            -webkit-user-select: text;
+            user-select: text;
+        }
+        /* Dokunulabilir her şeye basılı tutulduğunda hafif "çöküş" tepkisi — gerçek bir cihazda
+           parmağın altında bir şeyin tepki verdiğini hissettirir. */
+        button:active, .nav-btn:active, [onclick]:active {
+            transform: scale(0.96);
+            transition: transform 0.08s ease-out;
+        }
+        /* Tam ekran ekranlar (Soru/Kamp modalı) merkezi diyalog gibi ölçeklenmek yerine,
+           gerçek bir ekranın üzerine kayarak gelmesi gibi alttan yukarı doğru açılır. */
+        @keyframes screenSlideUp {
+            from { transform: translateY(6%); opacity: 0.4; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .screen-slide-animate:not(.hidden) {
+            animation: screenSlideUp 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        /* Çentikli telefonlarda üst bar ve alt navigasyon, cihazın güvenli alanına saygı göstersin. */
+        header {
+            padding-top: max(1rem, env(safe-area-inset-top));
+        }
+        #bottom-nav {
+            padding-bottom: env(safe-area-inset-bottom);
+            height: calc(76px + env(safe-area-inset-bottom));
+        }
+        /* Kaydırılabilir her alan: iOS'ta akıcı momentum scroll, ve bir listenin sonuna
+           gelince kaydırmanın arkadaki sayfaya "sızıp" tüm ekranı zıplatmasını engelle. */
+        .overflow-y-auto, main {
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior-y: contain;
+        }
+        /* Alt nav sekme geçişi ve ortadaki + butonu: düz "ease" yerine hafif esneyen bir eğri —
+           gerçek bir cihazdaki dokunsal/yaylı tepkiyi taklit eder. */
+        .nav-pill, #nav-add {
+            transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+        }
+
         .font-display { font-family: 'Sora', sans-serif; }
 
         .tab-content { display: none; opacity: 0; }
-        .tab-content.active { display: block; animation: smoothFade 0.3s ease-out forwards; }
+        .tab-content.active { display: block; animation: smoothFade 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
         @keyframes smoothFade {
-            0% { opacity: 0; transform: translateY(10px); }
+            0% { opacity: 0; transform: translateY(8px); }
             100% { opacity: 1; transform: translateY(0); }
         }
 
@@ -525,6 +584,49 @@
             animation: flame-flicker 1.6s ease-in-out infinite;
             transform-origin: center bottom;
         }
+
+        /* ==================== CEVAP GERİ BİLDİRİM FLAŞI ==================== */
+        @keyframes answerFlashPulse {
+            0% { opacity: 0; }
+            14% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        #answer-flash-overlay {
+            opacity: 0;
+        }
+        #answer-flash-overlay.answer-flash-correct {
+            background: rgba(5, 150, 105, 0.32);
+            animation: answerFlashPulse 0.5s ease-out forwards;
+        }
+        #answer-flash-overlay.answer-flash-wrong {
+            background: rgba(225, 29, 72, 0.32);
+            animation: answerFlashPulse 0.5s ease-out forwards;
+        }
+        /* Doğru cevapta karta hafif bir "pop", yanlışta kısa bir "sarsılma" — dokunsal his katar. */
+        @keyframes popCorrect {
+            0%, 100% { transform: scale(1); }
+            35% { transform: scale(1.025); }
+        }
+        @keyframes shakeWrong {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-7px); }
+            40% { transform: translateX(7px); }
+            60% { transform: translateX(-4px); }
+            80% { transform: translateX(4px); }
+        }
+        .pop-correct { animation: popCorrect 0.3s ease-out; }
+        .shake-wrong { animation: shakeWrong 0.35s ease-in-out; }
+        /* Flaş söndükten sonra ekranda hafif, kalıcı bir renk izi kalsın — soru cevaplı
+           kaldığı sürece (bir sonraki soruya geçene kadar) doğru/yanlış hissi devam etsin. */
+        #answer-settled-tint {
+            transition: background-color 0.4s ease-out;
+        }
+        #answer-settled-tint.settled-correct {
+            background-color: rgba(5, 150, 105, 0.12);
+        }
+        #answer-settled-tint.settled-wrong {
+            background-color: rgba(225, 29, 72, 0.12);
+        }
     </style>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="logo.png">
@@ -544,24 +646,33 @@
                 const parsed = JSON.parse(backup);
                 if (parsed && parsed.darkMode) {
                     document.body.classList.add('dark-mode');
+                    const mt = document.getElementById('meta-theme-color');
+                    if (mt) mt.setAttribute('content', '#131319');
+                    const ms = document.getElementById('meta-apple-status-bar');
+                    if (ms) ms.setAttribute('content', 'black-translucent');
                 }
             }
         } catch(e) {}
     </script>
 <!-- ŞİFRE / SEÇİM EKRANI -->
-<div id="login-screen" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: #ffffff; z-index: 999999; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: 'Plus Jakarta Sans', sans-serif; box-sizing: border-box; padding: 20px; text-align: center;">
-  <h2 style="font-family: 'Sora', sans-serif;">Net Kalkanım'a Giriş</h2>
-  <p>Uygulamayı kullanmak için bir seçenek belirle:</p>
+<div id="login-screen" class="fixed inset-0 z-[999999] flex flex-col items-center justify-center p-6 text-center bg-slate-50">
+  <div class="w-16 h-16 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-5 shadow-sm">
+    <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M12 2L3 6v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V6l-9-4zm0 2.18l7 3.11V12c0 4.52-3.05 8.69-7 9.93C8.05 20.69 5 16.52 5 12V7.29l7-3.11zM11 11h2v6h-2zm0-4h2v2h-2z"/></svg>
+  </div>
+  <h2 class="font-display text-xl font-bold text-slate-800 mb-2">Net Kalkanım'a Hoş Geldin</h2>
+  <p class="text-sm text-slate-500 mb-8 max-w-xs">Uygulamayı kullanmak için bir seçenek belirle</p>
 
-  <button onclick="showLoginFields()" style="padding: 12px 30px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 20px;">Şifrem Var</button>
-  <button onclick="startTrial()" style="padding: 12px 30px; font-size: 16px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px;">Ücretsiz Dene (20 Soru/Not)</button>
+  <div class="w-full max-w-xs space-y-3">
+    <button onclick="showLoginFields()" class="btn-cyber w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 font-semibold text-sm rounded-2xl shadow-md">Şifrem Var</button>
+    <button onclick="startTrial()" class="btn-cyber w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 font-semibold text-sm rounded-2xl shadow-md">Ücretsiz Dene <span class="opacity-80 font-normal">(20 Soru/Not)</span></button>
+  </div>
 
-  <a href="https://wa.me/905518224339" target="_blank" style="margin-top: 20px; color: #6c757d; text-decoration: underline; font-size: 14px;">Şifre Satın Al (Whatsapp'tan Ulaş)</a>
+  <a href="https://wa.me/905518224339" target="_blank" class="mt-6 text-xs font-semibold text-slate-400 underline underline-offset-2">Şifre Satın Al (WhatsApp'tan Ulaş)</a>
 
-  <div id="login-fields" style="display: none; margin-top: 20px;">
-    <input type="text" id="otp-input" placeholder="Şifren..." style="padding: 12px; width: 250px; font-size: 16px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"><br>
-    <button onclick="checkPassword()" style="padding: 12px 30px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px;">Giriş Yap</button>
-    <p id="error-msg" style="color: red; font-weight: bold; margin-top: 20px;"></p>
+  <div id="login-fields" class="hidden mt-6 w-full max-w-xs space-y-3">
+    <input type="text" id="otp-input" placeholder="Şifreni gir..." class="w-full bg-white p-3.5 border border-slate-300 outline-none focus:border-indigo-600 text-slate-800 font-medium text-center rounded-xl shadow-sm">
+    <button onclick="checkPassword()" class="btn-cyber w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 font-semibold text-sm rounded-2xl shadow-md">Giriş Yap</button>
+    <p id="error-msg" class="text-rose-600 font-semibold text-xs"></p>
   </div>
 </div>
 
@@ -586,7 +697,7 @@
             <div id="home" class="tab-content space-y-6">
                 <!-- Günlük Tekrar başlığı (Arşiv & Kamp ile aynı stil) -->
                 <div class="flex justify-between items-center border-b border-slate-200 pb-2">
-                    <h2 class="text-xl font-semibold text-slate-800 flex items-center gap-2 font-display">
+                    <h2 class="text-xl font-semibold text-slate-800 flex items-center gap-2 font-display tracking-tight">
                         <svg class="w-6 h-6 fill-current text-indigo-600" viewBox="0 0 24 24">
                             <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
                         </svg>
@@ -596,7 +707,7 @@
                         <svg class="streak-flame w-4 h-4" viewBox="0 0 24 24" fill="none">
                             <path d="M12.5 2.5c1.2 3-2.3 4.4-2.3 7.6a2.8 2.8 0 005.6 0c0-1-.4-1.9-1-2.8 2 1.1 3.2 3.3 3.2 5.6a5.5 5.5 0 11-11 0c0-4.6 3.5-6.7 5.5-10.4z" fill="#F97316"/>
                         </svg>
-                        <span id="home-streak-count" class="text-sm font-bold text-slate-800">0</span>
+                        <span id="home-streak-count" class="text-sm font-bold text-slate-800 tabular-nums">0</span>
                     </div>
                 </div>
 
@@ -605,20 +716,20 @@
                     <div class="absolute top-0 left-0 w-2 h-full" style="background-color: var(--box-red-accent);"></div>
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="font-semibold text-sm tracking-wider" style="color: var(--box-red-accent);">Kırmızı Kutu</h3>
-                        <span class="text-xs font-semibold px-3 py-1 rounded-full" style="background-color: var(--box-red-bg); color: var(--box-red-accent); border: 1px solid var(--box-red-accent); display: inline-block; text-align: center;">
-    Bekleyen: <span id="red-total-count">0</span><br>
-    <span id="red-estimated-time" style="font-size: 10px; opacity: 0.9;">tahmini ...</span>
+                        <span class="text-xs font-semibold px-3.5 py-2 rounded-2xl leading-tight" style="background-color: var(--box-inner-bg); color: var(--box-red-accent); border: 1px solid var(--box-red-accent); display: inline-block; text-align: center;">
+    Bekleyen: <span id="red-total-count" class="tabular-nums font-bold">0</span><br>
+    <span id="red-estimated-time" style="font-size: 10px; opacity: 0.85;">tahmini ...</span>
 </span>
                     </div>
                     <p class="text-xs font-medium mb-3" style="color: var(--box-desc-text);">Bugün halletmen gerekenler</p>
                     <div class="grid grid-cols-2 gap-3">
                         <button onclick="startReview('questions')" class="btn-cyber btn-cyber-red py-4 rounded-2xl font-semibold text-sm flex flex-col items-center justify-center gap-1 shadow-md" style="background-color: var(--box-inner-bg); color: var(--box-red-accent); border-bottom: 3px solid var(--box-red-accent);">
                             <span>Soruları Başlat</span>
-                            <span class="text-xs opacity-80">[ <span id="red-question-count">0</span> ]</span>
+                            <span class="text-xs opacity-80 tabular-nums">[ <span id="red-question-count">0</span> ]</span>
                         </button>
                         <button onclick="startReview('notes')" class="btn-cyber btn-cyber-yellow py-4 rounded-2xl font-semibold text-sm flex flex-col items-center justify-center gap-1 shadow-md" style="background-color: var(--box-inner-bg); color: var(--box-red-accent); border-bottom: 3px solid var(--box-red-accent);">
                             <span>Notları Başlat</span>
-                            <span class="text-xs opacity-80">[ <span id="red-note-count">0</span> ]</span>
+                            <span class="text-xs opacity-80 tabular-nums">[ <span id="red-note-count">0</span> ]</span>
                         </button>
                     </div>
                 </div>
@@ -630,7 +741,7 @@
                             <h3 class="font-semibold text-xs" style="color: var(--box-yellow-accent);">Sarı Kutu</h3>
                         </div>
                         <p class="text-xs font-medium mb-3" style="color: var(--box-desc-text);">Ara sıra bakabilirsin</p>
-                        <div class="text-xs font-semibold space-y-1" style="color: var(--box-yellow-accent);">
+                        <div class="text-xs font-semibold space-y-1 tabular-nums" style="color: var(--box-yellow-accent);">
                             <div>Soru: <span id="yellow-question-count">0</span></div>
                             <div>Not: <span id="yellow-note-count">0</span></div>
                         </div>
@@ -643,7 +754,7 @@
                             <h3 class="font-semibold text-xs" style="color: var(--box-green-accent);">Yeşil Kutu</h3>
                         </div>
                         <p class="text-xs font-medium mb-3" style="color: var(--box-desc-text);">Ustalık, ayda bir göz at</p>
-                        <div class="text-xs font-semibold space-y-1" style="color: var(--box-green-accent);">
+                        <div class="text-xs font-semibold space-y-1 tabular-nums" style="color: var(--box-green-accent);">
                             <div>Soru: <span id="green-question-count">0</span></div>
                             <div>Not: <span id="green-note-count">0</span></div>
                         </div>
@@ -663,8 +774,14 @@
                 </div>
 
                 <div id="question-type-toggle-area" class="flex gap-3 mb-4 bg-slate-200 p-1.5 rounded-2xl">
-                    <button type="button" onclick="setQuestionInputType('image')" id="btn-qinput-image" class="flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-semibold transition-all rounded-xl">Görsel</button>
-                    <button type="button" onclick="setQuestionInputType('text')" id="btn-qinput-text" class="flex-1 text-slate-600 py-2 text-xs font-semibold transition-all hover:text-indigo-600 rounded-xl">Yazı</button>
+                    <button type="button" onclick="setQuestionInputType('image')" id="btn-qinput-image" class="flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-semibold transition-all rounded-xl flex items-center justify-center gap-1.5">
+                        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                        Görsel
+                    </button>
+                    <button type="button" onclick="setQuestionInputType('text')" id="btn-qinput-text" class="flex-1 text-slate-600 py-2 text-xs font-semibold transition-all hover:text-indigo-600 rounded-xl flex items-center justify-center gap-1.5">
+                        <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                        Yazı
+                    </button>
                 </div>
 
                 <div class="space-y-4">
@@ -756,8 +873,14 @@
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-2">Çözüm / Not</label>
                         <div id="note-type-toggle" class="flex gap-3 mb-2 bg-slate-200 p-1.5 rounded-2xl hidden">
-                            <button type="button" onclick="setNoteInputType('text')" id="btn-note-type-text" class="flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-semibold transition-all rounded-xl">Metin</button>
-                            <button type="button" onclick="setNoteInputType('image')" id="btn-note-type-image" class="flex-1 text-slate-600 py-2 text-xs font-semibold transition-all hover:text-indigo-600 rounded-xl">Görsel</button>
+                            <button type="button" onclick="setNoteInputType('text')" id="btn-note-type-text" class="flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-semibold transition-all rounded-xl flex items-center justify-center gap-1.5">
+                                <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                                Metin
+                            </button>
+                            <button type="button" onclick="setNoteInputType('image')" id="btn-note-type-image" class="flex-1 text-slate-600 py-2 text-xs font-semibold transition-all hover:text-indigo-600 rounded-xl flex items-center justify-center gap-1.5">
+                                <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                                Görsel
+                            </button>
                         </div>
                         <div id="note-text-area">
                             <textarea id="q-note" placeholder="Metin gir..." class="w-full bg-white p-3.5 border border-slate-300 outline-none focus:border-indigo-600 text-slate-800 text-xs font-medium h-20 rounded-xl resize-none tracking-wide shadow-sm"></textarea>
@@ -859,7 +982,7 @@
 
             <div id="library" class="tab-content space-y-4">
                 <div class="flex justify-between items-center border-b border-slate-200 pb-2">
-                    <h2 class="text-xl font-semibold text-slate-800 flex items-center gap-2 font-display">
+                    <h2 class="text-xl font-semibold text-slate-800 flex items-center gap-2 font-display tracking-tight">
                         <svg class="w-6 h-6 fill-current text-indigo-600" viewBox="0 0 24 24"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM6.24 5h11.52l.83 1H5.41l.83-1zM5 19V8h14v11H5zm11-5.5H8v-2h8v2z"/></svg>
                         Arşiv & Kamp
                     </h2>
@@ -903,7 +1026,7 @@
 
                 <!-- Ayarlar başlığı (diğer sekmelerle aynı stil) -->
                 <div class="flex justify-between items-center border-b border-slate-200 pb-2">
-                    <h2 class="text-xl font-semibold text-slate-800 flex items-center gap-2 font-display">
+                    <h2 class="text-xl font-semibold text-slate-800 flex items-center gap-2 font-display tracking-tight">
                         <svg class="w-6 h-6 fill-current text-indigo-600" viewBox="0 0 24 24">
                             <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
                         </svg>
@@ -1015,7 +1138,9 @@
         </main>
 
         <!-- Soru Modalı -->
-        <div id="review-modal" class="modal-animate absolute inset-0 bg-slate-50 z-50 hidden flex flex-col rounded-none h-full overflow-hidden transition-colors duration-300">
+        <div id="review-modal" class="screen-slide-animate absolute inset-0 bg-slate-50 z-50 hidden flex flex-col rounded-none h-full overflow-hidden transition-colors duration-300">
+            <div id="answer-settled-tint" class="absolute inset-0 pointer-events-none z-[40]"></div>
+            <div id="answer-flash-overlay" class="absolute inset-0 pointer-events-none z-[45]"></div>
             <div class="flex justify-between items-center bg-white px-4 py-3 border-b border-indigo-100 shadow-sm shrink-0" id="review-header">
                 <div class="flex items-center gap-3">
                     <div class="w-2.5 h-2.5 bg-rose-500 rounded-full animate-pulse"></div>
@@ -1025,6 +1150,7 @@
                     <button onclick="closeReview()" class="text-slate-500 hover:text-indigo-600 transition-colors"><span class="text-xs font-semibold">KAPAT</span></button>
                 </div>
             </div>
+            <div id="review-progress-bar" class="flex gap-1 px-4 py-2 bg-white border-b border-slate-100 shrink-0"></div>
 
             <div class="flex-1 flex flex-col justify-start items-center p-3 bg-slate-100/50 overflow-y-auto gap-2 min-h-0">
     <div class="text-[11px] text-slate-500 font-semibold tracking-wider text-center" id="review-breadcrumbs">MATEMATİK > TÜREV</div>
@@ -1138,7 +1264,7 @@
 
         <!-- Ders/Konu Seçim Penceresi -->
         <div id="picker-modal" class="modal-animate absolute inset-0 bg-slate-100/80 backdrop-blur-sm z-50 hidden flex flex-col items-center justify-center p-4">
-            <div class="bg-white w-full max-w-xs rounded-3xl shadow-2xl p-5 flex flex-col max-h-[70vh]">
+            <div class="modal-animate bg-white w-full max-w-xs rounded-3xl shadow-2xl p-5 flex flex-col max-h-[70vh]">
                 <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-3">
                     <h3 id="picker-title" class="text-indigo-700 font-display font-bold text-sm tracking-wider">Seçim Yap</h3>
                     <button onclick="closePicker()" class="text-slate-400 hover:text-slate-600 p-1">
@@ -1149,7 +1275,7 @@
             </div>
         </div>
 
-        <div id="camp-review-modal" class="modal-animate absolute inset-0 bg-slate-50 z-50 hidden flex flex-col rounded-none">
+        <div id="camp-review-modal" class="screen-slide-animate absolute inset-0 bg-slate-50 z-50 hidden flex flex-col rounded-none">
             <div class="flex justify-between items-center bg-white p-4 border-b border-indigo-100 shadow-sm" id="camp-header">
                 <div class="flex items-center gap-3">
                     <span id="camp-review-progress" class="text-xs font-extrabold text-indigo-600 tracking-wider">KAMP 1/5</span>
@@ -1334,7 +1460,7 @@
                 <button onclick="closeCodeModal()" class="flex-1 bg-slate-100 border border-slate-300 text-slate-600 py-3 font-semibold hover:bg-slate-200 transition-colors rounded-xl shadow-sm">Vazgeç</button>
                 <button onclick="submitCode()" class="flex-1 bg-indigo-600 text-white py-3 font-semibold hover:bg-indigo-700 transition-colors rounded-xl shadow-sm">Giriş Yap</button>
             </div>
-            <p id="code-error-msg" style="color: red; font-weight: bold; margin-top: 10px;"></p>
+            <p id="code-error-msg" class="text-rose-600 font-semibold text-xs mt-2"></p>
         </div>
     </div>
 
@@ -2352,13 +2478,13 @@ function setNoteInputType(type) {
     const imageArea = document.getElementById('note-image-area');
 
     if (type === 'text') {
-        btnText.className = "flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold transition-all rounded-xl";
-        btnImage.className = "flex-1 text-slate-600 py-2 text-xs font-bold transition-all hover:text-indigo-600 rounded-xl";
+        btnText.className = "flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold transition-all rounded-xl flex items-center justify-center gap-1.5";
+        btnImage.className = "flex-1 text-slate-600 py-2 text-xs font-bold transition-all hover:text-indigo-600 rounded-xl flex items-center justify-center gap-1.5";
         textArea.classList.remove('hidden');
         imageArea.classList.add('hidden');
     } else {
-        btnText.className = "flex-1 text-slate-600 py-2 text-xs font-bold transition-all hover:text-indigo-600 rounded-xl";
-        btnImage.className = "flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold transition-all rounded-xl";
+        btnText.className = "flex-1 text-slate-600 py-2 text-xs font-bold transition-all hover:text-indigo-600 rounded-xl flex items-center justify-center gap-1.5";
+        btnImage.className = "flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold transition-all rounded-xl flex items-center justify-center gap-1.5";
         textArea.classList.add('hidden');
         imageArea.classList.remove('hidden');
     }
@@ -2754,13 +2880,13 @@ function updateQuestionInputVisibility() {
     if (currentEntryType === 'question') {
         if (qTypeToggle) qTypeToggle.classList.remove('hidden');
         if (currentQuestionInputType === 'image') {
-            if (btnImg) btnImg.className = "flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold transition-all rounded-xl";
-            if (btnText) btnText.className = "flex-1 text-slate-600 py-2 text-xs font-bold transition-all hover:text-indigo-600 rounded-xl";
+            if (btnImg) btnImg.className = "flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold transition-all rounded-xl flex items-center justify-center gap-1.5";
+            if (btnText) btnText.className = "flex-1 text-slate-600 py-2 text-xs font-bold transition-all hover:text-indigo-600 rounded-xl flex items-center justify-center gap-1.5";
             if (imgContainer) imgContainer.classList.remove('hidden');
             if (textQuestionContainer) textQuestionContainer.classList.add('hidden');
         } else {
-            if (btnImg) btnImg.className = "flex-1 text-slate-600 py-2 text-xs font-bold transition-all hover:text-indigo-600 rounded-xl";
-            if (btnText) btnText.className = "flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold transition-all rounded-xl";
+            if (btnImg) btnImg.className = "flex-1 text-slate-600 py-2 text-xs font-bold transition-all hover:text-indigo-600 rounded-xl flex items-center justify-center gap-1.5";
+            if (btnText) btnText.className = "flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold transition-all rounded-xl flex items-center justify-center gap-1.5";
             if (imgContainer) imgContainer.classList.add('hidden');
             if (textQuestionContainer) textQuestionContainer.classList.remove('hidden');
         }
@@ -3460,7 +3586,7 @@ function openPicker(type) {
     } else if (type === 'topic') {
         const selectedCourse = document.getElementById('q-course').value;
         if (!selectedCourse) {
-            showToast('Önce ders seçmelisin, ders menüsünü açıyorum...', true);
+            showToast('Önce ders seçmelisin!', true);
             openPicker('course');
             return;
         }
@@ -3519,8 +3645,16 @@ async function saveData() {
 const topic = document.getElementById('q-topic').value.trim();
 const todayStr = formatDate(getNowTR());
 
-if (!course) { showToast("Lütfen ders seç!", true); return; }
-if (!topic) { showToast("Lütfen konu seç!", true); return; }
+if (!course) {
+    showToast("Önce ders seçmelisin!", true);
+    openPicker('course');
+    return;
+}
+if (!topic) {
+    showToast("Önce konu seçmelisin!", true);
+    openPicker('topic');
+    return;
+}
 
     if (currentEntryType === 'question') {
         let finalImage = null;
@@ -3738,6 +3872,80 @@ function startReview(mode, boxColor = 'red', specificItem = null, isArchiveMode 
     }
 }
 
+// Soru/Kamp modalının üstündeki segmentli ilerleme çubuğunu (Instagram story tarzı) çizer.
+// Normal günlük tekrarda (kırmızı kutu, arşiv değil) her segment o karta basılan recall
+// butonuna göre renklenir: işaretlenmemiş = gri, Hatırladım = yeşil, Kısmen = sarı, Unuttum = kırmızı.
+// Kamp/arşiv modunda ise recall kavramı olmadığı için segmentler geçilen konuma göre dolar.
+function renderReviewProgressBar() {
+    const el = document.getElementById('review-progress-bar');
+    if (!el) return;
+    const total = currentReviewQueue.length;
+    const todayStr = formatDate(getNowTR());
+    const useRecallColors = !isCampMode && !currentArchiveMode && currentBoxColor === 'red';
+    el.innerHTML = '';
+    for (let i = 0; i < total; i++) {
+        const seg = document.createElement('div');
+        let colorClass = 'bg-slate-200';
+        if (useRecallColors) {
+            const it = currentReviewQueue[i];
+            if (it && it.userRecallStatus && it.lastReviewedDate === todayStr) {
+                if (it.userRecallStatus === 'remembered') colorClass = 'bg-emerald-500';
+                else if (it.userRecallStatus === 'partial') colorClass = 'bg-amber-400';
+                else if (it.userRecallStatus === 'forgot') colorClass = 'bg-rose-500';
+            }
+        } else {
+            colorClass = i <= currentReviewIndex ? 'bg-indigo-600' : 'bg-slate-200';
+        }
+        seg.className = 'flex-1 h-1.5 rounded-full transition-colors duration-300 ' + colorClass;
+        el.appendChild(seg);
+    }
+}
+
+// Cevap verildiğinde ekranı kısa süreliğine yeşil (doğru) veya kırmızı (yanlış) renkte
+// yanıp söndürür — anlık, güçlü bir geri bildirim hissi verir.
+function flashAnswerFeedback(isCorrect) {
+    const el = document.getElementById('answer-flash-overlay');
+    const frameBox = document.getElementById('review-frame-box');
+    const cls = isCorrect ? 'answer-flash-correct' : 'answer-flash-wrong';
+    const shakeCls = isCorrect ? 'pop-correct' : 'shake-wrong';
+
+    if (el) {
+        el.classList.remove('answer-flash-correct', 'answer-flash-wrong');
+        void el.offsetWidth; // reflow: animasyonun baştan oynaması için
+        el.classList.add(cls);
+        // ÖNEMLİ: sınıfı animasyon bitince kaldırıyoruz. Aksi halde modal kapatılıp
+        // (display:none) tekrar açıldığında (display:flex) tarayıcı CSS animasyonunu
+        // sıfırdan yeniden oynatıyor — yani ilgisiz bir soruda "kendiliğinden" yeşil/kırmızı
+        // yanma hatasına yol açıyordu. Sınıf kalmayınca bu tekrar oynama da olmuyor.
+        clearTimeout(el._flashCleanupTimer);
+        el._flashCleanupTimer = setTimeout(() => el.classList.remove(cls), 550);
+    }
+    if (frameBox) {
+        frameBox.classList.remove('pop-correct', 'shake-wrong');
+        void frameBox.offsetWidth;
+        frameBox.classList.add(shakeCls);
+        clearTimeout(frameBox._shakeCleanupTimer);
+        frameBox._shakeCleanupTimer = setTimeout(() => frameBox.classList.remove(shakeCls), 400);
+    }
+    // Cihaz destekliyorsa gerçek bir titreşim (haptic) ekle — doğru için tek kısa tık,
+    // yanlış için "dt-dt-dt" tarzı üç kısa darbe.
+    if (navigator.vibrate) {
+        navigator.vibrate(isCorrect ? 35 : [30, 40, 30]);
+    }
+}
+
+// Flaş söndükten sonra ekranda kalması gereken kalıcı rengi ayarlar. Bu, geçici
+// flashAnswerFeedback() çağrısından bağımsız çalışır — soru verisine (cevaplanmış mı,
+// doğru mu) bakarak karar verir. Böylece Önceki/Sonraki ile gezinince veya modal
+// kapanıp tekrar açılınca da her soru kendi doğru/yanlış durumunu doğru şekilde gösterir.
+function updateSettledTint(state) {
+    const el = document.getElementById('answer-settled-tint');
+    if (!el) return;
+    el.classList.remove('settled-correct', 'settled-wrong');
+    if (state === 'correct') el.classList.add('settled-correct');
+    else if (state === 'wrong') el.classList.add('settled-wrong');
+}
+
 function renderReviewItem() {
     if (!currentReviewQueue || currentReviewQueue.length === 0) {
         closeReview(); return;
@@ -3762,8 +3970,17 @@ function renderReviewItem() {
     const shouldKeepFlip = preserveFlipState;
     preserveFlipState = false;
 
+    // Kalıcı arka plan tonu: sadece soru modunda ve o soru bugün/kampta cevaplanmışsa
+    // doğru/yanlışa göre yeşil/kırmızı; aksi halde nötr (renksiz).
+    if (currentReviewMode === 'questions' && isAnsweredToday) {
+        updateSettledTint(effectiveUserAnswer === item.answer ? 'correct' : 'wrong');
+    } else {
+        updateSettledTint(null);
+    }
+
     document.getElementById('review-progress').innerText = `${isCampMode ? 'KAMP' : (currentReviewMode === 'questions' ? 'SORU' : 'NOT')} ${currentReviewIndex + 1}/${currentReviewQueue.length}`;
     document.getElementById('review-breadcrumbs').innerText = `${item.course} > ${item.topic}`;
+    renderReviewProgressBar();
 
     const imgEl = document.getElementById('review-img');
     const qTextEl = document.getElementById('review-question-text');
@@ -4219,6 +4436,7 @@ async function submitQuestionAnswer(userAns) {
         if (campAnswers[currentReviewIndex] !== undefined) return; // kampta zaten cevaplanmış
         campAnswers[currentReviewIndex] = String(userAns).trim().toUpperCase();
         campCompletedIndices.add(currentReviewIndex);
+        flashAnswerFeedback(campAnswers[currentReviewIndex] === String(q.answer).trim().toUpperCase());
         renderReviewItem();
         return;
     }
@@ -4231,6 +4449,7 @@ async function submitQuestionAnswer(userAns) {
 
     q.userTodayAnswer = String(userAns).trim().toUpperCase();
     q.lastReviewedDate = todayStr;
+    flashAnswerFeedback(q.userTodayAnswer === String(q.answer).trim().toUpperCase());
 
     await saveQuestion(q);
     updateHomeStats();
@@ -4249,6 +4468,12 @@ function applyDarkMode(isDark) {
     document.body.classList.toggle('dark-mode', isDark);
     const toggle = document.getElementById('dark-mode-toggle');
     const knob = document.getElementById('dark-mode-toggle-knob');
+    // Durum çubuğu/tarayıcı çerçevesi rengini de temaya göre değiştir — bu, uygulamanın
+    // kendi arayüzünün cihazın "native" chrome'una kadar uzandığı hissini verir.
+    const metaTheme = document.getElementById('meta-theme-color');
+    if (metaTheme) metaTheme.setAttribute('content', isDark ? '#131319' : '#f8fafc');
+    const metaStatusBar = document.getElementById('meta-apple-status-bar');
+    if (metaStatusBar) metaStatusBar.setAttribute('content', isDark ? 'black-translucent' : 'default');
     if (toggle && knob) {
         if (isDark) {
             toggle.classList.remove('bg-slate-300');
@@ -4313,6 +4538,8 @@ async function submitRecallStatus(status) {
 
     const item = currentReviewQueue[currentReviewIndex];
     if (!item) return;
+
+    if (navigator.vibrate) navigator.vibrate(15); // butona basıldığını hissettiren kısa dokunuş
 
     recordActivityToday();
 
@@ -4430,6 +4657,7 @@ function closeReview() {
         // Sadece kamptaki TÜM sorular/notlar gerçekten tamamlandıysa tebrik mesajı göster.
         if (total > 0 && done >= total) {
             showToast("Kamp tamamlandı! Tebrikler 🎉");
+            if (navigator.vibrate) navigator.vibrate([40, 30, 40, 30, 90]);
         }
     }
 }
@@ -4608,7 +4836,16 @@ if (appState.archSelectedTopics.length > 0) {
     container.appendChild(countDisplay);
 
     if (filteredList.length === 0) {
-        container.innerHTML = `<div class="p-8 text-center text-slate-400 font-bold text-xs bg-white rounded-2xl border border-slate-200 shadow-sm">Arşivde Kayıt Bulunamadı.</div>`;
+        const isQuestion = activeArchiveType === 'question';
+        container.innerHTML = `
+            <div class="flex flex-col items-center justify-center text-center py-12 px-6 bg-white rounded-2xl border-2 border-dashed border-slate-200">
+                <div class="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-4">
+                    <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24"><path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.18L18.82 7 12 9.82 5.18 7 12 4.18zM4 8.7l7 3.5v7.66l-7-3.5V8.7zm9 11.16v-7.66l7-3.5v7.66l-7 3.5z"/></svg>
+                </div>
+                <p class="text-sm font-bold text-slate-600 mb-1">Burada henüz ${isQuestion ? 'soru' : 'not'} yok</p>
+                <p class="text-xs text-slate-400 max-w-[220px] leading-relaxed">Zamanı geldiğinde ${isQuestion ? 'soruların' : 'notların'} burada birikecek.</p>
+            </div>
+        `;
         return;
     }
 
@@ -4649,20 +4886,20 @@ if (appState.archSelectedTopics.length > 0) {
         const card = document.createElement('div');
         
         let itemColor = getCardColor(item, activeArchiveType);
-        let bgColorClass = 'bg-white';
         let borderBarColor = 'bg-slate-300';
+        let nextColorVar = '#94a3b8';
         if (itemColor === 'red') {
-            bgColorClass = 'bg-red-50';
             borderBarColor = 'bg-red-500';
+            nextColorVar = 'var(--box-red-accent)';
         } else if (itemColor === 'yellow') {
-            bgColorClass = 'bg-yellow-50';
             borderBarColor = 'bg-yellow-500';
+            nextColorVar = 'var(--box-yellow-accent)';
         } else if (itemColor === 'green') {
-            bgColorClass = 'bg-green-50';
             borderBarColor = 'bg-green-500';
+            nextColorVar = 'var(--box-green-accent)';
         }
         
-        card.className = `${bgColorClass} border border-slate-200 p-3.5 rounded-2xl shadow-sm space-y-2 relative overflow-hidden cursor-pointer hover:border-indigo-300 transition-colors`;
+        card.className = `bg-white border border-slate-200 p-3.5 rounded-2xl shadow-sm space-y-2 relative overflow-hidden cursor-pointer hover:border-indigo-300 transition-colors`;
         
         let contentHTML = '';
         if(item.img) {
@@ -4704,60 +4941,55 @@ if (appState.archSelectedTopics.length > 0) {
             }
         }
 
-        const chipCheckIcon = `<svg class="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`;
-        const chipCycleIcon = `<svg class="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46A7.93 7.93 0 0020 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74A7.93 7.93 0 004 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>`;
-        const chipCalendarIcon = `<svg class="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM5 7V6h14v1H5z"/></svg>`;
-
-        let extraInfo = '';
-        if(activeArchiveType === 'question') {
-            extraInfo = `
-                <div class="flex flex-wrap items-center gap-1.5 border-t border-slate-100 pt-2 mt-1">
-                    <span class="inline-flex items-center gap-1 bg-indigo-50 text-indigo-700 text-[10px] font-bold px-2 py-1 rounded-lg">
-                        ${chipCheckIcon} Cevap: ${item.answer}
-                    </span>
-                    <span class="inline-flex items-center gap-1 bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-1 rounded-lg">
-                        ${chipCycleIcon} Döngü ${item.level + 1}
-                    </span>
-                    <span class="inline-flex items-center gap-1 bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-1 rounded-lg ml-auto">
-                        ${chipCalendarIcon} ${item.nextReview}
+        // Alt bilgi satırı: her bilginin ne olduğu artık renkten de anlaşılıyor —
+        // oluşturulma tarihi nötr gri, döngü mor, sıradaki tarih ise kartın durum
+        // rengiyle (kırmızı/sarı/yeşil) aynı, cevap ise vurgulu indigo + tik ikonuyla.
+        let metaInfo = '';
+        if (activeArchiveType === 'question') {
+            metaInfo = `
+                <div class="flex items-center gap-1.5 text-[10.5px] font-bold border-t border-slate-100 pt-2 mt-1">
+                    <span class="text-slate-400">${item.createdDate || ''}</span>
+                    <span class="text-slate-300">·</span>
+                    <span class="text-violet-600">Döngü ${item.level + 1}</span>
+                    <span class="text-slate-300">→</span>
+                    <span style="color: ${nextColorVar};">${item.nextReview || ''}</span>
+                    <span class="ml-auto inline-flex items-center gap-1 text-emerald-600 shrink-0">
+                        <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>${item.answer}
                     </span>
                 </div>
             `;
         } else {
-            extraInfo = `
-                <div class="flex flex-wrap items-center gap-1.5 border-t border-slate-100 pt-2 mt-1">
-                    <span class="inline-flex items-center gap-1 bg-amber-50 text-amber-700 text-[10px] font-bold px-2 py-1 rounded-lg">
-                        ${chipCycleIcon} Döngü ${(item.stage || 0) + 1}
-                    </span>
-                    <span class="inline-flex items-center gap-1 bg-slate-100 text-slate-600 text-[10px] font-bold px-2 py-1 rounded-lg ml-auto">
-                        ${chipCalendarIcon} ${item.nextReview}
-                    </span>
+            metaInfo = `
+                <div class="flex items-center gap-1.5 text-[10.5px] font-bold border-t border-slate-100 pt-2 mt-1">
+                    <span class="text-slate-400">${item.createdDate || ''}</span>
+                    <span class="text-slate-300">·</span>
+                    <span class="text-violet-600">Döngü ${(item.stage || 0) + 1}</span>
+                    <span class="text-slate-300">→</span>
+                    <span style="color: ${nextColorVar};">${item.nextReview || ''}</span>
                 </div>
             `;
         }
 
         let pushBtnHTML = '';
         if (activeColorFilter === 'yellow' || activeColorFilter === 'green') {
-            pushBtnHTML = `<button onclick="event.stopPropagation(); pushToEnd('${activeArchiveType}', ${item.id})" class="inline-flex items-center gap-1 bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 px-2.5 py-1 rounded-lg text-[10px] font-bold transition-colors" title="En sona at">
-                <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M11 4h2v10.17l3.59-3.58L18 12l-6 6-6-6 1.41-1.41L11 14.17V4zM5 18h14v2H5z"/></svg>
-                En Alta Gönder
+            pushBtnHTML = `<button onclick="event.stopPropagation(); pushToEnd('${activeArchiveType}', ${item.id})" class="text-slate-400 hover:text-slate-600 p-1 shrink-0" title="En sona at">
+                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M11 4h2v10.17l3.59-3.58L18 12l-6 6-6-6 1.41-1.41L11 14.17V4zM5 18h14v2H5z"/></svg>
             </button>`;
         }
 
         card.innerHTML = `
             <div class="absolute top-0 left-0 w-1.5 h-full ${borderBarColor}"></div>
-            <div class="flex justify-between items-start gap-2 text-xs font-extrabold text-slate-700">
-                <span class="truncate min-w-0 flex-1">${item.course} > ${item.topic}</span>
-                <div class="flex items-center gap-2 shrink-0">
-                    <span class="text-[10px] text-slate-400 font-semibold whitespace-nowrap">${item.createdDate || ''}</span>
-                    <button onclick="event.stopPropagation(); deleteItem('${activeArchiveType}', ${item.id})" class="text-rose-500 hover:text-rose-700 p-1 shrink-0" title="Sil">
+            <div class="flex justify-between items-center gap-2">
+                <p class="text-xs font-bold text-slate-700 truncate min-w-0 flex-1">${item.course} <span class="text-slate-300">›</span> ${item.topic}</p>
+                <div class="flex items-center shrink-0">
+                    ${pushBtnHTML}
+                    <button onclick="event.stopPropagation(); deleteItem('${activeArchiveType}', ${item.id})" class="text-rose-600 hover:text-rose-700 p-1 shrink-0" title="Sil">
                         <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
                     </button>
                 </div>
             </div>
-            ${pushBtnHTML ? `<div class="flex justify-end">${pushBtnHTML}</div>` : ''}
             ${contentHTML}
-            ${extraInfo}
+            ${metaInfo}
         `;
         
         card.onclick = () => openArchiveItem(activeArchiveType, item.id);
