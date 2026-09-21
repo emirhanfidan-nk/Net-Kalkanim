@@ -101,13 +101,30 @@
 
         .modal-animate:not(.hidden) { animation: modalEnter 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
-        .btn-cyber { transition: all 0.2s ease-out; position: relative; font-weight: 600; letter-spacing: 0.025em; }
-        .btn-cyber:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.25); }
-        .btn-cyber:active { transform: translateY(0); }
+        /* Butonlar artık düz bir renk lekesi değil — altta "kalın" bir kenar gölgesi ve
+           yumuşak bir çevresel gölge ile gerçek bir yüzeyden kabarık duruyor. Basılınca
+           bu kenar payı azalıyor, buton görsel olarak "çöküyor" — dokunsal (haptic'siz de
+           olsa) bir basma hissi veriyor. !important, Tailwind'in shadow-md gibi CDN'den
+           gelen sınıflarıyla çakışmasın diye. */
+        .btn-cyber {
+            transition: all 0.15s ease-out;
+            position: relative;
+            font-weight: 600;
+            letter-spacing: 0.025em;
+            box-shadow: 0 3px 0 rgba(0,0,0,0.16), 0 6px 14px rgba(0,0,0,0.10) !important;
+        }
+        .btn-cyber:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 0 rgba(0,0,0,0.16), 0 14px 20px -3px rgba(13, 148, 136, 0.3) !important;
+        }
+        .btn-cyber:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 rgba(0,0,0,0.16), 0 2px 6px rgba(0,0,0,0.08) !important;
+        }
 
-        .btn-cyber-red:hover { box-shadow: 0 10px 15px -3px rgba(225, 29, 72, 0.25); }
-        .btn-cyber-purple:hover { box-shadow: 0 10px 15px -3px rgba(147, 51, 234, 0.25); }
-        .btn-cyber-yellow:hover { box-shadow: 0 10px 15px -3px rgba(217, 119, 6, 0.25); }
+        .btn-cyber-red:hover { box-shadow: 0 4px 0 rgba(0,0,0,0.16), 0 14px 20px -3px rgba(225, 29, 72, 0.35) !important; }
+        .btn-cyber-purple:hover { box-shadow: 0 4px 0 rgba(0,0,0,0.16), 0 14px 20px -3px rgba(13, 148, 136, 0.35) !important; }
+        .btn-cyber-yellow:hover { box-shadow: 0 4px 0 rgba(0,0,0,0.16), 0 14px 20px -3px rgba(217, 119, 6, 0.35) !important; }
 
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
@@ -323,10 +340,21 @@
            renklendirildiği için, bunları CSS değişkenleri (variable) üzerinden yönetiyoruz.
            Karanlık modda bu değişkenler otomatik olarak koyu tonlara dönüyor. */
         :root {
+            /* ==== MARKA PALETİ ====
+               Uygulamanın her yerinde tek tip mor/teal yerine, tutarlı bir marka rengi
+               ve nötr yüzey/gölge tonları burada tanımlanır. Yeni bileşenler doğrudan bunları
+               kullanmalı; mevcut Tailwind renkleri (teal-600 vb.) geriye dönük uyumluluk için
+               şimdilik duruyor ve kademeli olarak buraya taşınacak. */
+            --brand-primary: #0D9488;
+            --brand-primary-soft: #F0FDFA;
+            --brand-secondary: #F97316;
+            --brand-secondary-soft: #FFF7ED;
+            --card-shadow: 0 1px 2px rgba(30, 34, 53, 0.04), 0 6px 16px rgba(30, 34, 53, 0.06);
+
             --box-red-bg: #FDE7EB;
-            --box-red-accent: #C92B43;
+            --box-red-accent: #DC2626;
             --box-yellow-bg: #FCF0DA;
-            --box-yellow-accent: #C57C10;
+            --box-yellow-accent: #EAB308;
             --box-green-bg: #E1F8EC;
             --box-green-accent: #0B8654;
             --box-inner-bg: #FFFFFF;
@@ -339,6 +367,12 @@
            doygun renk blokları yok); kategori rengi sadece kenar çizgisi, başlık, ikon ve
            buton metninde kullanılır — kartın kendisi asla renkli bir blok gibi durmaz. */
         body.dark-mode {
+            --brand-primary: #2DD4BF;
+            --brand-primary-soft: rgba(45, 212, 191, 0.16);
+            --brand-secondary: #FB923C;
+            --brand-secondary-soft: rgba(251, 146, 60, 0.14);
+            --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 16px rgba(0, 0, 0, 0.35);
+
             --box-red-bg: #1C1C1E;
             --box-red-accent: #ff7a8a;
             --box-yellow-bg: #1C1C1E;
@@ -364,7 +398,7 @@
         }
         /* Segmentli sekme/toggle bileşenlerinde (SORU EKLE/NOT EKLE, Görsel/Yazı vb.) "seçili"
            durumu belirginleştir — aksi halde karanlık modda arka plan farkı neredeyse kayboluyor. */
-        body.dark-mode .bg-white.text-indigo-600 {
+        body.dark-mode .bg-white.text-teal-600 {
             background-color: #4f46e5 !important;
             color: #ffffff !important;
         }
@@ -407,8 +441,8 @@
         body.dark-mode .bg-slate-100\/80 {
             background-color: #17181f !important;
         }
-        body.dark-mode .bg-indigo-50\/80 {
-            background-color: rgba(129, 140, 248, 0.24) !important;
+        body.dark-mode .bg-teal-50\/80 {
+            background-color: rgba(45, 212, 191, 0.24) !important;
         }
         body.dark-mode .bg-amber-100\/70 {
             background-color: rgba(255, 209, 102, 0.12) !important;
@@ -446,16 +480,16 @@
             border-color: rgba(255, 122, 138, 0.35) !important;
         }
         /* İndigo rozet/örnek kutuları (tanıtım ekranı vb.) */
-        body.dark-mode .bg-indigo-100 {
-            background-color: rgba(129, 140, 248, 0.18) !important;
+        body.dark-mode .bg-teal-100 {
+            background-color: rgba(45, 212, 191, 0.18) !important;
         }
-        body.dark-mode .bg-indigo-200 {
-            background-color: rgba(129, 140, 248, 0.28) !important;
+        body.dark-mode .bg-teal-200 {
+            background-color: rgba(45, 212, 191, 0.28) !important;
         }
-        body.dark-mode .text-indigo-700,
-        body.dark-mode .text-indigo-800,
-        body.dark-mode .text-indigo-900 {
-            color: #b4bafc !important;
+        body.dark-mode .text-teal-700,
+        body.dark-mode .text-teal-800,
+        body.dark-mode .text-teal-900 {
+            color: #5EEAD4 !important;
         }
         /* Gül kurusu (rose) rozet/buton arka planları */
         body.dark-mode .bg-rose-100 {
@@ -465,9 +499,9 @@
         body.dark-mode .hover\:bg-rose-200:hover {
             background-color: rgba(255, 122, 138, 0.26) !important;
         }
-        /* Mor (violet) ve zümrüt (emerald) rozet arka planları */
-        body.dark-mode .bg-violet-100 {
-            background-color: rgba(167, 139, 250, 0.18) !important;
+        /* Mor (teal) ve zümrüt (emerald) rozet arka planları */
+        body.dark-mode .bg-teal-100 {
+            background-color: rgba(45, 212, 191, 0.18) !important;
         }
         body.dark-mode .hover\:bg-emerald-100:hover {
             background-color: rgba(94, 235, 160, 0.18) !important;
@@ -493,9 +527,9 @@
             background: #221e14 !important;
         }
         body.dark-mode .face-heading-front {
-            background: rgba(129, 140, 248, 0.16) !important;
-            color: #b4bafc !important;
-            border-color: rgba(129, 140, 248, 0.35) !important;
+            background: rgba(45, 212, 191, 0.16) !important;
+            color: #5EEAD4 !important;
+            border-color: rgba(45, 212, 191, 0.35) !important;
         }
         body.dark-mode .face-heading-back {
             background: rgba(255, 209, 102, 0.14) !important;
@@ -507,36 +541,36 @@
         }
         /* Modal başlıklarında kullanılan çok koyu (900/950) tonlar açık zemin için tasarlanmış;
            karanlık kart yüzeyinde neredeyse görünmez kalıyordu — bunları açık tonlara çeviriyoruz. */
-        body.dark-mode .text-indigo-950 {
-            color: #c7cbfe !important;
+        body.dark-mode .text-teal-950 {
+            color: #5EEAD4 !important;
         }
-        body.dark-mode .text-violet-600,
-        body.dark-mode .text-violet-700 {
-            color: #c4b0fa !important;
+        body.dark-mode .text-teal-600,
+        body.dark-mode .text-teal-700 {
+            color: #5EEAD4 !important;
         }
-        body.dark-mode .text-violet-900,
-        body.dark-mode .text-violet-950 {
-            color: #ded1ff !important;
+        body.dark-mode .text-teal-900,
+        body.dark-mode .text-teal-950 {
+            color: #5EEAD4 !important;
         }
         body.dark-mode .text-emerald-600 {
             color: #5eeba0 !important;
         }
-        body.dark-mode .border-violet-200 {
-            border-color: rgba(167, 139, 250, 0.35) !important;
+        body.dark-mode .border-teal-200 {
+            border-color: rgba(45, 212, 191, 0.35) !important;
         }
         body.dark-mode .border-emerald-200 {
             border-color: rgba(94, 235, 160, 0.35) !important;
         }
-        body.dark-mode .border-indigo-100 {
-            border-color: rgba(129, 140, 248, 0.25) !important;
+        body.dark-mode .border-teal-100 {
+            border-color: rgba(45, 212, 191, 0.25) !important;
         }
         body.dark-mode #review-unified-board {
             border-color: #35363f !important;
         }
         /* Pastel kategori panelleri: tek düze gri yerine her birine kendi renginden hafif,
            "fosforlu" bir parıltı veriyoruz. */
-        body.dark-mode .bg-indigo-50 { background-color: rgba(129, 140, 248, 0.14) !important; }
-        body.dark-mode .bg-violet-50 { background-color: rgba(167, 139, 250, 0.14) !important; }
+        body.dark-mode .bg-teal-50 { background-color: rgba(45, 212, 191, 0.14) !important; }
+        body.dark-mode .bg-teal-50 { background-color: rgba(45, 212, 191, 0.14) !important; }
         body.dark-mode .bg-purple-50 { background-color: rgba(192, 132, 252, 0.14) !important; }
         body.dark-mode .bg-emerald-50 { background-color: rgba(94, 235, 160, 0.12) !important; }
         body.dark-mode .bg-green-50 { background-color: rgba(94, 235, 160, 0.12) !important; }
@@ -656,22 +690,22 @@
     </script>
 <!-- ŞİFRE / SEÇİM EKRANI -->
 <div id="login-screen" class="fixed inset-0 z-[999999] flex flex-col items-center justify-center p-6 text-center bg-slate-50">
-  <div class="w-16 h-16 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-5 shadow-sm">
+  <div class="w-16 h-16 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mb-5 shadow-sm">
     <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M12 2L3 6v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V6l-9-4zm0 2.18l7 3.11V12c0 4.52-3.05 8.69-7 9.93C8.05 20.69 5 16.52 5 12V7.29l7-3.11zM11 11h2v6h-2zm0-4h2v2h-2z"/></svg>
   </div>
   <h2 class="font-display text-xl font-bold text-slate-800 mb-2">Net Kalkanım'a Hoş Geldin</h2>
   <p class="text-sm text-slate-500 mb-8 max-w-xs">Uygulamayı kullanmak için bir seçenek belirle</p>
 
   <div class="w-full max-w-xs space-y-3">
-    <button onclick="showLoginFields()" class="btn-cyber w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 font-semibold text-sm rounded-2xl shadow-md">Şifrem Var</button>
+    <button onclick="showLoginFields()" class="btn-cyber w-full bg-teal-600 hover:bg-teal-700 text-white py-3.5 font-semibold text-sm rounded-2xl shadow-md">Şifrem Var</button>
     <button onclick="startTrial()" class="btn-cyber w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 font-semibold text-sm rounded-2xl shadow-md">Ücretsiz Dene <span class="opacity-80 font-normal">(20 Soru/Not)</span></button>
   </div>
 
   <a href="https://wa.me/905518224339" target="_blank" class="mt-6 text-xs font-semibold text-slate-400 underline underline-offset-2">Şifre Satın Al (WhatsApp'tan Ulaş)</a>
 
   <div id="login-fields" class="hidden mt-6 w-full max-w-xs space-y-3">
-    <input type="text" id="otp-input" placeholder="Şifreni gir..." class="w-full bg-white p-3.5 border border-slate-300 outline-none focus:border-indigo-600 text-slate-800 font-medium text-center rounded-xl shadow-sm">
-    <button onclick="checkPassword()" class="btn-cyber w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 font-semibold text-sm rounded-2xl shadow-md">Giriş Yap</button>
+    <input type="text" id="otp-input" placeholder="Şifreni gir..." class="w-full bg-white p-3.5 border border-slate-300 outline-none focus:border-teal-600 text-slate-800 font-medium text-center rounded-xl shadow-sm">
+    <button onclick="checkPassword()" class="btn-cyber w-full bg-teal-600 hover:bg-teal-700 text-white py-3.5 font-semibold text-sm rounded-2xl shadow-md">Giriş Yap</button>
     <p id="error-msg" class="text-rose-600 font-semibold text-xs"></p>
   </div>
 </div>
@@ -685,7 +719,7 @@
                     Kodu Gir
                 </button>
             </div>
-            <button onclick="switchTab('profile')" id="nav-profile" title="Ayarlar" class="p-2 text-slate-400 hover:text-indigo-600 transition-colors rounded-xl">
+            <button onclick="switchTab('profile')" id="nav-profile" title="Ayarlar" class="p-2 text-slate-400 hover:text-teal-600 transition-colors rounded-xl">
                 <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
                     <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
                 </svg>
@@ -698,7 +732,7 @@
                 <!-- Günlük Tekrar başlığı (Arşiv & Kamp ile aynı stil) -->
                 <div class="flex justify-between items-center border-b border-slate-200 pb-2">
                     <h2 class="text-xl font-semibold text-slate-800 flex items-center gap-2 font-display tracking-tight">
-                        <svg class="w-6 h-6 fill-current text-indigo-600" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 fill-current text-teal-600" viewBox="0 0 24 24">
                             <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
                         </svg>
                         Günlük Tekrar
@@ -712,7 +746,7 @@
                 </div>
 
                 <!-- KIRMIZI KUTU (BÜYÜK) -->
-                <div class="rounded-3xl p-5 shadow-lg relative overflow-hidden" style="background-color: var(--box-red-bg); border: 2px solid var(--box-red-bg);">
+                <div class="rounded-3xl p-5 shadow-lg relative overflow-hidden" style="background-color: var(--box-red-bg);">
                     <div class="absolute top-0 left-0 w-2 h-full" style="background-color: var(--box-red-accent);"></div>
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="font-semibold text-sm tracking-wider" style="color: var(--box-red-accent);">Kırmızı Kutu</h3>
@@ -723,20 +757,20 @@
                     </div>
                     <p class="text-xs font-medium mb-3" style="color: var(--box-desc-text);">Bugün halletmen gerekenler</p>
                     <div class="grid grid-cols-2 gap-3">
-                        <button onclick="startReview('questions')" class="btn-cyber btn-cyber-red py-4 rounded-2xl font-semibold text-sm flex flex-col items-center justify-center gap-1 shadow-md" style="background-color: var(--box-inner-bg); color: var(--box-red-accent); border-bottom: 3px solid var(--box-red-accent);">
+                        <button onclick="startReview('questions')" class="btn-cyber btn-cyber-red py-4 rounded-2xl font-semibold text-sm flex flex-col items-center justify-center gap-1 shadow-md text-white" style="background-color: var(--box-red-accent);">
                             <span>Soruları Başlat</span>
-                            <span class="text-xs opacity-80 tabular-nums">[ <span id="red-question-count">0</span> ]</span>
+                            <span class="text-xs opacity-90 tabular-nums">[ <span id="red-question-count">0</span> ]</span>
                         </button>
-                        <button onclick="startReview('notes')" class="btn-cyber btn-cyber-yellow py-4 rounded-2xl font-semibold text-sm flex flex-col items-center justify-center gap-1 shadow-md" style="background-color: var(--box-inner-bg); color: var(--box-red-accent); border-bottom: 3px solid var(--box-red-accent);">
+                        <button onclick="startReview('notes')" class="btn-cyber btn-cyber-red py-4 rounded-2xl font-semibold text-sm flex flex-col items-center justify-center gap-1 shadow-md text-white" style="background-color: var(--box-red-accent);">
                             <span>Notları Başlat</span>
-                            <span class="text-xs opacity-80 tabular-nums">[ <span id="red-note-count">0</span> ]</span>
+                            <span class="text-xs opacity-90 tabular-nums">[ <span id="red-note-count">0</span> ]</span>
                         </button>
                     </div>
                 </div>
 
                 <!-- SARI VE YEŞİL KUTULAR (YAN YANA) -->
                 <div class="grid grid-cols-2 gap-4">
-                    <button onclick="goToLibraryWithFilter('yellow')" class="rounded-2xl p-4 shadow-sm transition-colors text-left relative overflow-hidden" style="background-color: var(--box-yellow-bg); border: 2px solid var(--box-yellow-bg);">
+                    <button onclick="goToLibraryWithFilter('yellow')" class="rounded-2xl p-4 shadow-sm transition-colors text-left relative overflow-hidden" style="background-color: var(--box-yellow-bg);">
                         <div class="flex items-center justify-between mb-2">
                             <h3 class="font-semibold text-xs" style="color: var(--box-yellow-accent);">Sarı Kutu</h3>
                         </div>
@@ -745,11 +779,11 @@
                             <div>Soru: <span id="yellow-question-count">0</span></div>
                             <div>Not: <span id="yellow-note-count">0</span></div>
                         </div>
-                        <div class="mt-3 flex items-center justify-center gap-1 text-xs font-bold rounded-xl py-2 shadow-md" style="background-color: var(--box-inner-bg); color: var(--box-yellow-accent); border-bottom: 3px solid var(--box-yellow-accent);">
+                        <div class="btn-cyber mt-3 flex items-center justify-center gap-1 text-xs font-bold rounded-xl py-2 text-white" style="background-color: var(--box-yellow-accent);">
                             Göz At <span></span>
                         </div>
                     </button>
-                    <button onclick="goToLibraryWithFilter('green')" class="rounded-2xl p-4 shadow-sm transition-colors text-left relative overflow-hidden" style="background-color: var(--box-green-bg); border: 2px solid var(--box-green-bg);">
+                    <button onclick="goToLibraryWithFilter('green')" class="rounded-2xl p-4 shadow-sm transition-colors text-left relative overflow-hidden" style="background-color: var(--box-green-bg);">
                         <div class="flex items-center justify-between mb-2">
                             <h3 class="font-semibold text-xs" style="color: var(--box-green-accent);">Yeşil Kutu</h3>
                         </div>
@@ -758,10 +792,28 @@
                             <div>Soru: <span id="green-question-count">0</span></div>
                             <div>Not: <span id="green-note-count">0</span></div>
                         </div>
-                        <div class="mt-3 flex items-center justify-center gap-1 text-xs font-bold rounded-xl py-2 shadow-md" style="background-color: var(--box-inner-bg); color: var(--box-green-accent); border-bottom: 3px solid var(--box-green-accent);">
+                        <div class="btn-cyber mt-3 flex items-center justify-center gap-1 text-xs font-bold rounded-xl py-2 text-white" style="background-color: var(--box-green-accent);">
                             Göz At <span></span>
                         </div>
                     </button>
+                </div>
+
+                <!-- GENEL PERFORMANS (tüm zamanlar) -->
+                <div class="bg-white rounded-2xl p-4 space-y-3" style="box-shadow: var(--card-shadow);">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-sm font-bold text-slate-700 flex items-center gap-1.5">
+                            <svg class="w-4 h-4 fill-current text-teal-600" viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
+                            Genel Performans
+                        </h3>
+                        <span id="today-total-count" class="text-xs font-bold text-slate-400 tabular-nums shrink-0">0 tekrar</span>
+                    </div>
+                    <div id="today-progress-track" class="w-full h-2.5 rounded-full overflow-hidden flex bg-slate-100"></div>
+                    <div class="flex justify-between text-[10px] font-bold text-slate-400">
+                        <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-rose-500 inline-block shrink-0"></span>Unuttum <span id="today-forgot-count" class="tabular-nums">0</span></span>
+                        <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full inline-block shrink-0" style="background-color: #eab308;"></span>Kısmen <span id="today-partial-count" class="tabular-nums">0</span></span>
+                        <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500 inline-block shrink-0"></span>Hatırladım <span id="today-remembered-count" class="tabular-nums">0</span></span>
+                    </div>
+                    <p class="text-[11px] font-semibold text-slate-400 text-center pt-1 border-t border-slate-100">Tüm zamanlar doğruluk: <span id="today-accuracy" class="text-teal-600 font-bold">–</span></p>
                 </div>
 
                 <!-- Filtre bölümü kaldırıldı -->
@@ -769,16 +821,16 @@
 
             <div id="add" class="tab-content active space-y-6">
                 <div class="flex gap-3 mb-4 bg-slate-200 p-1.5 rounded-2xl">
-                    <button type="button" onclick="setEntryType('question')" id="btn-entry-question" class="flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-semibold transition-all rounded-xl">SORU EKLE</button>
+                    <button type="button" onclick="setEntryType('question')" id="btn-entry-question" class="flex-1 bg-white text-teal-600 shadow-sm py-2 text-xs font-semibold transition-all rounded-xl">SORU EKLE</button>
                     <button type="button" onclick="setEntryType('note')" id="btn-entry-note" class="flex-1 text-slate-600 py-2 text-xs font-semibold transition-all hover:text-amber-600 rounded-xl">NOT EKLE</button>
                 </div>
 
                 <div id="question-type-toggle-area" class="flex gap-3 mb-4 bg-slate-200 p-1.5 rounded-2xl">
-                    <button type="button" onclick="setQuestionInputType('image')" id="btn-qinput-image" class="flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-semibold transition-all rounded-xl flex items-center justify-center gap-1.5">
+                    <button type="button" onclick="setQuestionInputType('image')" id="btn-qinput-image" class="flex-1 bg-white text-teal-600 shadow-sm py-2 text-xs font-semibold transition-all rounded-xl flex items-center justify-center gap-1.5">
                         <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
                         Görsel
                     </button>
-                    <button type="button" onclick="setQuestionInputType('text')" id="btn-qinput-text" class="flex-1 text-slate-600 py-2 text-xs font-semibold transition-all hover:text-indigo-600 rounded-xl flex items-center justify-center gap-1.5">
+                    <button type="button" onclick="setQuestionInputType('text')" id="btn-qinput-text" class="flex-1 text-slate-600 py-2 text-xs font-semibold transition-all hover:text-teal-600 rounded-xl flex items-center justify-center gap-1.5">
                         <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
                         Yazı
                     </button>
@@ -791,7 +843,7 @@
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-2">Ders Seç</label>
                         <button type="button" id="btn-pick-course" onclick="openPicker('course')"
-                                class="w-full bg-white p-3.5 border border-slate-300 rounded-xl shadow-sm text-left flex justify-between items-center text-sm font-medium text-slate-700 hover:border-indigo-500 transition-colors">
+                                class="w-full bg-white p-3.5 border border-slate-300 rounded-xl shadow-sm text-left flex justify-between items-center text-sm font-medium text-slate-700 hover:border-teal-500 transition-colors">
                             <span id="btn-pick-course-text">Ders Seç</span>
                             <svg class="w-4 h-4 fill-slate-400" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
                         </button>
@@ -812,7 +864,7 @@
                             <div id="upload-placeholder" class="w-full min-h-[8rem] bg-white border-2 border-dashed border-slate-300 p-4 flex flex-col items-center justify-center transition-colors rounded-2xl shadow-sm">
                                 <p class="text-xs font-semibold tracking-wider text-slate-400 mb-3">Görsel yükle</p>
                                 <div class="flex gap-3 w-full max-w-[280px]">
-                                    <label class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3 flex justify-center items-center cursor-pointer transition-colors rounded-xl shadow-sm">
+                                    <label class="flex-1 bg-teal-600 hover:bg-teal-700 text-white py-3 flex justify-center items-center cursor-pointer transition-colors rounded-xl shadow-sm">
                                         <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
                                         <input type="file" id="q-image-gallery" accept="image/*" class="hidden">
                                     </label>
@@ -841,7 +893,7 @@
                                     <div id="upload-zoom-ui" class="hidden flex-col items-center gap-2 w-full">
                                         <div class="flex gap-2 justify-center flex-wrap">
                                             <button type="button" id="btn-up-move" onclick="setUploadDrawMode('move')" class="bg-amber-500 text-white px-4 py-2 text-xs font-semibold rounded-xl border border-amber-500">Kaydır</button>
-                                            <button type="button" id="btn-up-pen" onclick="setUploadDrawMode('pen')" class="bg-indigo-600 text-white px-4 py-2 text-xs font-semibold rounded-xl border border-indigo-600">
+                                            <button type="button" id="btn-up-pen" onclick="setUploadDrawMode('pen')" class="bg-teal-600 text-white px-4 py-2 text-xs font-semibold rounded-xl border border-teal-600">
                                                 <svg class="w-4 h-4 fill-current inline-block" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
                                             </button>
                                             <button type="button" id="btn-up-eraser" onclick="setUploadDrawMode('eraser')" class="bg-slate-200 text-slate-700 px-4 py-2 text-xs font-semibold rounded-xl border border-slate-300">
@@ -854,7 +906,7 @@
                                     </div>
                                 </div>
                                 <div id="upload-pen-sizes" class="hidden flex gap-1 mt-2 justify-center">
-                                    <button type="button" onclick="setUploadPenSize(7)" id="btn-up-size-7" class="px-2.5 py-1.5 inline-flex items-center justify-center bg-indigo-600 text-white border border-indigo-600 rounded-lg"><span class="rounded-full bg-current w-[2px] h-[2px]"></span></button>
+                                    <button type="button" onclick="setUploadPenSize(7)" id="btn-up-size-7" class="px-2.5 py-1.5 inline-flex items-center justify-center bg-teal-600 text-white border border-teal-600 rounded-lg"><span class="rounded-full bg-current w-[2px] h-[2px]"></span></button>
                                     <button type="button" onclick="setUploadPenSize(15)" id="btn-up-size-15" class="px-2.5 py-1.5 inline-flex items-center justify-center bg-slate-200 text-slate-600 border border-slate-300 rounded-lg"><span class="rounded-full bg-current w-[4px] h-[4px]"></span></button>
                                     <button type="button" onclick="setUploadPenSize(25)" id="btn-up-size-25" class="px-2.5 py-1.5 inline-flex items-center justify-center bg-slate-200 text-slate-600 border border-slate-300 rounded-lg"><span class="rounded-full bg-current w-[7px] h-[7px]"></span></button>
                                     <button type="button" onclick="setUploadPenSize(40)" id="btn-up-size-40" class="px-2.5 py-1.5 inline-flex items-center justify-center bg-slate-200 text-slate-600 border border-slate-300 rounded-lg"><span class="rounded-full bg-current w-[11px] h-[11px]"></span></button>
@@ -865,32 +917,32 @@
                     </div>
 
                     <div id="q-text-question-container" class="hidden">
-                        <label class="block text-xs font-semibold text-indigo-700 mb-2">Yazılı Soru Kutusu</label>
-                        <textarea id="q-text-question" placeholder="Soru metnini buraya yaz..." class="w-full bg-white p-3.5 border border-slate-300 outline-none focus:border-indigo-600 text-slate-800 text-xs font-medium h-20 rounded-xl resize-none tracking-wide shadow-sm"></textarea>
+                        <label class="block text-xs font-semibold text-teal-700 mb-2">Yazılı Soru Kutusu</label>
+                        <textarea id="q-text-question" placeholder="Soru metnini buraya yaz..." class="w-full bg-white p-3.5 border border-slate-300 outline-none focus:border-teal-600 text-slate-800 text-xs font-medium h-20 rounded-xl resize-none tracking-wide shadow-sm"></textarea>
                     </div>
 
                     <!-- YENİ NOT ALANI -->
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-2">Çözüm / Not</label>
                         <div id="note-type-toggle" class="flex gap-3 mb-2 bg-slate-200 p-1.5 rounded-2xl hidden">
-                            <button type="button" onclick="setNoteInputType('text')" id="btn-note-type-text" class="flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-semibold transition-all rounded-xl flex items-center justify-center gap-1.5">
+                            <button type="button" onclick="setNoteInputType('text')" id="btn-note-type-text" class="flex-1 bg-white text-teal-600 shadow-sm py-2 text-xs font-semibold transition-all rounded-xl flex items-center justify-center gap-1.5">
                                 <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
                                 Metin
                             </button>
-                            <button type="button" onclick="setNoteInputType('image')" id="btn-note-type-image" class="flex-1 text-slate-600 py-2 text-xs font-semibold transition-all hover:text-indigo-600 rounded-xl flex items-center justify-center gap-1.5">
+                            <button type="button" onclick="setNoteInputType('image')" id="btn-note-type-image" class="flex-1 text-slate-600 py-2 text-xs font-semibold transition-all hover:text-teal-600 rounded-xl flex items-center justify-center gap-1.5">
                                 <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
                                 Görsel
                             </button>
                         </div>
                         <div id="note-text-area">
-                            <textarea id="q-note" placeholder="Metin gir..." class="w-full bg-white p-3.5 border border-slate-300 outline-none focus:border-indigo-600 text-slate-800 text-xs font-medium h-20 rounded-xl resize-none tracking-wide shadow-sm"></textarea>
+                            <textarea id="q-note" placeholder="Metin gir..." class="w-full bg-white p-3.5 border border-slate-300 outline-none focus:border-teal-600 text-slate-800 text-xs font-medium h-20 rounded-xl resize-none tracking-wide shadow-sm"></textarea>
                         </div>
                         <div id="note-image-area" class="hidden">
                             <div class="relative w-full">
                                 <div id="note-upload-placeholder" class="w-full min-h-[8rem] bg-white border-2 border-dashed border-slate-300 p-4 flex flex-col items-center justify-center transition-colors rounded-2xl shadow-sm">
                                     <p class="text-xs font-semibold tracking-wider text-slate-400 mb-3">Not Görseli Yükle</p>
                                     <div class="flex gap-3 w-full max-w-[280px]">
-                                        <label class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3 flex justify-center items-center cursor-pointer transition-colors rounded-xl shadow-sm">
+                                        <label class="flex-1 bg-teal-600 hover:bg-teal-700 text-white py-3 flex justify-center items-center cursor-pointer transition-colors rounded-xl shadow-sm">
                                             <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
                                             <input type="file" id="note-image-gallery" accept="image/*" class="hidden">
                                         </label>
@@ -923,7 +975,7 @@
                                 <div id="note-back-upload-placeholder" class="w-full min-h-[8rem] bg-white border-2 border-dashed border-slate-300 p-4 flex flex-col items-center justify-center transition-colors rounded-2xl shadow-sm">
                                     <p class="text-xs font-semibold tracking-wider text-slate-400 mb-3">Görsel yükle</p>
                                     <div class="flex gap-3 w-full max-w-[280px]">
-                                        <label class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3 flex justify-center items-center cursor-pointer transition-colors rounded-xl shadow-sm">
+                                        <label class="flex-1 bg-teal-600 hover:bg-teal-700 text-white py-3 flex justify-center items-center cursor-pointer transition-colors rounded-xl shadow-sm">
                                             <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
                                             <input type="file" id="note-image-gallery-back" accept="image/*" class="hidden">
                                         </label>
@@ -954,36 +1006,36 @@
                     <div id="question-specific-area" class="space-y-4">
                         <div>
                             <div class="flex gap-3 bg-slate-200 p-1.5 rounded-2xl">
-                                <button type="button" onclick="setAnsType('choice')" id="btn-type-choice" class="flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-semibold transition-all rounded-xl">Seçenek</button>
-                                <button type="button" onclick="setAnsType('text')" id="btn-type-text" class="flex-1 text-slate-600 py-2 text-xs font-semibold transition-all hover:text-indigo-600 rounded-xl">Metin</button>
+                                <button type="button" onclick="setAnsType('choice')" id="btn-type-choice" class="flex-1 bg-white text-teal-600 shadow-sm py-2 text-xs font-semibold transition-all rounded-xl">Seçenek</button>
+                                <button type="button" onclick="setAnsType('text')" id="btn-type-text" class="flex-1 text-slate-600 py-2 text-xs font-semibold transition-all hover:text-teal-600 rounded-xl">Metin</button>
                             </div>
                         </div>
 
                         <div id="ans-choice-area">
-                            <label class="block text-xs font-semibold text-indigo-700 mb-2">Doğru Cevap</label>
+                            <label class="block text-xs font-semibold text-teal-700 mb-2">Doğru Cevap</label>
                             <div class="flex justify-between gap-2">
-                                <button type="button" onclick="selectChoice('A')" class="choice-btn w-12 h-12 bg-white border border-slate-300 font-semibold text-slate-600 hover:border-indigo-600 hover:text-indigo-600 flex items-center justify-center transition-all rounded-xl shadow-sm">A</button>
-                                <button type="button" onclick="selectChoice('B')" class="choice-btn w-12 h-12 bg-white border border-slate-300 font-semibold text-slate-600 hover:border-indigo-600 hover:text-indigo-600 flex items-center justify-center transition-all rounded-xl shadow-sm">B</button>
-                                <button type="button" onclick="selectChoice('C')" class="choice-btn w-12 h-12 bg-white border border-slate-300 font-semibold text-slate-600 hover:border-indigo-600 hover:text-indigo-600 flex items-center justify-center transition-all rounded-xl shadow-sm">C</button>
-                                <button type="button" onclick="selectChoice('D')" class="choice-btn w-12 h-12 bg-white border border-slate-300 font-semibold text-slate-600 hover:border-indigo-600 hover:text-indigo-600 flex items-center justify-center transition-all rounded-xl shadow-sm">D</button>
-                                <button type="button" onclick="selectChoice('E')" class="choice-btn w-12 h-12 bg-white border border-slate-300 font-semibold text-slate-600 hover:border-indigo-600 hover:text-indigo-600 flex items-center justify-center transition-all rounded-xl shadow-sm">E</button>
+                                <button type="button" onclick="selectChoice('A')" class="choice-btn w-12 h-12 bg-white border border-slate-300 font-semibold text-slate-600 hover:border-teal-600 hover:text-teal-600 flex items-center justify-center transition-all rounded-xl shadow-sm">A</button>
+                                <button type="button" onclick="selectChoice('B')" class="choice-btn w-12 h-12 bg-white border border-slate-300 font-semibold text-slate-600 hover:border-teal-600 hover:text-teal-600 flex items-center justify-center transition-all rounded-xl shadow-sm">B</button>
+                                <button type="button" onclick="selectChoice('C')" class="choice-btn w-12 h-12 bg-white border border-slate-300 font-semibold text-slate-600 hover:border-teal-600 hover:text-teal-600 flex items-center justify-center transition-all rounded-xl shadow-sm">C</button>
+                                <button type="button" onclick="selectChoice('D')" class="choice-btn w-12 h-12 bg-white border border-slate-300 font-semibold text-slate-600 hover:border-teal-600 hover:text-teal-600 flex items-center justify-center transition-all rounded-xl shadow-sm">D</button>
+                                <button type="button" onclick="selectChoice('E')" class="choice-btn w-12 h-12 bg-white border border-slate-300 font-semibold text-slate-600 hover:border-teal-600 hover:text-teal-600 flex items-center justify-center transition-all rounded-xl shadow-sm">E</button>
                             </div>
                         </div>
 
                         <div id="ans-text-area" class="hidden">
-                            <label class="block text-xs font-semibold text-indigo-700 mb-2">Doğru Cevap</label>
-                            <input type="text" id="q-text-answer" placeholder="Metin gir..." class="w-full bg-white p-3.5 border border-slate-300 outline-none focus:border-indigo-600 text-slate-800 font-medium placeholder-slate-400 transition-colors rounded-xl shadow-sm">
+                            <label class="block text-xs font-semibold text-teal-700 mb-2">Doğru Cevap</label>
+                            <input type="text" id="q-text-answer" placeholder="Metin gir..." class="w-full bg-white p-3.5 border border-slate-300 outline-none focus:border-teal-600 text-slate-800 font-medium placeholder-slate-400 transition-colors rounded-xl shadow-sm">
                         </div>
                     </div>
 
-                    <button onclick="saveData()" id="btn-save-data" class="btn-cyber btn-cyber-purple w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 font-semibold mt-6 rounded-2xl shadow-md">Soruyu Kaydet</button>
+                    <button onclick="saveData()" id="btn-save-data" class="btn-cyber btn-cyber-purple w-full bg-teal-600 hover:bg-teal-700 text-white py-4 font-semibold mt-6 rounded-2xl shadow-md">Soruyu Kaydet</button>
                 </div>
             </div>
 
             <div id="library" class="tab-content space-y-4">
                 <div class="flex justify-between items-center border-b border-slate-200 pb-2">
                     <h2 class="text-xl font-semibold text-slate-800 flex items-center gap-2 font-display tracking-tight">
-                        <svg class="w-6 h-6 fill-current text-indigo-600" viewBox="0 0 24 24"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM6.24 5h11.52l.83 1H5.41l.83-1zM5 19V8h14v11H5zm11-5.5H8v-2h8v2z"/></svg>
+                        <svg class="w-6 h-6 fill-current text-teal-600" viewBox="0 0 24 24"><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM6.24 5h11.52l.83 1H5.41l.83-1zM5 19V8h14v11H5zm11-5.5H8v-2h8v2z"/></svg>
                         Arşiv & Kamp
                     </h2>
                 </div>
@@ -995,7 +1047,7 @@
                 </div>
 
                 <div class="flex gap-2 bg-slate-200 p-1.5 rounded-2xl">
-                    <button type="button" onclick="setArchiveDataType('question')" id="btn-arch-type-q" class="flex-1 bg-white text-indigo-600 py-2 text-xs font-semibold shadow-sm transition-all rounded-xl">SORULARIM</button>
+                    <button type="button" onclick="setArchiveDataType('question')" id="btn-arch-type-q" class="flex-1 bg-white text-teal-600 py-2 text-xs font-semibold shadow-sm transition-all rounded-xl">SORULARIM</button>
                     <button type="button" onclick="setArchiveDataType('note')" id="btn-arch-type-n" class="flex-1 text-slate-600 py-2 text-xs font-semibold transition-all hover:text-amber-600 rounded-xl">NOTLARIM</button>
                 </div>
 
@@ -1005,14 +1057,14 @@
                 <div class="space-y-3 mb-2">
                     <button onclick="toggleArchiveFilters()" type="button" class="w-full bg-white border border-slate-200 p-3.5 rounded-2xl flex justify-between items-center text-xs font-semibold text-slate-700 tracking-wider shadow-sm hover:bg-slate-50 transition-colors">
                         <span class="flex items-center gap-2">
-                            <svg class="w-4 h-4 fill-current text-indigo-600" viewBox="0 0 24 24"><path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/></svg>
+                            <svg class="w-4 h-4 fill-current text-teal-600" viewBox="0 0 24 24"><path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/></svg>
                             Filtre
                         </span>
                         <span id="arch-filter-chevron" class="text-slate-400 transition-transform duration-200">▼</span>
                     </button>
 
                     <div id="arch-filters-container" class="hidden bg-white border border-slate-200 p-4 rounded-2xl space-y-3 shadow-sm">
-                        <div class="text-xs font-semibold text-indigo-600 tracking-wider border-b border-slate-100 pb-1">Ders Filtresi (Çoklu)</div>
+                        <div class="text-xs font-semibold text-teal-600 tracking-wider border-b border-slate-100 pb-1">Ders Filtresi (Çoklu)</div>
                         <div class="flex flex-wrap gap-1.5" id="arch-course-filters"></div>
                         <div class="text-xs font-semibold text-amber-600 tracking-wider border-b border-slate-100 pb-1 mt-2">Konu Filtresi (Çoklu)</div>
                         <div class="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto pr-1" id="arch-topic-filters"></div>
@@ -1027,7 +1079,7 @@
                 <!-- Ayarlar başlığı (diğer sekmelerle aynı stil) -->
                 <div class="flex justify-between items-center border-b border-slate-200 pb-2">
                     <h2 class="text-xl font-semibold text-slate-800 flex items-center gap-2 font-display tracking-tight">
-                        <svg class="w-6 h-6 fill-current text-indigo-600" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 fill-current text-teal-600" viewBox="0 0 24 24">
                             <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
                         </svg>
                         Ayarlar
@@ -1052,13 +1104,13 @@
 
                     <!-- Alan Bilgisi -->
                     <div class="p-4 flex items-start gap-3">
-                        <div class="w-9 h-9 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center shrink-0">
+                        <div class="w-9 h-9 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center shrink-0">
                             <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium text-slate-800">Alan: <span id="current-field-display" class="text-violet-600">-</span></p>
+                            <p class="text-sm font-medium text-slate-800">Alan: <span id="current-field-display" class="text-teal-600">-</span></p>
                             <p class="text-xs text-slate-500 mt-0.5">Değiştirdiğinde ders/konu listesi güncellenir, sorularının silinmez.</p>
-                            <button onclick="openFieldChangeModal()" class="mt-2 bg-violet-50 hover:bg-violet-100 text-violet-600 px-3 py-1.5 font-semibold text-xs rounded-lg transition-colors">
+                            <button onclick="openFieldChangeModal()" class="mt-2 bg-teal-50 hover:bg-teal-100 text-teal-600 px-3 py-1.5 font-semibold text-xs rounded-lg transition-colors">
                                 Alan Değiştir
                             </button>
                         </div>
@@ -1066,13 +1118,13 @@
 
                     <!-- Uygulama Rehberi -->
                     <div class="p-4 flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                        <div class="w-9 h-9 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center shrink-0">
                             <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>
                         </div>
                         <div class="flex-1 min-w-0">
                             <p class="text-sm font-medium text-slate-800">Uygulama Rehberi</p>
                         </div>
-                        <button onclick="showOnboarding()" class="text-indigo-600 text-xs font-semibold shrink-0">Tekrar Gör</button>
+                        <button onclick="showOnboarding()" class="text-teal-600 text-xs font-semibold shrink-0">Tekrar Gör</button>
                     </div>
 
                     <!-- Depolama Kullanımı -->
@@ -1141,13 +1193,13 @@
         <div id="review-modal" class="screen-slide-animate absolute inset-0 bg-slate-50 z-50 hidden flex flex-col rounded-none h-full overflow-hidden transition-colors duration-300">
             <div id="answer-settled-tint" class="absolute inset-0 pointer-events-none z-[40]"></div>
             <div id="answer-flash-overlay" class="absolute inset-0 pointer-events-none z-[45]"></div>
-            <div class="flex justify-between items-center bg-white px-4 py-3 border-b border-indigo-100 shadow-sm shrink-0" id="review-header">
+            <div class="flex justify-between items-center bg-white px-4 py-3 border-b border-teal-100 shadow-sm shrink-0" id="review-header">
                 <div class="flex items-center gap-3">
                     <div class="w-2.5 h-2.5 bg-rose-500 rounded-full animate-pulse"></div>
-                    <span id="review-progress" class="text-xs font-extrabold text-indigo-600 tracking-wider">TEST 1/5</span>
+                    <span id="review-progress" class="text-xs font-extrabold text-teal-600 tracking-wider">TEST 1/5</span>
                 </div>
                 <div class="flex items-center gap-4">
-                    <button onclick="closeReview()" class="text-slate-500 hover:text-indigo-600 transition-colors"><span class="text-xs font-semibold">KAPAT</span></button>
+                    <button onclick="closeReview()" class="text-slate-500 hover:text-teal-600 transition-colors"><span class="text-xs font-semibold">KAPAT</span></button>
                 </div>
             </div>
             <div id="review-progress-bar" class="flex gap-1 px-4 py-2 bg-white border-b border-slate-100 shrink-0"></div>
@@ -1179,7 +1231,7 @@
     <div id="review-draw-tools" class="flex flex-col gap-1.5 items-center w-full shrink-0">
         <div class="flex gap-1.5 justify-center flex-wrap">
             <button onclick="setReviewDrawMode('move')" id="rev-btn-move" class="bg-amber-500 text-white px-3 py-1 text-xs font-semibold rounded-xl border border-amber-500 shadow-sm">Kaydır</button>
-            <button onclick="setReviewDrawMode('pen')" id="rev-btn-pen" class="bg-indigo-600 text-white px-3 py-1 text-xs font-semibold rounded-xl border border-indigo-600 shadow-sm">
+            <button onclick="setReviewDrawMode('pen')" id="rev-btn-pen" class="bg-teal-600 text-white px-3 py-1 text-xs font-semibold rounded-xl border border-teal-600 shadow-sm">
                 <svg class="w-3.5 h-3.5 fill-current inline-block" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
             </button>
             <button onclick="setReviewDrawMode('eraser')" id="rev-btn-eraser" class="bg-slate-200 text-slate-700 px-3 py-1 text-xs font-semibold rounded-xl border border-slate-300 shadow-sm">
@@ -1191,7 +1243,7 @@
             <button onclick="clearReviewCanvas()" class="bg-rose-500 text-white px-3 py-1 text-xs font-semibold rounded-xl border border-rose-500 shadow-sm">Temizle</button>
         </div>
         <div id="review-pen-sizes" class="invisible flex gap-1 justify-center">
-            <button type="button" onclick="setReviewPenSize(2)" id="btn-rev-size-2" class="px-2 py-0.5 inline-flex items-center justify-center bg-indigo-600 text-white border border-indigo-600 rounded-lg"><span class="rounded-full bg-current w-[2px] h-[2px]"></span></button>
+            <button type="button" onclick="setReviewPenSize(2)" id="btn-rev-size-2" class="px-2 py-0.5 inline-flex items-center justify-center bg-teal-600 text-white border border-teal-600 rounded-lg"><span class="rounded-full bg-current w-[2px] h-[2px]"></span></button>
             <button type="button" onclick="setReviewPenSize(4)" id="btn-rev-size-4" class="px-2 py-0.5 inline-flex items-center justify-center bg-slate-200 text-slate-600 border border-slate-300 rounded-lg"><span class="rounded-full bg-current w-[4px] h-[4px]"></span></button>
             <button type="button" onclick="setReviewPenSize(7)" id="btn-rev-size-7" class="px-2 py-0.5 inline-flex items-center justify-center bg-slate-200 text-slate-600 border border-slate-300 rounded-lg"><span class="rounded-full bg-current w-[7px] h-[7px]"></span></button>
             <button type="button" onclick="setReviewPenSize(12)" id="btn-rev-size-12" class="px-2 py-0.5 inline-flex items-center justify-center bg-slate-200 text-slate-600 border border-slate-300 rounded-lg"><span class="rounded-full bg-current w-[12px] h-[12px]"></span></button>
@@ -1208,15 +1260,15 @@
 
             <div class="bg-white p-3 border-t border-slate-200 shrink-0 space-y-3">
                 <div id="review-choice-input" class="flex justify-center gap-2 hidden">
-                    <button id="choice-btn-A" onclick="submitQuestionAnswer('A')" class="w-11 h-11 bg-slate-50 border border-slate-300 hover:bg-indigo-600 hover:border-indigo-600 hover:text-white font-semibold text-base transition-all rounded-xl shadow-sm">A</button>
-                    <button id="choice-btn-B" onclick="submitQuestionAnswer('B')" class="w-11 h-11 bg-slate-50 border border-slate-300 hover:bg-indigo-600 hover:border-indigo-600 hover:text-white font-semibold text-base transition-all rounded-xl shadow-sm">B</button>
-                    <button id="choice-btn-C" onclick="submitQuestionAnswer('C')" class="w-11 h-11 bg-slate-50 border border-slate-300 hover:bg-indigo-600 hover:border-indigo-600 hover:text-white font-semibold text-base transition-all rounded-xl shadow-sm">C</button>
-                    <button id="choice-btn-D" onclick="submitQuestionAnswer('D')" class="w-11 h-11 bg-slate-50 border border-slate-300 hover:bg-indigo-600 hover:border-indigo-600 hover:text-white font-semibold text-base transition-all rounded-xl shadow-sm">D</button>
-                    <button id="choice-btn-E" onclick="submitQuestionAnswer('E')" class="w-11 h-11 bg-slate-50 border border-slate-300 hover:bg-indigo-600 hover:border-indigo-600 hover:text-white font-semibold text-base transition-all rounded-xl shadow-sm">E</button>
+                    <button id="choice-btn-A" onclick="submitQuestionAnswer('A')" class="w-11 h-11 bg-slate-50 border border-slate-300 hover:bg-teal-600 hover:border-teal-600 hover:text-white font-semibold text-base transition-all rounded-xl shadow-sm">A</button>
+                    <button id="choice-btn-B" onclick="submitQuestionAnswer('B')" class="w-11 h-11 bg-slate-50 border border-slate-300 hover:bg-teal-600 hover:border-teal-600 hover:text-white font-semibold text-base transition-all rounded-xl shadow-sm">B</button>
+                    <button id="choice-btn-C" onclick="submitQuestionAnswer('C')" class="w-11 h-11 bg-slate-50 border border-slate-300 hover:bg-teal-600 hover:border-teal-600 hover:text-white font-semibold text-base transition-all rounded-xl shadow-sm">C</button>
+                    <button id="choice-btn-D" onclick="submitQuestionAnswer('D')" class="w-11 h-11 bg-slate-50 border border-slate-300 hover:bg-teal-600 hover:border-teal-600 hover:text-white font-semibold text-base transition-all rounded-xl shadow-sm">D</button>
+                    <button id="choice-btn-E" onclick="submitQuestionAnswer('E')" class="w-11 h-11 bg-slate-50 border border-slate-300 hover:bg-teal-600 hover:border-teal-600 hover:text-white font-semibold text-base transition-all rounded-xl shadow-sm">E</button>
                 </div>
                 <div id="review-text-input" class="flex gap-2 hidden">
-                    <input type="text" id="review-text-val" placeholder="Metin gir..." class="flex-1 bg-slate-50 p-3 border border-slate-300 outline-none focus:border-indigo-600 text-slate-800 font-medium tracking-wider transition-colors rounded-xl shadow-sm text-xs">
-                    <button onclick="submitQuestionAnswer(document.getElementById('review-text-val').value)" class="bg-indigo-600 text-white px-5 font-semibold hover:bg-indigo-700 transition-colors rounded-xl shadow-sm text-xs">İlet</button>
+                    <input type="text" id="review-text-val" placeholder="Metin gir..." class="flex-1 bg-slate-50 p-3 border border-slate-300 outline-none focus:border-teal-600 text-slate-800 font-medium tracking-wider transition-colors rounded-xl shadow-sm text-xs">
+                    <button onclick="submitQuestionAnswer(document.getElementById('review-text-val').value)" class="bg-teal-600 text-white px-5 font-semibold hover:bg-teal-700 transition-colors rounded-xl shadow-sm text-xs">İlet</button>
                 </div>
                 <div id="review-nav-arrows" class="flex justify-between items-center w-full px-1 py-1 gap-3 shrink-0" style="z-index: 20; position: relative;">
         <button type="button" onclick="navigateReview(-1)" id="btn-rev-prev" class="flex-1 bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 py-2.5 px-3 text-xs font-extrabold rounded-xl shadow-sm transition-colors flex items-center justify-center gap-2">
@@ -1238,9 +1290,9 @@
 
         <div id="camp-setup-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[70] hidden flex justify-center items-center p-4">
             <div class="modal-animate bg-white border border-slate-200 w-full max-w-sm p-6 space-y-5 shadow-2xl rounded-3xl" id="camp-modal-box">
-                <h3 id="camp-title" class="text-indigo-600 font-display font-bold text-base text-center border-b border-indigo-100 pb-3 tracking-wider">Kamp Ayarı</h3>
+                <h3 id="camp-title" class="text-teal-600 font-display font-bold text-base text-center border-b border-teal-100 pb-3 tracking-wider">Kamp Ayarı</h3>
                 <div class="text-center space-y-3">
-                    <p class="text-slate-500 text-xs tracking-wide">Mevcut <span id="camp-total-count" class="font-semibold text-indigo-600">0</span> soru bulundu</p>
+                    <p class="text-slate-500 text-xs tracking-wide">Mevcut <span id="camp-total-count" class="font-semibold text-teal-600">0</span> soru bulundu</p>
                     <div class="flex justify-center gap-2">
                         <button id="camp-color-all" onclick="setCampColorFilter('all')" class="camp-color-chip px-3.5 py-2 rounded-full text-xs font-bold border-2 transition-all flex items-center gap-1.5">
                             <span class="w-2.5 h-2.5 rounded-full bg-slate-400 shrink-0"></span>Tümü
@@ -1253,11 +1305,11 @@
                         </button>
                     </div>
                     <label class="block text-xs font-semibold text-slate-700 mb-2">Kaç Soru Çözmek İstersin?</label>
-                    <input type="number" id="camp-count-input" min="1" value="5" class="w-full bg-slate-50 p-3.5 border border-slate-300 text-center outline-none focus:border-indigo-600 text-slate-800 font-semibold text-xl transition-colors rounded-2xl shadow-sm">
+                    <input type="number" id="camp-count-input" min="1" value="5" class="w-full bg-slate-50 p-3.5 border border-slate-300 text-center outline-none focus:border-teal-600 text-slate-800 font-semibold text-xl transition-colors rounded-2xl shadow-sm">
                 </div>
                 <div class="flex gap-3">
                     <button onclick="closeCampSetup()" class="flex-1 bg-slate-100 border border-slate-300 text-slate-600 py-3 font-semibold hover:bg-slate-200 transition-colors rounded-xl shadow-sm">İptal</button>
-                    <button id="camp-start-btn" onclick="startCamp()" class="flex-1 bg-indigo-600 text-white py-3 font-semibold hover:bg-indigo-700 transition-colors rounded-xl shadow-sm">Başlat</button>
+                    <button id="camp-start-btn" onclick="startCamp()" class="flex-1 bg-teal-600 text-white py-3 font-semibold hover:bg-teal-700 transition-colors rounded-xl shadow-sm">Başlat</button>
                 </div>
             </div>
         </div>
@@ -1266,7 +1318,7 @@
         <div id="picker-modal" class="modal-animate absolute inset-0 bg-slate-100/80 backdrop-blur-sm z-50 hidden flex flex-col items-center justify-center p-4">
             <div class="modal-animate bg-white w-full max-w-xs rounded-3xl shadow-2xl p-5 flex flex-col max-h-[70vh]">
                 <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-3">
-                    <h3 id="picker-title" class="text-indigo-700 font-display font-bold text-sm tracking-wider">Seçim Yap</h3>
+                    <h3 id="picker-title" class="text-teal-700 font-display font-bold text-sm tracking-wider">Seçim Yap</h3>
                     <button onclick="closePicker()" class="text-slate-400 hover:text-slate-600 p-1">
                         <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
                     </button>
@@ -1276,11 +1328,11 @@
         </div>
 
         <div id="camp-review-modal" class="screen-slide-animate absolute inset-0 bg-slate-50 z-50 hidden flex flex-col rounded-none">
-            <div class="flex justify-between items-center bg-white p-4 border-b border-indigo-100 shadow-sm" id="camp-header">
+            <div class="flex justify-between items-center bg-white p-4 border-b border-teal-100 shadow-sm" id="camp-header">
                 <div class="flex items-center gap-3">
-                    <span id="camp-review-progress" class="text-xs font-extrabold text-indigo-600 tracking-wider">KAMP 1/5</span>
+                    <span id="camp-review-progress" class="text-xs font-extrabold text-teal-600 tracking-wider">KAMP 1/5</span>
                 </div>
-                <button onclick="closeCamp()" class="text-slate-500 hover:text-indigo-600 transition-colors"><span class="text-xs font-semibold">KAPAT</span></button>
+                <button onclick="closeCamp()" class="text-slate-500 hover:text-teal-600 transition-colors"><span class="text-xs font-semibold">KAPAT</span></button>
             </div>
 
             <div class="flex-1 flex flex-col justify-center items-center p-4 bg-slate-100/50 overflow-hidden">
@@ -1310,24 +1362,24 @@
                         <button onclick="clearCampReviewCanvas()" class="bg-rose-500 text-white px-3 py-1.5 text-xs font-semibold rounded-xl border border-rose-500 shadow-sm">Temizle</button>
                     </div>
                     <div id="camp-pen-sizes" class="hidden flex gap-1 justify-center mt-1">
-                        <button type="button" onclick="setCampPenSize(2)" id="btn-camp-size-2" class="px-2.5 py-1 inline-flex items-center justify-center bg-indigo-600 text-white border border-indigo-600 rounded-lg"><span class="rounded-full bg-current w-[2px] h-[2px]"></span></button>
+                        <button type="button" onclick="setCampPenSize(2)" id="btn-camp-size-2" class="px-2.5 py-1 inline-flex items-center justify-center bg-teal-600 text-white border border-teal-600 rounded-lg"><span class="rounded-full bg-current w-[2px] h-[2px]"></span></button>
                         <button type="button" onclick="setCampPenSize(4)" id="btn-camp-size-4" class="px-2.5 py-1 inline-flex items-center justify-center bg-slate-200 text-slate-600 border border-slate-300 rounded-lg"><span class="rounded-full bg-current w-[4px] h-[4px]"></span></button>
                         <button type="button" onclick="setCampPenSize(7)" id="btn-camp-size-7" class="px-2.5 py-1 inline-flex items-center justify-center bg-slate-200 text-slate-600 border border-slate-300 rounded-lg"><span class="rounded-full bg-current w-[7px] h-[7px]"></span></button>
                         <button type="button" onclick="setCampPenSize(12)" id="btn-camp-size-12" class="px-2.5 py-1 inline-flex items-center justify-center bg-slate-200 text-slate-600 border border-slate-300 rounded-lg"><span class="rounded-full bg-current w-[12px] h-[12px]"></span></button>
                     </div>
                 </div>
 
-                <div id="camp-review-answer-box" class="w-full bg-indigo-50 border border-indigo-100 p-3.5 mt-3 text-xs font-medium hidden tracking-wide overflow-y-auto max-h-32 rounded-2xl text-center text-indigo-900 shadow-sm whitespace-pre-wrap"></div>
+                <div id="camp-review-answer-box" class="w-full bg-teal-50 border border-teal-100 p-3.5 mt-3 text-xs font-medium hidden tracking-wide overflow-y-auto max-h-32 rounded-2xl text-center text-teal-900 shadow-sm whitespace-pre-wrap"></div>
             </div>
 
             <div class="bg-white p-5 border-t border-slate-200 flex justify-center gap-4">
-                <button id="camp-reveal-btn" onclick="revealCampAnswer()" class="w-full max-w-xs btn-cyber bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 font-semibold text-sm tracking-wider rounded-2xl shadow-md">Cevabı Gör</button>
+                <button id="camp-reveal-btn" onclick="revealCampAnswer()" class="w-full max-w-xs btn-cyber bg-teal-600 hover:bg-teal-700 text-white py-3.5 font-semibold text-sm tracking-wider rounded-2xl shadow-md">Cevabı Gör</button>
                 <button id="camp-next-btn" onclick="nextCampQuestion()" class="w-full max-w-xs btn-cyber hidden bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 font-semibold text-sm tracking-wider rounded-2xl shadow-md">Anladım, Geç</button>
             </div>
         </div>
 
         <div id="lightbox" class="fixed inset-0 bg-slate-900/90 z-[80] hidden flex justify-center items-center p-4" onclick="closeLightbox()">
-            <button class="absolute top-4 right-4 text-white hover:text-indigo-300 text-xs font-semibold transition-colors bg-slate-800/80 px-4 py-2 rounded-full">KAPAT</button>
+            <button class="absolute top-4 right-4 text-white hover:text-teal-300 text-xs font-semibold transition-colors bg-slate-800/80 px-4 py-2 rounded-full">KAPAT</button>
             <img id="lightbox-img" src="" class="max-w-full max-h-full object-contain border border-slate-700 rounded-2xl shadow-2xl">
         </div>
 
@@ -1337,23 +1389,23 @@
 
                 <div class="w-full flex items-center gap-3 mb-6">
                     <div class="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                        <div id="onboarding-progress-fill" class="h-full bg-indigo-600 rounded-full transition-all duration-300 ease-out" style="width: 14%"></div>
+                        <div id="onboarding-progress-fill" class="h-full bg-teal-600 rounded-full transition-all duration-300 ease-out" style="width: 14%"></div>
                     </div>
                     <span id="onboarding-step-label" class="text-[11px] font-bold text-slate-400 tabular-nums whitespace-nowrap">1 / 7</span>
                 </div>
 
-                <div class="w-16 h-16 bg-gradient-to-br from-indigo-50 to-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mb-5 border border-indigo-100">
+                <div class="w-16 h-16 bg-gradient-to-br from-teal-50 to-teal-100 text-teal-600 rounded-2xl flex items-center justify-center mb-5 border border-teal-100">
                     <svg id="onboarding-icon" class="w-8 h-8 fill-current" viewBox="0 0 24 24"></svg>
                 </div>
 
-                <h3 id="onboarding-title" class="text-indigo-950 font-display font-bold text-lg tracking-tight mb-2"></h3>
+                <h3 id="onboarding-title" class="text-teal-950 font-display font-bold text-lg tracking-tight mb-2"></h3>
                 <p id="onboarding-desc" class="text-slate-600 text-xs leading-relaxed font-medium mb-5"></p>
 
                 <div id="onboarding-preview" class="w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl mb-6 text-left"></div>
 
                 <div class="w-full flex gap-3">
                     <button onclick="finishOnboarding()" id="btn-onboarding-skip" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-500 py-3.5 font-semibold text-xs rounded-xl transition-colors">Atla</button>
-                    <button id="btn-onboarding-next" onclick="nextOnboardingStep()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 font-semibold text-xs rounded-xl shadow-md transition-all">Devam Et</button>
+                    <button id="btn-onboarding-next" onclick="nextOnboardingStep()" class="flex-1 bg-teal-600 hover:bg-teal-700 text-white py-3.5 font-semibold text-xs rounded-xl shadow-md transition-all">Devam Et</button>
                 </div>
             </div>
         </div>
@@ -1361,16 +1413,16 @@
         <!-- ALAN DEĞİŞTİRME MODALI -->
         <div id="field-change-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[95] hidden flex justify-center items-center p-4">
             <div class="modal-animate bg-white border border-slate-200 w-full max-w-sm p-6 rounded-3xl shadow-2xl flex flex-col items-center text-center relative overflow-hidden">
-                <div class="w-16 h-16 bg-violet-100 text-violet-600 rounded-full flex items-center justify-center mb-4 shadow-inner">
+                <div class="w-16 h-16 bg-teal-100 text-teal-600 rounded-full flex items-center justify-center mb-4 shadow-inner">
                     <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm0 3.45l8.15 14.1H3.85L12 5.45zM11 10h2v4h-2zm0 5h2v2h-2z"/></svg>
                 </div>
-                <h3 class="text-violet-950 font-display font-bold text-lg tracking-tight mb-2">Alanını Değiştir</h3>
+                <h3 class="text-teal-950 font-display font-bold text-lg tracking-tight mb-2">Alanını Değiştir</h3>
                 <p class="text-slate-600 text-xs leading-relaxed font-medium mb-5">Yeni alanını seç, ders ve konu listen güncellensin.</p>
                 <div class="grid grid-cols-2 gap-3 w-full">
-                    <button onclick="changeField('SAYISAL')" class="field-btn bg-violet-50 border border-violet-200 text-violet-700 py-4 font-semibold text-sm rounded-xl hover:bg-violet-600 hover:text-white transition-all shadow-sm">Sayısal</button>
-                    <button onclick="changeField('EŞİT AĞIRLIK')" class="field-btn bg-violet-50 border border-violet-200 text-violet-700 py-4 font-semibold text-sm rounded-xl hover:bg-violet-600 hover:text-white transition-all shadow-sm">Eşit Ağırlık</button>
-                    <button onclick="changeField('SÖZEL')" class="field-btn bg-violet-50 border border-violet-200 text-violet-700 py-4 font-semibold text-sm rounded-xl hover:bg-violet-600 hover:text-white transition-all shadow-sm">Sözel</button>
-                    <button onclick="changeField('DİL')" class="field-btn bg-violet-50 border border-violet-200 text-violet-700 py-4 font-semibold text-sm rounded-xl hover:bg-violet-600 hover:text-white transition-all shadow-sm">Dil</button>
+                    <button onclick="changeField('SAYISAL')" class="field-btn bg-teal-50 border border-teal-200 text-teal-700 py-4 font-semibold text-sm rounded-xl hover:bg-teal-600 hover:text-white transition-all shadow-sm">Sayısal</button>
+                    <button onclick="changeField('EŞİT AĞIRLIK')" class="field-btn bg-teal-50 border border-teal-200 text-teal-700 py-4 font-semibold text-sm rounded-xl hover:bg-teal-600 hover:text-white transition-all shadow-sm">Eşit Ağırlık</button>
+                    <button onclick="changeField('SÖZEL')" class="field-btn bg-teal-50 border border-teal-200 text-teal-700 py-4 font-semibold text-sm rounded-xl hover:bg-teal-600 hover:text-white transition-all shadow-sm">Sözel</button>
+                    <button onclick="changeField('DİL')" class="field-btn bg-teal-50 border border-teal-200 text-teal-700 py-4 font-semibold text-sm rounded-xl hover:bg-teal-600 hover:text-white transition-all shadow-sm">Dil</button>
                 </div>
                 <button onclick="closeFieldChangeModal()" class="mt-4 w-full bg-slate-100 hover:bg-slate-200 text-slate-500 py-3 font-semibold text-xs rounded-xl transition-colors">Vazgeç</button>
             </div>
@@ -1380,11 +1432,11 @@
         <div id="install-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[90] hidden flex justify-center items-center p-4">
             <div class="modal-animate bg-white border border-slate-200 w-full max-w-sm p-6 rounded-3xl shadow-2xl flex flex-col items-center text-center relative overflow-hidden">
 
-                <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mb-4 shadow-inner">
+                <div class="w-16 h-16 bg-teal-100 text-teal-600 rounded-full flex items-center justify-center mb-4 shadow-inner">
                     <svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm0 3.45l8.15 14.1H3.85L12 5.45zM11 10h2v4h-2zm0 5h2v2h-2z"/></svg>
                 </div>
 
-                <h3 id="install-title" class="text-indigo-950 font-display font-bold text-lg tracking-tight mb-2">Ana Ekrana Ekle</h3>
+                <h3 id="install-title" class="text-teal-950 font-display font-bold text-lg tracking-tight mb-2">Ana Ekrana Ekle</h3>
                 <p id="install-desc" class="text-slate-600 text-xs leading-relaxed font-medium mb-5">
                     Uygulamayı ana ekranına ekleyerek daha hızlı erişebilirsin.
                 </p>
@@ -1392,7 +1444,7 @@
                 <div id="install-preview" class="w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl mb-6 text-left"></div>
 
                 <div class="w-full flex flex-col gap-2">
-                    <button id="btn-install-accept" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3.5 font-semibold text-xs rounded-xl shadow-md transition-all">
+                    <button id="btn-install-accept" class="w-full bg-teal-600 hover:bg-teal-700 text-white py-3.5 font-semibold text-xs rounded-xl shadow-md transition-all">
                         Ana Ekrana Ekle
                     </button>
                     <div class="flex gap-2">
@@ -1418,7 +1470,7 @@
                 </span>
             </button>
 
-            <button onclick="switchTab('add')" class="nav-btn flex items-center justify-center text-white bg-indigo-600 hover:bg-indigo-700 w-20 h-20 rounded-full shadow-2xl transition-all duration-300 ease-in-out scale-110 active:scale-95 -translate-y-6 border-4 border-indigo-600 ring-4 ring-indigo-100 shrink-0 z-30" id="nav-add" title="Veri Ekle">
+            <button onclick="switchTab('add')" class="nav-btn flex items-center justify-center text-white bg-teal-600 hover:bg-teal-700 w-20 h-20 rounded-full shadow-2xl transition-all duration-300 ease-in-out scale-110 active:scale-95 -translate-y-6 border-4 border-teal-600 ring-4 ring-teal-100 shrink-0 z-30" id="nav-add" title="Veri Ekle">
                 <svg class="w-12 h-12 fill-current" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
             </button>
 
@@ -1448,17 +1500,17 @@
     <!-- KODU GİR MODAL -->
     <div id="code-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[110] hidden flex justify-center items-center p-4">
         <div class="modal-animate bg-white border border-slate-200 w-full max-w-sm p-6 rounded-3xl shadow-2xl flex flex-col items-center text-center">
-            <h3 class="text-indigo-600 font-display font-bold text-base mb-3">Tam Sürüme Geç</h3>
+            <h3 class="text-teal-600 font-display font-bold text-base mb-3">Tam Sürüme Geç</h3>
             <p class="text-slate-500 text-xs tracking-wide mb-4">Whatsapp'tan şifre aldıysan buradan gir</p>
 
             <a href="https://wa.me/905518224339" target="_blank" class="mb-4 px-4 py-2 bg-amber-100 text-amber-700 font-semibold text-xs rounded-xl hover:bg-amber-200 transition-colors">
                 Şifre Satın Al (Whatsapp'tan Ulaş)
             </a>
 
-            <input type="text" id="code-input" placeholder="Şifren..." class="w-full bg-slate-50 p-3.5 border border-slate-300 outline-none focus:border-indigo-600 text-slate-800 font-semibold tracking-wider transition-colors rounded-xl shadow-sm mb-3">
+            <input type="text" id="code-input" placeholder="Şifren..." class="w-full bg-slate-50 p-3.5 border border-slate-300 outline-none focus:border-teal-600 text-slate-800 font-semibold tracking-wider transition-colors rounded-xl shadow-sm mb-3">
             <div class="flex gap-3 w-full">
                 <button onclick="closeCodeModal()" class="flex-1 bg-slate-100 border border-slate-300 text-slate-600 py-3 font-semibold hover:bg-slate-200 transition-colors rounded-xl shadow-sm">Vazgeç</button>
-                <button onclick="submitCode()" class="flex-1 bg-indigo-600 text-white py-3 font-semibold hover:bg-indigo-700 transition-colors rounded-xl shadow-sm">Giriş Yap</button>
+                <button onclick="submitCode()" class="flex-1 bg-teal-600 text-white py-3 font-semibold hover:bg-teal-700 transition-colors rounded-xl shadow-sm">Giriş Yap</button>
             </div>
             <p id="code-error-msg" class="text-rose-600 font-semibold text-xs mt-2"></p>
         </div>
@@ -1613,6 +1665,40 @@ function showToast(message, isError = false) {
     }, 2600);
 }
 
+// ==================== GERİ TUŞU / GESTURE ENTEGRASYONU ====================
+// PWA'da tarayıcı geçmişine hiç dokunulmazsa, telefondaki "geri" hareketi/tuşu doğrudan
+// uygulamadan çıkar. Bunu önlemek için: bir pencere/modal her açıldığında tarayıcı
+// geçmişine sahte bir durum ekliyoruz. Kullanıcı geri gidince, sayfadan çıkmak yerine
+// o pencereyi kapatıyoruz. Pencere kendi "Kapat/Vazgeç" butonuyla kapatılırsa, eklediğimiz
+// sahte geçmiş kaydını da temizliyoruz (yoksa bir sonraki gerçek geri basışı boşa gider).
+let modalBackStack = [];
+let suppressNextPopHandling = false;
+
+function openWithBackSupport(name, closeFn) {
+    modalBackStack.push({ name, closeFn });
+    history.pushState({ appModal: name }, '');
+}
+
+function closeWithBackSupport(name) {
+    const idx = modalBackStack.map(m => m.name).lastIndexOf(name);
+    if (idx !== -1) {
+        modalBackStack.splice(idx, 1);
+        suppressNextPopHandling = true;
+        history.back();
+    }
+}
+
+window.addEventListener('popstate', () => {
+    if (suppressNextPopHandling) {
+        suppressNextPopHandling = false;
+        return;
+    }
+    const top = modalBackStack.pop();
+    if (top && typeof top.closeFn === 'function') {
+        top.closeFn();
+    }
+});
+
 function showCustomConfirm(message, onConfirm) {
     const overlay = document.getElementById('custom-confirm-overlay');
     const msgEl = document.getElementById('custom-confirm-message');
@@ -1621,11 +1707,13 @@ function showCustomConfirm(message, onConfirm) {
 
     msgEl.textContent = message;
     overlay.style.display = 'flex';
+    openWithBackSupport('confirm', close);
 
     function close() {
         overlay.style.display = 'none';
         okBtn.removeEventListener('click', handleOk);
         cancelBtn.removeEventListener('click', handleCancel);
+        closeWithBackSupport('confirm');
     }
 
     function handleOk() {
@@ -1803,7 +1891,12 @@ function saveSettings() {
         archSelectedTopics: appState.archSelectedTopics,
         hasSeenOnboarding: appState.hasSeenOnboarding,
         activityDays: appState.activityDays,
-        darkMode: appState.darkMode
+        darkMode: appState.darkMode,
+        totalAnswered: appState.totalAnswered,
+        totalCorrect: appState.totalCorrect,
+        recallForgot: appState.recallForgot,
+        recallPartial: appState.recallPartial,
+        recallRemembered: appState.recallRemembered
     };
     return new Promise((resolve, reject) => {
         const tx = db.transaction(STORE_NAMES.settings, 'readwrite');
@@ -1875,7 +1968,12 @@ let appState = {
     dailyLimitQ: 20,
     dailyLimitN: 20,
     activityDays: [],
-    darkMode: false
+    darkMode: false,
+    totalAnswered: 0,
+    totalCorrect: 0,
+    recallForgot: 0,
+    recallPartial: 0,
+    recallRemembered: 0
 };
 
 let currentEntryType = 'question'; 
@@ -2478,13 +2576,13 @@ function setNoteInputType(type) {
     const imageArea = document.getElementById('note-image-area');
 
     if (type === 'text') {
-        btnText.className = "flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold transition-all rounded-xl flex items-center justify-center gap-1.5";
-        btnImage.className = "flex-1 text-slate-600 py-2 text-xs font-bold transition-all hover:text-indigo-600 rounded-xl flex items-center justify-center gap-1.5";
+        btnText.className = "flex-1 bg-white text-teal-600 shadow-sm py-2 text-xs font-bold transition-all rounded-xl flex items-center justify-center gap-1.5";
+        btnImage.className = "flex-1 text-slate-600 py-2 text-xs font-bold transition-all hover:text-teal-600 rounded-xl flex items-center justify-center gap-1.5";
         textArea.classList.remove('hidden');
         imageArea.classList.add('hidden');
     } else {
-        btnText.className = "flex-1 text-slate-600 py-2 text-xs font-bold transition-all hover:text-indigo-600 rounded-xl flex items-center justify-center gap-1.5";
-        btnImage.className = "flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold transition-all rounded-xl flex items-center justify-center gap-1.5";
+        btnText.className = "flex-1 text-slate-600 py-2 text-xs font-bold transition-all hover:text-teal-600 rounded-xl flex items-center justify-center gap-1.5";
+        btnImage.className = "flex-1 bg-white text-teal-600 shadow-sm py-2 text-xs font-bold transition-all rounded-xl flex items-center justify-center gap-1.5";
         textArea.classList.add('hidden');
         imageArea.classList.remove('hidden');
     }
@@ -2536,10 +2634,12 @@ function openCodeModal() {
     document.getElementById('code-modal').classList.remove('hidden');
     document.getElementById('code-error-msg').innerText = '';
     document.getElementById('code-input').value = '';
+    openWithBackSupport('code', closeCodeModal);
 }
 
 function closeCodeModal() {
     document.getElementById('code-modal').classList.add('hidden');
+    closeWithBackSupport('code');
 }
 
 async function submitCode() {
@@ -2605,10 +2705,10 @@ function renderOnboardingStep() {
         descEl.innerText = "Seçtiğin alana göre dersler ve konular otomatik olarak senin için tanımlanır. İstersen bunu daha sonra ayarlardan değiştirebilirsin.";
         previewEl.innerHTML = `
             <div class="grid grid-cols-2 gap-3">
-                <button onclick="selectFieldAndContinue('SAYISAL')" class="field-btn bg-indigo-50 border border-indigo-200 text-indigo-700 py-3 font-bold text-sm rounded-xl hover:bg-indigo-600 hover:text-white transition-all shadow-sm">Sayısal</button>
-                <button onclick="selectFieldAndContinue('EŞİT AĞIRLIK')" class="field-btn bg-indigo-50 border border-indigo-200 text-indigo-700 py-3 font-bold text-sm rounded-xl hover:bg-indigo-600 hover:text-white transition-all shadow-sm">Eşit Ağırlık</button>
-                <button onclick="selectFieldAndContinue('SÖZEL')" class="field-btn bg-indigo-50 border border-indigo-200 text-indigo-700 py-3 font-bold text-sm rounded-xl hover:bg-indigo-600 hover:text-white transition-all shadow-sm">Sözel</button>
-                <button onclick="selectFieldAndContinue('DİL')" class="field-btn bg-indigo-50 border border-indigo-200 text-indigo-700 py-3 font-bold text-sm rounded-xl hover:bg-indigo-600 hover:text-white transition-all shadow-sm">Dil</button>
+                <button onclick="selectFieldAndContinue('SAYISAL')" class="field-btn bg-teal-50 border border-teal-200 text-teal-700 py-3 font-bold text-sm rounded-xl hover:bg-teal-600 hover:text-white transition-all shadow-sm">Sayısal</button>
+                <button onclick="selectFieldAndContinue('EŞİT AĞIRLIK')" class="field-btn bg-teal-50 border border-teal-200 text-teal-700 py-3 font-bold text-sm rounded-xl hover:bg-teal-600 hover:text-white transition-all shadow-sm">Eşit Ağırlık</button>
+                <button onclick="selectFieldAndContinue('SÖZEL')" class="field-btn bg-teal-50 border border-teal-200 text-teal-700 py-3 font-bold text-sm rounded-xl hover:bg-teal-600 hover:text-white transition-all shadow-sm">Sözel</button>
+                <button onclick="selectFieldAndContinue('DİL')" class="field-btn bg-teal-50 border border-teal-200 text-teal-700 py-3 font-bold text-sm rounded-xl hover:bg-teal-600 hover:text-white transition-all shadow-sm">Dil</button>
             </div>
         `;
         btnNext.innerText = "Devam Et";
@@ -2645,15 +2745,15 @@ function renderOnboardingStep() {
         descEl.innerText = "Net Kalkanım, bilgiyi tam unutmadan hemen önce sana hatırlatır. Böylece bilgi, kalıcı hafızana daha az tekrarla yerleşir.";
         previewEl.innerHTML = `
             <div class="flex items-center justify-between text-[10px] font-bold text-center gap-1">
-                <div class="flex-1 p-2 bg-indigo-100 text-indigo-800 rounded-lg">1 Gün</div>
+                <div class="flex-1 p-2 bg-teal-100 text-teal-800 rounded-lg">1 Gün</div>
                 <span class="text-slate-400">→</span>
-                <div class="flex-1 p-2 bg-indigo-200 text-indigo-900 rounded-lg">3 Gün</div>
+                <div class="flex-1 p-2 bg-teal-200 text-teal-900 rounded-lg">3 Gün</div>
                 <span class="text-slate-400">→</span>
-                <div class="flex-1 p-2 bg-indigo-300 text-indigo-950 rounded-lg">7 Gün</div>
+                <div class="flex-1 p-2 bg-teal-300 text-teal-950 rounded-lg">7 Gün</div>
                 <span class="text-slate-400">→</span>
-                <div class="flex-1 p-2 bg-indigo-400 text-white rounded-lg">21 Gün</div>
+                <div class="flex-1 p-2 bg-teal-400 text-white rounded-lg">21 Gün</div>
                 <span class="text-slate-400">→</span>
-                <div class="flex-1 p-2 bg-indigo-600 text-white rounded-lg">45 Gün</div>
+                <div class="flex-1 p-2 bg-teal-600 text-white rounded-lg">45 Gün</div>
             </div>
         `;
         btnNext.innerText = "Devam Et";
@@ -2667,7 +2767,7 @@ function renderOnboardingStep() {
                 <div class="bg-slate-200 p-2 rounded-lg text-[10px] font-bold text-slate-600">KONU SEÇ</div>
                 <div class="bg-slate-100 border border-dashed border-slate-300 p-4 rounded-lg text-center text-[10px] font-bold text-slate-500">GÖRSEL YÜKLE</div>
                 <div class="flex gap-2">
-                    <div class="flex-1 bg-indigo-100 p-2 rounded-lg text-center text-[10px] font-bold text-indigo-700">CEVAP A</div>
+                    <div class="flex-1 bg-teal-100 p-2 rounded-lg text-center text-[10px] font-bold text-teal-700">CEVAP A</div>
                     <div class="flex-1 bg-slate-100 p-2 rounded-lg text-center text-[10px] font-bold text-slate-500">B</div>
                     <div class="flex-1 bg-slate-100 p-2 rounded-lg text-center text-[10px] font-bold text-slate-500">C</div>
                     <div class="flex-1 bg-slate-100 p-2 rounded-lg text-center text-[10px] font-bold text-slate-500">D</div>
@@ -2717,7 +2817,7 @@ function renderOnboardingStep() {
         previewEl.innerHTML = `
             <div class="space-y-2">
                 <div class="flex gap-2 mb-1">
-                    <div class="flex-1 bg-indigo-50 border border-indigo-200 p-2 rounded-lg text-center text-[10px] font-bold text-indigo-600">SORULARIM</div>
+                    <div class="flex-1 bg-teal-50 border border-teal-200 p-2 rounded-lg text-center text-[10px] font-bold text-teal-600">SORULARIM</div>
                     <div class="flex-1 bg-slate-50 border border-slate-200 p-2 rounded-lg text-center text-[10px] font-bold text-slate-400">NOTLARIM</div>
                 </div>
                 <div class="bg-white border border-slate-200 p-3 rounded-xl">
@@ -2784,9 +2884,9 @@ function nextOnboardingStep() {
             
             switchTab(targetTab);
             if (targetElement) {
-                targetElement.classList.add('ring-4', 'ring-indigo-300');
+                targetElement.classList.add('ring-4', 'ring-teal-300');
                 setTimeout(() => {
-                    targetElement.classList.remove('ring-4', 'ring-indigo-300');
+                    targetElement.classList.remove('ring-4', 'ring-teal-300');
                     renderOnboardingStep();
                     modal.classList.remove('hidden');
                 }, 1500);
@@ -2801,9 +2901,9 @@ function nextOnboardingStep() {
                 switchTab('add');
                 const noteBtn = document.getElementById('btn-entry-note');
                 if (noteBtn) {
-                    noteBtn.classList.add('ring-4', 'ring-indigo-300');
+                    noteBtn.classList.add('ring-4', 'ring-teal-300');
                     setTimeout(() => {
-                        noteBtn.classList.remove('ring-4', 'ring-indigo-300');
+                        noteBtn.classList.remove('ring-4', 'ring-teal-300');
                     }, 1500);
                 }
             }
@@ -2837,20 +2937,20 @@ function setEntryType(type) {
     const labelImgUpload = document.getElementById('label-q-image-upload');
 
     if (type === 'question') {
-        btnQ.className = "flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold transition-all rounded-xl";
+        btnQ.className = "flex-1 bg-white text-teal-600 shadow-sm py-2 text-xs font-bold transition-all rounded-xl";
         btnN.className = "flex-1 text-slate-600 py-2 text-xs font-bold transition-all hover:text-amber-600 rounded-xl";
         if (qSpecificArea) qSpecificArea.classList.remove('hidden');
         if (btnSave) {
             btnSave.innerText = "SORUYU KAYDET";
-            btnSave.className = "btn-cyber btn-cyber-purple w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 font-bold mt-6 rounded-2xl shadow-md";
+            btnSave.className = "btn-cyber btn-cyber-purple w-full bg-teal-600 hover:bg-teal-700 text-white py-4 font-bold mt-6 rounded-2xl shadow-md";
         }
         if (labelImgUpload) {
-            labelImgUpload.className = "flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3 flex justify-center items-center text-xs font-bold cursor-pointer transition-colors border border-indigo-600 rounded-xl shadow-sm";
+            labelImgUpload.className = "flex-1 bg-teal-600 hover:bg-teal-700 text-white py-3 flex justify-center items-center text-xs font-bold cursor-pointer transition-colors border border-teal-600 rounded-xl shadow-sm";
         }
         if (labelNoteText) labelNoteText.innerText = "Çözüm Notu / Açıklama";
     } else {
         btnN.className = "flex-1 bg-white text-amber-600 shadow-sm py-2 text-xs font-bold transition-all rounded-xl";
-        btnQ.className = "flex-1 text-slate-600 py-2 text-xs font-bold transition-all hover:text-indigo-600 rounded-xl";
+        btnQ.className = "flex-1 text-slate-600 py-2 text-xs font-bold transition-all hover:text-teal-600 rounded-xl";
         if (qSpecificArea) qSpecificArea.classList.add('hidden');
         if (btnSave) {
             btnSave.innerText = "NOTU KAYDET";
@@ -2880,13 +2980,13 @@ function updateQuestionInputVisibility() {
     if (currentEntryType === 'question') {
         if (qTypeToggle) qTypeToggle.classList.remove('hidden');
         if (currentQuestionInputType === 'image') {
-            if (btnImg) btnImg.className = "flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold transition-all rounded-xl flex items-center justify-center gap-1.5";
-            if (btnText) btnText.className = "flex-1 text-slate-600 py-2 text-xs font-bold transition-all hover:text-indigo-600 rounded-xl flex items-center justify-center gap-1.5";
+            if (btnImg) btnImg.className = "flex-1 bg-white text-teal-600 shadow-sm py-2 text-xs font-bold transition-all rounded-xl flex items-center justify-center gap-1.5";
+            if (btnText) btnText.className = "flex-1 text-slate-600 py-2 text-xs font-bold transition-all hover:text-teal-600 rounded-xl flex items-center justify-center gap-1.5";
             if (imgContainer) imgContainer.classList.remove('hidden');
             if (textQuestionContainer) textQuestionContainer.classList.add('hidden');
         } else {
-            if (btnImg) btnImg.className = "flex-1 text-slate-600 py-2 text-xs font-bold transition-all hover:text-indigo-600 rounded-xl flex items-center justify-center gap-1.5";
-            if (btnText) btnText.className = "flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold transition-all rounded-xl flex items-center justify-center gap-1.5";
+            if (btnImg) btnImg.className = "flex-1 text-slate-600 py-2 text-xs font-bold transition-all hover:text-teal-600 rounded-xl flex items-center justify-center gap-1.5";
+            if (btnText) btnText.className = "flex-1 bg-white text-teal-600 shadow-sm py-2 text-xs font-bold transition-all rounded-xl flex items-center justify-center gap-1.5";
             if (imgContainer) imgContainer.classList.add('hidden');
             if (textQuestionContainer) textQuestionContainer.classList.remove('hidden');
         }
@@ -2905,13 +3005,13 @@ function setAnsType(type) {
     const tArea = document.getElementById('ans-text-area');
 
     if (type === 'choice') {
-        btnC.className = "flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold transition-all rounded-xl";
-        btnT.className = "flex-1 text-slate-600 py-2 text-xs font-bold transition-all hover:text-indigo-600 rounded-xl";
+        btnC.className = "flex-1 bg-white text-teal-600 shadow-sm py-2 text-xs font-bold transition-all rounded-xl";
+        btnT.className = "flex-1 text-slate-600 py-2 text-xs font-bold transition-all hover:text-teal-600 rounded-xl";
         if(cArea) cArea.classList.remove('hidden');
         if(tArea) tArea.classList.add('hidden');
     } else {
-        btnT.className = "flex-1 bg-white text-indigo-600 shadow-sm py-2 text-xs font-bold transition-all rounded-xl";
-        btnC.className = "flex-1 text-slate-600 py-2 text-xs font-bold transition-all hover:text-indigo-600 rounded-xl";
+        btnT.className = "flex-1 bg-white text-teal-600 shadow-sm py-2 text-xs font-bold transition-all rounded-xl";
+        btnC.className = "flex-1 text-slate-600 py-2 text-xs font-bold transition-all hover:text-teal-600 rounded-xl";
         if(cArea) cArea.classList.add('hidden');
         if(tArea) tArea.classList.remove('hidden');
     }
@@ -2921,9 +3021,9 @@ function selectChoice(val) {
     selectedChoiceAnswer = val;
     document.querySelectorAll('.choice-btn').forEach(btn => {
         if (btn.innerText.trim() === val) {
-            btn.className = "choice-btn w-12 h-12 bg-indigo-600 border border-indigo-600 text-white font-extrabold flex items-center justify-center transition-all rounded-xl shadow-sm";
+            btn.className = "choice-btn w-12 h-12 bg-teal-600 border border-teal-600 text-white font-extrabold flex items-center justify-center transition-all rounded-xl shadow-sm";
         } else {
-            btn.className = "choice-btn w-12 h-12 bg-white border border-slate-300 font-bold text-slate-600 hover:border-indigo-600 hover:text-indigo-600 flex items-center justify-center transition-all rounded-xl shadow-sm";
+            btn.className = "choice-btn w-12 h-12 bg-white border border-slate-300 font-bold text-slate-600 hover:border-teal-600 hover:text-teal-600 flex items-center justify-center transition-all rounded-xl shadow-sm";
         }
     });
 }
@@ -2980,11 +3080,11 @@ function setUploadDrawMode(mode) {
             if(sDiv) sDiv.classList.add('hidden');
         } else if(mode === 'pen') {
             canvas.classList.remove('pointer-events-none');
-            if (pBtn) pBtn.className = "bg-indigo-600 text-white px-4 py-2 text-xs font-bold rounded-xl border border-indigo-600 shadow-sm";
+            if (pBtn) pBtn.className = "bg-teal-600 text-white px-4 py-2 text-xs font-bold rounded-xl border border-teal-600 shadow-sm";
             if(sDiv) sDiv.classList.remove('hidden');
         } else if(mode === 'eraser') {
             canvas.classList.remove('pointer-events-none');
-            if (eBtn) eBtn.className = "bg-indigo-600 text-white px-4 py-2 text-xs font-bold rounded-xl border border-indigo-600 shadow-sm";
+            if (eBtn) eBtn.className = "bg-teal-600 text-white px-4 py-2 text-xs font-bold rounded-xl border border-teal-600 shadow-sm";
             if(sDiv) sDiv.classList.add('hidden');
         }
     }
@@ -3000,7 +3100,7 @@ function updateUploadSizeUI() {
         let btn = document.getElementById(`btn-up-size-${s}`);
         if(btn) {
             if(uploadPenSize === s) {
-                btn.className = "px-2.5 py-1.5 inline-flex items-center justify-center bg-indigo-600 text-white border border-indigo-600 rounded-lg shadow-sm";
+                btn.className = "px-2.5 py-1.5 inline-flex items-center justify-center bg-teal-600 text-white border border-teal-600 rounded-lg shadow-sm";
             } else {
                 btn.className = "px-2.5 py-1.5 inline-flex items-center justify-center bg-slate-200 text-slate-600 border border-slate-300 rounded-lg";
             }
@@ -3157,11 +3257,11 @@ function setReviewDrawMode(mode) {
         if(mBtn) mBtn.className = "bg-amber-500 text-white px-3 py-1 text-xs font-bold rounded-xl border border-amber-500 shadow-sm";
         if(sDiv) sDiv.classList.add('invisible');
     } else if(mode === 'pen') {
-        if(pBtn) pBtn.className = "bg-indigo-600 text-white px-3 py-1 text-xs font-bold rounded-xl border border-indigo-600 shadow-sm";
+        if(pBtn) pBtn.className = "bg-teal-600 text-white px-3 py-1 text-xs font-bold rounded-xl border border-teal-600 shadow-sm";
         if(sDiv) sDiv.classList.remove('invisible');
         updateReviewSizeUI();
     } else if(mode === 'eraser') {
-        if(eBtn) eBtn.className = "bg-indigo-600 text-white px-3 py-1 text-xs font-bold rounded-xl border border-indigo-600 shadow-sm";
+        if(eBtn) eBtn.className = "bg-teal-600 text-white px-3 py-1 text-xs font-bold rounded-xl border border-teal-600 shadow-sm";
         if(sDiv) sDiv.classList.add('invisible');
     }
 }
@@ -3176,7 +3276,7 @@ function updateReviewSizeUI() {
         let btn = document.getElementById(`btn-rev-size-${s}`);
         if(btn) {
             if(reviewPenSize === s) {
-                btn.className = "px-2 py-0.5 inline-flex items-center justify-center bg-indigo-600 text-white border border-indigo-600 rounded-lg shadow-sm";
+                btn.className = "px-2 py-0.5 inline-flex items-center justify-center bg-teal-600 text-white border border-teal-600 rounded-lg shadow-sm";
             } else {
                 btn.className = "px-2 py-0.5 inline-flex items-center justify-center bg-slate-200 text-slate-600 border border-slate-300 rounded-lg";
             }
@@ -3225,12 +3325,12 @@ function setCampReviewDrawMode(mode) {
         if(sDiv) sDiv.classList.add('hidden');
     } else if(mode === 'pen') { 
         if(canvas) canvas.classList.remove('pointer-events-none');
-        if(pBtn) pBtn.className = "bg-indigo-600 text-white px-3 py-1.5 text-xs font-bold rounded-xl border border-indigo-600 shadow-sm";
+        if(pBtn) pBtn.className = "bg-teal-600 text-white px-3 py-1.5 text-xs font-bold rounded-xl border border-teal-600 shadow-sm";
         if(sDiv) sDiv.classList.remove('hidden');
         updateCampSizeUI();
     } else if(mode === 'eraser') { 
         if(canvas) canvas.classList.remove('pointer-events-none');
-        if(eBtn) eBtn.className = "bg-indigo-600 text-white px-3 py-1.5 text-xs font-bold rounded-xl border border-indigo-600 shadow-sm";
+        if(eBtn) eBtn.className = "bg-teal-600 text-white px-3 py-1.5 text-xs font-bold rounded-xl border border-teal-600 shadow-sm";
         if(sDiv) sDiv.classList.add('hidden');
     }
 }
@@ -3245,7 +3345,7 @@ function updateCampSizeUI() {
         let btn = document.getElementById(`btn-camp-size-${s}`);
         if(btn) {
             if(campPenSize === s) {
-                btn.className = "px-2.5 py-1 inline-flex items-center justify-center bg-indigo-600 text-white border border-indigo-600 rounded-lg shadow-sm";
+                btn.className = "px-2.5 py-1 inline-flex items-center justify-center bg-teal-600 text-white border border-teal-600 rounded-lg shadow-sm";
             } else {
                 btn.className = "px-2.5 py-1 inline-flex items-center justify-center bg-slate-200 text-slate-600 border border-slate-300 rounded-lg";
             }
@@ -3384,27 +3484,27 @@ function switchTab(tabId) {
     // Alt navigasyon barı artık tek parça, sabit bir yüzey — her ikon kendi aktif durumunu
     // sadece kendi çevresindeki küçük bir "pill" ile gösteriyor, barın geneli hiç değişmiyor.
     const inactivePillClass = "nav-pill flex items-center justify-center w-16 h-11 rounded-2xl transition-all duration-300 text-slate-400";
-    const activePillClass = "nav-pill flex items-center justify-center w-16 h-11 rounded-2xl transition-all duration-300 text-indigo-600 bg-indigo-50 font-bold";
+    const activePillClass = "nav-pill flex items-center justify-center w-16 h-11 rounded-2xl transition-all duration-300 text-teal-600 bg-teal-50 font-bold";
 
     if (pillHome) pillHome.className = inactivePillClass;
     if (pillLibrary) pillLibrary.className = inactivePillClass;
     if (btnProfile) {
-        btnProfile.classList.remove('text-indigo-600', 'bg-indigo-50');
+        btnProfile.classList.remove('text-teal-600', 'bg-teal-50');
         btnProfile.classList.add('text-slate-400');
     }
     if (btnAdd) {
-        btnAdd.className = "nav-btn flex items-center justify-center text-white bg-indigo-600 hover:bg-indigo-700 w-20 h-20 rounded-full shadow-2xl transition-all duration-300 ease-in-out hover:scale-110 active:scale-95 -translate-y-6 border-4 border-slate-50 shrink-0 z-30";
+        btnAdd.className = "nav-btn flex items-center justify-center text-white bg-teal-600 hover:bg-teal-700 w-20 h-20 rounded-full shadow-2xl transition-all duration-300 ease-in-out hover:scale-110 active:scale-95 -translate-y-6 border-4 border-slate-50 shrink-0 z-30";
     }
 
     if (tabId === 'home' && pillHome) {
         pillHome.className = activePillClass;
     } else if (tabId === 'add' && btnAdd) {
-        btnAdd.className = "nav-btn flex items-center justify-center text-white bg-indigo-600 hover:bg-indigo-700 w-20 h-20 rounded-full shadow-2xl transition-all duration-300 ease-in-out scale-110 active:scale-95 -translate-y-6 border-4 border-indigo-600 ring-4 ring-indigo-100 shrink-0 z-30";
+        btnAdd.className = "nav-btn flex items-center justify-center text-white bg-teal-600 hover:bg-teal-700 w-20 h-20 rounded-full shadow-2xl transition-all duration-300 ease-in-out scale-110 active:scale-95 -translate-y-6 border-4 border-teal-600 ring-4 ring-teal-100 shrink-0 z-30";
     } else if (tabId === 'library' && pillLibrary) {
         pillLibrary.className = activePillClass;
     } else if (tabId === 'profile' && btnProfile) {
         btnProfile.classList.remove('text-slate-400');
-        btnProfile.classList.add('text-indigo-600', 'bg-indigo-50');
+        btnProfile.classList.add('text-teal-600', 'bg-teal-50');
     }
 
     if(tabId === 'library') { populateArchiveFilters(); renderLibrary(); }
@@ -3476,6 +3576,53 @@ function updateHomeStats() {
     document.getElementById('green-question-count').innerText = greenQuestions.length;
     document.getElementById('green-note-count').innerText = greenNotes.length;
     updateStreakDisplay();
+    updatePerformanceStats();
+}
+
+// GENEL PERFORMANS kartını doldurur. Artık "bugün" için veri taramak yerine, appState'te
+// kalıcı olarak biriken tüm-zamanlar sayaçlarını (totalAnswered/totalCorrect/recall*) okur —
+// böylece hiç soru çözülmeyen günlerde de kart boş/anlamsız görünmez.
+function updatePerformanceStats() {
+    const totalAnswered = appState.totalAnswered || 0;
+    const totalCorrect = appState.totalCorrect || 0;
+    const forgotCount = appState.recallForgot || 0;
+    const partialCount = appState.recallPartial || 0;
+    const rememberedCount = appState.recallRemembered || 0;
+    const totalRecalled = forgotCount + partialCount + rememberedCount;
+
+    const totalEl = document.getElementById('today-total-count');
+    const accuracyEl = document.getElementById('today-accuracy');
+    const track = document.getElementById('today-progress-track');
+    if (totalEl) totalEl.innerText = totalRecalled + ' tekrar';
+    if (accuracyEl) accuracyEl.innerText = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) + '%' : '–';
+
+    if (track) {
+        track.innerHTML = '';
+        if (totalRecalled === 0) {
+            track.innerHTML = '<div class="w-full h-full bg-slate-100"></div>';
+        } else {
+            const segs = [
+                { count: forgotCount, color: '#e11d48' },
+                { count: partialCount, color: '#eab308' },
+                { count: rememberedCount, color: '#10b981' }
+            ];
+            segs.forEach(seg => {
+                if (seg.count <= 0) return;
+                const div = document.createElement('div');
+                div.style.width = (seg.count / totalRecalled * 100) + '%';
+                div.style.backgroundColor = seg.color;
+                div.style.transition = 'width 0.4s ease-out';
+                track.appendChild(div);
+            });
+        }
+    }
+
+    const forgotEl = document.getElementById('today-forgot-count');
+    const partialEl = document.getElementById('today-partial-count');
+    const rememberedEl = document.getElementById('today-remembered-count');
+    if (forgotEl) forgotEl.innerText = forgotCount;
+    if (partialEl) partialEl.innerText = partialCount;
+    if (rememberedEl) rememberedEl.innerText = rememberedCount;
 }
 
 function toggleHomeFilters() {
@@ -3502,8 +3649,8 @@ function buildHomeFilters() {
                 const tKey = course + '::' + topic;
                 const tChecked = appState.selectedTopics.includes(tKey);
                 topicsHTML += `
-                    <label class="flex items-center gap-2 text-slate-600 font-semibold cursor-pointer text-[11px] hover:text-indigo-600">
-                        <input type="checkbox" value="${tKey}" ${tChecked ? 'checked' : ''} onchange="toggleTopicFilter(this)" class="accent-indigo-600 rounded">
+                    <label class="flex items-center gap-2 text-slate-600 font-semibold cursor-pointer text-[11px] hover:text-teal-600">
+                        <input type="checkbox" value="${tKey}" ${tChecked ? 'checked' : ''} onchange="toggleTopicFilter(this)" class="accent-teal-600 rounded">
                         <span>${topic}</span>
                     </label>
                 `;
@@ -3512,9 +3659,9 @@ function buildHomeFilters() {
         }
 
         cBox.innerHTML = `
-            <label class="flex items-center justify-between cursor-pointer hover:text-indigo-600 transition-colors font-bold text-xs text-slate-800">
+            <label class="flex items-center justify-between cursor-pointer hover:text-teal-600 transition-colors font-bold text-xs text-slate-800">
                 <span>${course}</span>
-                <input type="checkbox" value="${course}" ${cChecked ? 'checked' : ''} onchange="toggleCourseFilter(this)" class="accent-indigo-600 rounded w-4 h-4">
+                <input type="checkbox" value="${course}" ${cChecked ? 'checked' : ''} onchange="toggleCourseFilter(this)" class="accent-teal-600 rounded w-4 h-4">
             </label>
             ${topicsHTML}
         `;
@@ -3578,7 +3725,7 @@ function openPicker(type) {
         const courses = Object.keys(appState.categories);
         courses.forEach(course => {
             const btn = document.createElement('button');
-            btn.className = "w-full text-left px-4 py-3 rounded-xl text-sm font-bold text-slate-700 bg-slate-50 border border-slate-200 hover:bg-indigo-50 hover:border-indigo-300 transition-colors";
+            btn.className = "w-full text-left px-4 py-3 rounded-xl text-sm font-bold text-slate-700 bg-slate-50 border border-slate-200 hover:bg-teal-50 hover:border-teal-300 transition-colors";
             btn.innerText = course;
             btn.onclick = () => selectCourse(course);
             listDiv.appendChild(btn);
@@ -3600,11 +3747,18 @@ function openPicker(type) {
             listDiv.appendChild(btn);
         });
     }
+    // Sadece pencere gerçekten kapalıyken (yeni açılıyorken) geçmişe kayıt ekliyoruz.
+    // Ders seçilince aynı pencere içinde konu listesine geçerken (pencere zaten açıkken)
+    // tekrar eklemiyoruz — yoksa kullanıcı çıkmak için iki kez geri basmak zorunda kalırdı.
+    if (modal.classList.contains('hidden')) {
+        openWithBackSupport('picker', closePicker);
+    }
     modal.classList.remove('hidden');
 }
 
 function closePicker() {
     document.getElementById('picker-modal').classList.add('hidden');
+    closeWithBackSupport('picker');
 }
 
 function selectCourse(course) {
@@ -3815,6 +3969,7 @@ function startReview(mode, boxColor = 'red', specificItem = null, isArchiveMode 
         currentReviewQueue = [specificItem];
         currentReviewIndex = 0;
         document.getElementById('review-modal').classList.remove('hidden');
+        openWithBackSupport('review', closeReview);
         renderReviewItem();
         return;
     }
@@ -3845,6 +4000,7 @@ function startReview(mode, boxColor = 'red', specificItem = null, isArchiveMode 
 
         currentReviewIndex = 0;
         document.getElementById('review-modal').classList.remove('hidden');
+        openWithBackSupport('review', closeReview);
         renderReviewItem();
     } else {
         let filtered = [];
@@ -3868,6 +4024,7 @@ function startReview(mode, boxColor = 'red', specificItem = null, isArchiveMode 
         currentReviewQueue = filtered;
         currentReviewIndex = 0;
         document.getElementById('review-modal').classList.remove('hidden');
+        openWithBackSupport('review', closeReview);
         renderReviewItem();
     }
 }
@@ -3894,7 +4051,7 @@ function renderReviewProgressBar() {
                 else if (it.userRecallStatus === 'forgot') colorClass = 'bg-rose-500';
             }
         } else {
-            colorClass = i <= currentReviewIndex ? 'bg-indigo-600' : 'bg-slate-200';
+            colorClass = i <= currentReviewIndex ? 'bg-teal-600' : 'bg-slate-200';
         }
         seg.className = 'flex-1 h-1.5 rounded-full transition-colors duration-300 ' + colorClass;
         el.appendChild(seg);
@@ -4223,7 +4380,7 @@ if (currentArchiveMode) {
                         const btn = document.getElementById(`choice-btn-${letter}`);
                         if (btn) {
                             btn.disabled = true;
-                            btn.classList.remove('hover:bg-indigo-600', 'hover:border-indigo-600', 'hover:text-white');
+                            btn.classList.remove('hover:bg-teal-600', 'hover:border-teal-600', 'hover:text-white');
                             if (letter === item.answer) {
                                 btn.className = "w-11 h-11 bg-green-500 border border-green-500 text-white font-extrabold text-base transition-all rounded-xl shadow-sm opacity-100";
                             } else if (letter === effectiveUserAnswer) {
@@ -4258,7 +4415,7 @@ if (currentArchiveMode) {
                         const btn = document.getElementById(`choice-btn-${letter}`);
                         if (btn) {
                             btn.disabled = false;
-                            btn.className = "w-11 h-11 bg-slate-50 border border-slate-300 hover:bg-indigo-600 hover:border-indigo-600 hover:text-white font-extrabold text-base transition-all rounded-xl shadow-sm";
+                            btn.className = "w-11 h-11 bg-slate-50 border border-slate-300 hover:bg-teal-600 hover:border-teal-600 hover:text-white font-extrabold text-base transition-all rounded-xl shadow-sm";
                         }
                     });
                 } else {
@@ -4266,7 +4423,7 @@ if (currentArchiveMode) {
                     const textInputEl = document.getElementById('review-text-val');
                     textInputEl.value = '';
                     textInputEl.disabled = false;
-                    textInputEl.className = "flex-1 bg-slate-50 p-3 border border-slate-300 outline-none focus:border-indigo-600 text-slate-800 font-bold tracking-wider transition-colors rounded-xl shadow-sm text-xs";
+                    textInputEl.className = "flex-1 bg-slate-50 p-3 border border-slate-300 outline-none focus:border-teal-600 text-slate-800 font-bold tracking-wider transition-colors rounded-xl shadow-sm text-xs";
                 }
                 recallInput.classList.add('invisible');
             }
@@ -4449,9 +4606,17 @@ async function submitQuestionAnswer(userAns) {
 
     q.userTodayAnswer = String(userAns).trim().toUpperCase();
     q.lastReviewedDate = todayStr;
-    flashAnswerFeedback(q.userTodayAnswer === String(q.answer).trim().toUpperCase());
+    const isCorrectAnswer = q.userTodayAnswer === String(q.answer).trim().toUpperCase();
+    flashAnswerFeedback(isCorrectAnswer);
+
+    // Tüm zamanlar performans sayaçları: kamp hariç, gerçek günlük tekrarda verilen
+    // her ilk cevap burada birikir (yukarıdaki "bugün zaten cevaplanmış" kontrolü sayesinde
+    // aynı soru aynı gün iki kez sayılmaz).
+    appState.totalAnswered = (appState.totalAnswered || 0) + 1;
+    if (isCorrectAnswer) appState.totalCorrect = (appState.totalCorrect || 0) + 1;
 
     await saveQuestion(q);
+    await saveSettings();
     updateHomeStats();
     renderReviewItem();
 }
@@ -4477,11 +4642,11 @@ function applyDarkMode(isDark) {
     if (toggle && knob) {
         if (isDark) {
             toggle.classList.remove('bg-slate-300');
-            toggle.classList.add('bg-indigo-600');
+            toggle.classList.add('bg-teal-600');
             knob.style.transform = 'translateX(20px)';
         } else {
             toggle.classList.add('bg-slate-300');
-            toggle.classList.remove('bg-indigo-600');
+            toggle.classList.remove('bg-teal-600');
             knob.style.transform = 'translateX(0px)';
         }
     }
@@ -4584,6 +4749,12 @@ async function submitRecallStatus(status) {
     item.lastReviewedDate = todayStr;
     item.sortOrder = Date.now();
 
+    // Tüm zamanlar recall sayaçları — hem sorular hem notlar için, sadece ilk (gerçek)
+    // işaretlemede bir kez artar (yukarıdaki "zaten işaretli" kontrolü sayesinde).
+    if (status === 'forgot') appState.recallForgot = (appState.recallForgot || 0) + 1;
+    else if (status === 'partial') appState.recallPartial = (appState.recallPartial || 0) + 1;
+    else if (status === 'remembered') appState.recallRemembered = (appState.recallRemembered || 0) + 1;
+
     if (currentReviewMode === 'questions') {
         const q = item;
         let days;
@@ -4631,6 +4802,8 @@ async function submitRecallStatus(status) {
         await saveNote(n);
     }
 
+    await saveSettings();
+
     // Bu, aynı kartın (soru/not) tekrar render edilmesi — kullanıcı arka yüzü zaten
     // görüyorsa (flip açıksa), recall'a bastıktan sonra render sırasında ön yüze
     // sıçramasın diye mevcut flip durumunu koruyoruz.
@@ -4643,6 +4816,7 @@ async function submitRecallStatus(status) {
 
 function closeReview() {
     document.getElementById('review-modal').classList.add('hidden');
+    closeWithBackSupport('review');
     if (reviewObjectURL) { revokeObjectURL(reviewObjectURL); reviewObjectURL = null; }
     if (reviewNoteObjectURL) { revokeObjectURL(reviewNoteObjectURL); reviewNoteObjectURL = null; }
     if (reviewNoteBackObjectURL) { revokeObjectURL(reviewNoteBackObjectURL); reviewNoteBackObjectURL = null; }
@@ -4669,11 +4843,11 @@ function setArchiveDataType(type) {
     const btnN = document.getElementById('btn-arch-type-n');
 
     if (type === 'question') {
-        btnQ.className = "flex-1 bg-white text-indigo-600 py-2 text-xs font-bold shadow-sm transition-all rounded-xl";
+        btnQ.className = "flex-1 bg-white text-teal-600 py-2 text-xs font-bold shadow-sm transition-all rounded-xl";
         btnN.className = "flex-1 text-slate-600 py-2 text-xs font-bold transition-all hover:text-amber-600 rounded-xl";
     } else {
         btnN.className = "flex-1 bg-white text-amber-600 py-2 text-xs font-bold shadow-sm transition-all rounded-xl";
-        btnQ.className = "flex-1 text-slate-600 py-2 text-xs font-bold transition-all hover:text-indigo-600 rounded-xl";
+        btnQ.className = "flex-1 text-slate-600 py-2 text-xs font-bold transition-all hover:text-teal-600 rounded-xl";
     }
     renderLibrary();
 }
@@ -4697,7 +4871,7 @@ async function populateArchiveFilters() {
         let active = appState.archSelectedCourses.includes(c);
         let btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = `px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all border ${active ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-slate-100 text-slate-600 border-slate-200'}`;
+        btn.className = `px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all border ${active ? 'bg-teal-600 text-white border-teal-600' : 'bg-slate-100 text-slate-600 border-slate-200'}`;
         btn.innerText = c;
         btn.onclick = async () => {
             if(active) {
@@ -4839,7 +5013,7 @@ if (appState.archSelectedTopics.length > 0) {
         const isQuestion = activeArchiveType === 'question';
         container.innerHTML = `
             <div class="flex flex-col items-center justify-center text-center py-12 px-6 bg-white rounded-2xl border-2 border-dashed border-slate-200">
-                <div class="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-4">
+                <div class="w-14 h-14 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mb-4">
                     <svg class="w-7 h-7 fill-current" viewBox="0 0 24 24"><path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.18L18.82 7 12 9.82 5.18 7 12 4.18zM4 8.7l7 3.5v7.66l-7-3.5V8.7zm9 11.16v-7.66l7-3.5v7.66l-7 3.5z"/></svg>
                 </div>
                 <p class="text-sm font-bold text-slate-600 mb-1">Burada henüz ${isQuestion ? 'soru' : 'not'} yok</p>
@@ -4886,20 +5060,22 @@ if (appState.archSelectedTopics.length > 0) {
         const card = document.createElement('div');
         
         let itemColor = getCardColor(item, activeArchiveType);
-        let borderBarColor = 'bg-slate-300';
         let nextColorVar = '#94a3b8';
         if (itemColor === 'red') {
-            borderBarColor = 'bg-red-500';
             nextColorVar = 'var(--box-red-accent)';
         } else if (itemColor === 'yellow') {
-            borderBarColor = 'bg-yellow-500';
             nextColorVar = 'var(--box-yellow-accent)';
         } else if (itemColor === 'green') {
-            borderBarColor = 'bg-green-500';
             nextColorVar = 'var(--box-green-accent)';
         }
-        
-        card.className = `bg-white border border-slate-200 p-3.5 rounded-2xl shadow-sm space-y-2 relative overflow-hidden cursor-pointer hover:border-indigo-300 transition-colors`;
+        // Dolu, doygun renk — soluk pastel yerine, referanstaki (Lorem/Ipsum/Dolor Shop)
+        // gibi net ve belirgin bir renk rozeti için.
+        const badgeSolidVar = `var(--box-${itemColor}-accent)`;
+
+        // Kenarlıksız, sadece gölgeyle yükselen kart — referans tasarımlardaki
+        // "yumuşak zemin üzerinde yüzen beyaz kart" hissi.
+        card.className = `bg-white p-3.5 rounded-2xl space-y-3 relative cursor-pointer transition-shadow`;
+        card.style.boxShadow = 'var(--card-shadow)';
         
         let contentHTML = '';
         if(item.img) {
@@ -4908,22 +5084,22 @@ if (appState.archSelectedTopics.length > 0) {
             // Blob'u global bir map'te saklayalım (basitlik için)
             if (!window.blobStore) window.blobStore = {};
             window.blobStore[blobId] = item.img;
-            contentHTML += `<img src="" loading="lazy" data-blob-id="${blobId}" data-original-blob-id="${blobId}" class="w-full h-36 object-contain rounded-xl bg-slate-50 border border-slate-100 cursor-zoom-in" onclick="event.stopPropagation(); openLightboxFromBlob('${blobId}')">`;
+            contentHTML += `<img src="" loading="lazy" data-blob-id="${blobId}" data-original-blob-id="${blobId}" class="w-full h-36 object-contain rounded-xl bg-slate-50 cursor-zoom-in" onclick="event.stopPropagation(); openLightboxFromBlob('${blobId}')">`;
         }
         if(item.text_question) {
-            contentHTML += `<div class="text-xs font-bold text-slate-800 bg-slate-50 p-2.5 rounded-xl border border-slate-100">${item.text_question}</div>`;
+            contentHTML += `<div class="text-xs font-bold text-slate-800 bg-slate-50 p-2.5 rounded-xl">${item.text_question}</div>`;
         }
         if(item.note_text) {
-            contentHTML += `<div class="text-[11px] font-semibold text-amber-800 bg-amber-50 p-2 rounded-xl border border-amber-100">${item.note_text}</div>`;
+            contentHTML += `<div class="text-[11px] font-semibold text-amber-800 bg-amber-50 p-2 rounded-xl">${item.note_text}</div>`;
         }
         if(item.note_img) {
             const blobId = `blob-${Date.now()}-${Math.random()}`;
             if (!window.blobStore) window.blobStore = {};
             window.blobStore[blobId] = item.note_img;
-            contentHTML += `<img src="" loading="lazy" data-blob-id="${blobId}" data-original-blob-id="${blobId}" class="w-full h-36 object-contain rounded-xl bg-amber-50 border border-amber-100 cursor-zoom-in mt-1" onclick="event.stopPropagation(); openLightboxFromBlob('${blobId}')">`;
+            contentHTML += `<img src="" loading="lazy" data-blob-id="${blobId}" data-original-blob-id="${blobId}" class="w-full h-36 object-contain rounded-xl bg-amber-50 cursor-zoom-in mt-1" onclick="event.stopPropagation(); openLightboxFromBlob('${blobId}')">`;
         }
         if(!item.note_text && !item.note_img && item.note) {
-            contentHTML += `<div class="text-[11px] font-semibold text-amber-800 bg-amber-50 p-2 rounded-xl border border-amber-100">${item.note}</div>`;
+            contentHTML += `<div class="text-[11px] font-semibold text-amber-800 bg-amber-50 p-2 rounded-xl">${item.note}</div>`;
         }
 
         // Not arka yüzü (Cevap): sadece doluysa gösterilir, otomatik açık (flip gerekmez).
@@ -4931,41 +5107,33 @@ if (appState.archSelectedTopics.length > 0) {
         if (item.note_back || item.note_back_img) {
             contentHTML += `<div class="archive-back-tag pt-1">Cevap:</div>`;
             if (item.note_back) {
-                contentHTML += `<div class="text-[11px] font-semibold text-amber-900 bg-amber-100/70 p-2 rounded-xl border border-amber-200">${item.note_back}</div>`;
+                contentHTML += `<div class="text-[11px] font-semibold text-amber-900 bg-amber-100/70 p-2 rounded-xl">${item.note_back}</div>`;
             }
             if (item.note_back_img) {
                 const backBlobId = `blob-${Date.now()}-${Math.random()}`;
                 if (!window.blobStore) window.blobStore = {};
                 window.blobStore[backBlobId] = item.note_back_img;
-                contentHTML += `<img src="" loading="lazy" data-blob-id="${backBlobId}" data-original-blob-id="${backBlobId}" class="w-full h-36 object-contain rounded-xl bg-amber-100/70 border border-amber-200 cursor-zoom-in mt-1" onclick="event.stopPropagation(); openLightboxFromBlob('${backBlobId}')">`;
+                contentHTML += `<img src="" loading="lazy" data-blob-id="${backBlobId}" data-original-blob-id="${backBlobId}" class="w-full h-36 object-contain rounded-xl bg-amber-100/70 cursor-zoom-in mt-1" onclick="event.stopPropagation(); openLightboxFromBlob('${backBlobId}')">`;
             }
         }
 
-        // Alt bilgi satırı: her bilginin ne olduğu artık renkten de anlaşılıyor —
-        // oluşturulma tarihi nötr gri, döngü mor, sıradaki tarih ise kartın durum
-        // rengiyle (kırmızı/sarı/yeşil) aynı, cevap ise vurgulu indigo + tik ikonuyla.
+        // Alt satır: artık düz renkli yazı yerine, referans tasarımlardaki "durum rozeti"
+        // (pill) diliyle — sıradaki tarih kendi kutu rengiyle dolgulu bir pill, cevap ise
+        // ayrı bir yeşil pill. Döngü/oluşturulma bilgisi başlığın altına, alt yazı olarak taşındı.
         let metaInfo = '';
         if (activeArchiveType === 'question') {
             metaInfo = `
-                <div class="flex items-center gap-1.5 text-[10.5px] font-bold border-t border-slate-100 pt-2 mt-1">
-                    <span class="text-slate-400">${item.createdDate || ''}</span>
-                    <span class="text-slate-300">·</span>
-                    <span class="text-violet-600">Döngü ${item.level + 1}</span>
-                    <span class="text-slate-300">→</span>
-                    <span style="color: ${nextColorVar};">${item.nextReview || ''}</span>
-                    <span class="ml-auto inline-flex items-center gap-1 text-emerald-600 shrink-0">
+                <div class="flex items-center justify-between pt-1">
+                    <span class="text-[10px] font-bold px-2.5 py-1 rounded-full text-white" style="background-color: ${badgeSolidVar};">${item.nextReview || ''}</span>
+                    <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 shrink-0">
                         <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>${item.answer}
                     </span>
                 </div>
             `;
         } else {
             metaInfo = `
-                <div class="flex items-center gap-1.5 text-[10.5px] font-bold border-t border-slate-100 pt-2 mt-1">
-                    <span class="text-slate-400">${item.createdDate || ''}</span>
-                    <span class="text-slate-300">·</span>
-                    <span class="text-violet-600">Döngü ${(item.stage || 0) + 1}</span>
-                    <span class="text-slate-300">→</span>
-                    <span style="color: ${nextColorVar};">${item.nextReview || ''}</span>
+                <div class="flex items-center pt-1">
+                    <span class="text-[10px] font-bold px-2.5 py-1 rounded-full text-white" style="background-color: ${badgeSolidVar};">${item.nextReview || ''}</span>
                 </div>
             `;
         }
@@ -4977,10 +5145,17 @@ if (appState.archSelectedTopics.length > 0) {
             </button>`;
         }
 
+        const cycleNum = activeArchiveType === 'question' ? (item.level + 1) : ((item.stage || 0) + 1);
+
         card.innerHTML = `
-            <div class="absolute top-0 left-0 w-1.5 h-full ${borderBarColor}"></div>
-            <div class="flex justify-between items-center gap-2">
-                <p class="text-xs font-bold text-slate-700 truncate min-w-0 flex-1">${item.course} <span class="text-slate-300">›</span> ${item.topic}</p>
+            <div class="flex items-start gap-3">
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-white" style="background-color: ${badgeSolidVar};">
+                    <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 18H6V4h12v16zM8 7h8v2H8zm0 4h8v2H8zm0 4h5v2H8z"/></svg>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <p class="text-xs font-bold text-slate-700 truncate">${item.course} <span class="text-slate-300">›</span> ${item.topic}</p>
+                    <p class="text-[10px] font-semibold text-slate-400 mt-0.5">${item.createdDate || ''} · Döngü ${cycleNum}</p>
+                </div>
                 <div class="flex items-center shrink-0">
                     ${pushBtnHTML}
                     <button onclick="event.stopPropagation(); deleteItem('${activeArchiveType}', ${item.id})" class="text-rose-600 hover:text-rose-700 p-1 shrink-0" title="Sil">
@@ -5100,10 +5275,12 @@ function openCampSetup(type) {
     document.getElementById('camp-title').innerText = "Rastgele Kamp";
     setCampColorFilter('all');
     document.getElementById('camp-setup-modal').classList.remove('hidden');
+    openWithBackSupport('campsetup', closeCampSetup);
 }
 
 function closeCampSetup() {
     document.getElementById('camp-setup-modal').classList.add('hidden');
+    closeWithBackSupport('campsetup');
 }
 
 function startCamp() {
@@ -5132,6 +5309,7 @@ function startCamp() {
     campAnswers = {};
 
     document.getElementById('review-modal').classList.remove('hidden');
+    openWithBackSupport('review', closeReview);
     renderReviewItem();
 }
 
@@ -5230,10 +5408,12 @@ function openLightbox(src) {
     lightboxObjectURL = src;
     document.getElementById('lightbox-img').src = src;
     document.getElementById('lightbox').classList.remove('hidden');
+    openWithBackSupport('lightbox', closeLightbox);
 }
 
 function closeLightbox() {
     document.getElementById('lightbox').classList.add('hidden');
+    closeWithBackSupport('lightbox');
     if (lightboxObjectURL) { revokeObjectURL(lightboxObjectURL); lightboxObjectURL = null; }
 }
 
@@ -5246,10 +5426,12 @@ function updateFieldDisplay() {
 
 function openFieldChangeModal() {
     document.getElementById('field-change-modal').classList.remove('hidden');
+    openWithBackSupport('fieldchange', closeFieldChangeModal);
 }
 
 function closeFieldChangeModal() {
     document.getElementById('field-change-modal').classList.add('hidden');
+    closeWithBackSupport('fieldchange');
 }
 
 async function changeField(field) {
@@ -5387,6 +5569,7 @@ async function changeField(field) {
 
         function closeInstallModal() {
             installModal.classList.add('hidden');
+            closeWithBackSupport('install');
         }
 
         function showIOSInstructions() {
@@ -5404,7 +5587,7 @@ async function changeField(field) {
             installTitle.innerText = 'Ana Ekrana Ekle';
             installDesc.innerText = 'Net Kalkanım\'ı ana ekranına ekle, her zaman elinin altında olsun!';
             installPreview.innerHTML = `
-            <div class="flex items-center gap-3 p-3 bg-indigo-50 text-indigo-700 rounded-xl border border-indigo-100">
+            <div class="flex items-center gap-3 p-3 bg-teal-50 text-teal-700 rounded-xl border border-teal-100">
                 <span class="text-3xl">📲</span>
                 <span class="text-xs font-bold">Hızlı erişim için uygulamayı yükle</span>
             </div>
@@ -5431,9 +5614,11 @@ async function changeField(field) {
             if (isIOS && iosInstallPending) {
                 showIOSInstructions();
                 installModal.classList.remove('hidden');
+                openWithBackSupport('install', closeInstallModal);
             } else if (androidInstallPending && deferredPrompt) {
                 showAndroidInstall();
                 installModal.classList.remove('hidden');
+                openWithBackSupport('install', closeInstallModal);
             }
         }
 
