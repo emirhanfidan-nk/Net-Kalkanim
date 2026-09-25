@@ -225,11 +225,11 @@
             background: #e2e8f0;
         }
         .btn-confirm-ok {
-            background: #4f46e5;
+            background: #0D9488;
             color: white;
         }
         .btn-confirm-ok:hover {
-            background: #4338ca;
+            background: #0F766E;
         }
         @keyframes fadeIn {
             from { opacity: 0; } to { opacity: 1; }
@@ -319,9 +319,9 @@
             margin-top: 0.5rem;
         }
         .face-heading-front {
-            color: #4338ca;
-            background: #eef2ff;
-            border: 1px solid #c7d2fe;
+            color: #0F766E;
+            background: #F0FDFA;
+            border: 1px solid #99F6E4;
         }
         .face-heading-back {
             color: #b45309;
@@ -374,11 +374,11 @@
             --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 16px rgba(0, 0, 0, 0.35);
 
             --box-red-bg: #1C1C1E;
-            --box-red-accent: #ff7a8a;
+            --box-red-accent: #DC2626;
             --box-yellow-bg: #1C1C1E;
-            --box-yellow-accent: #ffd166;
+            --box-yellow-accent: #EAB308;
             --box-green-bg: #1C1C1E;
-            --box-green-accent: #5eeba0;
+            --box-green-accent: #0B8654;
             --box-inner-bg: #232326;
             --box-desc-text: #98989f;
             --board-bg: #16171d;
@@ -399,7 +399,7 @@
         /* Segmentli sekme/toggle bileşenlerinde (SORU EKLE/NOT EKLE, Görsel/Yazı vb.) "seçili"
            durumu belirginleştir — aksi halde karanlık modda arka plan farkı neredeyse kayboluyor. */
         body.dark-mode .bg-white.text-teal-600 {
-            background-color: #4f46e5 !important;
+            background-color: #0D9488 !important;
             color: #ffffff !important;
         }
         body.dark-mode .bg-white.text-amber-600 {
@@ -661,6 +661,24 @@
         #answer-settled-tint.settled-wrong {
             background-color: rgba(225, 29, 72, 0.12);
         }
+        /* Karanlık modda bu yarı saydam kırmızı/yeşil dolgu, zaten koyu olan zemine
+           binince rengi mor/bordoya kaydırıyor ve tuhaf duruyordu — karanlık modda
+           belirgin şekilde daha düşük yoğunlukla uyguluyoruz. */
+        /* Karanlık modda kalıcı/oturmuş renk dolgusunu tamamen kaldırıyoruz — uygulamanın
+           geri kalanında zaten benimsenen ilke bu: karanlık modda kartın kendisi asla
+           renkli bir blok gibi durmaz, doğru/yanlış hissi A/B şık renkleriyle zaten veriliyor. */
+        body.dark-mode #answer-settled-tint.settled-correct,
+        body.dark-mode #answer-settled-tint.settled-wrong {
+            background-color: transparent;
+        }
+        /* Anlık flaş (yarım saniyelik) kalıcı değil, o yüzden tamamen kaldırmak yerine
+           sadece hafifletiyoruz. */
+        body.dark-mode #answer-flash-overlay.answer-flash-correct {
+            background: rgba(16, 185, 129, 0.20);
+        }
+        body.dark-mode #answer-flash-overlay.answer-flash-wrong {
+            background: rgba(244, 63, 94, 0.20);
+        }
     </style>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="logo.png">
@@ -719,11 +737,16 @@
                     Kodu Gir
                 </button>
             </div>
+            <div class="flex items-center gap-1">
+                <button onclick="openDenemeTab()" id="nav-deneme" title="Denemeler" class="p-2 text-slate-400 hover:text-teal-600 transition-colors rounded-xl">
+                    <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M5 9.2h3V19H5V9.2zM10.6 5h2.8v14h-2.8V5zm5.6 8H19v6h-2.8v-6z"/></svg>
+                </button>
             <button onclick="switchTab('profile')" id="nav-profile" title="Ayarlar" class="p-2 text-slate-400 hover:text-teal-600 transition-colors rounded-xl">
                 <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
                     <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
                 </svg>
             </button>
+            </div>
         </header>
 
         <main class="flex-1 p-5 overflow-y-auto pb-6">
@@ -809,9 +832,10 @@
                     </div>
                     <div id="today-progress-track" class="w-full h-2.5 rounded-full overflow-hidden flex bg-slate-100"></div>
                     <div class="flex justify-between text-[10px] font-bold text-slate-400">
-                        <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-rose-500 inline-block shrink-0"></span>Unuttum <span id="today-forgot-count" class="tabular-nums">0</span></span>
-                        <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full inline-block shrink-0" style="background-color: #eab308;"></span>Kısmen <span id="today-partial-count" class="tabular-nums">0</span></span>
-                        <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500 inline-block shrink-0"></span>Hatırladım <span id="today-remembered-count" class="tabular-nums">0</span></span>
+                        <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-rose-500 inline-block shrink-0"></span>Zor <span id="today-forgot-count" class="tabular-nums">0</span></span>
+                        <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full inline-block shrink-0" style="background-color: #eab308;"></span>Orta <span id="today-partial-count" class="tabular-nums">0</span></span>
+                        <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500 inline-block shrink-0"></span>Kolay <span id="today-remembered-count" class="tabular-nums">0</span></span>
+                        <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full inline-block shrink-0" style="background-color: #0ea5e9;"></span>Çok Kolay <span id="today-veryeasy-count" class="tabular-nums">0</span></span>
                     </div>
                     <p class="text-[11px] font-semibold text-slate-400 text-center pt-1 border-t border-slate-100">Tüm zamanlar doğruluk: <span id="today-accuracy" class="text-teal-600 font-bold">–</span></p>
                 </div>
@@ -820,7 +844,11 @@
             </div>
 
             <div id="add" class="tab-content active space-y-6">
-                <div class="flex gap-3 mb-4 bg-slate-200 p-1.5 rounded-2xl">
+                <div id="add-deneme-banner" class="hidden items-center justify-between gap-3 bg-teal-50 border border-teal-200 rounded-2xl px-4 py-3">
+                    <p class="text-xs font-semibold text-teal-700 min-w-0 truncate"><span id="add-deneme-banner-text"></span> denemesine ekleniyor</p>
+                    <button type="button" onclick="cancelPendingDeneme()" class="text-xs font-bold text-teal-700 underline shrink-0">Vazgeç</button>
+                </div>
+                <div id="entry-type-toggle" class="flex gap-3 mb-4 bg-slate-200 p-1.5 rounded-2xl">
                     <button type="button" onclick="setEntryType('question')" id="btn-entry-question" class="flex-1 bg-white text-teal-600 shadow-sm py-2 text-xs font-semibold transition-all rounded-xl">SORU EKLE</button>
                     <button type="button" onclick="setEntryType('note')" id="btn-entry-note" class="flex-1 text-slate-600 py-2 text-xs font-semibold transition-all hover:text-amber-600 rounded-xl">NOT EKLE</button>
                 </div>
@@ -1074,6 +1102,10 @@
                 <div id="library-list" class="space-y-3"></div>
             </div>
 
+            <div id="deneme" class="tab-content space-y-5">
+                <div id="deneme-root"></div>
+            </div>
+
             <div id="profile" class="tab-content space-y-5">
 
                 <!-- Ayarlar başlığı (diğer sekmelerle aynı stil) -->
@@ -1174,8 +1206,8 @@
                         <div id="advanced-settings-content" class="hidden px-4 pb-4 space-y-3">
                             <div class="bg-slate-50 border border-slate-200 p-4 space-y-3 rounded-xl">
                                 <p class="text-xs font-semibold text-slate-600">Algoritma Döngüsü (Sorular)</p>
-                                <input type="text" id="setting-intervals" class="w-full bg-white p-2.5 border border-slate-300 font-mono text-center text-sm text-slate-700 font-medium outline-none focus:border-purple-500 transition-colors rounded-lg">
-                                <button onclick="saveIntervals()" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2.5 text-xs font-semibold rounded-lg shadow-sm">Geriye Dönük Güncelle</button>
+                                <input type="text" id="setting-intervals" class="w-full bg-white p-2.5 border border-slate-300 font-mono text-center text-sm text-slate-700 font-medium outline-none focus:border-teal-500 transition-colors rounded-lg">
+                                <button onclick="saveIntervals()" class="w-full bg-teal-600 hover:bg-teal-700 text-white py-2.5 text-xs font-semibold rounded-lg shadow-sm">Geriye Dönük Güncelle</button>
                             </div>
                             <div class="bg-slate-50 border border-slate-200 p-4 space-y-3 rounded-xl">
                                 <p class="text-xs font-semibold text-slate-600">Algoritma Döngüsü (Notlar)</p>
@@ -1279,10 +1311,12 @@
         </button>
     </div>
                 <div id="review-recall-input" class="invisible w-full mt-3" style="min-height: 52px; z-index: 20; position: relative;">
+                    <button type="button" id="undo-recall-btn" onclick="undoRecall()" class="hidden" style="position:absolute; top:-11px; right:8px; z-index:30; background:#fff; border:1px solid #cbd5e1; color:#475569; font-size:10px; font-weight:800; line-height:1; padding:5px 10px; border-radius:9999px; box-shadow:0 2px 6px rgba(15,23,42,.15); transition:opacity .3s;">↩ Geri al</button>
                     <div class="flex gap-2 justify-center">
-                        <button type="button" id="recall-btn-forgot" onclick="submitRecallStatus('forgot')" class="flex-1 py-3 font-semibold text-xs rounded-xl border-2 transition-all bg-rose-600 border-rose-600 text-white hover:bg-rose-700">Unuttum</button>
-                        <button type="button" id="recall-btn-partial" onclick="submitRecallStatus('partial')" class="flex-1 py-3 font-semibold text-xs rounded-xl border-2 transition-all bg-amber-500 border-amber-500 text-white hover:bg-amber-600">Kısmen Hatırladım</button>
-                        <button type="button" id="recall-btn-remembered" onclick="submitRecallStatus('remembered')" class="flex-1 py-3 font-semibold text-xs rounded-xl border-2 transition-all bg-emerald-600 border-emerald-600 text-white hover:bg-emerald-700">Hatırladım</button>
+                        <button type="button" id="recall-btn-forgot" onclick="submitRecallStatus('forgot')" class="flex-1 py-3 px-1 font-semibold text-xs rounded-xl border-2 transition-all bg-rose-600 border-rose-600 text-white hover:bg-rose-700">Zor</button>
+                        <button type="button" id="recall-btn-partial" onclick="submitRecallStatus('partial')" class="flex-1 py-3 px-1 font-semibold text-xs rounded-xl border-2 transition-all bg-amber-500 border-amber-500 text-white hover:bg-amber-600">Orta</button>
+                        <button type="button" id="recall-btn-remembered" onclick="submitRecallStatus('remembered')" class="flex-1 py-3 px-1 font-semibold text-xs rounded-xl border-2 transition-all bg-emerald-600 border-emerald-600 text-white hover:bg-emerald-700">Kolay</button>
+                        <button type="button" id="recall-btn-veryeasy" onclick="submitRecallStatus('veryeasy')" class="flex-1 py-3 px-1 font-semibold text-xs rounded-xl border-2 transition-all bg-sky-600 border-sky-600 text-white hover:bg-sky-700">Çok Kolay</button>
                     </div>
                 </div>
             </div>
@@ -1481,6 +1515,24 @@
             </button>
         </nav>
 
+    </div>
+
+    <!-- DENEME FORMU -->
+    <div id="deneme-form-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[70] hidden flex justify-center items-start overflow-y-auto p-4">
+        <div class="modal-animate bg-white border border-slate-200 w-full max-w-md flex flex-col rounded-3xl shadow-2xl mt-6 mb-6" style="max-height: 85vh;">
+            <div class="flex items-center justify-between px-5 pt-4 pb-3 border-b border-slate-200 shrink-0">
+                <h3 id="deneme-form-title" class="text-base font-semibold text-slate-800 font-display">Yeni Deneme</h3>
+                <button type="button" onclick="closeDenemeForm()" class="text-slate-400 hover:text-slate-600 text-xl leading-none px-2">✕</button>
+            </div>
+            <div id="deneme-form-body" class="px-5 py-4 overflow-y-auto space-y-4"></div>
+            <div class="px-5 py-4 border-t border-slate-200 shrink-0 flex items-center gap-3">
+                <div class="shrink-0">
+                    <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Toplam Net</p>
+                    <p id="dn-total" class="text-xl font-bold text-teal-600 tabular-nums leading-tight">0</p>
+                </div>
+                <button type="button" onclick="saveDeneme()" class="flex-1 bg-teal-600 hover:bg-teal-700 text-white py-3.5 font-semibold text-sm rounded-2xl shadow-md">Kaydet</button>
+            </div>
+        </div>
     </div>
 
     <!-- TOAST KONTEYNER -->
@@ -1732,6 +1784,9 @@ function showCustomConfirm(message, onConfirm) {
 // IndexedDB Ayarları
 let db;
 const DB_NAME = 'Net Kalkanım';
+// Bir kart döngünün sonuna gelip "mezun" olunca artık sonsuza kadar gizlenmiyor —
+// bu kadar gün sonra tek bir bakım turu için tekrar karşına çıkıyor.
+const MAINTENANCE_DAYS = 90;
 const DB_VERSION = 2; // Yeni sürüm
 const STORE_NAMES = {
     questions: 'questions',
@@ -1896,7 +1951,9 @@ function saveSettings() {
         totalCorrect: appState.totalCorrect,
         recallForgot: appState.recallForgot,
         recallPartial: appState.recallPartial,
-        recallRemembered: appState.recallRemembered
+        recallRemembered: appState.recallRemembered,
+        recallVeryEasy: appState.recallVeryEasy,
+        denemeler: appState.denemeler
     };
     return new Promise((resolve, reject) => {
         const tx = db.transaction(STORE_NAMES.settings, 'readwrite');
@@ -1973,7 +2030,9 @@ let appState = {
     totalCorrect: 0,
     recallForgot: 0,
     recallPartial: 0,
-    recallRemembered: 0
+    recallRemembered: 0,
+    recallVeryEasy: 0,
+    denemeler: []
 };
 
 let currentEntryType = 'question'; 
@@ -2078,6 +2137,7 @@ window.onload = async function() {
         
         appState.questions = data.questions || [];
         appState.notes = data.notes || [];
+        if (!Array.isArray(appState.denemeler)) appState.denemeler = [];
         
         // Alan ve kategori düzeltmeleri
         if (appState.field && FIELD_DATA[appState.field]) {
@@ -2107,6 +2167,7 @@ window.onload = async function() {
         
         // Migration: Base64 string'leri Blob'a dönüştür
         await migrateBase64ToBlob();
+        await migrateMasteredCardsToMaintenance();
         
         syncSystemUI();
         applyDarkMode(!!appState.darkMode);
@@ -2375,6 +2436,33 @@ async function migrateBase64ToBlob() {
             await saveNote(n);
         }
         showToast("Eski görüntüler yeni formata dönüştürüldü.");
+    }
+}
+
+// Eskiden "mezun" olan (is_mastered=true, nextReview=null → sonsuza kadar gizli) kartlar
+// artık periyodik bir bakım turuna giriyor. Bu kartları yeni modele bir kerelik geçiriyoruz:
+// hepsi aynı anda "bugün vadesi geldi" diye kırmızı kutuya dolmasın diye, bugünden itibaren
+// MAINTENANCE_DAYS kadar sonrasına planlıyoruz.
+async function migrateMasteredCardsToMaintenance() {
+    const today = getNowTR();
+    const next = new Date(today);
+    next.setDate(next.getDate() + MAINTENANCE_DAYS);
+    const nextStr = formatDate(next);
+    let changed = false;
+
+    for (const q of appState.questions) {
+        if (q.is_mastered && !q.nextReview) {
+            q.nextReview = nextStr;
+            changed = true;
+            await saveQuestion(q);
+        }
+    }
+    for (const n of appState.notes) {
+        if (n.is_mastered && !n.nextReview) {
+            n.nextReview = nextStr;
+            changed = true;
+            await saveNote(n);
+        }
     }
 }
 
@@ -3425,7 +3513,9 @@ async function recalculateQuestionDates() {
         if (!q.is_mastered) {
             if (q.level >= appState.intervals.length) {
                 q.is_mastered = true;
-                q.nextReview = null;
+                const next = new Date(today);
+                next.setDate(next.getDate() + MAINTENANCE_DAYS);
+                q.nextReview = formatDate(next);
             } else {
                 const days = appState.intervals[q.level] || 1;
                 const next = new Date(today);
@@ -3445,7 +3535,9 @@ async function recalculateNoteDates() {
         if (!n.is_mastered) {
             if ((n.stage || 0) >= appState.noteIntervals.length) {
                 n.is_mastered = true;
-                n.nextReview = null;
+                const next = new Date(today);
+                next.setDate(next.getDate() + MAINTENANCE_DAYS);
+                n.nextReview = formatDate(next);
             } else {
                 const days = appState.noteIntervals[n.stage] || 1;
                 const next = new Date(today);
@@ -3472,6 +3564,420 @@ function syncSystemUI() {
     checkStorageUsage();
 }
 
+
+// ==================== DENEME SEKMESİ ====================
+// Denemeler ayarların içinde (appState.denemeler) saklanır. Deneme sırasında yapılan sorular
+// normal soru olarak eklenir ve q.denemeId ile denemeye bağlanır; tekrar döngüleri
+// denemenin tarihinden bağımsız, sorunun eklendiği güne göre işler.
+let denemeActiveType = 'TYT';
+let denemeChartCourse = 'TOPLAM';
+let denemeChipList = ['TOPLAM'];
+let denemeOpenId = null;
+let denemeAskAddId = null;
+let denemeFormType = 'TYT';
+let denemeFormEditId = null;
+let pendingDenemeId = null;
+let denemeThumbURLs = [];
+
+function denemeEsc(t) {
+    return String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function denemeCoursesFor(type) {
+    const keys = Object.keys(appState.categories || {});
+    return keys.filter(k => type === 'TYT' ? k.startsWith('TYT ') : !k.startsWith('TYT '));
+}
+function denemeCourseLabel(c) {
+    const base = c.replace(/^(TYT|AYT)\s+/, '');
+    const low = base.toLocaleLowerCase('tr-TR');
+    return low.charAt(0).toLocaleUpperCase('tr-TR') + low.slice(1);
+}
+function denemeFmtNet(n) { return (Math.round(n * 100) / 100).toString().replace('.', ','); }
+function denemeDateTR(iso) { const p = String(iso).split('-'); return p[2] + '.' + p[1] + '.' + p[0]; }
+function denemeShortDate(iso) { const p = String(iso).split('-'); return parseInt(p[2], 10) + '.' + p[1]; }
+function denemeCourseNet(sc) { return (sc.c || 0) - (sc.w || 0) / 4; }
+function denemeTotalNet(d) { return Object.values(d.scores || {}).reduce((a, sc) => a + denemeCourseNet(sc), 0); }
+function denemesOfType(type) {
+    return appState.denemeler.filter(d => d.type === type)
+        .sort((a, b) => a.date === b.date ? a.id - b.id : (a.date < b.date ? -1 : 1));
+}
+function denemeQuestions(id) { return appState.questions.filter(q => q.denemeId === id); }
+
+function openDenemeTab() {
+    // Üstteki ikona her tıklandığında, nerede kalınmış olursa olsun denemeler listesinden
+    // başla — kullanıcı önceki bir denemenin detayında kilitli kalıp çıkış yolunu
+    // bulamamasın diye. Soru ekleme akışı içindeki dönüşler bu fonksiyonu kullanmıyor,
+    // o yüzden oradan geri dönüş yine ilgili denemenin detayına düşmeye devam ediyor.
+    denemeOpenId = null;
+    denemeAskAddId = null;
+    switchTab('deneme');
+}
+
+function renderDeneme() {
+    denemeThumbURLs.forEach(u => revokeObjectURL(u));
+    denemeThumbURLs = [];
+    if (denemeOpenId) renderDenemeDetail(); else renderDenemeList();
+}
+
+function denemeChartSVG(points) {
+    if (!points.length) return '';
+    const W = 320, H = 160, L = 30, R = 14, T = 22, B = 26;
+    const vals = points.map(p => p.v);
+    let lo = Math.min(...vals), hi = Math.max(...vals);
+    if (hi - lo < 1) { lo -= 1; hi += 1; }
+    const pad = (hi - lo) * 0.2; lo -= pad; hi += pad;
+    const n = points.length;
+    const x = i => n === 1 ? (L + (W - L - R) / 2) : L + i * (W - L - R) / (n - 1);
+    const y = v => T + (hi - v) * (H - T - B) / (hi - lo);
+    let g = '';
+    for (let k = 0; k < 3; k++) {
+        const v = lo + (hi - lo) * k / 2;
+        const yy = y(v).toFixed(1);
+        g += `<line x1="${L}" x2="${W - R}" y1="${yy}" y2="${yy}" stroke="#94a3b8" stroke-opacity=".25"/>`;
+        g += `<text x="${L - 4}" y="${(+yy + 3).toFixed(1)}" text-anchor="end" font-size="9" fill="#94a3b8">${Math.round(v)}</text>`;
+    }
+    const path = points.map((p, i) => (i ? 'L' : 'M') + x(i).toFixed(1) + ',' + y(p.v).toFixed(1)).join(' ');
+    const maxIdx = vals.indexOf(Math.max(...vals));
+    const step = Math.ceil(n / 5);
+    let dots = '', xl = '';
+    points.forEach((p, i) => {
+        const cx = x(i).toFixed(1), cy = y(p.v).toFixed(1);
+        const isLast = i === n - 1;
+        dots += `<circle cx="${cx}" cy="${cy}" r="${isLast ? 4.5 : 3.2}" fill="${isLast ? '#0d9488' : '#fff'}" stroke="#0d9488" stroke-width="2"/>`;
+        if (n <= 8 || isLast || i === maxIdx) {
+            dots += `<text x="${cx}" y="${(+cy - 8).toFixed(1)}" text-anchor="middle" font-size="9.5" font-weight="700" fill="#0d9488">${denemeFmtNet(p.v)}</text>`;
+        }
+        if (n <= 6 || i === 0 || isLast || i % step === 0) {
+            xl += `<text x="${cx}" y="${H - 8}" text-anchor="middle" font-size="9" fill="#94a3b8">${denemeShortDate(p.date)}</text>`;
+        }
+    });
+    return `<svg viewBox="0 0 ${W} ${H}" class="w-full" role="img" aria-label="Net grafiği">${g}${n > 1 ? `<path d="${path}" fill="none" stroke="#0d9488" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>` : ''}${dots}${xl}</svg>`;
+}
+
+function setDenemeType(t) { denemeActiveType = t; denemeChartCourse = 'TOPLAM'; renderDenemeList(); }
+function setDenemeChart(i) { denemeChartCourse = denemeChipList[i] || 'TOPLAM'; renderDenemeList(); }
+
+function renderDenemeList() {
+    const root = document.getElementById('deneme-root');
+    if (!root) return;
+    const type = denemeActiveType;
+    const all = denemesOfType(type);
+    const courses = denemeCoursesFor(type).filter(c => all.some(d => d.scores && d.scores[c]));
+    denemeChipList = ['TOPLAM', ...courses];
+    if (!denemeChipList.includes(denemeChartCourse)) denemeChartCourse = 'TOPLAM';
+
+    const points = all.map(d => ({
+        date: d.date,
+        v: denemeChartCourse === 'TOPLAM' ? denemeTotalNet(d) : (d.scores[denemeChartCourse] ? denemeCourseNet(d.scores[denemeChartCourse]) : null)
+    })).filter(p => p.v !== null);
+
+    let stats = '';
+    if (points.length) {
+        const last = points[points.length - 1].v;
+        const avg = points.reduce((a, p) => a + p.v, 0) / points.length;
+        const best = Math.max(...points.map(p => p.v));
+        const st = (label, v) => `<div class="flex-1 text-center"><p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">${label}</p><p class="text-base font-bold text-slate-800 tabular-nums">${denemeFmtNet(v)}</p></div>`;
+        stats = `<div class="flex gap-2 pt-3 mt-3 border-t border-slate-100">${st('Son', last)}${st('Ortalama', avg)}${st('En İyi', best)}</div>`;
+    }
+
+    const chips = denemeChipList.map((c, i) => {
+        const on = c === denemeChartCourse;
+        const label = c === 'TOPLAM' ? 'Toplam' : denemeCourseLabel(c);
+        return `<button onclick="setDenemeChart(${i})" class="shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border ${on ? 'bg-teal-600 border-teal-600 text-white' : 'bg-white border-slate-200 text-slate-600'}">${denemeEsc(label)}</button>`;
+    }).join('');
+
+    const chartCard = all.length ? `
+        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+            <div class="flex gap-2 overflow-x-auto pb-3 -mx-1 px-1">${chips}</div>
+            ${points.length ? denemeChartSVG(points) : '<p class="text-xs text-slate-400 text-center py-8">Bu ders için henüz veri yok.</p>'}
+            ${stats}
+        </div>` : '';
+
+    const cards = [...all].reverse().map(d => {
+        const qn = denemeQuestions(d.id).length;
+        return `<button onclick="openDeneme(${d.id})" class="w-full bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex items-center justify-between gap-3 text-left">
+            <div class="min-w-0">
+                <p class="text-sm font-semibold text-slate-800 truncate">${denemeEsc(d.name)}</p>
+                <p class="text-xs text-slate-400 mt-0.5">${denemeDateTR(d.date)}${qn ? ' · ' + qn + ' soru' : ''}</p>
+            </div>
+            <div class="text-right shrink-0">
+                <p class="text-lg font-bold text-teal-600 tabular-nums leading-tight">${denemeFmtNet(denemeTotalNet(d))}</p>
+                <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">net</p>
+            </div>
+        </button>`;
+    }).join('');
+
+    const empty = all.length ? '' : `<div class="bg-white border border-dashed border-slate-300 rounded-2xl p-6 text-center">
+        <p class="text-sm font-semibold text-slate-600">Henüz ${type} denemesi yok</p>
+        <p class="text-xs text-slate-400 mt-1">Sağ üstteki "+ Yeni" ile ilk denemeni ekle.</p></div>`;
+
+    root.innerHTML = `
+        <div class="flex justify-between items-center border-b border-slate-200 pb-2">
+            <h2 class="text-xl font-semibold text-slate-800 flex items-center gap-2 font-display tracking-tight">
+                <svg class="w-6 h-6 fill-current text-teal-600" viewBox="0 0 24 24"><path d="M5 9.2h3V19H5V9.2zM10.6 5h2.8v14h-2.8V5zm5.6 8H19v6h-2.8v-6z"/></svg>
+                Denemeler
+            </h2>
+            <button onclick="openDenemeForm()" class="bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold px-3.5 py-2 rounded-xl shadow-sm">+ Yeni</button>
+        </div>
+        <div class="flex gap-3 bg-slate-200 p-1.5 rounded-2xl">
+            <button onclick="setDenemeType('TYT')" class="flex-1 py-2 text-xs font-semibold rounded-xl transition-all ${type === 'TYT' ? 'bg-white text-teal-600 shadow-sm' : 'text-slate-600'}">TYT</button>
+            <button onclick="setDenemeType('AYT')" class="flex-1 py-2 text-xs font-semibold rounded-xl transition-all ${type === 'AYT' ? 'bg-white text-teal-600 shadow-sm' : 'text-slate-600'}">AYT</button>
+        </div>
+        ${chartCard}${empty}
+        <div class="space-y-3">${cards}</div>`;
+}
+
+function openDeneme(id) {
+    denemeOpenId = id;
+    renderDeneme();
+    const m = document.querySelector('main'); if (m) m.scrollTop = 0;
+}
+function closeDenemeDetail() {
+    denemeOpenId = null;
+    denemeAskAddId = null;
+    renderDeneme();
+    const m = document.querySelector('main'); if (m) m.scrollTop = 0;
+}
+
+function renderDenemeDetail() {
+    const root = document.getElementById('deneme-root');
+    const d = appState.denemeler.find(x => x.id === denemeOpenId);
+    if (!root) return;
+    if (!d) { denemeOpenId = null; renderDenemeList(); return; }
+
+    const rows = denemeCoursesFor(d.type).concat(Object.keys(d.scores || {}).filter(c => !denemeCoursesFor(d.type).includes(c)))
+        .filter(c => d.scores && d.scores[c]).map(c => {
+            const sc = d.scores[c];
+            return `<div class="flex items-center gap-2 py-2 border-b border-slate-100 last:border-0">
+                <span class="flex-1 text-xs font-semibold text-slate-700 truncate">${denemeEsc(denemeCourseLabel(c))}</span>
+                <span class="text-xs text-emerald-600 font-semibold tabular-nums w-8 text-right">${sc.c}D</span>
+                <span class="text-xs text-rose-500 font-semibold tabular-nums w-8 text-right">${sc.w}Y</span>
+                <span class="text-sm font-bold text-teal-600 tabular-nums w-14 text-right">${denemeFmtNet(denemeCourseNet(sc))}</span>
+            </div>`;
+        }).join('');
+
+    const qs = denemeQuestions(d.id);
+    const qRows = qs.map(q => {
+        let thumb = '<div class="w-11 h-11 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400 text-lg shrink-0">?</div>';
+        if (q.img) {
+            const u = createObjectURL(q.img);
+            if (u) { denemeThumbURLs.push(u); thumb = `<img src="${u}" class="w-11 h-11 rounded-lg object-cover shrink-0 bg-slate-100" alt="">`; }
+        }
+        const preview = q.text_question ? denemeEsc(q.text_question).slice(0, 60) : 'Görselli soru';
+        return `<div class="bg-white border border-slate-200 rounded-2xl p-3 flex items-center gap-3 shadow-sm">
+            <div onclick="openArchiveItem('question', ${q.id})" class="flex items-center gap-3 flex-1 min-w-0 cursor-pointer">
+                ${thumb}
+                <div class="min-w-0">
+                    <p class="text-xs font-bold text-slate-700 truncate">${denemeEsc(q.course)} <span class="text-slate-300">›</span> ${denemeEsc(q.topic)}</p>
+                    <p class="text-[11px] text-slate-400 truncate">${preview}</p>
+                </div>
+            </div>
+            <button onclick="deleteDenemeQuestion(${q.id})" title="Sil" class="p-2 text-slate-300 hover:text-rose-500 shrink-0">
+                <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+            </button>
+        </div>`;
+    }).join('');
+
+    const askCard = denemeAskAddId === d.id ? `
+        <div class="bg-teal-50 border border-teal-200 rounded-2xl p-4">
+            <p class="text-sm font-semibold text-teal-800">Bu denemeden eklemek istediğin soru var mı?</p>
+            <div class="flex gap-2 mt-3">
+                <button onclick="startAddQuestionForDeneme(${d.id})" class="flex-1 bg-teal-600 hover:bg-teal-700 text-white py-2.5 text-xs font-semibold rounded-xl">Soru Ekle</button>
+                <button onclick="denemeAskAddId = null; renderDeneme();" class="flex-1 bg-white border border-teal-200 text-teal-700 py-2.5 text-xs font-semibold rounded-xl">Şimdi Değil</button>
+            </div>
+        </div>` : '';
+
+    root.innerHTML = `
+        <div class="flex items-center justify-between">
+            <button onclick="closeDenemeDetail()" class="inline-flex items-center gap-1.5 bg-white border border-slate-200 rounded-full pl-2.5 pr-3.5 py-1.5 text-xs font-semibold text-slate-600 shadow-sm">
+                <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+                Denemeler
+            </button>
+            <button onclick="openDenemeForm()" class="bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold px-3.5 py-2 rounded-xl shadow-sm">+ Yeni</button>
+        </div>
+        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+            <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                    <p class="text-[10px] font-bold text-teal-600 uppercase tracking-wider">${d.type}</p>
+                    <h3 class="text-base font-semibold text-slate-800 truncate">${denemeEsc(d.name)}</h3>
+                    <p class="text-xs text-slate-400 mt-0.5">${denemeDateTR(d.date)}</p>
+                </div>
+                <div class="text-right shrink-0">
+                    <p class="text-2xl font-bold text-teal-600 tabular-nums leading-tight">${denemeFmtNet(denemeTotalNet(d))}</p>
+                    <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">toplam net</p>
+                </div>
+            </div>
+            <div class="mt-3">${rows}</div>
+            <div class="flex gap-2 mt-3">
+                <button onclick="openDenemeForm(${d.id})" class="flex-1 bg-slate-100 text-slate-700 py-2 text-xs font-semibold rounded-xl">Düzenle</button>
+                <button onclick="deleteDeneme(${d.id})" class="flex-1 bg-slate-100 text-rose-600 py-2 text-xs font-semibold rounded-xl">Denemeyi Sil</button>
+            </div>
+        </div>
+        ${askCard}
+        <div class="flex justify-between items-center">
+            <h4 class="text-sm font-semibold text-slate-700">Eklenen Sorular${qs.length ? ' (' + qs.length + ')' : ''}</h4>
+            <button onclick="startAddQuestionForDeneme(${d.id})" class="bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold px-3.5 py-2 rounded-xl shadow-sm">+ Soru Ekle</button>
+        </div>
+        <div class="space-y-2">${qRows || '<p class="text-xs text-slate-400 text-center py-4">Bu denemeden henüz soru eklemedin.</p>'}</div>`;
+}
+
+// ---- Deneme formu ----
+function openDenemeForm(editId) {
+    denemeFormEditId = editId || null;
+    const ex = editId ? appState.denemeler.find(d => d.id === editId) : null;
+    denemeFormType = ex ? ex.type : denemeActiveType;
+    renderDenemeForm(ex ? { name: ex.name, date: ex.date, scores: ex.scores } : null);
+    document.getElementById('deneme-form-title').textContent = ex ? 'Denemeyi Düzenle' : 'Yeni Deneme';
+    document.getElementById('deneme-form-modal').classList.remove('hidden');
+    openWithBackSupport('denemeForm', closeDenemeForm);
+}
+function closeDenemeForm() {
+    document.getElementById('deneme-form-modal').classList.add('hidden');
+    closeWithBackSupport('denemeForm');
+}
+function setDenemeFormType(t) {
+    if (denemeFormEditId) return;
+    const date = (document.getElementById('dn-date') || {}).value;
+    denemeFormType = t;
+    renderDenemeForm({ name: null, date: date || null, scores: null });
+}
+function renderDenemeForm(st) {
+    const type = denemeFormType;
+    const courses = denemeCoursesFor(type);
+    const name = (st && st.name) || `${type} Deneme ${denemesOfType(type).length + 1}`;
+    const date = (st && st.date) || formatDate(getNowTR());
+    const sc = (st && st.scores) || {};
+    const typeToggle = denemeFormEditId ? '' : `
+        <div class="flex gap-3 bg-slate-200 p-1.5 rounded-2xl">
+            <button type="button" onclick="setDenemeFormType('TYT')" class="flex-1 py-2 text-xs font-semibold rounded-xl ${type === 'TYT' ? 'bg-white text-teal-600 shadow-sm' : 'text-slate-600'}">TYT</button>
+            <button type="button" onclick="setDenemeFormType('AYT')" class="flex-1 py-2 text-xs font-semibold rounded-xl ${type === 'AYT' ? 'bg-white text-teal-600 shadow-sm' : 'text-slate-600'}">AYT</button>
+        </div>`;
+    const rows = courses.map((c, i) => {
+        const cv = sc[c] ? sc[c].c : '', wv = sc[c] ? sc[c].w : '';
+        return `<div class="flex items-center gap-2">
+            <span class="flex-1 text-xs font-semibold text-slate-700 truncate">${denemeEsc(denemeCourseLabel(c))}</span>
+            <input id="dn-c-${i}" type="number" inputmode="numeric" min="0" placeholder="D" value="${cv}" oninput="denemeFormRecalc()" class="w-14 text-center bg-white border border-slate-300 rounded-lg py-2 text-sm font-semibold outline-none focus:border-emerald-500">
+            <input id="dn-w-${i}" type="number" inputmode="numeric" min="0" placeholder="Y" value="${wv}" oninput="denemeFormRecalc()" class="w-14 text-center bg-white border border-slate-300 rounded-lg py-2 text-sm font-semibold outline-none focus:border-rose-500">
+            <span id="dn-net-${i}" class="w-12 text-right text-xs font-bold text-teal-600 tabular-nums">–</span>
+        </div>`;
+    }).join('');
+    document.getElementById('deneme-form-body').innerHTML = `
+        ${typeToggle}
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label class="block text-[11px] font-semibold text-slate-500 mb-1">Deneme adı</label>
+                <input id="dn-name" type="text" maxlength="40" value="${denemeEsc(name)}" class="w-full bg-white border border-slate-300 rounded-xl p-2.5 text-sm font-medium outline-none focus:border-teal-500">
+            </div>
+            <div>
+                <label class="block text-[11px] font-semibold text-slate-500 mb-1">Tarih</label>
+                <input id="dn-date" type="date" value="${date}" class="w-full bg-white border border-slate-300 rounded-xl p-2.5 text-sm font-medium outline-none focus:border-teal-500">
+            </div>
+        </div>
+        ${courses.length ? `
+        <div>
+            <div class="flex items-center gap-2 pb-1 text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                <span class="flex-1">Ders</span><span class="w-14 text-center">Doğru</span><span class="w-14 text-center">Yanlış</span><span class="w-12 text-right">Net</span>
+            </div>
+            <div class="space-y-2">${rows}</div>
+            <p class="text-[11px] text-slate-400 mt-2">Girmediğin dersler hesaba katılmaz.</p>
+        </div>` : '<p class="text-xs text-slate-500 text-center py-6">Önce ayarlardan alanını seçmelisin.</p>'}`;
+    denemeFormRecalc();
+}
+function denemeFormRecalc() {
+    const courses = denemeCoursesFor(denemeFormType);
+    let total = 0;
+    courses.forEach((c, i) => {
+        const cv = document.getElementById('dn-c-' + i).value, wv = document.getElementById('dn-w-' + i).value;
+        const el = document.getElementById('dn-net-' + i);
+        if (cv === '' && wv === '') { el.textContent = '–'; return; }
+        const net = (parseInt(cv || '0', 10) || 0) - (parseInt(wv || '0', 10) || 0) / 4;
+        total += net;
+        el.textContent = denemeFmtNet(net);
+    });
+    const t = document.getElementById('dn-total');
+    if (t) t.textContent = denemeFmtNet(total);
+}
+async function saveDeneme() {
+    const type = denemeFormType;
+    const courses = denemeCoursesFor(type);
+    const nameEl = document.getElementById('dn-name'), dateEl = document.getElementById('dn-date');
+    if (!nameEl || !dateEl) return;
+    const date = dateEl.value;
+    if (!date) { showToast('Tarihi seçmelisin!', true); return; }
+    const scores = {};
+    courses.forEach((c, i) => {
+        const cv = document.getElementById('dn-c-' + i).value, wv = document.getElementById('dn-w-' + i).value;
+        if (cv === '' && wv === '') return;
+        scores[c] = { c: Math.max(0, parseInt(cv || '0', 10) || 0), w: Math.max(0, parseInt(wv || '0', 10) || 0) };
+    });
+    if (!Object.keys(scores).length) { showToast('En az bir dersin sonucunu girmelisin!', true); return; }
+    const name = nameEl.value.trim() || `${type} Deneme ${denemesOfType(type).length + 1}`;
+
+    if (denemeFormEditId) {
+        const d = appState.denemeler.find(x => x.id === denemeFormEditId);
+        if (d) { d.name = name; d.date = date; d.scores = scores; }
+    } else {
+        const id = Date.now();
+        appState.denemeler.push({ id, type, name, date, scores });
+        denemeActiveType = type;
+        denemeChartCourse = 'TOPLAM';
+        denemeOpenId = id;
+        denemeAskAddId = id;
+    }
+    await saveSettings();
+    closeDenemeForm();
+    renderDeneme();
+    const m = document.querySelector('main'); if (m) m.scrollTop = 0;
+    showToast('Deneme kaydedildi!');
+}
+function deleteDeneme(id) {
+    const qs = denemeQuestions(id);
+    const msg = qs.length
+        ? `Bu deneme silinecek. Eklediğin ${qs.length} soru tekrar döngüsünde kalacak. Emin misin?`
+        : 'Bu deneme silinecek. Emin misin?';
+    showCustomConfirm(msg, async () => {
+        for (const q of qs) { delete q.denemeId; await saveQuestion(q); }
+        appState.denemeler = appState.denemeler.filter(d => d.id !== id);
+        await saveSettings();
+        denemeOpenId = null;
+        renderDeneme();
+    });
+}
+function deleteDenemeQuestion(qid) {
+    showCustomConfirm('Bu soru tekrar döngüsünden de tamamen silinecek. Emin misin?', async () => {
+        appState.questions = appState.questions.filter(q => q.id !== qid);
+        await deleteQuestion(qid);
+        renderDeneme();
+        updateHomeStats();
+    });
+}
+
+// ---- Denemeden soru ekleme ----
+function startAddQuestionForDeneme(id) {
+    pendingDenemeId = id;
+    denemeAskAddId = null;
+    setEntryType('question');
+    switchTab('add');
+    updateAddDenemeBanner();
+    const m = document.querySelector('main'); if (m) m.scrollTop = 0;
+}
+function updateAddDenemeBanner() {
+    const b = document.getElementById('add-deneme-banner');
+    const tog = document.getElementById('entry-type-toggle');
+    const d = pendingDenemeId ? appState.denemeler.find(x => x.id === pendingDenemeId) : null;
+    if (b) {
+        b.classList.toggle('hidden', !d);
+        const t = document.getElementById('add-deneme-banner-text');
+        if (t && d) t.textContent = d.name;
+    }
+    if (tog) tog.classList.toggle('hidden', !!d);
+}
+function cancelPendingDeneme() {
+    const id = pendingDenemeId;
+    pendingDenemeId = null;
+    updateAddDenemeBanner();
+    if (id) { denemeOpenId = id; switchTab('deneme'); }
+}
+
 function switchTab(tabId) {
     document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
     document.getElementById(tabId).classList.add('active');
@@ -3480,6 +3986,10 @@ function switchTab(tabId) {
     const btnAdd = document.getElementById('nav-add');
     const pillLibrary = document.getElementById('nav-library-pill');
     const btnProfile = document.getElementById('nav-profile');
+    const btnDeneme = document.getElementById('nav-deneme');
+
+    // Deneme ekleme modundayken başka sekmeye geçilirse bağlantı iptal olur.
+    if (tabId !== 'add' && pendingDenemeId) { pendingDenemeId = null; updateAddDenemeBanner(); }
 
     // Alt navigasyon barı artık tek parça, sabit bir yüzey — her ikon kendi aktif durumunu
     // sadece kendi çevresindeki küçük bir "pill" ile gösteriyor, barın geneli hiç değişmiyor.
@@ -3491,6 +4001,10 @@ function switchTab(tabId) {
     if (btnProfile) {
         btnProfile.classList.remove('text-teal-600', 'bg-teal-50');
         btnProfile.classList.add('text-slate-400');
+    }
+    if (btnDeneme) {
+        btnDeneme.classList.remove('text-teal-600', 'bg-teal-50');
+        btnDeneme.classList.add('text-slate-400');
     }
     if (btnAdd) {
         btnAdd.className = "nav-btn flex items-center justify-center text-white bg-teal-600 hover:bg-teal-700 w-20 h-20 rounded-full shadow-2xl transition-all duration-300 ease-in-out hover:scale-110 active:scale-95 -translate-y-6 border-4 border-slate-50 shrink-0 z-30";
@@ -3505,10 +4019,14 @@ function switchTab(tabId) {
     } else if (tabId === 'profile' && btnProfile) {
         btnProfile.classList.remove('text-slate-400');
         btnProfile.classList.add('text-teal-600', 'bg-teal-50');
+    } else if (tabId === 'deneme' && btnDeneme) {
+        btnDeneme.classList.remove('text-slate-400');
+        btnDeneme.classList.add('text-teal-600', 'bg-teal-50');
     }
 
     if(tabId === 'library') { populateArchiveFilters(); renderLibrary(); }
     if(tabId === 'home') { updateHomeStats(); }
+    if(tabId === 'deneme') { renderDeneme(); }
 }
 
 function getEstimatedTime(count) {
@@ -3526,7 +4044,6 @@ function updateHomeStats() {
     const todayStr = formatDate(getNowTR());
 
     const redQuestions = appState.questions.filter(q => 
-        !q.is_mastered && 
         appState.selectedCourses.includes(q.course) && 
         appState.selectedTopics.includes(q.course + '::' + q.topic) &&
         getCardColor(q, 'question') === 'red'
@@ -3588,7 +4105,8 @@ function updatePerformanceStats() {
     const forgotCount = appState.recallForgot || 0;
     const partialCount = appState.recallPartial || 0;
     const rememberedCount = appState.recallRemembered || 0;
-    const totalRecalled = forgotCount + partialCount + rememberedCount;
+    const veryEasyCount = appState.recallVeryEasy || 0;
+    const totalRecalled = forgotCount + partialCount + rememberedCount + veryEasyCount;
 
     const totalEl = document.getElementById('today-total-count');
     const accuracyEl = document.getElementById('today-accuracy');
@@ -3604,7 +4122,8 @@ function updatePerformanceStats() {
             const segs = [
                 { count: forgotCount, color: '#e11d48' },
                 { count: partialCount, color: '#eab308' },
-                { count: rememberedCount, color: '#10b981' }
+                { count: rememberedCount, color: '#10b981' },
+                { count: veryEasyCount, color: '#0ea5e9' }
             ];
             segs.forEach(seg => {
                 if (seg.count <= 0) return;
@@ -3623,6 +4142,8 @@ function updatePerformanceStats() {
     if (forgotEl) forgotEl.innerText = forgotCount;
     if (partialEl) partialEl.innerText = partialCount;
     if (rememberedEl) rememberedEl.innerText = rememberedCount;
+    const veryEasyEl = document.getElementById('today-veryeasy-count');
+    if (veryEasyEl) veryEasyEl.innerText = veryEasyCount;
 }
 
 function toggleHomeFilters() {
@@ -3870,6 +4391,9 @@ if (!topic) {
             createdDate: todayStr,
             sortOrder: Date.now()
         };
+        // Deneme sekmesinden geldiyse soruyu o denemeye bağla. Tekrar döngüsü yine
+        // sorunun eklendiği güne göre başlar (yukarıdaki nextReview), deneme tarihine göre değil.
+        if (pendingDenemeId) newQ.denemeId = pendingDenemeId;
 
         appState.questions.push(newQ);
         await saveQuestion(newQ);
@@ -3950,6 +4474,14 @@ if (!topic) {
     clearSelectedImage();
     clearNoteImage();
     clearBackImage();
+    if (pendingDenemeId) {
+        const backId = pendingDenemeId;
+        pendingDenemeId = null;
+        updateAddDenemeBanner();
+        denemeOpenId = backId;
+        switchTab('deneme');
+        return;
+    }
     switchTab('home');
 }
 
@@ -3977,7 +4509,6 @@ function startReview(mode, boxColor = 'red', specificItem = null, isArchiveMode 
     if (boxColor === 'red') {
         if (mode === 'questions') {
             currentReviewQueue = appState.questions.filter(q => 
-                !q.is_mastered && 
                 q.nextReview && q.nextReview <= todayStr &&
                 appState.selectedCourses.includes(q.course) && 
                 appState.selectedTopics.includes(q.course + '::' + q.topic)
@@ -3985,7 +4516,6 @@ function startReview(mode, boxColor = 'red', specificItem = null, isArchiveMode 
             currentReviewQueue.sort((a, b) => (a.nextReview || '').localeCompare(b.nextReview || '') || a.id - b.id);
         } else {
             currentReviewQueue = appState.notes.filter(n => 
-                !n.is_mastered &&
                 n.nextReview && n.nextReview <= todayStr &&
                 appState.selectedCourses.includes(n.course) && 
                 appState.selectedTopics.includes(n.course + '::' + n.topic)
@@ -4045,8 +4575,12 @@ function renderReviewProgressBar() {
         let colorClass = 'bg-slate-200';
         if (useRecallColors) {
             const it = currentReviewQueue[i];
-            if (it && it.userRecallStatus && it.lastReviewedDate === todayStr) {
-                if (it.userRecallStatus === 'remembered') colorClass = 'bg-emerald-500';
+            if (it && it._retry) {
+                // Oturum sonu tekrar kartı: puanlanmaz, sadece geçildikçe dolar.
+                colorClass = i <= currentReviewIndex ? 'bg-teal-600' : 'bg-slate-200';
+            } else if (it && it.userRecallStatus && it.lastReviewedDate === todayStr) {
+                if (it.userRecallStatus === 'veryeasy') colorClass = 'bg-sky-500';
+                else if (it.userRecallStatus === 'remembered') colorClass = 'bg-emerald-500';
                 else if (it.userRecallStatus === 'partial') colorClass = 'bg-amber-400';
                 else if (it.userRecallStatus === 'forgot') colorClass = 'bg-rose-500';
             }
@@ -4129,13 +4663,13 @@ function renderReviewItem() {
 
     // Kalıcı arka plan tonu: sadece soru modunda ve o soru bugün/kampta cevaplanmışsa
     // doğru/yanlışa göre yeşil/kırmızı; aksi halde nötr (renksiz).
-    if (currentReviewMode === 'questions' && isAnsweredToday) {
+    if (currentReviewMode === 'questions' && isAnsweredToday && !item._retry) {
         updateSettledTint(effectiveUserAnswer === item.answer ? 'correct' : 'wrong');
     } else {
         updateSettledTint(null);
     }
 
-    document.getElementById('review-progress').innerText = `${isCampMode ? 'KAMP' : (currentReviewMode === 'questions' ? 'SORU' : 'NOT')} ${currentReviewIndex + 1}/${currentReviewQueue.length}`;
+    document.getElementById('review-progress').innerText = `${isCampMode ? 'KAMP' : (currentReviewMode === 'questions' ? 'SORU' : 'NOT')} ${currentReviewIndex + 1}/${currentReviewQueue.length}${item._retry ? ' · TEKRAR' : ''}`;
     document.getElementById('review-breadcrumbs').innerText = `${item.course} > ${item.topic}`;
     renderReviewProgressBar();
 
@@ -4371,7 +4905,16 @@ if (currentArchiveMode) {
     return; // Arşiv modunda buradan sonrasını çalıştırma
 }
 
-    if (currentBoxColor === 'red') {
+    if (item._retry) {
+        // Oturum sonu tekrarı: şık / metin girişi ve Zor-Orta-Kolay butonları yok.
+        // Sadece kart gösterilir; sorularda doğru cevap bilgi olarak yazılır.
+        if (currentReviewMode === 'questions' && item.answer) {
+            feedbackBox.innerHTML = `Doğru Cevap: <strong>${item.answer}</strong>`;
+            feedbackBox.className = 'w-full p-3 text-xs font-extrabold text-center rounded-xl transition-colors shadow-sm shrink-0 bg-amber-100 text-amber-800 border border-amber-300';
+            feedbackBox.classList.remove('hidden');
+        }
+        recallInput.classList.add('invisible');
+    } else if (currentBoxColor === 'red') {
         if (currentReviewMode === 'questions') {
             if (isAnsweredToday) {
                 if (item.type === 'choice') {
@@ -4526,8 +5069,9 @@ function updateRecallButtons(status) {
     const forgotBtn = document.getElementById('recall-btn-forgot');
     const partialBtn = document.getElementById('recall-btn-partial');
     const rememberedBtn = document.getElementById('recall-btn-remembered');
+    const veryEasyBtn = document.getElementById('recall-btn-veryeasy');
 
-    if (!forgotBtn || !partialBtn || !rememberedBtn) return;
+    if (!forgotBtn || !partialBtn || !rememberedBtn || !veryEasyBtn) return;
 
     function setButtonStyle(btn, isActive, color) {
         if (isActive) {
@@ -4539,39 +5083,36 @@ function updateRecallButtons(status) {
             btn.style.cursor = 'pointer';
         } else {
             btn.disabled = true;
-            btn.style.backgroundColor = '#e2e8f0'; // gri
-            btn.style.borderColor = '#cbd5e1';
-            btn.style.color = '#94a3b8';
+            // Bu renkler inline stil olduğu için CSS'teki .dark-mode kuralları
+            // bunları geçersiz kılamıyor — karanlık modda açık gri kutu olarak kalıp
+            // sırıtmasınlar diye modu burada elle kontrol ediyoruz.
+            const dark = document.body.classList.contains('dark-mode');
+            btn.style.backgroundColor = dark ? '#34353f' : '#e2e8f0';
+            btn.style.borderColor = dark ? '#34353f' : '#cbd5e1';
+            btn.style.color = dark ? '#93949f' : '#94a3b8';
             btn.style.opacity = '0.7';
             btn.style.cursor = 'not-allowed';
         }
     }
 
     if (status) {
-        if (status === 'forgot') {
-            setButtonStyle(forgotBtn, true, '#e11d48');   // kırmızı
-            setButtonStyle(partialBtn, false);
-            setButtonStyle(rememberedBtn, false);
-        } else if (status === 'partial') {
-            setButtonStyle(forgotBtn, false);
-            setButtonStyle(partialBtn, true, '#f59e0b');  // sarı
-            setButtonStyle(rememberedBtn, false);
-        } else if (status === 'remembered') {
-            setButtonStyle(forgotBtn, false);
-            setButtonStyle(partialBtn, false);
-            setButtonStyle(rememberedBtn, true, '#059669'); // yeşil
-        }
+        setButtonStyle(forgotBtn, status === 'forgot', '#e11d48');        // kırmızı
+        setButtonStyle(partialBtn, status === 'partial', '#f59e0b');      // sarı
+        setButtonStyle(rememberedBtn, status === 'remembered', '#059669'); // yeşil
+        setButtonStyle(veryEasyBtn, status === 'veryeasy', '#0284c7');    // mavi
     } else {
         // Hiçbiri seçilmediyse hepsi aktif
         setButtonStyle(forgotBtn, true, '#e11d48');
         setButtonStyle(partialBtn, true, '#f59e0b');
         setButtonStyle(rememberedBtn, true, '#059669');
+        setButtonStyle(veryEasyBtn, true, '#0284c7');
     }
 }
 
 function navigateReview(dir) {
     let nextIdx = currentReviewIndex + dir;
     if (nextIdx >= 0 && nextIdx < currentReviewQueue.length) {
+        hideUndoPill();
         currentReviewIndex = nextIdx;
         try {
             renderReviewItem();
@@ -4584,7 +5125,7 @@ function navigateReview(dir) {
 
 async function submitQuestionAnswer(userAns) {
     let q = currentReviewQueue[currentReviewIndex];
-    if (!q) return;
+    if (!q || q._retry) return;
 
     // Kamp modu: gerçek soru verisine (userTodayAnswer/lastReviewedDate) HİÇ dokunmuyoruz.
     // Böylece o soru bugün gerçek Günlük Tekrar'da zaten cevaplanmış olsa bile, kampta
@@ -4698,11 +5239,57 @@ function updateStreakDisplay() {
     }
 }
 
+// Soru ve notlar için ortak tekrar mantığı. lvKey: 'level' (sorular) veya 'stage' (notlar).
+// Kartın yeni seviyesini günceller ve bir sonraki tekrara kaç gün kaldığını döndürür.
+//   Zor   : Bakımdaki kart 3. seviyeye (7 gün), 3. seviye ve üstündekiler 2. seviyeye (3 gün) düşer;
+//           2. ve 1. seviyedeki kartlar 1. seviyeye (1 gün) düşer.
+//   Orta  : Seviye aynı kalır. Bakımdaki kart bir seviye geri (son aralığa) düşer.
+//   Kolay : +1 seviye. Çok Kolay: +2 seviye.
+//           Kart eskiden son aralığa (45 gün) ya da bakıma ulaşmış ama düşmüşse
+//           (max_level ile takip edilir) tırmanırken Kolay +2, Çok Kolay +3.
+//   Bakımdaki kart Kolay / Çok Kolay alırsa 90 gün sonrasına gider.
+function applyRecallToCard(card, lvKey, intervals, status) {
+    const len = intervals.length;
+    const cur = card.is_mastered ? len : Math.min(card[lvKey] || 0, len);
+    const peak = Math.max(card.max_level || 0, cur);   // şimdiye kadar ulaşılan en yüksek seviye
+    let lv = cur;
+
+    if (status === 'forgot') {
+        lv = card.is_mastered ? Math.min(2, len - 1) : (cur >= 2 ? 1 : 0);
+        card.is_mastered = false;
+    } else if (status === 'partial') {
+        if (card.is_mastered) {
+            lv = len - 1;
+            card.is_mastered = false;
+        }
+    } else { // 'remembered' veya 'veryeasy'
+        if (card.is_mastered) {
+            card.max_level = peak;
+            return MAINTENANCE_DAYS;
+        }
+        const wasStrong = peak >= len - 1;              // eskiden 45 gün ya da bakım seviyesine ulaşmış
+        const isClimbingBack = wasStrong && cur < peak; // ama şu an düşmüş durumda
+        const step = status === 'veryeasy' ? (isClimbingBack ? 3 : 2) : (isClimbingBack ? 2 : 1);
+        lv = cur + step;
+    }
+
+    if (lv >= len) {
+        // Döngü bitti — bakım turuna giriyor.
+        card[lvKey] = len;
+        card.is_mastered = true;
+        card.max_level = Math.max(peak, len);
+        return MAINTENANCE_DAYS;
+    }
+    card[lvKey] = lv;
+    card.max_level = Math.max(peak, lv);
+    return intervals[lv] !== undefined ? intervals[lv] : (intervals[len - 1] || 1);
+}
+
 async function submitRecallStatus(status) {
     if (isCampMode) return; // Kamp modunda hatırlama butonları zaten gizli, ekstra güvenlik
 
     const item = currentReviewQueue[currentReviewIndex];
-    if (!item) return;
+    if (!item || item._retry) return; // oturum sonu tekrar kartları puanlanmaz
 
     if (navigator.vibrate) navigator.vibrate(15); // butona basıldığını hissettiren kısa dokunuş
 
@@ -4725,7 +5312,7 @@ async function submitRecallStatus(status) {
             }
             item.nextReview = todayStr;
             showToast("Kart kırmızı kutuya taşındı!");
-        } else if (status === 'remembered') {
+        } else if (status === 'remembered' || status === 'veryeasy') {
             showToast("Kart döngüsü korundu.");
         } else {
             showToast("Geçersiz işlem.");
@@ -4745,6 +5332,12 @@ async function submitRecallStatus(status) {
         return;
     }
 
+    // Geri al için, değişecek alanların eski halini sakla.
+    const undoSnap = {};
+    ['level', 'stage', 'is_mastered', 'max_level', 'nextReview', 'userRecallStatus', 'lastReviewedDate', 'sortOrder']
+        .forEach(k => { undoSnap[k] = item[k]; });
+    let undoRetryRef = null;
+
     item.userRecallStatus = status;
     item.lastReviewedDate = todayStr;
     item.sortOrder = Date.now();
@@ -4754,55 +5347,28 @@ async function submitRecallStatus(status) {
     if (status === 'forgot') appState.recallForgot = (appState.recallForgot || 0) + 1;
     else if (status === 'partial') appState.recallPartial = (appState.recallPartial || 0) + 1;
     else if (status === 'remembered') appState.recallRemembered = (appState.recallRemembered || 0) + 1;
+    else if (status === 'veryeasy') appState.recallVeryEasy = (appState.recallVeryEasy || 0) + 1;
 
     if (currentReviewMode === 'questions') {
-        const q = item;
-        let days;
-        if (status === 'forgot') {
-            q.level = 0;
-            days = appState.intervals[0] || 1;
-        } else if (status === 'partial') {
-            days = appState.intervals[q.level] || 1;
-        } else if (status === 'remembered') {
-            q.level = (q.level || 0) + 1;
-            if (q.level >= appState.intervals.length) {
-                q.is_mastered = true;
-            }
-            days = appState.intervals[q.level] !== undefined ? appState.intervals[q.level] : appState.intervals[appState.intervals.length - 1] || 1;
-        }
-        if (q.is_mastered) {
-            q.nextReview = null;
-        } else {
-            let nextD = getNowTR(); nextD.setDate(nextD.getDate() + days);
-            q.nextReview = formatDate(nextD);
-        }
-        await saveQuestion(q);
+        const days = applyRecallToCard(item, 'level', appState.intervals, status);
+        let nextD = getNowTR(); nextD.setDate(nextD.getDate() + days);
+        item.nextReview = formatDate(nextD);
+        await saveQuestion(item);
     } else {
-        const n = item;
-        let days;
-        if (status === 'forgot') {
-            n.stage = 0;
-            n.is_mastered = false;
-            days = appState.noteIntervals[0] || 1;
-        } else if (status === 'partial') {
-            days = appState.noteIntervals[n.stage] || 1;
-        } else if (status === 'remembered') {
-            n.stage = (n.stage || 0) + 1;
-            if (n.stage >= appState.noteIntervals.length) {
-                n.is_mastered = true;
-            }
-            days = appState.noteIntervals[n.stage] !== undefined ? appState.noteIntervals[n.stage] : appState.noteIntervals[appState.noteIntervals.length - 1] || 1;
-        }
-        if (n.is_mastered) {
-            n.nextReview = null;
-        } else {
-            let nextD = getNowTR(); nextD.setDate(nextD.getDate() + days);
-            n.nextReview = formatDate(nextD);
-        }
-        await saveNote(n);
+        const days = applyRecallToCard(item, 'stage', appState.noteIntervals, status);
+        let nextD = getNowTR(); nextD.setDate(nextD.getDate() + days);
+        item.nextReview = formatDate(nextD);
+        await saveNote(item);
     }
 
     await saveSettings();
+
+    // Zor işaretlenen kart, aynı oturumun sonuna bir kez daha eklenir (Duolingo gibi).
+    // Bu kopya veritabanına yazılmaz ve puanlanmaz: şık / Zor-Orta-Kolay butonu yok.
+    if (status === 'forgot' && !isCampMode && !currentArchiveMode) {
+        undoRetryRef = { ...item, _retry: true, userRecallStatus: null };
+        currentReviewQueue.push(undoRetryRef);
+    }
 
     // Bu, aynı kartın (soru/not) tekrar render edilmesi — kullanıcı arka yüzü zaten
     // görüyorsa (flip açıksa), recall'a bastıktan sonra render sırasında ön yüze
@@ -4812,9 +5378,66 @@ async function submitRecallStatus(status) {
 
     updateHomeStats();
     renderReviewItem();
+
+    lastRecallUndo = { item, mode: currentReviewMode, status, snap: undoSnap, retryRef: undoRetryRef };
+    showUndoPill();
+}
+
+// ---- Geri al (son Zor/Orta/Kolay/Çok Kolay işaretini birkaç saniye içinde iptal eder) ----
+let lastRecallUndo = null;
+let undoPillTimer = null;
+
+function showUndoPill() {
+    const btn = document.getElementById('undo-recall-btn');
+    if (!btn) return;
+    clearTimeout(undoPillTimer);
+    btn.style.opacity = '1';
+    btn.classList.remove('hidden');
+    undoPillTimer = setTimeout(() => {
+        btn.style.opacity = '0';
+        undoPillTimer = setTimeout(hideUndoPill, 300);
+    }, 6000);
+}
+
+function hideUndoPill() {
+    clearTimeout(undoPillTimer);
+    const btn = document.getElementById('undo-recall-btn');
+    if (btn) { btn.classList.add('hidden'); btn.style.opacity = '1'; }
+    lastRecallUndo = null;
+}
+
+async function undoRecall() {
+    const u = lastRecallUndo;
+    if (!u || currentReviewQueue[currentReviewIndex] !== u.item) { hideUndoPill(); return; }
+    if (navigator.vibrate) navigator.vibrate(10);
+
+    // Alanları eski haline getir (eskiden hiç yoksa sil)
+    Object.keys(u.snap).forEach(k => {
+        if (u.snap[k] === undefined) delete u.item[k]; else u.item[k] = u.snap[k];
+    });
+
+    // Sayaçtan düş
+    const counterKey = { forgot: 'recallForgot', partial: 'recallPartial', remembered: 'recallRemembered', veryeasy: 'recallVeryEasy' }[u.status];
+    if (counterKey) appState[counterKey] = Math.max((appState[counterKey] || 0) - 1, 0);
+
+    // Zor demiştiysek oturum sonuna eklenen tekrar kopyasını kuyruktan çıkar
+    if (u.retryRef) {
+        const ri = currentReviewQueue.indexOf(u.retryRef);
+        if (ri !== -1) currentReviewQueue.splice(ri, 1);
+    }
+
+    if (u.mode === 'questions') await saveQuestion(u.item); else await saveNote(u.item);
+    await saveSettings();
+
+    hideUndoPill();
+    const flipEl = document.getElementById('review-flip-inner');
+    preserveFlipState = !!(flipEl && flipEl.classList.contains('flipped'));
+    updateHomeStats();
+    renderReviewItem();
 }
 
 function closeReview() {
+    hideUndoPill();
     document.getElementById('review-modal').classList.add('hidden');
     closeWithBackSupport('review');
     if (reviewObjectURL) { revokeObjectURL(reviewObjectURL); reviewObjectURL = null; }
@@ -4926,10 +5549,11 @@ function daysBetweenDates(fromStr, toStr) {
 
 function getCardColor(card, type) {
     const today = formatDate(getNowTR());
-    // ÖNEMLİ: Tamamlanmış (is_mastered) kartlar için önce bu kontrol yapılır — böylece
-    // eski bir nextReview tarihi geçmiş olsa bile bir daha asla kırmızıya dönmezler.
-    if (card.is_mastered) return 'green';
+    // ÖNEMLİ: Önce tarih kontrol edilir — bakım turundaki (is_mastered) bir kartın da
+    // 90 günlük vadesi gelince kırmızıya düşebilmesi için. is_mastered artık "sonsuza kadar
+    // yeşil" değil, "vadesi gelene kadar yeşil, sonra normal bir kart gibi kırmızı" demek.
     if (!card.nextReview || card.nextReview <= today) return 'red';
+    if (card.is_mastered) return 'green';
     // Kırmızıdan çıkmış bir kart: sonraki tekrarına 21 günden az kaldıysa sarı kutuda,
     // 21 gün veya daha fazla kaldıysa yeşil kutuda kalır.
     const daysLeft = daysBetweenDates(today, card.nextReview);
