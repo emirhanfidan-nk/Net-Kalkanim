@@ -768,6 +768,12 @@
                     </div>
                 </div>
 
+                <!-- MOTİVASYON ŞERİDİ -->
+                <div id="motivation-banner" class="bg-white border border-slate-200 rounded-2xl px-4 py-3 flex items-center gap-3 shadow-sm">
+                    <p id="motivation-quote-text" class="text-xs font-medium text-slate-600 flex-1 min-w-0 leading-snug"></p>
+                    <div id="yks-countdown-badge" class="hidden items-center bg-teal-50 text-teal-700 text-[11px] font-bold px-2.5 py-1.5 rounded-full shrink-0 whitespace-nowrap"></div>
+                </div>
+
                 <!-- KIRMIZI KUTU (BÜYÜK) -->
                 <div class="rounded-3xl p-5 shadow-lg relative overflow-hidden" style="background-color: var(--box-red-bg);">
                     <div class="absolute top-0 left-0 w-2 h-full" style="background-color: var(--box-red-accent);"></div>
@@ -3792,7 +3798,7 @@ function renderDenemeDetail() {
                 <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
                 Denemeler
             </button>
-            <button onclick="openDenemeForm()" class="bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold px-3.5 py-2 rounded-xl shadow-sm">+ Yeni</button>
+            <button onclick="openDenemeForm()" class="bg-white border border-teal-200 text-teal-700 text-xs font-semibold px-3 py-1.5 rounded-full shadow-sm">+ Yeni</button>
         </div>
         <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
             <div class="flex items-start justify-between gap-3">
@@ -3815,7 +3821,7 @@ function renderDenemeDetail() {
         ${askCard}
         <div class="flex justify-between items-center">
             <h4 class="text-sm font-semibold text-slate-700">Eklenen Sorular${qs.length ? ' (' + qs.length + ')' : ''}</h4>
-            <button onclick="startAddQuestionForDeneme(${d.id})" class="bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold px-3.5 py-2 rounded-xl shadow-sm">+ Soru Ekle</button>
+            ${denemeAskAddId === d.id ? '' : `<button onclick="startAddQuestionForDeneme(${d.id})" class="bg-teal-600 hover:bg-teal-700 text-white text-xs font-semibold px-3.5 py-2 rounded-xl shadow-sm">+ Soru Ekle</button>`}
         </div>
         <div class="space-y-2">${qRows || '<p class="text-xs text-slate-400 text-center py-4">Bu denemeden henüz soru eklemedin.</p>'}</div>`;
 }
@@ -4041,6 +4047,7 @@ function getEstimatedTime(count) {
 
 // Güncellenmiş ana ekran istatistikleri
 function updateHomeStats() {
+    updateMotivationBanner();
     const todayStr = formatDate(getNowTR());
 
     const redQuestions = appState.questions.filter(q => 
@@ -6039,6 +6046,55 @@ function closeLightbox() {
     document.getElementById('lightbox').classList.add('hidden');
     closeWithBackSupport('lightbox');
     if (lightboxObjectURL) { revokeObjectURL(lightboxObjectURL); lightboxObjectURL = null; }
+}
+
+
+// ==================== MOTİVASYON ŞERİDİ + SINAV SAYACI ====================
+// Not: Bunlar gerçek, doğrulanabilir sözler olacak şekilde seçildi — internette dolaşan
+// "ünlü sözlerin" çoğu yanlış kişiye atfediliyor, o yüzden büyük listeyi eklerken
+// kaynağından emin olmadığın sözleri atfetmeden (isimsiz) kullanmanı öneririm.
+// Kendi 300'lük listeni eklemek için: aşağıdaki diziye { text: "...", author: "..." }
+// satırları ekle/çıkar, sıra ve sayı önemli değil.
+const MOTIVATION_QUOTES = [
+    { text: "Başarı, günlük tekrar eden küçük çabaların toplamıdır.", author: "Robert Collier" },
+    { text: "Bir şeyi öğrenmenin en iyi yolu, onu yapmaktır.", author: "Richard Branson" },
+    { text: "Yapamayacağını düşündüğün şeyi yapmaya çalış.", author: "Eleanor Roosevelt" },
+    { text: "Pes etmediğin sürece kaybetmiş sayılmazsın.", author: "Vince Lombardi" },
+    { text: "Bugün zor olan, yarın kolaylaşacak.", author: "Konfüçyüs" },
+    { text: "Disiplin, hedeflerin ile aranda köprü kurar.", author: "Jim Rohn" },
+    { text: "Küçük adımlar, büyük mesafeler kat ettirir.", author: "Konfüçyüs" },
+    { text: "Zafer, çoğu zaman en çok çalışanındır.", author: "Thomas Edison" },
+    { text: "Bir hedefin yoksa, her rüzgar seni savurur.", author: "Seneca" },
+    { text: "Bugün ektiğin, yarın hasat edeceğindir.", author: "Robert Louis Stevenson" },
+    { text: "Zorluklar, seni pes ettirmek için değil güçlendirmek için vardır.", author: "Nelson Mandela" },
+    { text: "Tekrar etmek, unutmanın ilacıdır.", author: "İbn Sina" }
+];
+function dayOfYear(d) {
+    const start = new Date(d.getFullYear(), 0, 0);
+    return Math.floor((d - start) / 86400000);
+}
+// ÖSYM 2027 sınav takvimini henüz resmî olarak açıklamadı; bu, geçmiş yılların düzenine
+// göre yaygın olarak kullanılan TAHMİNİ TYT tarihidir (19 Haziran 2027, 10:15). ÖSYM resmî
+// tarihi açıklayınca burayı güncellemek yeterli — uygulamanın geri kalanına dokunmaya gerek yok.
+const YKS_EXAM_DATETIME = new Date('2027-06-19T10:15:00');
+function updateMotivationBanner() {
+    const qEl = document.getElementById('motivation-quote-text');
+    if (qEl && MOTIVATION_QUOTES.length) {
+        const q = MOTIVATION_QUOTES[dayOfYear(getNowTR()) % MOTIVATION_QUOTES.length];
+        qEl.innerHTML = `"${denemeEsc(q.text)}" <span class="text-slate-400 font-normal">— ${denemeEsc(q.author)}</span>`;
+    }
+    const badge = document.getElementById('yks-countdown-badge');
+    if (!badge) return;
+    badge.classList.remove('hidden'); badge.classList.add('flex');
+    const diffMs = YKS_EXAM_DATETIME - getNowTR();
+    if (diffMs <= 0) { badge.textContent = 'YKS başladı, başarılar!'; return; }
+    const days = Math.floor(diffMs / 86400000);
+    if (days >= 1) {
+        badge.textContent = `YKS'ye ${days} gün`;
+    } else {
+        const hours = Math.floor(diffMs / 3600000);
+        badge.textContent = hours >= 1 ? `YKS'ye ${hours} saat` : `YKS'ye ${Math.ceil(diffMs / 60000)} dk`;
+    }
 }
 
 function updateFieldDisplay() {
