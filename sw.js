@@ -1,9 +1,10 @@
-const CACHE_NAME = 'net-kalkanim-v43';
+const CACHE_NAME = 'net-kalkanim-v44';
 
 // Mutlak yol (/) yerine göreceli yol (./) kullanarak alt klasör ve GitHub Pages uyumu sağlandı.
 const APP_SHELL = [
   './',
   './index.html',
+  './duzeltme.js',
   './manifest.json',
   './logo.png'
 ];
@@ -67,7 +68,7 @@ self.addEventListener('fetch', event => {
       return fetch(event.request)
         .then(response => {
           if (!response) return response;
-          
+
           const responseClone = response.clone();
           caches.open(CACHE_NAME).then(cache => {
             cache.put(event.request, responseClone);
