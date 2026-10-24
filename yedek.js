@@ -168,13 +168,14 @@
       var batch = [], keys = [], hashes = [];
       async function flush() {
         if (!batch.length) return;
-        await rpc('nk_upsert', { p_code: code, p_items: batch });
-        for (var i = 0; i < keys.length; i++) {
-          st.h[keys[i]] = hashes[i];
-          if (keys[i].indexOf('settings:') !== 0) progress.done++;
+        var b = batch, k = keys, hh = hashes;
+        batch = []; keys = []; hashes = [];
+        await rpc('nk_upsert', { p_code: code, p_items: b });
+        for (var i = 0; i < k.length; i++) {
+          st.h[k[i]] = hh[i];
+          if (k[i].indexOf('settings:') !== 0) progress.done++;
         }
         saveState(st);
-        batch = []; keys = []; hashes = [];
         if (bannerShown) setBanner('run', 'Yedekleniyor ' + progress.done + '/' + progress.total + ' — bitene kadar uygulamayı kapatma');
         updateStatus();
       }
@@ -201,26 +202,37 @@
         }
       } catch (e) {}
 
-      // Soru ve notlar
-      var skipped = 0;
-      for (var di = 0; di < dirty.length; di++) {
-        var d = dirty[di], o = d.o, imgs = d.imgs, ok = true;
-        for (var f in imgs) {
-          var bl = imgs[f];
-          var ext = bl.type === 'image/webp' ? 'webp' : (bl.type === 'image/png' ? 'png' : 'jpg');
-          var path = code + '/' + d.kind + '_' + d.item.id + '_' + f + '_' + bl.size + '.' + ext;
-          if (!st.img[path]) {
-            try { await uploadImage(path, bl); st.img[path] = 1; saveState(st); }
-            catch (e) { ok = false; break; }
-          }
-          o[f] = { __img: path, type: bl.type || 'image/jpeg' };
+      // Soru ve notlar: 4 kayıt aynı anda, her kaydın fotoğrafları da aynı anda yüklenir
+      var skipped = 0, nextIdx = 0, flushChain = Promise.resolve();
+      function queueFlush() { flushChain = flushChain.then(flush); return flushChain; }
+      async function worker() {
+        while (true) {
+          var di = nextIdx++;
+          if (di >= dirty.length) return;
+          var d = dirty[di], o = d.o, imgs = d.imgs, ok = true;
+          var fields = Object.keys(imgs);
+          var results = await Promise.all(fields.map(async function (f) {
+            var bl = imgs[f];
+            var ext = bl.type === 'image/webp' ? 'webp' : (bl.type === 'image/png' ? 'png' : 'jpg');
+            var path = code + '/' + d.kind + '_' + d.item.id + '_' + f + '_' + bl.size + '.' + ext;
+            if (!st.img[path]) {
+              try { await uploadImage(path, bl); st.img[path] = 1; }
+              catch (e) { return null; }
+            }
+            return { f: f, path: path, type: bl.type || 'image/jpeg' };
+          }));
+          saveState(st);
+          results.forEach(function (r) {
+            if (!r) ok = false; else o[r.f] = { __img: r.path, type: r.type };
+          });
+          if (!ok) { skipped++; continue; }
+          batch.push({ kind: d.kind, id: String(d.item.id), data: o });
+          keys.push(d.key); hashes.push(d.h);
+          if (batch.length >= 10) await queueFlush();
         }
-        if (!ok) { skipped++; continue; }
-        batch.push({ kind: d.kind, id: String(d.item.id), data: o });
-        keys.push(d.key); hashes.push(d.h);
-        if (batch.length >= 25) await flush();
       }
-      await flush();
+      await Promise.all([worker(), worker(), worker(), worker()]);
+      await queueFlush();
       if (skipped) throw new Error('bazı fotoğraflar yüklenemedi');
 
       // Silinenler (güvenlik: telefon boşsa ya da çok fazla kayıt birden kaybolduysa silme bilgisi gönderme)
@@ -245,6 +257,7 @@
       try {
         if (!localStorage.getItem(LS_SHOWN)) {
           localStorage.setItem(LS_SHOWN, '1');
+          storeCredential(code);
           if (typeof showCustomConfirm === 'function') {
             showCustomConfirm('Bulut yedek açıldı. Kurtarma kodun: ' + pretty(code) + ' — Bunu bir yere not al ya da ekran görüntüsü çek. Ayarlar bölümündeki Bulut Yedek kısmında da görebilirsin.', function () {});
           }
@@ -292,41 +305,112 @@
     (appState.questions || []).forEach(function (x) { haveQ[String(x.id)] = 1; });
     (appState.notes || []).forEach(function (x) { haveN[String(x.id)] = 1; });
 
-    var total = rows.filter(function (r) { return r.kind !== 'settings'; }).length;
-    var n = 0, failed = 0;
-
-    for (var i = 0; i < rows.length; i++) {
-      var r = rows[i];
+    var items = [];
+    rows.forEach(function (r) {
       if (r.kind === 'settings') {
         if (r.item_id === 'profile') { try { if (!localStorage.getItem('nk_profile')) localStorage.setItem('nk_profile', JSON.stringify(r.data)); } catch (e) {} }
         else applySettings(r.data);
-        continue;
+        return;
       }
-      n++;
-      if (n % 10 === 0) showToast('Geri yükleniyor: ' + n + '/' + total);
       var have = r.kind === 'question' ? haveQ : haveN;
-      if (have[String(r.item_id)]) continue;
-      try {
-        var item = {};
-        var d = r.data || {};
-        for (var k in d) {
-          var v = d[k];
-          if (v && typeof v === 'object' && v.__img) item[k] = await downloadImage(v.__img);
-          else item[k] = v;
+      if (!have[String(r.item_id)]) items.push(r);
+    });
+
+    var total = items.length, n = 0, failed = 0, idx = 0;
+    // 4 kaydı aynı anda indir (fotoğraflar da kendi içinde aynı anda)
+    async function worker() {
+      while (true) {
+        var i = idx++;
+        if (i >= items.length) return;
+        var r = items[i];
+        try {
+          var item = {};
+          var d = r.data || {};
+          var keys = Object.keys(d);
+          await Promise.all(keys.map(async function (k) {
+            var v = d[k];
+            if (v && typeof v === 'object' && v.__img) item[k] = await downloadImage(v.__img);
+            else item[k] = v;
+          }));
+          if (r.kind === 'question') { await saveQuestion(item); appState.questions.push(item); }
+          else { await saveNote(item); appState.notes.push(item); }
+        } catch (e) {
+          failed++;
+          console.warn('Kayıt geri yüklenemedi:', r.item_id, e);
         }
-        if (r.kind === 'question') { await saveQuestion(item); appState.questions.push(item); }
-        else { await saveNote(item); appState.notes.push(item); }
-      } catch (e) {
-        failed++;
-        console.warn('Kayıt geri yüklenemedi:', r.item_id, e);
+        n++;
+        if (n % 10 === 0) showToast('Geri yükleniyor: ' + n + '/' + total);
       }
     }
+    await Promise.all([worker(), worker(), worker(), worker()]);
     await saveSettings();
 
     if (failed) showToast(failed + ' kayıt yüklenemedi. Kodu tekrar girerek eksikleri tamamlayabilirsin.', true);
     else showToast('Geri yükleme tamamlandı! Uygulama yenileniyor...');
     setTimeout(function () { location.reload(); }, failed ? 3000 : 1500);
     return true;
+  }
+
+
+  /* ---------- Depolama tanısı ---------- */
+  var diagText = '';
+  async function computeDiag() {
+    try {
+      var persisted = (navigator.storage && navigator.storage.persisted) ? await navigator.storage.persisted() : null;
+      var std = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || navigator.standalone;
+      var t = 'Depolama koruması: ' + (persisted ? 'açık.' : 'kapalı.');
+      if (!persisted && !std) t += ' Uygulamayı ana ekrana ekleyip oradan açarsan telefon verilerini silmez.';
+      if (navigator.storage && navigator.storage.estimate) {
+        var e = await navigator.storage.estimate();
+        if (e && e.quota) {
+          t += ' Telefonda kullanılabilir alan: yaklaşık ' + (e.quota / 1073741824).toFixed(1) + ' GB.';
+          if (e.quota < 400 * 1048576) t += ' Boş yer çok az, bu yüzden veriler silinebilir. Telefonda yer aç.';
+        }
+      }
+      diagText = t;
+    } catch (e) {}
+    var el = document.getElementById('nk-diag');
+    if (el) el.textContent = diagText;
+  }
+
+  /* ---------- Telefon verileri silinince buluttan kendiliğinden geri getir ---------- */
+  var hadCodeAtStart = rawCode().length >= 16;
+  function storeCredential(code) {
+    try {
+      if (window.PasswordCredential && navigator.credentials && navigator.credentials.store) {
+        navigator.credentials.store(new PasswordCredential({ id: 'Net Kalkanım yedek kodu', name: 'Net Kalkanım', password: code })).catch(function () {});
+      }
+    } catch (e) {}
+  }
+  async function autoRestore() {
+    try {
+      if (typeof appState === 'undefined') return;
+      var total = (appState.questions || []).length + (appState.notes || []).length;
+      if (total > 0) return;
+      try { if (sessionStorage.getItem('nk_auto_restore')) return; } catch (e) {}
+
+      if (hadCodeAtStart) {
+        // Kod duruyor ama kayıtlar gitmiş: daha önce kayıt tutulmuş bir cihaz mı?
+        var seen = 0;
+        try { seen = parseInt(localStorage.getItem('nk_seen_total') || '0', 10) || 0; } catch (e) {}
+        var synced = Object.keys(loadState().h).filter(function (k) { return k.indexOf('settings:') !== 0; }).length;
+        if (Math.max(seen, synced) < 3) return;
+        try { sessionStorage.setItem('nk_auto_restore', '1'); } catch (e) {}
+        showToast('Verilerin buluttan geri getiriliyor...');
+        await restoreFromCode(rawCode());
+        return;
+      }
+
+      // Kod da gitmiş: Chrome şifre yöneticisinde saklanan kodu kullanıcıdan tek dokunuşla al
+      try { sessionStorage.setItem('nk_auto_restore', '1'); } catch (e) {}
+      if (window.PasswordCredential && navigator.credentials && navigator.credentials.get) {
+        var cred = await navigator.credentials.get({ password: true, mediation: 'optional' });
+        if (cred && cred.password && cred.password.length >= 16) {
+          showToast('Yedek kodun bulundu, veriler geri getiriliyor...');
+          await restoreFromCode(cred.password);
+        }
+      }
+    } catch (e) { console.warn('Otomatik geri getirme:', e); }
   }
 
   /* ---------- Arayüz ---------- */
@@ -386,6 +470,7 @@
       d.innerHTML =
         '<p class="text-sm font-medium text-slate-800">Bulut Yedek</p>' +
         '<p id="nk-cloud-status" class="text-xs text-slate-500"></p>' +
+        '<p id="nk-diag" class="text-[11px] text-slate-500"></p>' +
         '<p class="text-[11px] font-semibold text-slate-500">Kurtarma Kodun</p>' +
         '<div class="flex items-center gap-2">' +
         '<code id="nk-cloud-code" class="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-2 py-2 text-[11px] font-mono text-slate-700 text-center"></code>' +
@@ -428,6 +513,9 @@
       }
     });
     setTimeout(pushAll, 3000);
+    setTimeout(autoRestore, 5000);
+    setTimeout(computeDiag, 2000);
+    setInterval(computeDiag, 60000);
     setInterval(pushAll, 20000);
     setInterval(updateStatus, 5000);
     document.addEventListener('visibilitychange', function () {
@@ -438,5 +526,5 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
   else start();
 
-  window.__nkBackup = { pushAll: pushAll, restoreFromCode: restoreFromCode, getCode: getCode };
+  window.__nkBackup = { pushAll: pushAll, restoreFromCode: restoreFromCode, getCode: getCode, autoRestore: autoRestore };
 })();
