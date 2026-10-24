@@ -1,12 +1,14 @@
-const CACHE_NAME = 'net-kalkanim-v45';
+// Sürüm numarasını artık elle değiştirmen gerekmiyor: uygulama dosyaları her açılışta
+// internetten kontrol edilir, internet yoksa kayıtlı kopya kullanılır.
+const CACHE_NAME = 'net-kalkanim-v47';
 
-// Mutlak yol (/) yerine göreceli yol (./) kullanarak alt klasör ve GitHub Pages uyumu sağlandı.
 const APP_SHELL = [
   './',
   './index.html',
   './duzeltme.js',
   './yedek.js',
   './profil.js',
+  './kamera.js',
   './manifest.json',
   './logo.png'
 ];
@@ -20,21 +22,18 @@ const CDN_URLS = [
   'https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js'
 ];
 
-// Kurulum aşaması
+// Kurulum
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then(async cache => {
-      // APP_SHELL dosyalarını tek tek yakalayarak 404 hatasında tüm yapının patlamasını engelledik
       for (const file of APP_SHELL) {
         try {
-          await cache.add(file);
+          await cache.add(new Request(file, { cache: 'reload' }));
         } catch (err) {
           console.warn('App Shell dosyası eklenemedi:', file, err);
         }
       }
-
-      // CDN dosyalarını no-cors olarak önbelleğe alma
       for (const url of CDN_URLS) {
         try {
           const response = await fetch(url, { mode: 'no-cors' });
@@ -47,7 +46,7 @@ self.addEventListener('install', event => {
   );
 });
 
-// Aktivasyon ve eski cache temizliği
+// Aktivasyon ve eski önbellek temizliği
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys()
@@ -58,32 +57,74 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Fetch yakalama ve Cache-First stratejisi
+// Kendi dosyalarımız: önce internet (hep güncel), 4 saniyede gelmezse ya da internet yoksa kayıtlı kopya.
+async function networkFirst(request) {
+  const cache = await caches.open(CACHE_NAME);
+  try {
+    const response = await Promise.race([
+      fetch(request),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('zaman aşımı')), 4000))
+    ]);
+    if (response && response.ok) cache.put(request, response.clone());
+    return response;
+  } catch (err) {
+    const cached = await cache.match(request);
+    if (cached) return cached;
+    if (request.mode === 'navigate') {
+      const page = (await cache.match('./index.html')) || (await cache.match('./'));
+      if (page) return page;
+    }
+    throw err;
+  }
+}
+
+// Dış kaynaklar (CDN): önce kayıtlı kopya
+async function cacheFirst(request) {
+  const cached = await caches.match(request);
+  if (cached) return cached;
+  const response = await fetch(request);
+  if (response) {
+    const clone = response.clone();
+    caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
+  }
+  return response;
+}
+
 self.addEventListener('fetch', event => {
-  if (event.request.method !== 'GET') return;
-  if (!event.request.url.startsWith('http')) return; // Chrome extension ve tarayıcı içi istekleri filtrele
-  // Bulut yedek ve lisans sunucusu istekleri asla önbelleğe alınmasın (telefon hafızasını doldurmasın)
-  if (event.request.url.includes('.supabase.co') || event.request.url.includes('firebaseio.com')) return;
+  const req = event.request;
+  if (req.method !== 'GET') return;
+  if (!req.url.startsWith('http')) return;
+  // Bulut yedek ve lisans sunucusu istekleri asla önbelleğe alınmasın
+  if (req.url.includes('.supabase.co') || req.url.includes('firebaseio.com')) return;
 
-  event.respondWith(
-    caches.match(event.request).then(cached => {
-      if (cached) return cached;
+  const sameOrigin = new URL(req.url).origin === self.location.origin;
+  event.respondWith(sameOrigin ? networkFirst(req) : cacheFirst(req));
+});
 
-      return fetch(event.request)
-        .then(response => {
-          if (!response) return response;
+// Günlük hatırlatma bildirimi
+self.addEventListener('push', event => {
+  let data = { title: 'Net Kalkanım', body: 'Bugün tekrar zamanı!', url: './' };
+  try { if (event.data) data = Object.assign(data, event.data.json()); } catch (e) {}
+  event.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: './logo.png',
+      badge: './logo.png',
+      tag: 'nk-daily',
+      data: { url: data.url || './' }
+    })
+  );
+});
 
-          const responseClone = response.clone();
-          caches.open(CACHE_NAME).then(cache => {
-            cache.put(event.request, responseClone);
-          });
-          return response;
-        })
-        .catch(() => {
-          if (event.request.mode === 'navigate') {
-            return caches.match('./index.html') || caches.match('./');
-          }
-        });
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  const target = (event.notification.data && event.notification.data.url) || './';
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
+      for (const c of list) {
+        if ('focus' in c) return c.focus();
+      }
+      return self.clients.openWindow(target);
     })
   );
 });
