@@ -1,6 +1,6 @@
 // Sürüm numarasını artık elle değiştirmen gerekmiyor: uygulama dosyaları her açılışta
 // internetten kontrol edilir, internet yoksa kayıtlı kopya kullanılır.
-const CACHE_NAME = 'net-kalkanim-v48';
+const CACHE_NAME = 'net-kalkanim-v49';
 
 const APP_SHELL = [
   './',
@@ -10,6 +10,7 @@ const APP_SHELL = [
   './profil.js',
   './kamera.js',
   './duzen.js',
+  './animasyon.js',
   './manifest.json',
   './logo.png'
 ];
