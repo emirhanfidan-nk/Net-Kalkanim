@@ -223,7 +223,7 @@
   })();
 
   /* ---------- 4) DİĞER MODÜLLER (Bulut yedek + Profil) ---------- */
-  ['yedek.js', 'profil.js', 'kamera.js'].forEach(function (src) {
+  ['yedek.js', 'profil.js', 'kamera.js', 'duzen.js'].forEach(function (src) {
     try {
       const s = document.createElement('script');
       s.src = src;
