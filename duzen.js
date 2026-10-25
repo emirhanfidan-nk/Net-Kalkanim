@@ -109,15 +109,17 @@
 
     function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
 
-    function pill(ok, text) {
-      var host = document.getElementById('review-modal');
+    function pill(ok, text, hostEl) {
+      var host = hostEl || document.getElementById('review-modal');
       if (!host) return;
+      var fixed = host === document.body;
       var old = document.getElementById('nk-pill');
       if (old) old.remove();
       var p = document.createElement('div');
       p.id = 'nk-pill';
       p.textContent = text;
-      p.style.cssText = 'position:absolute;left:50%;top:84px;transform:translateX(-50%);z-index:70;padding:10px 20px;border-radius:9999px;' +
+      p.style.cssText = 'position:' + (fixed ? 'fixed' : 'absolute') + ';left:50%;top:' + (fixed ? 'calc(16px + env(safe-area-inset-top))' : '84px') +
+        ';transform:translateX(-50%);z-index:' + (fixed ? '2147483000' : '70') + ';padding:10px 20px;border-radius:9999px;' +
         'font-weight:800;font-size:14px;color:#fff;box-shadow:0 8px 20px rgba(0,0,0,.25);pointer-events:none;white-space:nowrap;background:' +
         (ok ? '#16a34a' : '#e11d48');
       host.appendChild(p);
@@ -134,6 +136,7 @@
 
     function burst(el) {
       try {
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
         var r = el.getBoundingClientRect();
         var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
         var colors = ['#facc15', '#22c55e', '#38bdf8', '#f472b6', '#fb923c'];
@@ -204,6 +207,8 @@
         return r;
       };
     }
+
+    window.__nkFx = { pill: pill, burst: burst, play: play };
 
     // Oturum kapanınca üst üste sayacı sıfırlansın
     var origCloseForCombo = window.closeReview;
