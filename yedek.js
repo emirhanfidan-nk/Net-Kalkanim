@@ -148,6 +148,9 @@
       var cur = {};
       (appState.questions || []).forEach(function (q) { if (q && q.id !== undefined) cur['question:' + q.id] = { kind: 'question', item: q }; });
       (appState.notes || []).forEach(function (n) { if (n && n.id !== undefined) cur['note:' + n.id] = { kind: 'note', item: n }; });
+      var hoca = window.__nkHoca;
+      var askReady = !!(hoca && hoca.ready);
+      if (askReady) (hoca.getCache() || []).forEach(function (a) { if (a && a.id !== undefined) cur['ask:' + a.id] = { kind: 'ask', item: a }; });
       var curCount = Object.keys(cur).length;
 
       // Neyin yedeklenmesi gerekiyor?
@@ -237,7 +240,7 @@
 
       // Silinenler (güvenlik: telefon boşsa ya da çok fazla kayıt birden kaybolduysa silme bilgisi gönderme)
       var synced = Object.keys(st.h).filter(function (k) { return k.indexOf('settings:') !== 0; });
-      var missing = synced.filter(function (k) { return !cur[k]; });
+      var missing = synced.filter(function (k) { return !cur[k] && (k.indexOf('ask:') !== 0 || askReady); });
       if (missing.length && curCount > 0 && (missing.length <= 5 || missing.length <= synced.length * 0.3)) {
         var dels = missing.map(function (k) {
           var p = k.split(':');
@@ -301,7 +304,8 @@
 
     try { localStorage.setItem(LS_CODE, code); localStorage.setItem(LS_SHOWN, '1'); } catch (e) {}
 
-    var haveQ = {}, haveN = {};
+    var haveQ = {}, haveN = {}, haveA = {};
+    try { ((window.__nkHoca && window.__nkHoca.getCache()) || []).forEach(function (x) { haveA[String(x.id)] = 1; }); } catch (e) {}
     (appState.questions || []).forEach(function (x) { haveQ[String(x.id)] = 1; });
     (appState.notes || []).forEach(function (x) { haveN[String(x.id)] = 1; });
 
@@ -312,7 +316,7 @@
         else applySettings(r.data);
         return;
       }
-      var have = r.kind === 'question' ? haveQ : haveN;
+      var have = r.kind === 'question' ? haveQ : (r.kind === 'ask' ? haveA : haveN);
       if (!have[String(r.item_id)]) items.push(r);
     });
 
@@ -333,6 +337,7 @@
             else item[k] = v;
           }));
           if (r.kind === 'question') { await saveQuestion(item); appState.questions.push(item); }
+          else if (r.kind === 'ask') { if (window.__nkHoca) await window.__nkHoca.restoreItem(item); }
           else { await saveNote(item); appState.notes.push(item); }
         } catch (e) {
           failed++;
