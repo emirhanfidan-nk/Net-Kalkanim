@@ -86,6 +86,22 @@
           var t = (MOTIVATION_QUOTES[i] && MOTIVATION_QUOTES[i].text) || '';
           if (BAD.some(function (b) { return t.indexOf(b) !== -1; })) MOTIVATION_QUOTES.splice(i, 1);
         }
+        // Sıkı süzgeç: çalışma, öğrenme, disiplin, hedef, sınav gibi konulara değinmeyen ya da
+        // "karanlıkta ekilmek" gibi soyut/şiirsel sözleri de çıkar. Çok az söz kalırsa eski listeye dön.
+        var ALLOW = /çalış|öğren|bilgi|eğitim|disiplin|ders|kitap|sınav|tekrar|azim|emek|okul|zeki|akıllı|alışkanlık|tutarl|hedef|başla|pes et|vazgeç|başarı|başar|zorluk|çaba|gelişim|ilerle|adım|zihin|bilim|sabır|kararl/;
+        var DENY = /karanlık|ekilmiş|gömül|gömüldü|tanrı|ölüm|aşk/;
+        var before = MOTIVATION_QUOTES.slice();
+        for (var j = MOTIVATION_QUOTES.length - 1; j >= 0; j--) {
+          var tt = String((MOTIVATION_QUOTES[j] && MOTIVATION_QUOTES[j].text) || '').toLocaleLowerCase('tr-TR');
+          if (!ALLOW.test(tt) || DENY.test(tt)) MOTIVATION_QUOTES.splice(j, 1);
+        }
+        if (MOTIVATION_QUOTES.length < 25) {
+          MOTIVATION_QUOTES.splice(0, MOTIVATION_QUOTES.length);
+          before.forEach(function (q) {
+            var t2 = String(q.text || '').toLocaleLowerCase('tr-TR');
+            if (!DENY.test(t2)) MOTIVATION_QUOTES.push(q);
+          });
+        }
         if (typeof updateMotivationBanner === 'function') updateMotivationBanner();
       }
     } catch (e) {}
