@@ -101,6 +101,8 @@
     return blob;
   }
 
+  window.nkShrinkImage = nkShrinkImage;
+
   let lastCropUrl = null;
   let lastBackCropUrl = null;
 
@@ -223,7 +225,7 @@
   })();
 
   /* ---------- 4) DİĞER MODÜLLER (Bulut yedek + Profil) ---------- */
-  ['yedek.js', 'profil.js', 'kamera.js', 'duzen.js', 'animasyon.js'].forEach(function (src) {
+  ['yedek.js', 'profil.js', 'kamera.js', 'duzen.js', 'animasyon.js', 'hoca.js'].forEach(function (src) {
     try {
       const s = document.createElement('script');
       s.src = src;
