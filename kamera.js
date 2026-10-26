@@ -117,4 +117,6 @@
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wire);
   else wire();
+
+  window.__nkCamera = { open: openCamera, supported: supported };
 })();
