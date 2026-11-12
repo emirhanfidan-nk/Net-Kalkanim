@@ -18,7 +18,7 @@
     'selectedCourses', 'selectedTopics', 'archSelectedCourses', 'archSelectedTopics',
     'hasSeenOnboarding', 'activityDays', 'darkMode', 'hapticsEnabled', 'curriculum',
     'totalAnswered', 'totalCorrect', 'recallForgot', 'recallPartial', 'recallRemembered',
-    'recallVeryEasy', 'denemeler'
+    'recallVeryEasy', 'denemeler', 'oyun'
   ];
 
   /* ---------- Kurtarma kodu ---------- */
