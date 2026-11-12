@@ -471,20 +471,38 @@
     if (list && !document.getElementById('nk-cloud-card')) {
       var d = document.createElement('div');
       d.id = 'nk-cloud-card';
-      d.className = 'p-4 space-y-2';
+      d.className = '';
       d.innerHTML =
-        '<p class="text-sm font-medium text-slate-800">Bulut Yedek</p>' +
-        '<p id="nk-cloud-status" class="text-xs text-slate-500"></p>' +
-        '<p id="nk-diag" class="text-[11px] text-slate-500"></p>' +
-        '<p class="text-[11px] font-semibold text-slate-500">Kurtarma Kodun</p>' +
-        '<div class="flex items-center gap-2">' +
-        '<code id="nk-cloud-code" class="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-2 py-2 text-[11px] font-mono text-slate-700 text-center"></code>' +
-        '<button id="nk-cloud-copy" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 text-xs font-semibold rounded-lg">Kopyala</button>' +
-        '</div>' +
-        '<p class="text-[11px] text-slate-500">Bu kodu bir yere yaz. Telefon değişir ya da veriler silinirse bununla geri getirirsin. Kimseyle paylaşma.</p>' +
-        '<button id="nk-cloud-now" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 text-xs font-semibold rounded-lg">Şimdi Yedekle</button>' +
-        '<button id="nk-cloud-restore" class="w-full bg-emerald-50 border border-emerald-200 text-emerald-600 hover:bg-emerald-100 px-3 py-2 text-xs font-semibold rounded-lg">Kodla Geri Yükle</button>';
+        '<button id="nk-cloud-head" type="button" class="w-full p-4 flex items-center gap-3 text-left">' +
+          '<div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">' +
+            '<svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg>' +
+          '</div>' +
+          '<div class="flex-1 min-w-0">' +
+            '<p class="text-sm font-medium text-slate-800">Bulut Yedek</p>' +
+            '<p id="nk-cloud-status" class="text-xs text-slate-500 mt-0.5"></p>' +
+          '</div>' +
+          '<svg id="nk-cloud-chevron" class="w-4 h-4 fill-current text-slate-400 transition-transform shrink-0" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>' +
+        '</button>' +
+        '<div id="nk-cloud-details" class="hidden px-4 pb-4 space-y-2">' +
+          '<p id="nk-diag" class="text-[11px] text-slate-500"></p>' +
+          '<p class="text-[11px] font-semibold text-slate-500">Kurtarma Kodun</p>' +
+          '<div class="flex items-center gap-2">' +
+            '<code id="nk-cloud-code" class="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-2 py-2 text-[11px] font-mono text-slate-700 text-center"></code>' +
+            '<button id="nk-cloud-copy" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 text-xs font-semibold rounded-lg">Kopyala</button>' +
+          '</div>' +
+          '<p class="text-[11px] text-slate-500">Bu kodu bir yere yaz. Telefon değişir ya da veriler silinirse bununla geri getirirsin. Kimseyle paylaşma.</p>' +
+          '<div class="flex gap-2">' +
+            '<button id="nk-cloud-now" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 text-xs font-semibold rounded-lg">Şimdi Yedekle</button>' +
+            '<button id="nk-cloud-restore" class="flex-1 bg-emerald-50 border border-emerald-200 text-emerald-600 hover:bg-emerald-100 px-3 py-2 text-xs font-semibold rounded-lg">Kodla Geri Yükle</button>' +
+          '</div>' +
+        '</div>';
       list.insertBefore(d, list.lastElementChild);
+      document.getElementById('nk-cloud-head').onclick = function () {
+        var det = document.getElementById('nk-cloud-details'), ch = document.getElementById('nk-cloud-chevron');
+        var open = det.classList.toggle('hidden') === false;
+        ch.style.transform = open ? 'rotate(180deg)' : 'rotate(0deg)';
+        if (open) computeDiag();
+      };
       document.getElementById('nk-cloud-copy').onclick = function () {
         copyText(pretty(getCode())).then(function (ok) { showToast(ok ? 'Kod kopyalandı.' : 'Kopyalanamadı, kodu elle yaz.', !ok); });
       };
