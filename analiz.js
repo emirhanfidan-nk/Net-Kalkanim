@@ -1,5 +1,6 @@
 /* Net Kalkanım - Deneme "Analiz Edildi" İşareti
-   Deneme detayında "Analiz edildi olarak işaretle" düğmesi çıkar. İşaretlenen deneme,
+   Deneme detayında "Analiz edildi olarak işaretle" düğmesi çıkar; listede de her denemenin
+   yanındaki küçük kutucukla içeri girmeden işaretlenebilir. İşaretlenen deneme,
    Denemeler listesinde yeşile bürünür ve üzerinde "Analiz edildi" yazar.
    İşaret ayarlarla birlikte saklanır ve buluta yedeklenir. */
 (function () {
@@ -23,6 +24,42 @@
   }
 
   /* ---------- Deneme listesi ---------- */
+  // Kartın soluna küçük yuvarlak kutucuk: içeri girmeden "analiz edildi" işareti
+  function makeBox(d) {
+    var on = !!d.analyzed;
+    var box = document.createElement('span');
+    box.className = 'nk-analiz-box';
+    box.setAttribute('role', 'checkbox');
+    box.setAttribute('aria-checked', on ? 'true' : 'false');
+    box.setAttribute('aria-label', 'Analiz edildi');
+    // 40px'lik dokunma alanı, içinde 24px'lik daire
+    box.style.cssText = 'flex-shrink:0;width:40px;height:40px;margin:-8px 0 -8px -10px;display:flex;align-items:center;justify-content:center;';
+    var dot = document.createElement('span');
+    dot.style.cssText = 'width:24px;height:24px;border-radius:9999px;display:flex;align-items:center;justify-content:center;border:2px solid;';
+    if (on) {
+      dot.style.backgroundColor = '#16a34a';
+      dot.style.borderColor = '#16a34a';
+      dot.style.color = '#fff';
+      dot.innerHTML = CHECK.replace('width="14" height="14"', 'width="14" height="14"');
+    } else {
+      dot.className = 'bg-white border-slate-300';
+    }
+    box.appendChild(dot);
+    box.addEventListener('click', async function (e) {
+      e.stopPropagation();   // kartın "denemeyi aç" tıklamasını tetikleme
+      e.preventDefault();
+      d.analyzed = !d.analyzed;
+      try { await saveSettings(); } catch (err) {
+        d.analyzed = !d.analyzed;
+        showToast('Kaydedilemedi, tekrar dene.', true);
+        return;
+      }
+      try { if (d.analyzed && window.__nkFx) window.__nkFx.burst(dot); } catch (err) {}
+      renderDeneme();
+    });
+    return box;
+  }
+
   function paintList() {
     var root = document.getElementById('deneme-root');
     if (!root) return;
@@ -32,9 +69,11 @@
       var m = /openDeneme\((\d+)\)/.exec(card.getAttribute('onclick') || '');
       if (!m) continue;
       var d = findDeneme(parseInt(m[1], 10));
-      if (!d || !d.analyzed) continue;
+      if (!d) continue;
+      if (!card.querySelector('.nk-analiz-box')) card.insertBefore(makeBox(d), card.firstChild);
+      if (!d.analyzed) continue;
       greenSurface(card);
-      var left = card.firstElementChild;
+      var left = card.querySelector('.min-w-0');
       if (left && !left.querySelector('.nk-analiz-badge')) {
         var badge = document.createElement('p');
         badge.className = 'nk-analiz-badge';
