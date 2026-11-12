@@ -8,9 +8,9 @@
 (function () {
   'use strict';
 
-  var GOAL = 30;          // günlük hedef (XP)
+  var GOAL = 20;          // günlük hedef (XP)
   var XP_Q = 2;           // soru çözme
-  var XP_N = 1;           // not tekrarı
+  var XP_N = 2;           // not tekrarı
   var XP_DENEME = 10;     // deneme analiz etme
   var XP_BONUS = 20;      // günlük hedefi bitirme
 
@@ -46,7 +46,9 @@
   var css = document.createElement('style');
   css.textContent =
     '#home-streak-badge{display:none!important}' +
-    '@keyframes nkOFlick{0%,100%{transform:scale(1,1)}50%{transform:scale(1.04,1.07)}}' +
+    '@keyframes nkOFlick{0%,100%{transform:scale(1,1) rotate(0deg)}22%{transform:scale(1.06,1.12) rotate(-4deg)}50%{transform:scale(.96,1.02) rotate(3deg)}78%{transform:scale(1.05,1.14) rotate(-2deg)}}' +
+    '@keyframes nkOIdle{0%,100%{transform:scale(1) rotate(0deg)}50%{transform:scale(1.03,1.05) rotate(-2deg)}}' +
+    '@keyframes nkOCore{from{opacity:.65}to{opacity:1}}' +
     '@keyframes nkOGlow{0%,100%{opacity:.55;transform:scale(1)}50%{opacity:.95;transform:scale(1.12)}}' +
     '@keyframes nkOFade{from{opacity:0}to{opacity:1}}' +
     '@keyframes nkOPop{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.15);opacity:1}100%{transform:scale(1);opacity:1}}' +
@@ -59,7 +61,10 @@
     '.nk-o-fire,.nk-o-core{opacity:0;transition:opacity .5s}' +
     '.nk-o-card.lit .nk-o-fire,.nk-o-card.lit .nk-o-core,.nk-o-on .nk-o-fire,.nk-o-on .nk-o-core{opacity:1}' +
     '.nk-o-flame{display:block;transform-origin:50% 90%}' +
-    '.nk-o-card.lit .nk-o-flame,.nk-o-on .nk-o-flame{animation:nkOFlick 1.6s ease-in-out infinite}' +
+    '.nk-o-card .nk-o-flame{animation:nkOIdle 3.2s ease-in-out infinite}' +
+    '.nk-o-card.lit .nk-o-flame,.nk-o-on .nk-o-flame{animation:nkOFlick 1.15s ease-in-out infinite}' +
+    '.nk-o-card.lit .nk-o-core,.nk-o-on .nk-o-core{animation:nkOCore .7s ease-in-out infinite alternate}' +
+    '@media (prefers-reduced-motion:reduce){.nk-o-flame,.nk-o-core{animation:none!important}}' +
     '.nk-o-mid{flex:1;min-width:0}' +
     '.nk-o-num{display:flex;align-items:baseline;gap:6px;line-height:1}' +
     '.nk-o-num b{font-size:40px;font-weight:800;letter-spacing:-.02em}' +
