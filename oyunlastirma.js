@@ -85,10 +85,10 @@
     '@keyframes nkOGlow{0%,100%{opacity:.55;transform:scale(1)}50%{opacity:.95;transform:scale(1.12)}}' +
     '@keyframes nkOFade{from{opacity:0}to{opacity:1}}' +
     '@keyframes nkOPop{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.15);opacity:1}100%{transform:scale(1);opacity:1}}' +
-    '.nk-o-card{position:relative;overflow:hidden;border-radius:24px;padding:16px 18px;color:#fff;font-family:"Sora","Plus Jakarta Sans",sans-serif;' +
+    '.nk-o-card{position:relative;overflow:hidden;border-radius:24px;padding:12px 16px;color:#fff;font-family:"Sora","Plus Jakarta Sans",sans-serif;' +
       'background:linear-gradient(135deg,#64748b,#475569);box-shadow:0 10px 24px -12px rgba(71,85,105,.8);transition:box-shadow .6s}' +
-    '.nk-o-card.lit{box-shadow:0 12px 28px -10px rgba(234,88,12,.8)}' +
-    '.nk-o-bgon{position:absolute;inset:0;background:linear-gradient(135deg,#fb923c,#f97316 45%,#ea580c);opacity:0;transition:opacity .6s}' +
+    '.nk-o-card.lit{box-shadow:0 8px 18px -12px rgba(234,88,12,.6)}' +
+    '.nk-o-bgon{position:absolute;inset:0;background:linear-gradient(135deg,#fdba74,#fb923c 55%,#f97316);opacity:0;transition:opacity .6s}' +
     '.nk-o-card.lit .nk-o-bgon{opacity:1}' +
     '.nk-o-row{position:relative;display:flex;align-items:center;gap:14px}' +
     '.nk-o-fire,.nk-o-core{opacity:0;transition:opacity .5s}' +
@@ -100,14 +100,14 @@
     '@media (prefers-reduced-motion:reduce){.nk-o-flame,.nk-o-core{animation:none!important}}' +
     '.nk-o-mid{flex:1;min-width:0}' +
     '.nk-o-num{display:flex;align-items:baseline;gap:6px;line-height:1}' +
-    '.nk-o-num b{font-size:40px;font-weight:800;letter-spacing:-.02em}' +
-    '.nk-o-num span{font-size:13px;font-weight:700;opacity:.9}' +
-    '.nk-o-sub{margin-top:5px;font-size:11.5px;font-weight:700;opacity:.92;line-height:1.25}' +
+    '.nk-o-num b{font-size:30px;font-weight:800;letter-spacing:-.02em}' +
+    '.nk-o-num span{font-size:12px;font-weight:700;opacity:.9}' +
+    '.nk-o-sub{margin-top:3px;font-size:11px;font-weight:700;opacity:.92;line-height:1.25}' +
     '.nk-o-xp{margin-top:7px;display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.2);padding:3px 9px;border-radius:9999px;font-size:11px;font-weight:800}' +
-    '.nk-o-ringbox{position:relative;width:64px;height:64px;flex-shrink:0}' +
+    '.nk-o-ringbox{position:relative;width:54px;height:54px;flex-shrink:0}' +
     '.nk-o-ringtxt{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.05}' +
-    '.nk-o-ringtxt b{font-size:15px;font-weight:800}' +
-    '.nk-o-ringtxt i{font-style:normal;font-size:9px;font-weight:700;opacity:.85}' +
+    '.nk-o-ringtxt b{font-size:13px;font-weight:800}' +
+    '.nk-o-ringtxt i{font-style:normal;font-size:8px;font-weight:700;opacity:.85}' +
     '.nk-o-ov{position:fixed;inset:0;z-index:2147483200;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:24px;' +
       'background:rgba(15,23,42,.95);color:#fff;font-family:"Sora","Plus Jakarta Sans",sans-serif;text-align:center;animation:nkOFade .25s ease-out;overflow:hidden}' +
     '.nk-o-btn{margin-top:26px;width:100%;max-width:320px;padding:15px;border:0;border-radius:16px;background:#fff;color:#ea580c;font-size:15px;font-weight:800;' +
@@ -126,12 +126,12 @@
     '.nk-o-stat b{display:block;font-size:22px;font-weight:800;font-variant-numeric:tabular-nums}' +
     '.nk-o-stat span{display:block;margin-top:3px;font-size:11px;font-weight:700;opacity:.75}' +
     '.nk-o-stat.xp b{color:#fdba74}' +
-    '.nk-o-foot{position:relative;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.22)}' +
+    '.nk-o-foot{position:relative;margin-top:9px;padding-top:8px;border-top:1px solid rgba(255,255,255,.22)}' +
     '.nk-o-lvrow{display:flex;justify-content:space-between;font-size:11.5px;font-weight:800}' +
-    '.nk-o-lvbar{height:7px;border-radius:9999px;background:rgba(255,255,255,.25);margin-top:6px;overflow:hidden}' +
+    '.nk-o-lvbar{height:5px;border-radius:9999px;background:rgba(255,255,255,.25);margin-top:5px;overflow:hidden}' +
     '.nk-o-lvbar>div{height:100%;width:0;border-radius:9999px;background:#fff;transition:width .8s cubic-bezier(.22,1,.36,1)}' +
-    '.nk-o-chips{display:flex;gap:8px;margin-top:10px}' +
-    '.nk-o-chip{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.2);color:#fff;border:0;padding:6px 11px;border-radius:9999px;font-size:11px;font-weight:800;font-family:inherit}' +
+    '.nk-o-chips{display:flex;gap:6px;margin-top:6px}' +
+    '.nk-o-chip{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.2);color:#fff;border:0;padding:3px 9px;border-radius:9999px;font-size:10px;font-weight:800;font-family:inherit}' +
     'button.nk-o-chip:active{transform:scale(.95)}' +
     '.nk-o-bgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%;max-width:340px;margin-top:18px;max-height:52vh;overflow-y:auto;padding:2px}' +
     '.nk-o-bd{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:10.5px;font-weight:800;line-height:1.2}' +
@@ -268,22 +268,21 @@
     card.innerHTML =
       '<div class="nk-o-bgon"></div>' +
       '<div class="nk-o-row">' +
-        '<div style="flex-shrink:0;width:60px;height:60px">' + flameSVG(60) + '</div>' +
+        '<div style="flex-shrink:0;width:46px;height:46px">' + flameSVG(46) + '</div>' +
         '<div class="nk-o-mid">' +
           '<div class="nk-o-num"><b id="nk-o-streak">0</b><span>günlük seri</span></div>' +
           '<div class="nk-o-sub" id="nk-o-sub"></div>' +
-          '<div class="nk-o-xp"><svg width="11" height="11" viewBox="0 0 24 24" fill="#fff"><path d="' + BOLT_D + '"/></svg><span><span id="nk-o-xp">0</span> XP</span></div>' +
+          '<div class="nk-o-xp" style="display:none"><svg width="11" height="11" viewBox="0 0 24 24" fill="#fff"><path d="' + BOLT_D + '"/></svg><span><span id="nk-o-xp">0</span> XP</span></div>' +
+          '<div class="nk-o-chips">' +
+          '<span class="nk-o-chip" id="nk-o-shield"><svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><path d="' + SHIELD_D + '"/></svg><span id="nk-o-shn">0</span> kalkan</span>' +
+          '<button type="button" class="nk-o-chip" id="nk-o-badgebtn"><svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><path d="' + STAR_D + '"/></svg><span id="nk-o-bdn">0</span> rozet</button>' + '</div>' +
         '</div>' +
-        '<div class="nk-o-ringbox" id="nk-o-ringbox">' + ringSVG(64, 7, '#ffffff', 'rgba(255,255,255,.28)') +
+        '<div class="nk-o-ringbox" id="nk-o-ringbox">' + ringSVG(54, 6, '#ffffff', 'rgba(255,255,255,.28)') +
           '<div class="nk-o-ringtxt"><b id="nk-o-dayxp">0</b><i>/ ' + GOAL + ' XP</i></div></div>' +
       '</div>' +
       '<div class="nk-o-foot">' +
         '<div class="nk-o-lvrow"><span id="nk-o-lv">Seviye 1</span><span id="nk-o-lvxp" style="opacity:.85"></span></div>' +
         '<div class="nk-o-lvbar"><div id="nk-o-lvfill"></div></div>' +
-        '<div class="nk-o-chips">' +
-          '<span class="nk-o-chip" id="nk-o-shield"><svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><path d="' + SHIELD_D + '"/></svg><span id="nk-o-shn">0</span> kalkan</span>' +
-          '<button type="button" class="nk-o-chip" id="nk-o-badgebtn"><svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><path d="' + STAR_D + '"/></svg><span id="nk-o-bdn">0</span> rozet</button>' +
-        '</div>' +
       '</div>';
     head.insertAdjacentElement('afterend', card);
     var bb = card.querySelector('#nk-o-badgebtn');
@@ -473,7 +472,7 @@
         '<div class="nk-o-stat xp"><b id="nk-o-sx">+0</b><span>XP</span></div>' +
       '</div>' +
       '<div style="display:flex;align-items:center;gap:14px;margin-top:22px;background:rgba(255,255,255,.08);border-radius:18px;padding:12px 18px">' +
-        '<div class="nk-o-ringbox" id="nk-o-sring">' + ringSVG(64, 7, '#fb923c', 'rgba(255,255,255,.16)') +
+        '<div class="nk-o-ringbox" id="nk-o-sring">' + ringSVG(54, 6, '#fb923c', 'rgba(255,255,255,.16)') +
           '<div class="nk-o-ringtxt"><b id="nk-o-sday">0</b><i>/ ' + GOAL + '</i></div></div>' +
         '<div style="text-align:left"><div style="font-size:13px;font-weight:800">Günlük hedef</div><div style="font-size:11.5px;font-weight:600;opacity:.75;margin-top:2px">' + GOAL + ' XP\'lik hedefe ilerledin</div></div>' +
       '</div>' +

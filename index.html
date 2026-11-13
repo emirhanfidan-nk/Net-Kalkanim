@@ -148,6 +148,17 @@
            bu kenar payı azalıyor, buton görsel olarak "çöküyor" — dokunsal (haptic'siz de
            olsa) bir basma hissi veriyor. !important, Tailwind'in shadow-md gibi CDN'den
            gelen sınıflarıyla çakışmasın diye. */
+        /* Ana ekran kutuları */
+        .nk-box { background: linear-gradient(160deg, var(--bxbg), color-mix(in srgb, var(--bxbg) 82%, var(--bx))); box-shadow: 0 10px 22px -14px var(--bx), 0 1px 0 rgba(255,255,255,.6) inset; border: 1px solid color-mix(in srgb, var(--bx) 18%, transparent); }
+        .nk-box-title { color: var(--bx); font-weight: 800; letter-spacing: -.01em; }
+        .nk-box-pill { background: var(--box-inner-bg, #fff); color: var(--bx); border: 1.5px solid var(--bx); }
+        .nk-box-btn { background: linear-gradient(180deg, color-mix(in srgb, var(--bx) 88%, #fff), var(--bx)); box-shadow: 0 4px 0 color-mix(in srgb, var(--bx) 62%, #000); transition: transform .1s, box-shadow .1s; }
+        .nk-box-btn:active, .nk-box:active .nk-box-btn { transform: translateY(3px); box-shadow: 0 1px 0 color-mix(in srgb, var(--bx) 62%, #000); }
+        .nk-box-stat { flex: 1; background: rgba(255,255,255,.55); border-radius: 14px; padding: 6px 4px; text-align: center; }
+        .nk-box-stat b { display: block; font-size: 18px; font-weight: 800; color: var(--bx); line-height: 1.1; }
+        body.dark-mode .nk-box { box-shadow: none; }
+        body.dark-mode .nk-box-stat { background: rgba(255,255,255,.07); }
+        .nk-box-stat span { display: block; font-size: 10px; font-weight: 700; color: var(--box-desc-text); margin-top: 1px; }
         .btn-cyber {
             transition: all 0.15s ease-out;
             position: relative;
@@ -838,55 +849,48 @@
                 </div>
 
                 <!-- KIRMIZI KUTU (BÜYÜK) -->
-                <div class="rounded-3xl p-5 shadow-lg relative overflow-hidden" style="background-color: var(--box-red-bg);">
-                    <div class="absolute top-0 left-0 w-2 h-full" style="background-color: var(--box-red-accent);"></div>
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="font-semibold text-sm tracking-wider" style="color: var(--box-red-accent);">Kırmızı Kutu</h3>
-                        <span class="text-xs font-semibold px-3.5 py-2 rounded-2xl leading-tight" style="background-color: var(--box-inner-bg); color: var(--box-red-accent); border: 1px solid var(--box-red-accent); display: inline-block; text-align: center;">
-    Bekleyen: <span id="red-total-count" class="tabular-nums font-bold">0</span><br>
-    <span id="red-estimated-time" style="font-size: 10px; opacity: 0.85;">tahmini ...</span>
-</span>
+                <div class="nk-box nk-box-red rounded-3xl p-5 relative overflow-hidden font-display" style="--bx: var(--box-red-accent); --bxbg: var(--box-red-bg);">
+                    <div class="flex items-start justify-between gap-3 mb-1">
+                        <div>
+                            <h3 class="nk-box-title text-base">Kırmızı Kutu</h3>
+                            <p class="text-[11px] font-semibold mt-0.5" style="color: var(--box-desc-text);">Bugün halletmen gerekenler</p>
+                        </div>
+                        <span class="nk-box-pill text-[11px] font-bold px-3 py-1.5 rounded-2xl leading-tight text-center">
+                            <span class="block text-sm font-extrabold tabular-nums leading-none"><span id="red-total-count">0</span> bekleyen</span>
+                            <span id="red-estimated-time" class="block mt-0.5" style="font-size: 10px; opacity: 0.85;">tahmini ...</span>
+                        </span>
                     </div>
-                    <p class="text-xs font-medium mb-3" style="color: var(--box-desc-text);">Bugün halletmen gerekenler</p>
-                    <div class="grid grid-cols-2 gap-3">
-                        <button onclick="startReview('questions')" class="btn-cyber btn-cyber-red py-4 rounded-2xl font-semibold text-sm flex flex-col items-center justify-center gap-1 shadow-md text-white" style="background-color: var(--box-red-accent);">
-                            <span>Soruları Başlat</span>
-                            <span class="text-xs opacity-90 tabular-nums">[ <span id="red-question-count">0</span> ]</span>
+                    <div class="grid grid-cols-2 gap-3 mt-4">
+                        <button onclick="startReview('questions')" class="nk-box-btn py-3.5 rounded-2xl text-sm flex flex-col items-center justify-center gap-0.5 text-white">
+                            <span class="font-extrabold">Soruları Başlat</span>
+                            <span class="text-lg font-extrabold tabular-nums leading-none" id="red-question-count">0</span>
                         </button>
-                        <button onclick="startReview('notes')" class="btn-cyber btn-cyber-red py-4 rounded-2xl font-semibold text-sm flex flex-col items-center justify-center gap-1 shadow-md text-white" style="background-color: var(--box-red-accent);">
-                            <span>Notları Başlat</span>
-                            <span class="text-xs opacity-90 tabular-nums">[ <span id="red-note-count">0</span> ]</span>
+                        <button onclick="startReview('notes')" class="nk-box-btn py-3.5 rounded-2xl text-sm flex flex-col items-center justify-center gap-0.5 text-white">
+                            <span class="font-extrabold">Notları Başlat</span>
+                            <span class="text-lg font-extrabold tabular-nums leading-none" id="red-note-count">0</span>
                         </button>
                     </div>
                 </div>
 
                 <!-- SARI VE YEŞİL KUTULAR (YAN YANA) -->
                 <div class="grid grid-cols-2 gap-4">
-                    <button onclick="goToLibraryWithFilter('yellow')" class="rounded-2xl p-4 shadow-sm transition-colors text-left relative overflow-hidden" style="background-color: var(--box-yellow-bg);">
-                        <div class="flex items-center justify-between mb-2">
-                            <h3 class="font-semibold text-xs" style="color: var(--box-yellow-accent);">Sarı Kutu</h3>
+                    <button onclick="goToLibraryWithFilter('yellow')" class="nk-box nk-box-sm rounded-3xl p-4 text-left relative overflow-hidden font-display" style="--bx: var(--box-yellow-accent); --bxbg: var(--box-yellow-bg);">
+                        <h3 class="nk-box-title text-sm">Sarı Kutu</h3>
+                        <p class="text-[11px] font-semibold mt-0.5 mb-3" style="color: var(--box-desc-text);">Ara sıra bakabilirsin</p>
+                        <div class="flex gap-2 tabular-nums">
+                            <div class="nk-box-stat"><b id="yellow-question-count">0</b><span>Soru</span></div>
+                            <div class="nk-box-stat"><b id="yellow-note-count">0</b><span>Not</span></div>
                         </div>
-                        <p class="text-xs font-medium mb-3" style="color: var(--box-desc-text);">Ara sıra bakabilirsin</p>
-                        <div class="text-xs font-semibold space-y-1 tabular-nums" style="color: var(--box-yellow-accent);">
-                            <div>Soru: <span id="yellow-question-count">0</span></div>
-                            <div>Not: <span id="yellow-note-count">0</span></div>
-                        </div>
-                        <div class="btn-cyber mt-3 flex items-center justify-center gap-1 text-xs font-bold rounded-xl py-2 text-white" style="background-color: var(--box-yellow-accent);">
-                            Göz At <span></span>
-                        </div>
+                        <div class="nk-box-btn mt-3 flex items-center justify-center text-xs font-extrabold rounded-2xl py-2.5 text-white">Göz At</div>
                     </button>
-                    <button onclick="goToLibraryWithFilter('green')" class="rounded-2xl p-4 shadow-sm transition-colors text-left relative overflow-hidden" style="background-color: var(--box-green-bg);">
-                        <div class="flex items-center justify-between mb-2">
-                            <h3 class="font-semibold text-xs" style="color: var(--box-green-accent);">Yeşil Kutu</h3>
+                    <button onclick="goToLibraryWithFilter('green')" class="nk-box nk-box-sm rounded-3xl p-4 text-left relative overflow-hidden font-display" style="--bx: var(--box-green-accent); --bxbg: var(--box-green-bg);">
+                        <h3 class="nk-box-title text-sm">Yeşil Kutu</h3>
+                        <p class="text-[11px] font-semibold mt-0.5 mb-3" style="color: var(--box-desc-text);">Ustalık, ayda bir göz at</p>
+                        <div class="flex gap-2 tabular-nums">
+                            <div class="nk-box-stat"><b id="green-question-count">0</b><span>Soru</span></div>
+                            <div class="nk-box-stat"><b id="green-note-count">0</b><span>Not</span></div>
                         </div>
-                        <p class="text-xs font-medium mb-3" style="color: var(--box-desc-text);">Ustalık, ayda bir göz at</p>
-                        <div class="text-xs font-semibold space-y-1 tabular-nums" style="color: var(--box-green-accent);">
-                            <div>Soru: <span id="green-question-count">0</span></div>
-                            <div>Not: <span id="green-note-count">0</span></div>
-                        </div>
-                        <div class="btn-cyber mt-3 flex items-center justify-center gap-1 text-xs font-bold rounded-xl py-2 text-white" style="background-color: var(--box-green-accent);">
-                            Göz At <span></span>
-                        </div>
+                        <div class="nk-box-btn mt-3 flex items-center justify-center text-xs font-extrabold rounded-2xl py-2.5 text-white">Göz At</div>
                     </button>
                 </div>
 
