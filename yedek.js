@@ -258,7 +258,8 @@
         setTimeout(function () { if (!bannerShown) setBanner(null); }, 3500);
       }
       try {
-        if (!localStorage.getItem(LS_SHOWN)) {
+        // Tanıtım turu sürerken kod penceresi üstüne binmesin; tur bitince ilk yedekte gösterilir
+        if (!localStorage.getItem(LS_SHOWN) && appState.hasSeenOnboarding) {
           localStorage.setItem(LS_SHOWN, '1');
           storeCredential(code);
           if (typeof showCustomConfirm === 'function') {
@@ -280,12 +281,69 @@
   }
 
   /* ---------- Geri yükleme ---------- */
+  /* Yeni telefonda alan seçilmiş olsa bile kaybolmaması gereken ilerleme verileri
+     (seri, XP, sayaçlar, denemeler) yerel ve bulut verisi BİRLEŞTİRİLİR; hiçbiri silinmez. */
+  var COUNTER_KEYS = ['totalAnswered', 'totalCorrect', 'recallForgot', 'recallPartial', 'recallRemembered', 'recallVeryEasy'];
+
+  function later(a, b) { return (a || '') >= (b || '') ? a : b; }
+
+  function mergeOyun(a, b) {
+    if (!a || typeof a !== 'object') return b;
+    if (!b || typeof b !== 'object') return a;
+    var out = {};
+    out.xp = Math.max(a.xp || 0, b.xp || 0);
+    out.denemeInit = !!(a.denemeInit || b.denemeInit);
+    out.flameDay = later(a.flameDay, b.flameDay) || undefined;
+    out.goalDay = later(a.goalDay, b.goalDay) || undefined;
+    var src;
+    if (a.day === b.day) {
+      src = (a.dayXp || 0) >= (b.dayXp || 0) ? a : b;
+      var other = src === a ? b : a;
+      out.day = src.day; out.dayXp = src.dayXp || 0;
+      out.paid = (src.paid || []).concat((other.paid || []).filter(function (x) { return (src.paid || []).indexOf(x) < 0; }));
+    } else {
+      src = later(a.day, b.day) === a.day ? a : b;
+      out.day = src.day; out.dayXp = src.dayXp || 0; out.paid = (src.paid || []).slice();
+    }
+    return out;
+  }
+
+  function mergeDenemeler(local, cloud) {
+    var byId = {}, out = [];
+    (local || []).forEach(function (d) { byId[d.id] = d; out.push(d); });
+    (cloud || []).forEach(function (d) {
+      var m = byId[d.id];
+      if (!m) { out.push(d); return; }
+      if (d.analyzed) m.analyzed = true;
+      if (d.xpPaid) m.xpPaid = true;
+    });
+    return out;
+  }
+
+  function mergeKey(k, v) {
+    if (k === 'activityDays') {
+      var set = {};
+      (appState.activityDays || []).concat(Array.isArray(v) ? v : []).forEach(function (x) { set[x] = 1; });
+      appState.activityDays = Object.keys(set).sort();
+    } else if (COUNTER_KEYS.indexOf(k) >= 0) {
+      appState[k] = Math.max(appState[k] || 0, v || 0);
+    } else if (k === 'hasSeenOnboarding') {
+      appState.hasSeenOnboarding = !!(appState.hasSeenOnboarding || v);
+    } else if (k === 'denemeler') {
+      appState.denemeler = mergeDenemeler(appState.denemeler, v);
+    } else if (k === 'oyun') {
+      appState.oyun = mergeOyun(appState.oyun, v);
+    }
+  }
+
   function applySettings(d) {
     var fresh = !appState.field;
     Object.keys(d || {}).forEach(function (k) {
       if (SETTINGS_KEYS.indexOf(k) === -1) return;
       if (k === 'authState') {
         if (d.authState === 'full' || !appState.authState || appState.authState === 'none') appState.authState = d.authState;
+      } else if (k === 'activityDays' || k === 'oyun' || k === 'denemeler' || k === 'hasSeenOnboarding' || COUNTER_KEYS.indexOf(k) >= 0) {
+        mergeKey(k, d[k]);          // ilerleme verisi: her zaman birleştir
       } else if (fresh) {
         appState[k] = d[k];
       }

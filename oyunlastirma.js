@@ -42,6 +42,9 @@
     return (appState.activityDays || []).indexOf(today()) >= 0;
   }
 
+  // Tanıtım turu bitmeden kart ve alev gösterilmez
+  function ready() { return !!appState.hasSeenOnboarding; }
+
   /* ---------- CSS ---------- */
   var css = document.createElement('style');
   css.textContent =
@@ -240,6 +243,8 @@
   function renderCard() {
     var card = ensureCard();
     if (!card) return;
+    card.style.display = ready() ? '' : 'none';
+    if (!ready()) return;
     var o = O();
     var streak = 0;
     try { streak = calculateStreak(); } catch (e) {}
@@ -525,6 +530,16 @@
     };
   }
 
+  // Tanıtım turu bitince kart ve (varsa) alev hemen gelsin
+  var origFinish = window.finishOnboarding;
+  if (typeof origFinish === 'function') {
+    window.finishOnboarding = async function () {
+      var r = await origFinish.apply(this, arguments);
+      try { if (typeof updateHomeStats === 'function') updateHomeStats(); } catch (e) {}
+      return r;
+    };
+  }
+
   // Deneme analizi: işaretlenen her deneme bir kez 10 XP verir (işareti kaldırıp tekrar koyunca verilmez)
   function scanDenemeler() {
     var list = appState.denemeler || [], o = O(), n = 0;
@@ -548,6 +563,7 @@
 
   // Seri o gün ilk kez devam edince alev animasyonu (günde bir kez)
   function maybeFlame() {
+    if (!ready()) return;
     var o = O();
     if (!activeToday() || o.flameDay === today()) return;
     o.flameDay = today();
