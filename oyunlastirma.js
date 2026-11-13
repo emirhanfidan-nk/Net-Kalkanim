@@ -17,6 +17,28 @@
   var reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   var FLAME_D = 'M12.5 2.5c1.2 3-2.3 4.4-2.3 7.6a2.8 2.8 0 005.6 0c0-1-.4-1.9-1-2.8 2 1.1 3.2 3.3 3.2 5.6a5.5 5.5 0 11-11 0c0-4.6 3.5-6.7 5.5-10.4z';
   var BOLT_D = 'M13 2 4 14h6l-1 8 9-12h-6z';
+  var SHIELD_D = 'M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z';
+  var STAR_D = 'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z';
+  var LOCK_D = 'M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM9 8V6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9z';
+  var MAX_SHIELDS = 2;
+
+  // Seviye: 1. seviye 0 XP, 2. seviye 40 XP, 3. seviye 160 XP, 4. seviye 360 XP ... (40 x seviye-1 kare)
+  function levelOf(xp) { return Math.floor(Math.sqrt(Math.max(0, xp) / 40)) + 1; }
+  function levelStart(lv) { return 40 * (lv - 1) * (lv - 1); }
+
+  var BADGES = [
+    { id: 's3',  name: '3 Gün Seri',  desc: '3 gün üst üste tekrar yap',  ok: function (c) { return c.streak >= 3; } },
+    { id: 's7',  name: '7 Gün Seri',  desc: '7 gün üst üste tekrar yap',  ok: function (c) { return c.streak >= 7; } },
+    { id: 's14', name: '14 Gün Seri', desc: '14 gün üst üste tekrar yap', ok: function (c) { return c.streak >= 14; } },
+    { id: 's30', name: '30 Gün Seri', desc: '30 gün üst üste tekrar yap', ok: function (c) { return c.streak >= 30; } },
+    { id: 'x100', name: '100 XP',  desc: 'Toplam 100 XP topla',  ok: function (c) { return c.xp >= 100; } },
+    { id: 'x500', name: '500 XP',  desc: 'Toplam 500 XP topla',  ok: function (c) { return c.xp >= 500; } },
+    { id: 'x1000', name: '1000 XP', desc: 'Toplam 1000 XP topla', ok: function (c) { return c.xp >= 1000; } },
+    { id: 'q50',  name: '50 Soru',  desc: '50 soru çöz',  ok: function (c) { return c.answered >= 50; } },
+    { id: 'q250', name: '250 Soru', desc: '250 soru çöz', ok: function (c) { return c.answered >= 250; } },
+    { id: 'g1', name: 'İlk Hedef', desc: 'Günlük hedefi bir kez doldur', ok: function (c) { return c.goals >= 1; } },
+    { id: 'd1', name: 'İlk Analiz', desc: 'Bir denemeyi analiz et', ok: function (c) { return c.analyzed >= 1; } }
+  ];
   var uid = 0;
 
   /* ---------- Veri ---------- */
@@ -29,6 +51,9 @@
     if (o.day !== t) { o.day = t; o.dayXp = 0; o.paid = []; }
     if (typeof o.dayXp !== 'number') o.dayXp = 0;
     if (!Array.isArray(o.paid)) o.paid = [];
+    if (typeof o.shields !== 'number') o.shields = 1;      // başlangıçta 1 seri kalkanı
+    if (!Array.isArray(o.badges)) o.badges = [];
+    if (!Array.isArray(o.frozen)) o.frozen = [];
     return o;
   }
 
@@ -95,7 +120,19 @@
     '.nk-o-stat{flex:1;border-radius:16px;padding:12px 6px;background:rgba(255,255,255,.1)}' +
     '.nk-o-stat b{display:block;font-size:22px;font-weight:800;font-variant-numeric:tabular-nums}' +
     '.nk-o-stat span{display:block;margin-top:3px;font-size:11px;font-weight:700;opacity:.75}' +
-    '.nk-o-stat.xp b{color:#fdba74}';
+    '.nk-o-stat.xp b{color:#fdba74}' +
+    '.nk-o-foot{position:relative;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.22)}' +
+    '.nk-o-lvrow{display:flex;justify-content:space-between;font-size:11.5px;font-weight:800}' +
+    '.nk-o-lvbar{height:7px;border-radius:9999px;background:rgba(255,255,255,.25);margin-top:6px;overflow:hidden}' +
+    '.nk-o-lvbar>div{height:100%;width:0;border-radius:9999px;background:#fff;transition:width .8s cubic-bezier(.22,1,.36,1)}' +
+    '.nk-o-chips{display:flex;gap:8px;margin-top:10px}' +
+    '.nk-o-chip{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.2);color:#fff;border:0;padding:6px 11px;border-radius:9999px;font-size:11px;font-weight:800;font-family:inherit}' +
+    'button.nk-o-chip:active{transform:scale(.95)}' +
+    '.nk-o-bgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%;max-width:340px;margin-top:18px;max-height:52vh;overflow-y:auto;padding:2px}' +
+    '.nk-o-bd{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:10.5px;font-weight:800;line-height:1.2}' +
+    '.nk-o-bdc{width:60px;height:60px;border-radius:9999px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.1);color:rgba(255,255,255,.5)}' +
+    '.nk-o-bd.on .nk-o-bdc{background:linear-gradient(135deg,#fbbf24,#f97316);color:#fff;box-shadow:0 6px 16px rgba(249,115,22,.45)}' +
+    '.nk-o-bd small{display:block;font-size:9.5px;font-weight:600;opacity:.7;margin-top:2px}';
   document.head.appendChild(css);
 
   /* ---------- Çizim yardımcıları ---------- */
@@ -234,8 +271,18 @@
         '</div>' +
         '<div class="nk-o-ringbox" id="nk-o-ringbox">' + ringSVG(64, 7, '#ffffff', 'rgba(255,255,255,.28)') +
           '<div class="nk-o-ringtxt"><b id="nk-o-dayxp">0</b><i>/ ' + GOAL + ' XP</i></div></div>' +
+      '</div>' +
+      '<div class="nk-o-foot">' +
+        '<div class="nk-o-lvrow"><span id="nk-o-lv">Seviye 1</span><span id="nk-o-lvxp" style="opacity:.85"></span></div>' +
+        '<div class="nk-o-lvbar"><div id="nk-o-lvfill"></div></div>' +
+        '<div class="nk-o-chips">' +
+          '<span class="nk-o-chip" id="nk-o-shield"><svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><path d="' + SHIELD_D + '"/></svg><span id="nk-o-shn">0</span> kalkan</span>' +
+          '<button type="button" class="nk-o-chip" id="nk-o-badgebtn"><svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><path d="' + STAR_D + '"/></svg><span id="nk-o-bdn">0</span> rozet</button>' +
+        '</div>' +
       '</div>';
     head.insertAdjacentElement('afterend', card);
+    var bb = card.querySelector('#nk-o-badgebtn');
+    if (bb) bb.addEventListener('click', function () { enqueue(0, function (done) { showBadges(null, done); }); });
     return card;
   }
 
@@ -246,6 +293,7 @@
     card.style.display = ready() ? '' : 'none';
     if (!ready()) return;
     var o = O();
+    try { applyShield(o); } catch (e) { console.warn(e); }
     var streak = 0;
     try { streak = calculateStreak(); } catch (e) {}
     var lit = activeToday();
@@ -272,6 +320,7 @@
       setRing(document.getElementById('nk-o-ringbox'), o.dayXp / GOAL, lastShown.dayXp >= 0);
       lastShown.dayXp = o.dayXp;
     }
+    try { checkShieldEarn(o, streak); checkBadges(o, streak); updateFooter(o); } catch (e) { console.warn(e); }
   }
 
   /* ---------- Tam ekran sıra yöneticisi ---------- */
@@ -441,6 +490,118 @@
     }, 1000);
   }
 
+  /* ---------- Seri kalkanı, seviye, rozetler ---------- */
+  function dayStr(offset) { var d = getNowTR(); d.setDate(d.getDate() + offset); return formatDate(d); }
+
+  // Dün tekrar yapılmadıysa ama önceki gün yapıldıysa ve kalkan varsa: dünü kurtarır, seri kopmaz
+  function applyShield(o) {
+    var days = appState.activityDays || [];
+    var y = dayStr(-1), y2 = dayStr(-2);
+    if (days.indexOf(y) >= 0 || days.indexOf(y2) < 0) return;
+    if (o.shieldUsedFor === y || o.shields < 1) return;
+    o.shields--;
+    o.shieldUsedFor = y;
+    o.frozen.push(y);
+    appState.activityDays = days.concat([y]).sort();
+    persist();
+    enqueue(0, function (done) { showShieldUsed(o.shields, done); });
+  }
+
+  // Her 7 günlük seride yeni kalkan (en fazla 2)
+  function checkShieldEarn(o, streak) {
+    if (!activeToday() || streak < 1 || streak % 7 !== 0) return;
+    if (o.shieldEarnDay === today() || o.shields >= MAX_SHIELDS) return;
+    o.shields++;
+    o.shieldEarnDay = today();
+    persist();
+    try { if (typeof showToast === 'function') showToast('Yeni seri kalkanı kazandın!'); } catch (e) {}
+  }
+
+  var lastLevel = 0;
+  function updateFooter(o) {
+    var lv = levelOf(o.xp), a = levelStart(lv), b = levelStart(lv + 1);
+    var set = function (id, t) { var e = document.getElementById(id); if (e) e.textContent = t; };
+    set('nk-o-lv', 'Seviye ' + lv);
+    set('nk-o-lvxp', (o.xp - a) + ' / ' + (b - a) + ' XP');
+    set('nk-o-shn', String(o.shields));
+    set('nk-o-bdn', String(o.badges.length));
+    var fill = document.getElementById('nk-o-lvfill');
+    if (fill) fill.style.width = Math.min(100, Math.round((o.xp - a) / (b - a) * 100)) + '%';
+    if (lastLevel > 0 && lv > lastLevel) enqueue(2, function (done) { showLevelUp(lv, done); });
+    lastLevel = lv;
+  }
+
+  function checkBadges(o, streak) {
+    var ctx = {
+      streak: streak, xp: o.xp, answered: appState.totalAnswered || 0,
+      goals: o.goals || (o.goalDay ? 1 : 0),
+      analyzed: (appState.denemeler || []).filter(function (d) { return d.analyzed; }).length
+    };
+    var fresh = [];
+    BADGES.forEach(function (b) {
+      if (o.badges.indexOf(b.id) < 0 && b.ok(ctx)) { o.badges.push(b.id); fresh.push(b); }
+    });
+    if (fresh.length) {
+      persist();
+      enqueue(2.5, function (done) { showBadges(fresh, done); });
+    }
+  }
+
+  function simpleOverlay(iconD, color, title, text, done) {
+    var ov = makeOverlay(
+      '<div id="nk-o-sico" style="width:130px;height:130px;border-radius:9999px;display:flex;align-items:center;justify-content:center;background:' + color + ';box-shadow:0 0 0 14px rgba(255,255,255,.07)">' +
+        '<svg width="64" height="64" viewBox="0 0 24 24" fill="#fff"><path d="' + iconD + '"/></svg></div>' +
+      '<div class="nk-o-title" style="margin-top:22px">' + title + '</div>' +
+      '<div class="nk-o-text">' + text + '</div>' +
+      '<button type="button" class="nk-o-btn">Devam</button>');
+    wireClose(ov, done);
+    vibrate([30, 30, 70]);
+    if (!reduce) {
+      try { ov.querySelector('#nk-o-sico').animate([{ transform: 'scale(.3) rotate(-15deg)', opacity: 0 }, { transform: 'scale(1.18) rotate(4deg)', opacity: 1, offset: .6 }, { transform: 'scale(1) rotate(0)', opacity: 1 }], { duration: 700, easing: 'ease-out' }); } catch (e) {}
+      confetti(ov);
+    }
+    return ov;
+  }
+
+  function showShieldUsed(left, done) {
+    simpleOverlay(SHIELD_D, 'linear-gradient(135deg,#38bdf8,#2563eb)', 'Seri kalkanın seni kurtardı!',
+      'Dün tekrar yapmadın ama kalkanın zinciri korudu. Kalan kalkan: ' + left + '. Her 7 günlük seride yeni kalkan kazanırsın.', done);
+  }
+
+  function showLevelUp(lv, done) {
+    simpleOverlay(BOLT_D, 'linear-gradient(135deg,#a78bfa,#7c3aed)', 'Seviye ' + lv + '!', 'XP topladıkça seviye atlıyorsun. Böyle devam!', done);
+  }
+
+  function badgeCell(b, on) {
+    return '<div class="nk-o-bd' + (on ? ' on' : '') + '"><div class="nk-o-bdc"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="' + (on ? STAR_D : LOCK_D) + '"/></svg></div>' +
+      '<div>' + b.name + '<small>' + b.desc + '</small></div></div>';
+  }
+
+  // fresh verilirse "Yeni rozet" ekranı, verilmezse tüm rozetler listesi
+  function showBadges(fresh, done) {
+    var o = O(), cells = '', title, text = '';
+    if (fresh && fresh.length) {
+      title = fresh.length === 1 ? 'Yeni rozet!' : fresh.length + ' yeni rozet!';
+      fresh.forEach(function (b) { cells += badgeCell(b, true); });
+    } else {
+      title = 'Rozetlerin';
+      text = o.badges.length + ' / ' + BADGES.length + ' rozet topladın';
+      BADGES.forEach(function (b) { cells += badgeCell(b, o.badges.indexOf(b.id) >= 0); });
+    }
+    var ov = makeOverlay(
+      '<div class="nk-o-title">' + title + '</div>' + (text ? '<div class="nk-o-text">' + text + '</div>' : '') +
+      '<div class="nk-o-bgrid">' + cells + '</div>' +
+      '<button type="button" class="nk-o-btn">Devam</button>');
+    wireClose(ov, done);
+    if (fresh && fresh.length) { vibrate([30, 30, 80]); confetti(ov); }
+    if (!reduce) {
+      var items = ov.querySelectorAll('.nk-o-bd');
+      for (var i = 0; i < items.length; i++) {
+        try { items[i].animate([{ transform: 'scale(.4)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], { duration: 420, delay: 80 + i * 55, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'backwards' }); } catch (e) {}
+      }
+    }
+  }
+
   /* ---------- XP verme ---------- */
   var sess = null;   // günlük tekrar oturumu
 
@@ -453,6 +614,7 @@
     try { renderCard(); } catch (e) {}
     if (!isBonus && o.dayXp >= GOAL && o.goalDay !== today()) {
       o.goalDay = today();
+      o.goals = (o.goals || 0) + 1;
       o.xp += XP_BONUS;
       o.dayXp += XP_BONUS;
       try { renderCard(); } catch (e) {}

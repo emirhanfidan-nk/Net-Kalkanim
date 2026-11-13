@@ -108,6 +108,13 @@
             100% { opacity: 1; transform: translateY(0) scale(1); }
         }
         .onb-step { animation: onbStep 0.38s cubic-bezier(0.16, 1, 0.3, 1) both; }
+        @keyframes onbPop { 0% { opacity: 0; transform: translateY(18px) scale(0.9); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes onbIconIn { 0% { transform: scale(0.5) rotate(-12deg); opacity: 0; } 60% { transform: scale(1.12) rotate(4deg); opacity: 1; } 100% { transform: scale(1) rotate(0); opacity: 1; } }
+        @keyframes onbFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+        @keyframes onbFlame { 0%, 100% { transform: scale(1, 1) rotate(0deg); } 25% { transform: scale(1.08, 1.14) rotate(-5deg); } 55% { transform: scale(0.96, 1.02) rotate(4deg); } 80% { transform: scale(1.06, 1.16) rotate(-3deg); } }
+        .onb-icon-in { animation: onbIconIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both, onbFloat 3.2s ease-in-out 0.7s infinite; }
+        .onb-icon-flame svg { transform-origin: 50% 90%; animation: onbFlame 1.15s ease-in-out infinite; }
+        @media (prefers-reduced-motion: reduce) { .onb-icon-in, .onb-icon-flame svg, #onboarding-preview * { animation: none !important; } }
         @keyframes rtPop { 0% { transform: scale(0.4); opacity: 0; } 60% { transform: scale(1.08); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
         #review-transition-overlay.celebrate { background: linear-gradient(135deg, #0d9488, #0ea5a0 55%, #10b981); }
         .confetti-dot { position: absolute; top: 50%; left: 50%; width: 8px; height: 8px; border-radius: 50%; opacity: 0; }
@@ -2975,6 +2982,7 @@ function renderOnboardingStep() {
         const sl = document.getElementById('onboarding-step-label');
         if (pf) pf.style.width = '0%';
         if (sl) sl.textContent = 'Müfredat';
+        onbAnimate();
         return;
     }
 
@@ -3187,6 +3195,32 @@ function renderOnboardingStep() {
         `;
         btnNext.innerText = "Serimi Başlat";
     }
+    onbAnimate();
+}
+
+// Onboarding adımı çizildikten sonra: ikon zıplayıp süzülür, önizlemedeki parçalar sırayla belirir.
+function onbAnimate() {
+    try {
+        const iconBox = document.getElementById('onboarding-icon');
+        const box = iconBox ? iconBox.parentElement : null;
+        if (box) {
+            box.classList.remove('onb-icon-in', 'onb-icon-flame');
+            void box.offsetWidth;
+            box.classList.add('onb-icon-in');
+            if (currentOnboardingStep === 10) box.classList.add('onb-icon-flame');
+        }
+        const prev = document.getElementById('onboarding-preview');
+        if (!prev) return;
+        let list = prev.firstElementChild;
+        // tek sarmalayıcı varsa onun çocuklarını, yoksa doğrudan önizlemenin çocuklarını sırala
+        let items = list && list.children.length > 1 ? Array.from(list.children) : Array.from(prev.children);
+        items.forEach((el, i) => {
+            el.style.animation = 'none';
+            void el.offsetWidth;
+            el.style.animation = 'onbPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both';
+            el.style.animationDelay = (0.2 + i * 0.11) + 's';
+        });
+    } catch (e) {}
 }
 
 async function selectCurriculumAndContinue(curriculum) {

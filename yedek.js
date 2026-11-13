@@ -293,6 +293,13 @@
     var out = {};
     out.xp = Math.max(a.xp || 0, b.xp || 0);
     out.denemeInit = !!(a.denemeInit || b.denemeInit);
+    out.shields = Math.max(a.shields || 0, b.shields || 0);
+    out.goals = Math.max(a.goals || 0, b.goals || 0);
+    out.shieldUsedFor = later(a.shieldUsedFor, b.shieldUsedFor) || undefined;
+    out.shieldEarnDay = later(a.shieldEarnDay, b.shieldEarnDay) || undefined;
+    var uni = function (x, y) { var s = {}; (x || []).concat(y || []).forEach(function (v) { s[v] = 1; }); return Object.keys(s); };
+    out.badges = uni(a.badges, b.badges);
+    out.frozen = uni(a.frozen, b.frozen);
     out.flameDay = later(a.flameDay, b.flameDay) || undefined;
     out.goalDay = later(a.goalDay, b.goalDay) || undefined;
     var src;
