@@ -20,24 +20,29 @@
   var SHIELD_D = 'M12 1 3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z';
   var STAR_D = 'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z';
   var LOCK_D = 'M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM9 8V6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9z';
+  var BOOK_D = 'M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z';
+  var CHECK_D = 'M9 16.2l-3.5-3.5L4 14.2 9 19.2 20 8.2l-1.5-1.5z';
+  var CHART_D = 'M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z';
   var MAX_SHIELDS = 2;
+  var TITLES = ['', 'Çaylak', 'Azimli', 'Kararlı', 'Gayretli', 'Usta', 'Uzman', 'Efsane'];
+  function titleOf(lv) { return TITLES[Math.min(lv, TITLES.length - 1)]; }
 
   // Seviye: 1. seviye 0 XP, 2. seviye 40 XP, 3. seviye 160 XP, 4. seviye 360 XP ... (40 x seviye-1 kare)
   function levelOf(xp) { return Math.floor(Math.sqrt(Math.max(0, xp) / 40)) + 1; }
   function levelStart(lv) { return 40 * (lv - 1) * (lv - 1); }
 
   var BADGES = [
-    { id: 's3',  name: '3 Gün Seri',  desc: '3 gün üst üste tekrar yap',  ok: function (c) { return c.streak >= 3; } },
-    { id: 's7',  name: '7 Gün Seri',  desc: '7 gün üst üste tekrar yap',  ok: function (c) { return c.streak >= 7; } },
-    { id: 's14', name: '14 Gün Seri', desc: '14 gün üst üste tekrar yap', ok: function (c) { return c.streak >= 14; } },
-    { id: 's30', name: '30 Gün Seri', desc: '30 gün üst üste tekrar yap', ok: function (c) { return c.streak >= 30; } },
-    { id: 'x100', name: '100 XP',  desc: 'Toplam 100 XP topla',  ok: function (c) { return c.xp >= 100; } },
-    { id: 'x500', name: '500 XP',  desc: 'Toplam 500 XP topla',  ok: function (c) { return c.xp >= 500; } },
-    { id: 'x1000', name: '1000 XP', desc: 'Toplam 1000 XP topla', ok: function (c) { return c.xp >= 1000; } },
-    { id: 'q50',  name: '50 Soru',  desc: '50 soru çöz',  ok: function (c) { return c.answered >= 50; } },
-    { id: 'q250', name: '250 Soru', desc: '250 soru çöz', ok: function (c) { return c.answered >= 250; } },
-    { id: 'g1', name: 'İlk Hedef', desc: 'Günlük hedefi bir kez doldur', ok: function (c) { return c.goals >= 1; } },
-    { id: 'd1', name: 'İlk Analiz', desc: 'Bir denemeyi analiz et', ok: function (c) { return c.analyzed >= 1; } }
+    { id: 's3',  name: '3 Gün Seri',  desc: '3 gün üst üste tekrar yap',  ok: function (c) { return c.streak >= 3; }, icon: FLAME_D, c: '#fb923c,#ef4444' },
+    { id: 's7',  name: '7 Gün Seri',  desc: '7 gün üst üste tekrar yap',  ok: function (c) { return c.streak >= 7; }, icon: FLAME_D, c: '#fb923c,#ef4444' },
+    { id: 's14', name: '14 Gün Seri', desc: '14 gün üst üste tekrar yap', ok: function (c) { return c.streak >= 14; }, icon: FLAME_D, c: '#fb923c,#ef4444' },
+    { id: 's30', name: '30 Gün Seri', desc: '30 gün üst üste tekrar yap', ok: function (c) { return c.streak >= 30; }, icon: FLAME_D, c: '#fb923c,#ef4444' },
+    { id: 'x100', name: '100 XP',  desc: 'Toplam 100 XP topla',  ok: function (c) { return c.xp >= 100; }, icon: BOLT_D, c: '#a78bfa,#7c3aed' },
+    { id: 'x500', name: '500 XP',  desc: 'Toplam 500 XP topla',  ok: function (c) { return c.xp >= 500; }, icon: BOLT_D, c: '#a78bfa,#7c3aed' },
+    { id: 'x1000', name: '1000 XP', desc: 'Toplam 1000 XP topla', ok: function (c) { return c.xp >= 1000; }, icon: BOLT_D, c: '#a78bfa,#7c3aed' },
+    { id: 'q50',  name: '50 Soru',  desc: '50 soru çöz',  ok: function (c) { return c.answered >= 50; }, icon: BOOK_D, c: '#2dd4bf,#0891b2' },
+    { id: 'q250', name: '250 Soru', desc: '250 soru çöz', ok: function (c) { return c.answered >= 250; }, icon: BOOK_D, c: '#2dd4bf,#0891b2' },
+    { id: 'g1', name: 'İlk Hedef', desc: 'Günlük hedefi bir kez doldur', ok: function (c) { return c.goals >= 1; }, icon: CHECK_D, c: '#4ade80,#16a34a' },
+    { id: 'd1', name: 'İlk Analiz', desc: 'Bir denemeyi analiz et', ok: function (c) { return c.analyzed >= 1; }, icon: CHART_D, c: '#60a5fa,#2563eb' }
   ];
   var uid = 0;
 
@@ -521,7 +526,7 @@
   function updateFooter(o) {
     var lv = levelOf(o.xp), a = levelStart(lv), b = levelStart(lv + 1);
     var set = function (id, t) { var e = document.getElementById(id); if (e) e.textContent = t; };
-    set('nk-o-lv', 'Seviye ' + lv);
+    set('nk-o-lv', 'Seviye ' + lv + ' · ' + titleOf(lv));
     set('nk-o-lvxp', (o.xp - a) + ' / ' + (b - a) + ' XP');
     set('nk-o-shn', String(o.shields));
     set('nk-o-bdn', String(o.badges.length));
@@ -573,7 +578,8 @@
   }
 
   function badgeCell(b, on) {
-    return '<div class="nk-o-bd' + (on ? ' on' : '') + '"><div class="nk-o-bdc"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="' + (on ? STAR_D : LOCK_D) + '"/></svg></div>' +
+    var bg = on && b.c ? ' style="background:linear-gradient(135deg,' + b.c.split(',')[0] + ',' + b.c.split(',')[1] + ')"' : '';
+    return '<div class="nk-o-bd' + (on ? ' on' : '') + '"><div class="nk-o-bdc"' + bg + '><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="' + (on ? (b.icon || STAR_D) : LOCK_D) + '"/></svg></div>' +
       '<div>' + b.name + '<small>' + b.desc + '</small></div></div>';
   }
 
@@ -744,7 +750,14 @@
     };
   }
 
-  window.__nkOyun = { addXp: addXp, showFlame: function (s) { enqueue(3, function (d) { showFlame(s, d); }); },
+  window.__nkOyun = {
+    info: function () {
+      var o = O(), lv = levelOf(o.xp);
+      return { xp: o.xp, level: lv, from: levelStart(lv), to: levelStart(lv + 1), title: titleOf(lv), shields: o.shields, goals: o.goals || 0,
+        badges: BADGES.map(function (b) { return { id: b.id, name: b.name, desc: b.desc, icon: b.icon, c: b.c, on: o.badges.indexOf(b.id) >= 0 }; }) };
+    },
+    openBadges: function () { enqueue(0, function (done) { showBadges(null, done); }); },
+    addXp: addXp, showFlame: function (s) { enqueue(3, function (d) { showFlame(s, d); }); },
     showGoal: function () { enqueue(2, showGoal); }, showSummary: function (d) { enqueue(1, function (x) { showSummary(d, x); }); }, renderCard: renderCard };
 
   try { renderCard(); } catch (e) {}

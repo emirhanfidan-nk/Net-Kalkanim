@@ -31,14 +31,6 @@
     ['#475569', '#1e293b']
   ];
 
-  var RANKS = [
-    { min: 0, name: 'Çaylak' },
-    { min: 50, name: 'Azimli' },
-    { min: 200, name: 'Kararlı' },
-    { min: 500, name: 'Usta' },
-    { min: 1000, name: 'Efsane' }
-  ];
-
   function svg(name, size, extra) {
     return '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" ' +
       'stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ' + (extra || '') + '>' + ICONS[name] + '</svg>';
@@ -173,13 +165,48 @@
   }
 
   /* ---------- Kart ---------- */
-  function stars(n, total) {
-    var s = '';
-    for (var i = 0; i < total; i++) {
-      s += '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="' + (i < n ? '#fde68a' : 'rgba(255,255,255,.3)') + '" ' +
-        'stroke="none" style="display:inline-block;margin-right:2px">' + ICONS.yildiz + '</svg>';
+  var BOLT = '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>';
+  var SHIELD = ICONS.kalkan;
+
+  function ringAvatar(p, frac, level) {
+    var S = 92, R = 42, C = 2 * Math.PI * R;
+    var w = el('div', '');
+    w.style.cssText = 'position:relative;width:' + S + 'px;height:' + S + 'px;flex-shrink:0';
+    w.innerHTML = '<svg width="' + S + '" height="' + S + '" viewBox="0 0 ' + S + ' ' + S + '" style="position:absolute;inset:0;transform:rotate(-90deg)">' +
+      '<circle cx="46" cy="46" r="' + R + '" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="5"/>' +
+      '<circle cx="46" cy="46" r="' + R + '" fill="none" stroke="#fde68a" stroke-width="5" stroke-linecap="round" ' +
+      'stroke-dasharray="' + C.toFixed(1) + '" stroke-dashoffset="' + (C * (1 - frac)).toFixed(1) + '"/></svg>';
+    var av = avatar(p, 70, false);
+    av.style.position = 'absolute';
+    av.style.left = '11px';
+    av.style.top = '11px';
+    w.appendChild(av);
+    if (level) {
+      var b = el('div', '', String(level));
+      b.style.cssText = 'position:absolute;right:-2px;bottom:-2px;min-width:28px;height:28px;padding:0 6px;border-radius:9999px;' +
+        'background:linear-gradient(135deg,#fbbf24,#f97316);color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;' +
+        'justify-content:center;box-shadow:0 0 0 3px #0f766e';
+      w.appendChild(b);
     }
-    return s;
+    return w;
+  }
+
+  function badgeChip(b) {
+    var c = el('div', '');
+    c.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:4px;width:56px;flex-shrink:0';
+    var g = (b.c || '#fbbf24,#f97316').split(',');
+    var ic = el('div', '');
+    ic.style.cssText = 'width:46px;height:46px;border-radius:9999px;display:flex;align-items:center;justify-content:center;' +
+      (b.on ? 'color:#fff;background:linear-gradient(135deg,' + g[0] + ',' + g[1] + ');box-shadow:0 4px 10px ' + g[1] + '55'
+            : 'color:#cbd5e1;background:#f1f5f9;border:1px dashed #cbd5e1');
+    ic.innerHTML = b.on
+      ? '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="' + b.icon + '"/></svg>'
+      : '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6a5 5 0 0 0-10 0v2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2zM9 6a3 3 0 0 1 6 0v2H9V6z"/></svg>';
+    c.appendChild(ic);
+    var t = el('div', 'text-[10px] font-semibold text-center leading-tight', b.name);
+    t.style.color = b.on ? '#334155' : '#94a3b8';
+    c.appendChild(t);
+    return c;
   }
 
   function render() {
@@ -191,16 +218,13 @@
     var p = load();
     var qs = (appState.questions || []).length;
     var ns = (appState.notes || []).length;
-    var recalls = (appState.recallForgot || 0) + (appState.recallPartial || 0) +
-      (appState.recallRemembered || 0) + (appState.recallVeryEasy || 0);
     var ans = appState.totalAnswered || 0, cor = appState.totalCorrect || 0;
     var acc = ans > 0 ? Math.round(cor / ans * 100) + '%' : '–';
     var streak = 0;
     try { streak = calculateStreak(); } catch (e) {}
 
-    var ri = 0;
-    for (var i = 0; i < RANKS.length; i++) if (recalls >= RANKS[i].min) ri = i;
-    var rank = RANKS[ri], next = RANKS[ri + 1];
+    var g = null;
+    try { if (window.__nkOyun && window.__nkOyun.info) g = window.__nkOyun.info(); } catch (e) {}
 
     var card = el('div', 'space-y-3');
     card.id = 'nk-profile-card';
@@ -208,8 +232,9 @@
     var hero = el('div', 'rounded-3xl p-5 text-white');
     hero.style.background = 'linear-gradient(135deg,#134e4a,#0f766e 60%,#0d9488)';
 
+    var frac = g ? Math.max(0.03, Math.min(1, (g.xp - g.from) / Math.max(1, g.to - g.from))) : 0;
     var top = el('div', 'flex items-center gap-4');
-    top.appendChild(avatar(p, 68, true));
+    top.appendChild(ringAvatar(p, frac, g ? g.level : 0));
     var info = el('div', 'min-w-0 flex-1');
     var nameRow = el('div', 'flex items-center gap-2');
     nameRow.appendChild(el('h3', 'text-lg font-bold truncate', p.name));
@@ -220,12 +245,11 @@
     nameRow.appendChild(edit);
     info.appendChild(nameRow);
 
-    var lvl = el('div', 'mt-1.5 flex items-center gap-2 text-xs font-semibold');
-    var st = document.createElement('span');
-    st.innerHTML = stars(ri + 1, RANKS.length);
-    lvl.appendChild(st);
-    lvl.appendChild(el('span', '', rank.name + (appState.field ? ' · ' + appState.field : '')));
+    var lvl = el('div', 'mt-1 text-sm font-bold');
+    lvl.style.color = '#fde68a';
+    lvl.textContent = g ? g.title + ' · Seviye ' + g.level : 'Öğrenci';
     info.appendChild(lvl);
+    if (appState.field) info.appendChild(el('div', 'text-[11px] opacity-80 mt-0.5', appState.field));
 
     var badge = document.getElementById('yks-countdown-badge');
     if (badge && badge.textContent) {
@@ -240,27 +264,50 @@
     top.appendChild(info);
     hero.appendChild(top);
 
-    var barWrap = el('div', 'mt-4');
-    var label = next
-      ? next.name + ' olmana ' + (next.min - recalls) + ' tekrar kaldı'
-      : 'En üst seviyedesin, harikasın!';
-    barWrap.appendChild(el('p', 'text-[11px] font-semibold mb-1.5', label));
-    var track = el('div', 'w-full rounded-full overflow-hidden');
-    track.style.cssText = 'height:8px;background:rgba(255,255,255,.2)';
-    var pct = next ? Math.max(4, Math.min(100, Math.round((recalls - rank.min) / (next.min - rank.min) * 100))) : 100;
-    var fill = el('div', '');
-    fill.style.cssText = 'height:100%;border-radius:9999px;background:#fff;width:' + pct + '%';
-    track.appendChild(fill);
-    barWrap.appendChild(track);
-    hero.appendChild(barWrap);
+    if (g) {
+      var barWrap = el('div', 'mt-4');
+      var row = el('div', 'flex items-center justify-between text-[11px] font-semibold mb-1.5');
+      row.appendChild(el('span', '', g.xp + ' XP'));
+      row.appendChild(el('span', '', 'Seviye ' + (g.level + 1) + ' için ' + (g.to - g.xp) + ' XP kaldı'));
+      barWrap.appendChild(row);
+      var track = el('div', 'w-full rounded-full overflow-hidden');
+      track.style.cssText = 'height:8px;background:rgba(255,255,255,.2)';
+      var fill = el('div', '');
+      fill.style.cssText = 'height:100%;border-radius:9999px;background:linear-gradient(90deg,#fde68a,#fb923c);width:' + Math.round(frac * 100) + '%';
+      track.appendChild(fill);
+      barWrap.appendChild(track);
+      hero.appendChild(barWrap);
+    }
     card.appendChild(hero);
 
-    var grid = el('div', 'grid grid-cols-4 gap-2');
+    var grid = el('div', 'grid grid-cols-3 gap-2');
     grid.appendChild(tile('ates', '#f97316', streak, 'Seri'));
+    if (g) {
+      grid.appendChild(tile('simsek', '#7c3aed', g.xp, 'Toplam XP'));
+      grid.appendChild(tile('kalkan', '#0891b2', g.shields, 'Kalkan'));
+    }
     grid.appendChild(tile('kitap', '#0d9488', qs, 'Soru'));
     grid.appendChild(tile('not', '#d97706', ns, 'Not'));
     grid.appendChild(tile('hedef', '#e11d48', acc, 'Doğruluk'));
     card.appendChild(grid);
+
+    if (g && g.badges && g.badges.length) {
+      var got = g.badges.filter(function (b) { return b.on; }).length;
+      var box = el('button', 'w-full text-left bg-white border border-slate-200 rounded-2xl p-4 shadow-sm');
+      box.type = 'button';
+      box.id = 'nk-profile-badges';
+      var head = el('div', 'flex items-center justify-between mb-3');
+      head.appendChild(el('div', 'text-sm font-bold text-slate-800', 'Rozetlerim'));
+      head.appendChild(el('div', 'text-xs font-semibold text-teal-600', got + ' / ' + g.badges.length + ' ›'));
+      box.appendChild(head);
+      var strip = el('div', '');
+      strip.style.cssText = 'display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch';
+      var sorted = g.badges.slice().sort(function (a, b) { return (b.on ? 1 : 0) - (a.on ? 1 : 0); });
+      sorted.forEach(function (b) { strip.appendChild(badgeChip(b)); });
+      box.appendChild(strip);
+      box.onclick = function () { try { window.__nkOyun.openBadges(); } catch (e) {} };
+      card.appendChild(box);
+    }
 
     var first = tab.children[0];
     if (first && first.nextSibling) tab.insertBefore(card, first.nextSibling);
