@@ -310,9 +310,11 @@
       lastShown.streak = streak;
     }
     var sub = document.getElementById('nk-o-sub');
-    if (lit) sub.textContent = 'Bugün tamam, harikasın!';
-    else if (streak > 0) sub.textContent = 'Bugün tekrarını yap, serini koru!';
-    else sub.textContent = 'Bugün tekrar yap, serini başlat!';
+    var nm = '';
+    try { var pp = JSON.parse(localStorage.getItem('nk_profile') || 'null'); if (pp && pp.name && pp.name !== 'Öğrenci') nm = pp.name + ', '; } catch (e) {}
+    if (lit) sub.textContent = nm + 'bugün tamam, harikasın!';
+    else if (streak > 0) sub.textContent = nm + 'bugün tekrarını yap, serini koru!';
+    else sub.textContent = nm + 'bugün tekrar yap, serini başlat!';
 
     var xEl = document.getElementById('nk-o-xp');
     if (lastShown.xp !== o.xp) {

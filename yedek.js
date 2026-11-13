@@ -377,7 +377,7 @@
     var items = [];
     rows.forEach(function (r) {
       if (r.kind === 'settings') {
-        if (r.item_id === 'profile') { try { if (!localStorage.getItem('nk_profile')) localStorage.setItem('nk_profile', JSON.stringify(r.data)); } catch (e) {} }
+        if (r.item_id === 'profile') { try { var lp = JSON.parse(localStorage.getItem('nk_profile') || 'null'); if (!lp || lp.onb) { var cp = Object.assign({}, r.data); delete cp.onb; localStorage.setItem('nk_profile', JSON.stringify(cp)); } } catch (e) {} }
         else applySettings(r.data);
         return;
       }

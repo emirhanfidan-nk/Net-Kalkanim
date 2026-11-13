@@ -2986,6 +2986,32 @@ function renderOnboardingStep() {
         return;
     }
 
+    // İsim ekranı: müfredattan sonra, alan seçiminden önce. Bildirimlerde ve uygulamada kişiye adıyla hitap edilir.
+    if (!appState.hasSeenOnboarding && !window.__onbNameDone) {
+        let hasName = false;
+        try { const pp = JSON.parse(localStorage.getItem('nk_profile') || 'null'); hasName = !!(pp && pp.name && pp.name !== 'Öğrenci'); } catch (e) {}
+        if (!hasName) {
+            iconEl.innerHTML = `<path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>`;
+            titleEl.innerText = "Sana Nasıl Hitap Edelim?";
+            descEl.innerText = "Adını yaz, bildirimlerde ve uygulamada sana adınla seslenelim. Bunu sonradan profilinden değiştirebilirsin.";
+            previewEl.innerHTML = `
+                <input id="onb-name-input" type="text" maxlength="20" autocomplete="given-name" placeholder="Adın" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-center text-base font-bold text-slate-800 bg-white mb-3" oninput="document.getElementById('onb-name-go').disabled = !this.value.trim()" onkeydown="if(event.key==='Enter')onbSaveName()">
+                <button id="onb-name-go" disabled onclick="onbSaveName()" class="w-full bg-teal-600 text-white py-3 font-bold text-sm rounded-xl shadow-sm disabled:opacity-50">Devam Et</button>
+            `;
+            btnNext.innerText = "Devam Et";
+            btnSkip.classList.add('hidden');
+            btnNext.disabled = true;
+            btnNext.classList.add('opacity-50', 'cursor-not-allowed');
+            const pf0 = document.getElementById('onboarding-progress-fill');
+            const sl0 = document.getElementById('onboarding-step-label');
+            if (pf0) pf0.style.width = '0%';
+            if (sl0) sl0.textContent = 'İsim';
+            onbAnimate();
+            return;
+        }
+        window.__onbNameDone = true;
+    }
+
     const totalOnboardingSteps = 10;
     const progressFill = document.getElementById('onboarding-progress-fill');
     const stepLabel = document.getElementById('onboarding-step-label');
@@ -3221,6 +3247,20 @@ function onbAnimate() {
             el.style.animationDelay = (0.2 + i * 0.11) + 's';
         });
     } catch (e) {}
+}
+
+function onbSaveName() {
+    const inp = document.getElementById('onb-name-input');
+    const name = ((inp && inp.value) || '').trim().slice(0, 20);
+    if (!name) return;
+    try {
+        let pp = null;
+        try { pp = JSON.parse(localStorage.getItem('nk_profile') || 'null'); } catch (e) {}
+        pp = Object.assign({ icon: 'kalkan', grad: 0 }, pp || {}, { name: name, onb: true });
+        localStorage.setItem('nk_profile', JSON.stringify(pp));
+    } catch (e) {}
+    window.__onbNameDone = true;
+    renderOnboardingStep();
 }
 
 async function selectCurriculumAndContinue(curriculum) {
