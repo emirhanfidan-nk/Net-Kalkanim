@@ -114,6 +114,9 @@
       '@keyframes nkBounce{0%{transform:scale(1)}30%{transform:scale(1.3)}55%{transform:scale(.93)}100%{transform:scale(1)}}' +
       '@keyframes nkShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}' +
       '.nk-bounce{animation:nkBounce .55s cubic-bezier(.34,1.56,.64,1)!important}' +
+      // Alt çubuktaki + butonu translateY(-1.5rem) ile yukarıda duruyor; genel nkBounce bu konumu eziyordu (buton aşağı zıplıyordu).
+      '@keyframes nkBounceAdd{0%,100%{translate:none;scale:none;transform:translateY(-1.5rem) scale(1.1)}30%{translate:none;scale:none;transform:translateY(-1.5rem) scale(1.3)}55%{translate:none;scale:none;transform:translateY(-1.5rem) scale(1.03)}}' +
+      '#nav-add.nk-bounce{animation:nkBounceAdd .55s cubic-bezier(.34,1.56,.64,1)!important}' +
       '.nk-shake{animation:nkShake .45s ease-in-out!important}' +
       '#review-choice-input button,#review-recall-input button{border-bottom-width:4px!important;border-bottom-color:rgba(0,0,0,.22)!important;transition:transform .08s,border-bottom-width .08s!important}' +
       '#review-choice-input button:active:not(:disabled),#review-recall-input button:active:not(:disabled){transform:translateY(3px)!important;border-bottom-width:1px!important}';
