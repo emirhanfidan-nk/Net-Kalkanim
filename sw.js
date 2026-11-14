@@ -1,6 +1,6 @@
 // Sürüm numarasını artık elle değiştirmen gerekmiyor: uygulama dosyaları her açılışta
 // internetten kontrol edilir, internet yoksa kayıtlı kopya kullanılır.
-const CACHE_NAME = 'net-kalkanim-v72';
+const CACHE_NAME = 'net-kalkanim-v73';
 
 const APP_SHELL = [
   './',
@@ -145,6 +145,8 @@ self.addEventListener('push', event => {
       icon: './logo.png',
       badge: './logo.png',
       tag: 'nk-daily',
+      renotify: true,
+      vibrate: [120, 60, 120],
       data: { url: data.url || './' }
     })
   );
