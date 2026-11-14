@@ -157,16 +157,23 @@
     ov.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:2147483000;display:flex;align-items:flex-end;justify-content:center;padding:12px';
     var box = document.createElement('div');
     box.style.cssText = 'background:#fff;border-radius:24px;padding:18px;width:100%;max-width:420px;max-height:90vh;overflow-y:auto';
+    var step = function (n, t) {
+      return '<div style="display:flex;gap:10px;align-items:flex-start;margin-top:9px"><div style="flex-shrink:0;width:22px;height:22px;border-radius:9999px;background:#0d9488;color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center">' + n + '</div><div style="font-size:12.5px;line-height:1.45;color:#334155">' + t + '</div></div>';
+    };
     box.innerHTML =
       '<div style="font-weight:800;font-size:16px;color:#0f172a">Gemini ile ekle</div>' +
-      '<p style="font-size:12px;color:#64748b;margin:6px 0 12px;line-height:1.5">Gemini\'de formatlı cevabı al, Paylaş\'tan Net Kalkanım\'ı seç. Paylaş çıkmazsa cevabı kopyalayıp aşağı yapıştır.</p>' +
-      '<textarea id="nk-gm-text" placeholder="Gemini cevabını buraya yapıştır..." style="width:100%;height:120px;border:1px solid #cbd5e1;border-radius:12px;padding:10px;font-size:12px;color:#1e293b;background:#fff"></textarea>' +
+      '<p style="font-size:12px;color:#64748b;margin:6px 0 4px;line-height:1.5">Gemini\'de çözdüğün soruyu, notu ya da formülü uygulamaya kolayca aktar.</p>' +
+      step(1, 'Aşağıdaki <b>Komutu kopyala</b> düğmesine bas.') +
+      step(2, 'Gemini\'de <b>yeni bir sohbet</b> aç, komutu yapıştırıp gönder. (Her yeni sohbetin başında bir kez.)') +
+      step(3, 'Sorunu normal şekilde sor, anlamadığın yerleri konuş.') +
+      step(4, 'İşin bitince Gemini\'ye şunlardan birini yaz: <b>soru hazırla</b> (soru kaydı), <b>not hazırla</b> (kart) ya da <b>formül hazırla</b> (formül).') +
+      step(5, 'Gemini\'nin yazdığı cevabı kopyala, aşağıdaki kutuya yapıştır, <b>Forma aktar</b>\'a bas.') +
+      '<button id="nk-gm-copy" type="button" style="width:100%;margin-top:14px;padding:12px;border-radius:12px;font-weight:800;font-size:12.5px;background:#0d9488;color:#fff;border:none;box-shadow:0 3px 0 #0f766e">Komutu kopyala</button>' +
+      '<textarea id="nk-gm-text" placeholder="Gemini\'nin cevabını buraya yapıştır..." style="width:100%;height:110px;border:1px solid #cbd5e1;border-radius:12px;padding:10px;font-size:12px;color:#1e293b;background:#fff;margin-top:12px"></textarea>' +
       '<div style="display:flex;gap:8px;margin-top:10px">' +
-        '<button id="nk-gm-go" type="button" style="flex:1;padding:12px;border-radius:12px;font-weight:700;font-size:13px;background:#0d9488;color:#fff;border:none">Forma aktar</button>' +
+        '<button id="nk-gm-go" type="button" style="flex:1;padding:12px;border-radius:12px;font-weight:700;font-size:13px;background:#f0fdfa;color:#0f766e;border:1px solid #99f6e4">Forma aktar</button>' +
         '<button id="nk-gm-x" type="button" style="padding:12px 16px;border-radius:12px;font-weight:600;font-size:13px;background:#f1f5f9;color:#475569;border:none">Kapat</button>' +
-      '</div>' +
-      '<button id="nk-gm-copy" type="button" style="width:100%;margin-top:10px;padding:12px;border-radius:12px;font-weight:700;font-size:12px;background:#f0fdfa;color:#0f766e;border:1px solid #99f6e4">Gemini komutunu kopyala (ders ve konu listemle)</button>' +
-      '<p style="font-size:11px;color:#94a3b8;margin-top:8px;line-height:1.5">Komutu Gemini\'de bir kez yapıştır, istersen Gem olarak kaydet. Her yeni sohbetin başında bir kez yapıştır. Sonra sorunu sor, işin bitince "soru hazırla" ya da "not hazırla" de.</p>';
+      '</div>';
     ov.appendChild(box);
     document.body.appendChild(ov);
     ov.addEventListener('click', function (e) { if (e.target === ov) ov.remove(); });

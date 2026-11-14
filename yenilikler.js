@@ -4,27 +4,44 @@
 (function () {
   'use strict';
 
-  var VERSION = '2026-11-14b';
+  var VERSION = '2026-11-14c';
   var LS = 'nk_whatsnew_seen';
   var iOS = /iPhone|iPad|iPod/i.test(navigator.userAgent || '');
 
   var SLIDES = [
-    { c: '#fb923c,#ef4444', icon: 'M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z',
+    { id: 'seri', c: '#fb923c,#ef4444', icon: 'M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z',
       title: 'Seri, XP ve Seviyeler', text: 'Her gün tekrar yap, serini ve XP\'ni büyüt. Bir günü kaçırırsan Seri Kalkanı serini kurtarır. Rozetler kazan, seviye atla.' },
-    { c: '#14b8a6,#059669', icon: 'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z',
+    { id: 'profil', c: '#14b8a6,#059669', icon: 'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z',
       title: 'Yeni Profil', text: 'Adını yazdın mı uygulama sana adınla seslenir. Seviyeni, XP\'ni ve rozetlerini profilinde gör. Profil ekranından adını ve avatarını değiştirebilirsin.' },
-    { c: '#a78bfa,#7c3aed', icon: 'M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z',
+    { id: 'gemini', c: '#a78bfa,#7c3aed', icon: 'M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z',
       title: 'Gemini ile Ekle', text: 'Ekle sekmesindeki "Gemini ile ekle" düğmesine bas, komutu kopyala ve Gemini\'ye yapıştır. Sorunu çözdürüp "soru hazırla" ya da "not hazırla" de, cevabı buraya yapıştır; ders, konu ve not hazır gelir.' + (iOS ? '' : ' Android\'de Gemini\'nin Paylaş menüsünden de gönderebilirsin.') },
-    { c: '#60a5fa,#2563eb', icon: 'M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z',
+    { id: 'kalem', c: '#60a5fa,#2563eb', icon: 'M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z',
       title: 'Notlarda Kalem', text: 'Not tekrarında da artık kalemle yazıp çizebilirsin. Kaydır, kalem, silgi ve geri al düğmeleri tekrar ekranının altında.' },
-    { c: '#f59e0b,#d97706', icon: 'M5 4v3h5.5v12h3V7H19V4z',
-      title: 'Formüller', text: 'Arşiv sekmesinde yeni "Formüller" bölümü var. Formülleri derse göre gör, arama yap, yıldızla. Tekrar kutularına karışmaz, sadece bakılacak yer. Kendi formülünü de ekleyebilirsin.' },
-    { c: '#4ade80,#16a34a', icon: 'M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z',
+    { id: 'formul', c: '#f59e0b,#d97706', icon: 'M5 4v3h5.5v12h3V7H19V4z',
+      title: 'Formüller', text: 'Üstteki çubukta, Denemeler simgesinin yanında yeni Formüller simgesi var. Formülleri derse göre gör, arama yap, yıldızla. Tekrar kutularına karışmaz, sadece bakılacak yer. Kendi formülünü de ekleyebilirsin.' },
+    { id: 'yedek', c: '#4ade80,#16a34a', icon: 'M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z',
       title: 'Denemelerin de Yedekte', text: 'Soruların, notların, denemelerin, serin ve XP\'ni artık hepsi bulut yedeğe giriyor. Uygulamayı silsen bile kurtarma koduyla geri gelir.' }
   ];
 
-  function seen() { try { return localStorage.getItem(LS) === VERSION; } catch (e) { return false; } }
-  function mark() { try { localStorage.setItem(LS, VERSION); } catch (e) {} }
+  var LS_IDS = 'nk_wn_ids';
+  function seenIds() {
+    var ids = [];
+    try { ids = JSON.parse(localStorage.getItem(LS_IDS) || '[]') || []; } catch (e) {}
+    // Eski sürümde (tek seferlik) tanıtımı görmüş olanlar o ekranları tekrar görmesin
+    try {
+      var old = localStorage.getItem(LS);
+      if (old && ids.indexOf('seri') < 0) ids = ids.concat(['seri', 'profil', 'gemini', 'kalem', 'yedek']);
+    } catch (e) {}
+    return ids;
+  }
+  function markId(id) {
+    var ids = seenIds();
+    if (ids.indexOf(id) < 0) ids.push(id);
+    try { localStorage.setItem(LS_IDS, JSON.stringify(ids)); } catch (e) {}
+  }
+  function unseen() { var ids = seenIds(); return SLIDES.filter(function (s) { return ids.indexOf(s.id) < 0; }); }
+  function seen() { return unseen().length === 0; }
+  function mark() { SLIDES.forEach(function (s) { markId(s.id); }); }
 
   function css() {
     if (document.getElementById('nk-wn-css')) return;
@@ -51,6 +68,8 @@
   function show() {
     if (document.querySelector('.nk-wn')) return;
     css();
+    var list = unseen();
+    if (!list.length) return;
     var i = 0;
     var ov = document.createElement('div');
     ov.className = 'nk-wn';
@@ -60,18 +79,19 @@
     document.body.appendChild(ov);
 
     function paint() {
-      var s = SLIDES[i], g = s.c.split(',');
-      var last = i === SLIDES.length - 1;
+      var s = list[i], g = s.c.split(',');
+      var last = i === list.length - 1;
+      markId(s.id);
       box.innerHTML =
-        '<div class="nk-wn-tag">Yenilikler ' + (i + 1) + ' / ' + SLIDES.length + '</div>' +
+        '<div class="nk-wn-tag">Yenilikler ' + (i + 1) + ' / ' + list.length + '</div>' +
         '<div class="nk-wn-ic" style="background:linear-gradient(135deg,' + g[0] + ',' + g[1] + ')"><svg width="42" height="42" viewBox="0 0 24 24" fill="currentColor"><path d="' + s.icon + '"/></svg></div>' +
         '<div class="nk-wn-t"></div><p class="nk-wn-p"></p>' +
-        '<div class="nk-wn-dots">' + SLIDES.map(function (_, k) { return '<i' + (k === i ? ' class="on"' : '') + '></i>'; }).join('') + '</div>' +
+        '<div class="nk-wn-dots">' + list.map(function (_, k) { return '<i' + (k === i ? ' class="on"' : '') + '></i>'; }).join('') + '</div>' +
         '<button type="button" class="nk-wn-btn">' + (last ? 'Hadi Başlayalım' : 'Devam') + '</button>';
       box.querySelector('.nk-wn-t').textContent = s.title;
       box.querySelector('.nk-wn-p').textContent = s.text;
       box.querySelector('.nk-wn-btn').onclick = function () {
-        if (last) { mark(); ov.remove(); } else { i++; paint(); }
+        if (last) { ov.remove(); } else { i++; paint(); }
       };
     }
     paint();

@@ -47,7 +47,7 @@
   }
 
   /* ---------- Ana pencere ---------- */
-  var state = { q: '', course: '' };
+  var state = { q: '', course: '', chipLeft: 0 };
   var root = null;
 
   function close() {
@@ -57,7 +57,7 @@
 
   function open() {
     if (root) return;
-    state = { q: '', course: '' };
+    state = { q: '', course: '', chipLeft: 0 };
     root = el('div', 'position:fixed;inset:0;z-index:2147482000;background:#f8fafc;display:flex;flex-direction:column;font-family:inherit');
     root.id = 'nk-formul';
     document.body.appendChild(root);
@@ -67,6 +67,8 @@
 
   function paint() {
     if (!root) return;
+    var oldChips = root.querySelector('#nk-fm-chips');
+    if (oldChips) state.chipLeft = oldChips.scrollLeft;
     var keepScroll = root.querySelector('#nk-fm-list');
     var st = keepScroll ? keepScroll.scrollTop : 0;
     root.innerHTML = '';
@@ -99,7 +101,9 @@
     }
     chip('Tümü', '');
     courses().forEach(function (c) { chip(pretty(c), c); });
+    chips.id = 'nk-fm-chips';
     root.appendChild(chips);
+    chips.scrollLeft = state.chipLeft;
 
     var lst = el('div', 'flex:1;overflow-y:auto;padding:12px 16px 90px');
     lst.id = 'nk-fm-list';
@@ -129,7 +133,7 @@
       var empty = el('div', 'text-align:center;color:#64748b;padding:48px 16px;font-size:13px;line-height:1.6');
       empty.innerHTML = all().length
         ? 'Bu aramayla eşleşen formül yok.'
-        : '<b style="color:#0f172a">Henüz formül yok.</b><br>Sağ üstten <b>+ Ekle</b> ile kendi formülünü ekleyebilirsin. Gemini ile de ekleyebilirsin: Ekle sekmesinde "Gemini ile ekle" düğmesine bas, Gemini\'ye "formül hazırla" de.';
+        : '<b style="color:#0f172a">Henüz formül yok.</b><br>Sağ üstten <b>+ Ekle</b> ile kendi formülünü ekleyebilirsin. Gemini ile de ekleyebilirsin: Ekle sekmesindeki "Gemini ile ekle" düğmesine bas ve adımları izle.';
       lst.appendChild(empty);
       return;
     }
@@ -225,28 +229,7 @@
     document.body.appendChild(ov);
   }
 
-  /* ---------- Başlangıç: Arşiv sekmesine düğme ---------- */
-  function ensureButton() {
-    var lib = document.getElementById('library');
-    if (!lib || document.getElementById('nk-fm-btn')) return;
-    var b = document.createElement('button');
-    b.id = 'nk-fm-btn';
-    b.type = 'button';
-    b.style.cssText = 'width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:16px;font-weight:800;font-size:12px;' +
-      'color:#0f766e;background:#f0fdfa;border:1px solid #99f6e4';
-    b.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M5 4v3h5.5v12h3V7H19V4z"/></svg>Formüller';
-    b.onclick = open;
-    var header = lib.firstElementChild;
-    if (header && header.nextSibling) lib.insertBefore(b, header.nextSibling); else lib.appendChild(b);
-  }
-
-  function start() {
-    ensureButton();
-    var sw = window.switchTab;
-    if (typeof sw === 'function') {
-      window.switchTab = function (id) { var r = sw.apply(this, arguments); if (id === 'library') ensureButton(); return r; };
-    }
-  }
+  function start() { /* giriş düğmesi üst çubukta (index.html) */ }
 
   window.__nkFormul = {
     open: open,

@@ -812,6 +812,9 @@
                 </button>
             </div>
             <div class="flex items-center gap-1">
+                <button onclick="window.__nkFormul && window.__nkFormul.open()" id="nav-formul" title="Formüller" class="p-2 text-slate-400 hover:text-teal-600 transition-colors rounded-xl">
+                    <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M18 4H6v2l6.5 6L6 18v2h12v-3h-7l5-5-5-5h7z"/></svg>
+                </button>
                 <button onclick="openDenemeTab()" id="nav-deneme" title="Denemeler" class="p-2 text-slate-400 hover:text-teal-600 transition-colors rounded-xl">
                     <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M5 9.2h3V19H5V9.2zM10.6 5h2.8v14h-2.8V5zm5.6 8H19v6h-2.8v-6z"/></svg>
                 </button>
@@ -4016,12 +4019,14 @@ function denemeChartSVG(points) {
     return `<svg viewBox="0 0 ${W} ${H}" class="w-full" role="img" aria-label="Net grafiği">${g}${n > 1 ? `<path d="${path}" fill="none" stroke="#0d9488" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>` : ''}${dots}${xl}</svg>`;
 }
 
-function setDenemeType(t) { denemeActiveType = t; denemeChartCourse = 'TOPLAM'; renderDenemeList(); }
+let denemeChipsLeft = 0;
+function setDenemeType(t) { denemeActiveType = t; denemeChartCourse = 'TOPLAM'; denemeChipsLeft = 0; renderDenemeList(); }
 function setDenemeChart(i) { denemeChartCourse = denemeChipList[i] || 'TOPLAM'; renderDenemeList(); }
 
 function renderDenemeList() {
     const root = document.getElementById('deneme-root');
     if (!root) return;
+    { const oc = root.querySelector('.nk-dn-chips'); if (oc) denemeChipsLeft = oc.scrollLeft; }
     const type = denemeActiveType;
     const all = denemesOfType(type);
     const courses = denemeCoursesFor(type).filter(c => all.some(d => d.scores && d.scores[c]));
@@ -4050,7 +4055,7 @@ function renderDenemeList() {
 
     const chartCard = all.length ? `
         <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
-            <div class="flex gap-2 overflow-x-auto pb-3 -mx-1 px-1">${chips}</div>
+            <div class="nk-dn-chips flex gap-2 overflow-x-auto pb-3 -mx-1 px-1">${chips}</div>
             ${points.length ? denemeChartSVG(points) : '<p class="text-xs text-slate-400 text-center py-8">Bu ders için henüz veri yok.</p>'}
             ${stats}
         </div>` : '';
@@ -4087,6 +4092,8 @@ function renderDenemeList() {
         </div>
         ${chartCard}${empty}
         <div class="space-y-3">${cards}</div>`;
+    // Ders çipleri yatay kayıyor; yeniden çizimde en sola dönmesin, kaldığı yerde dursun.
+    { const nc = root.querySelector('.nk-dn-chips'); if (nc) nc.scrollLeft = denemeChipsLeft; }
 }
 
 function openDeneme(id) {
