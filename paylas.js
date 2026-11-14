@@ -129,7 +129,7 @@
   function buildPrompt() {
     var cats = (appState && appState.categories) || {};
     var lines = Object.keys(cats).map(function (c) { return c + ': ' + (cats[c] || []).join(' | '); });
-    return 'Bu sohbette benimle normal konuşmaya devam et: sorularımı çöz, anlamadığım yerleri anlat. Sadece ben "soru hazırla", "not hazırla" ya da "formül hazırla" dediğimde o ana kadarki konuşmadan Net Kalkanım uygulaması için bir kayıt hazırla. O zaman SADECE ilgili formatı yaz, başka açıklama, ** veya markdown kullanma.\n\n' +
+    return 'Bu sohbette benimle normal konuşmaya devam et: sorularımı çöz, anlamadığım yerleri anlat. Ben "soru hazırla", "not hazırla" ya da "formül hazırla" dediğimde, ya da bunun gibi bir isteği cümle içinde söylediğimde (ör. "bu soruyu uygulamaya gönder", "soruyu kaydetmek için hazırla", "bunun notunu çıkar", "şu formülü ekle") ne istediğimi anla ve o ana kadarki konuşmadan Net Kalkanım uygulaması için ilgili kaydı hazırla. Cümle nasıl kurulursa kurulsun: soru/soruyu gönder = soru, not/kart = not, formül = formül. O zaman SADECE ilgili formatı yaz, başka açıklama, ** veya markdown kullanma.\n\n' +
       'Ben "soru hazırla" dersem:\nTÜR: SORU\nDERS: (aşağıdaki listeden)\nKONU: (aşağıdaki listeden)\nCEVAP: (doğru şık harfi, A-E)\nNOT: (anlamadığım yerin kısa notu, en fazla 3-4 cümle)\n\n' +
       'Ben "not hazırla" dersem:\nTÜR: KART\nDERS: (aşağıdaki listeden)\nKONU: (aşağıdaki listeden)\nÖN: (kısa soru veya başlık)\nARKA: (kısa bilgi)\n\n' +
       'Ben "formül hazırla" dersem:\nTÜR: FORMÜL\nDERS: (aşağıdaki listeden)\nBAŞLIK: (formülün kısa adı)\nFORMÜL: (her formülü ayrı satıra ve LaTeX olarak $ işaretleri arasına yaz, ör. $F = m \\cdot a$ ; istersen satırın başına kısa etiket koy, ör. Düz tel: $B = \\frac{2ki}{d}$)\n\n' +
