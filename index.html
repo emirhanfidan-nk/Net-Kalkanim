@@ -1182,6 +1182,10 @@
                 <div id="deneme-root"></div>
             </div>
 
+            <div id="formul" class="tab-content space-y-5">
+                <div id="formul-root"></div>
+            </div>
+
             <div id="profile" class="tab-content space-y-5">
 
                 <!-- Ayarlar başlığı (diğer sekmelerle aynı stil) -->
@@ -4387,7 +4391,7 @@ function cancelPendingDeneme() {
     if (id) { denemeOpenId = id; switchTab('deneme'); }
 }
 
-const TAB_ORDER = ['home', 'add', 'library', 'deneme', 'profile'];
+const TAB_ORDER = ['home', 'add', 'library', 'formul', 'deneme', 'profile'];
 function switchTab(tabId) {
     {
         const prev = document.querySelector('.tab-content.active');
@@ -4406,6 +4410,7 @@ function switchTab(tabId) {
     const pillLibrary = document.getElementById('nav-library-pill');
     const btnProfile = document.getElementById('nav-profile');
     const btnDeneme = document.getElementById('nav-deneme');
+    const btnFormul = document.getElementById('nav-formul');
 
     // Deneme ekleme modundayken başka sekmeye geçilirse bağlantı iptal olur.
     if (tabId !== 'add' && pendingDenemeId) { pendingDenemeId = null; updateAddDenemeBanner(); }
@@ -4420,6 +4425,10 @@ function switchTab(tabId) {
     if (btnProfile) {
         btnProfile.classList.remove('text-teal-600', 'bg-teal-50');
         btnProfile.classList.add('text-slate-400');
+    }
+    if (btnFormul) {
+        btnFormul.classList.remove('text-teal-600', 'bg-teal-50');
+        btnFormul.classList.add('text-slate-400');
     }
     if (btnDeneme) {
         btnDeneme.classList.remove('text-teal-600', 'bg-teal-50');
@@ -4438,6 +4447,9 @@ function switchTab(tabId) {
     } else if (tabId === 'profile' && btnProfile) {
         btnProfile.classList.remove('text-slate-400');
         btnProfile.classList.add('text-teal-600', 'bg-teal-50');
+    } else if (tabId === 'formul' && btnFormul) {
+        btnFormul.classList.remove('text-slate-400');
+        btnFormul.classList.add('text-teal-600', 'bg-teal-50');
     } else if (tabId === 'deneme' && btnDeneme) {
         btnDeneme.classList.remove('text-slate-400');
         btnDeneme.classList.add('text-teal-600', 'bg-teal-50');
@@ -4446,6 +4458,7 @@ function switchTab(tabId) {
     if(tabId === 'library') { populateArchiveFilters(); renderLibrary(); }
     if(tabId === 'home') { updateHomeStats(); }
     if(tabId === 'deneme') { renderDeneme(); }
+    if(tabId === 'formul' && window.__nkFormul) { window.__nkFormul.render(); }
 }
 
 function getEstimatedTime(count) {

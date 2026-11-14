@@ -7,9 +7,43 @@
   'use strict';
 
   /* ---------- Hazır formüller (herkeste) ----------
-     { id: 'benzersiz-kısa-ad', ders: 'TYT MATEMATİK', baslik: 'Başlık', formul: 'Formül metni' }
+     { id: 'benzersiz-kısa-ad', ders: 'TYT MATEMATİK', baslik: 'Başlık', formul: 'Formül metni', kaynak: 'İsteğe bağlı: nereden geldiği' }
      ders, uygulamadaki ders adıyla aynı olmalı (TYT MATEMATİK, AYT FİZİK ...). */
-  var BUILTIN = [];
+  var BUILTIN = [
+    { id: 'fz1', ders: 'AYT FİZİK', baslik: "Mekanik · Bağıl Hız", formul: "v_bağıl = v_gözlenen − v_gözlemci   (vektörel)" },
+    { id: 'fz2', ders: 'AYT FİZİK', baslik: "Mekanik · Newton'un 2. Yasası ve Sürtünme", formul: "F_net = m·a\nf_s = k·N" },
+    { id: 'fz3', ders: 'AYT FİZİK', baslik: "Mekanik · Sabit İvmeli Hareket", formul: "v = v₀ ± a·t\nx = v₀·t ± ½·a·t²\nv² = v₀² ± 2·a·x" },
+    { id: 'fz4', ders: 'AYT FİZİK', baslik: "Mekanik · Atışlar", formul: "h = ½·g·t²\nv = g·t\nt_çıkış = v₀y / g\nx_menzil = v₀x · t_uçuş" },
+    { id: 'fz5', ders: 'AYT FİZİK', baslik: "Mekanik · İş, Güç ve Enerji", formul: "W = F·Δx·cosθ\nE_k = ½·m·v²\nE_p = m·g·h\nE_yay = ½·k·x²\nP = W / t" },
+    { id: 'fz6', ders: 'AYT FİZİK', baslik: "Mekanik · İtme ve Momentum", formul: "I = F_ort·Δt = ΔP\nP = m·v\nP_ilk = P_son" },
+    { id: 'fz7', ders: 'AYT FİZİK', baslik: "Mekanik · Tork ve Basit Makineler", formul: "τ = F·d·sinθ\nF·x_F = P·x_P\nVerim = W_alınan / W_verilen" },
+    { id: 'fz8', ders: 'AYT FİZİK', baslik: "Elektrik · Elektriksel Kuvvet ve Alan", formul: "F = k·q₁·q₂ / d²\nE = F / q = k·q / d²" },
+    { id: 'fz9', ders: 'AYT FİZİK', baslik: "Elektrik · Potansiyel ve İş", formul: "V = k·q / d\nE_p = k·q₁·q₂ / d\nW = q·ΔV" },
+    { id: 'fz10', ders: 'AYT FİZİK', baslik: "Elektrik · Paralel Levhalar ve Sığa", formul: "E = V / d\nF = q·E = q·V / d\nC = Q / V = ε₀·A / d\nE_sığa = ½·C·V²" },
+    { id: 'fz11', ders: 'AYT FİZİK', baslik: "Manyetizma · Manyetik Alan (B)", formul: "Düz tel: B = 2k·i / d\nÇember merkezinde: B = 2kπ·i / r\nAkım makarası (bobin): B = 4kπ·N·i / L" },
+    { id: 'fz12', ders: 'AYT FİZİK', baslik: "Manyetizma · Manyetik Kuvvet ve Tork", formul: "Akım geçen tele: F = B·i·l·sinα\nHareketli yüke: F = q·v·B·sinα , r = m·v / (q·B)\nÇerçeveye etkiyen tork: τ = B·i·A·N" },
+    { id: 'fz13', ders: 'AYT FİZİK', baslik: "Manyetizma · İndüksiyon ve Öz İndüksiyon", formul: "Φ = B·A·cosα\nε = −ΔΦ / Δt = B·v·l\nε_öz = −L·Δi / Δt" },
+    { id: 'fz14', ders: 'AYT FİZİK', baslik: "Alternatif Akım · Etkin Değerler", formul: "V_etkin = V_max / √2\ni_etkin = i_max / √2" },
+    { id: 'fz15', ders: 'AYT FİZİK', baslik: "Alternatif Akım · Reaktans ve Empedans", formul: "X_L = ω·L = 2π·f·L\nX_C = 1 / (ω·C) = 1 / (2π·f·C)\nZ = √( R² + (X_L − X_C)² )" },
+    { id: 'fz16', ders: 'AYT FİZİK', baslik: "Alternatif Akım · Transformatör", formul: "V_p / V_s = N_p / N_s\nVerim = (V_s·i_s) / (V_p·i_p)" },
+    { id: 'fz17', ders: 'AYT FİZİK', baslik: "Çembersel Hareket · Hız ve Periyot", formul: "T·f = 1\nω = 2π / T = 2π·f\nv = ω·r = 2π·r / T" },
+    { id: 'fz18', ders: 'AYT FİZİK', baslik: "Çembersel Hareket · İvme ve Kuvvet", formul: "a_m = v² / r = ω²·r\nF_m = m·v² / r = m·ω²·r" },
+    { id: 'fz19', ders: 'AYT FİZİK', baslik: "Çembersel Hareket · Virajlar", formul: "v_yatay,max = √(k·g·r)\nv_eğimli = √(g·r·tanα)" },
+    { id: 'fz20', ders: 'AYT FİZİK', baslik: "Dönme · Eylemsizlik Momenti ve Enerji", formul: "I = Σ m·r²\nE_dönme = ½·I·ω²\nE_top = ½·m·v² + ½·I·ω²" },
+    { id: 'fz21', ders: 'AYT FİZİK', baslik: "Dönme · Açısal Momentum ve Tork", formul: "L = I·ω = m·v·r\nτ_net = I·α = ΔL / Δt" },
+    { id: 'fz22', ders: 'AYT FİZİK', baslik: "Kütle Çekim · Kuvvet ve İvme", formul: "F = G·m₁·m₂ / d²\ng = G·M / r²" },
+    { id: 'fz23', ders: 'AYT FİZİK', baslik: "Kütle Çekim · Yörünge ve Kurtulma Hızı", formul: "v_yörünge = √(G·M / r)\nv_kurtulma = √(2·G·M / r)" },
+    { id: 'fz24', ders: 'AYT FİZİK', baslik: "Kütle Çekim · Enerjiler", formul: "E_pot = −G·M·m / r\nE_top = −G·M·m / 2r\nE_bağlanma = +G·M·m / 2r" },
+    { id: 'fz25', ders: 'AYT FİZİK', baslik: "Kütle Çekim · Kepler Periyot Yasası", formul: "R³ / T² = sabit" },
+    { id: 'fz26', ders: 'AYT FİZİK', baslik: "Basit Harmonik Hareket · Konum, Hız, İvme, Kuvvet", formul: "x = r·sin(ω·t)\nv = ω·√(r² − x²)   (v_max = ω·r)\na = −ω²·x   (a_max = ω²·r)\nF = −m·ω²·x" },
+    { id: 'fz27', ders: 'AYT FİZİK', baslik: "Basit Harmonik Hareket · Periyotlar", formul: "T_yay = 2π·√(m / k)\nT_sarkaç = 2π·√(L / g)" },
+    { id: 'fz28', ders: 'AYT FİZİK', baslik: "Dalga · Çift Yarıkta Girişim (Young)", formul: "Δx = L·λ / (d·n)\nAydınlık: Δs = n·λ\nKaranlık: Δs = (n − ½)·λ" },
+    { id: 'fz29', ders: 'AYT FİZİK', baslik: "Dalga · Tek Yarıkta Kırınım", formul: "Δx = L·λ / (w·n)\nAydınlık: Δs = (n + ½)·λ\nKaranlık: Δs = n·λ" },
+    { id: 'fz30', ders: 'AYT FİZİK', baslik: "Dalga · Elektromanyetik Dalgalar", formul: "c = λ·f\nE / B = c" },
+    { id: 'fz31', ders: 'AYT FİZİK', baslik: "Modern Fizik · Bohr Atom Modeli", formul: "r_n = a₀·n² / Z\nE_n = −13,6·Z² / n²  eV\nL_n = n·h / 2π" },
+    { id: 'fz32', ders: 'AYT FİZİK', baslik: "Modern Fizik · Fotoelektrik Olay", formul: "E_foton = h·f = h·c / λ\nE_foton = E₀ + E_k,max\nE₀ = h·f₀ = h·c / λ₀\nE_k,max = e·V_kesme" },
+    { id: 'fz33', ders: 'AYT FİZİK', baslik: "Modern Fizik · Compton Saçılması ve De Broglie", formul: "E_gelen = E_saçılan + E_k,elektron\nΔλ = λ′ − λ = (h / m_e·c)·(1 − cosθ)\nλ = h / P = h / (m·v)" }
+  ];
 
   var FAV = 'nk_fav_formul';
 
@@ -46,74 +80,59 @@
     return BUILTIN.map(function (f) { return Object.assign({ mine: false }, f); }).concat(mine);
   }
 
-  /* ---------- Ana pencere ---------- */
-  var state = { q: '', course: '', chipLeft: 0 };
-  var root = null;
-
-  function close() {
-    if (root) { root.remove(); root = null; }
-    try { closeWithBackSupport('formul'); } catch (e) {}
-  }
+  /* ---------- Sekme (denemeler gibi) ---------- */
+  var state = { q: '', course: '' };
+  function host() { return document.getElementById('formul-root'); }
 
   function open() {
-    if (root) return;
-    state = { q: '', course: '', chipLeft: 0 };
-    root = el('div', 'position:fixed;inset:0;z-index:2147482000;background:#f8fafc;display:flex;flex-direction:column;font-family:inherit');
-    root.id = 'nk-formul';
-    document.body.appendChild(root);
-    try { openWithBackSupport('formul', close); } catch (e) {}
-    paint();
+    state.q = ''; state.course = '';
+    try { switchTab('formul'); } catch (e) {}
   }
+  function render() { paint(); }
 
   function paint() {
+    var root = host();
     if (!root) return;
-    var oldChips = root.querySelector('#nk-fm-chips');
-    if (oldChips) state.chipLeft = oldChips.scrollLeft;
-    var keepScroll = root.querySelector('#nk-fm-list');
-    var st = keepScroll ? keepScroll.scrollTop : 0;
+    var oldList = root.querySelector('#nk-fm-list');
     root.innerHTML = '';
 
-    var head = el('div', 'display:flex;align-items:center;gap:10px;padding:14px 16px 8px;background:#fff;border-bottom:1px solid #e2e8f0');
-    var back = el('button', 'width:38px;height:38px;border-radius:12px;border:0;background:#f1f5f9;color:#334155;font-size:18px;font-weight:700', '←');
-    back.onclick = close;
-    head.appendChild(back);
-    head.appendChild(el('div', 'flex:1;font-weight:800;font-size:18px;color:#0f172a', 'Formüller'));
-    var add = el('button', 'padding:9px 14px;border-radius:12px;border:0;background:#0d9488;color:#fff;font-weight:800;font-size:12px;box-shadow:0 3px 0 #0f766e', '+ Ekle');
+    var head = el('div', 'display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e2e8f0;padding-bottom:8px;margin-bottom:12px');
+    head.appendChild(el('h2', 'font-size:20px;font-weight:600;color:#1e293b;font-family:inherit', 'Formüller'));
+    var add = el('button', 'padding:8px 14px;border-radius:12px;border:0;background:#0d9488;color:#fff;font-weight:800;font-size:12px;box-shadow:0 3px 0 #0f766e', '+ Ekle');
     add.onclick = function () { openAdd(null); };
     head.appendChild(add);
     root.appendChild(head);
 
-    var bar = el('div', 'padding:10px 16px 6px;background:#fff');
-    var inp = el('input', 'width:100%;border:1px solid #cbd5e1;border-radius:12px;padding:10px 12px;font-size:13px;color:#0f172a;background:#fff');
+    var inp = el('input', 'width:100%;border:1px solid #cbd5e1;border-radius:12px;padding:10px 12px;font-size:13px;color:#0f172a;background:#fff;margin-bottom:10px');
     inp.type = 'search';
-    inp.placeholder = 'Formül ara (ör. tork, türev)';
+    inp.placeholder = 'Formül ara (ör. tork, momentum)';
     inp.value = state.q;
     inp.oninput = function () { state.q = inp.value; list(); };
-    bar.appendChild(inp);
-    root.appendChild(bar);
+    root.appendChild(inp);
 
-    var chips = el('div', 'display:flex;gap:6px;overflow-x:auto;padding:4px 16px 10px;background:#fff;border-bottom:1px solid #e2e8f0;-webkit-overflow-scrolling:touch');
+    // Çipler alt alta sarılır (yatay kaydırma yok); sadece formülü olan dersler gösterilir
+    var have = courses().filter(function (c) { return all().some(function (x) { return x.ders === c; }); });
+    if (state.course && have.indexOf(state.course) < 0) state.course = '';
+    var chips = el('div', 'display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px');
     function chip(label, val) {
       var on = state.course === val;
-      var b = el('button', 'flex-shrink:0;padding:6px 12px;border-radius:9999px;font-size:11px;font-weight:700;border:1px solid ' + (on ? '#0d9488' : '#cbd5e1') + ';background:' + (on ? '#0d9488' : '#fff') + ';color:' + (on ? '#fff' : '#475569'), label);
+      var b = el('button', 'padding:6px 12px;border-radius:9999px;font-size:11px;font-weight:700;border:1px solid ' + (on ? '#0d9488' : '#cbd5e1') + ';background:' + (on ? '#0d9488' : '#fff') + ';color:' + (on ? '#fff' : '#475569'), label);
       b.onclick = function () { state.course = val; paint(); };
       chips.appendChild(b);
     }
     chip('Tümü', '');
-    courses().forEach(function (c) { chip(pretty(c), c); });
+    have.forEach(function (c) { chip(pretty(c), c); });
     chips.id = 'nk-fm-chips';
     root.appendChild(chips);
-    chips.scrollLeft = state.chipLeft;
 
-    var lst = el('div', 'flex:1;overflow-y:auto;padding:12px 16px 90px');
+    var lst = el('div', '');
     lst.id = 'nk-fm-list';
     root.appendChild(lst);
     list();
-    lst.scrollTop = st;
   }
 
   function list() {
-    var lst = root && root.querySelector('#nk-fm-list');
+    var lst = document.getElementById('nk-fm-list');
     if (!lst) return;
     lst.innerHTML = '';
     var f = favs(), q = norm(state.q).trim();
@@ -157,6 +176,7 @@
       if (starred) card.appendChild(el('div', 'font-size:10px;font-weight:800;color:#64748b;margin-top:2px', pretty(x.ders)));
       var body = el('div', 'margin-top:8px;font-size:16px;line-height:1.7;color:#0f766e;font-weight:600;white-space:pre-wrap;word-break:break-word', x.formul);
       card.appendChild(body);
+      if (x.kaynak) card.appendChild(el('div', 'margin-top:8px;font-size:10px;font-weight:600;color:#94a3b8', 'Kaynak: ' + x.kaynak));
       if (x.mine) {
         var row = el('div', 'display:flex;gap:14px;margin-top:10px');
         var ed = el('button', 'border:0;background:transparent;font-size:11px;font-weight:700;color:#0d9488;padding:0', 'Düzenle');
@@ -184,44 +204,59 @@
   /* ---------- Ekleme / düzenleme formu ---------- */
   function openAdd(item, pre) {
     var d = item || pre || {};
-    var ov = el('div', 'position:fixed;inset:0;z-index:2147483200;background:rgba(15,23,42,.6);display:flex;align-items:flex-end;justify-content:center;padding:12px');
-    var box = el('div', 'background:#fff;border-radius:24px;padding:18px;width:100%;max-width:420px;max-height:92vh;overflow-y:auto');
-    box.appendChild(el('div', 'font-weight:800;font-size:16px;color:#0f172a;margin-bottom:12px', item ? 'Formülü düzenle' : 'Yeni formül'));
+    var ov = el('div', 'position:fixed;inset:0;z-index:2147483200;background:#fff;overflow-y:auto;font-family:inherit');
+    var box = el('div', 'max-width:480px;margin:0 auto;padding:18px 18px 40px');
+    var hd = el('div', 'display:flex;align-items:center;gap:10px;margin-bottom:8px');
+    var bk = el('button', 'width:38px;height:38px;border-radius:12px;border:0;background:#f1f5f9;color:#334155;font-size:18px;font-weight:700', '←');
+    bk.onclick = function () { ov.remove(); };
+    hd.appendChild(bk);
+    hd.appendChild(el('div', 'font-weight:800;font-size:17px;color:#0f172a', item ? 'Formülü düzenle' : 'Yeni formül'));
+    box.appendChild(hd);
 
-    function lab(t) { box.appendChild(el('div', 'font-size:11px;font-weight:700;color:#64748b;margin:10px 0 4px', t)); }
+    function lab(t) { box.appendChild(el('div', 'font-size:11px;font-weight:700;color:#64748b;margin:14px 0 6px', t)); }
     lab('Ders');
-    var sel = el('select', 'width:100%;border:1px solid #cbd5e1;border-radius:12px;padding:11px;font-size:13px;background:#fff;color:#0f172a');
     var cs = Object.keys((appState && appState.categories) || {});
     if (d.ders && cs.indexOf(d.ders) < 0) cs.push(d.ders);
     if (!cs.length) cs = ['GENEL'];
-    cs.forEach(function (c) { var o = document.createElement('option'); o.value = c; o.textContent = pretty(c); if (c === d.ders || (!d.ders && c === state.course)) o.selected = true; sel.appendChild(o); });
-    box.appendChild(sel);
+    var chosen = d.ders || state.course || cs[0];
+    var wrap = el('div', 'display:flex;flex-wrap:wrap;gap:6px');
+    function drawChips() {
+      wrap.innerHTML = '';
+      cs.forEach(function (c) {
+        var on = c === chosen;
+        var b = el('button', 'padding:7px 12px;border-radius:9999px;font-size:11px;font-weight:700;border:1px solid ' + (on ? '#0d9488' : '#cbd5e1') + ';background:' + (on ? '#0d9488' : '#fff') + ';color:' + (on ? '#fff' : '#475569'), pretty(c));
+        b.onclick = function () { chosen = c; drawChips(); };
+        wrap.appendChild(b);
+      });
+    }
+    drawChips();
+    box.appendChild(wrap);
     lab('Başlık');
-    var tin = el('input', 'width:100%;border:1px solid #cbd5e1;border-radius:12px;padding:11px;font-size:13px;color:#0f172a;background:#fff');
+    var tin = el('input', 'width:100%;border:1px solid #cbd5e1;border-radius:12px;padding:11px;font-size:14px;color:#0f172a;background:#fff');
     tin.value = d.baslik || ''; tin.placeholder = 'ör. Tork'; tin.maxLength = 80;
     box.appendChild(tin);
     lab('Formül');
-    var fin = el('textarea', 'width:100%;height:110px;border:1px solid #cbd5e1;border-radius:12px;padding:11px;font-size:14px;color:#0f172a;background:#fff');
+    var fin = el('textarea', 'width:100%;height:140px;border:1px solid #cbd5e1;border-radius:12px;padding:11px;font-size:15px;color:#0f172a;background:#fff');
     fin.value = d.formul || ''; fin.placeholder = 'ör. τ = F · d · sinθ'; fin.maxLength = 1500;
     box.appendChild(fin);
 
-    var row = el('div', 'display:flex;gap:8px;margin-top:14px');
-    var cancel = el('button', 'flex:1;padding:12px;border-radius:12px;border:0;background:#f1f5f9;color:#475569;font-weight:700;font-size:13px', 'Vazgeç');
+    var row = el('div', 'display:flex;gap:8px;margin-top:18px');
+    var cancel = el('button', 'flex:1;padding:13px;border-radius:12px;border:0;background:#f1f5f9;color:#475569;font-weight:700;font-size:13px', 'Vazgeç');
     cancel.onclick = function () { ov.remove(); };
-    var ok = el('button', 'flex:1;padding:12px;border-radius:12px;border:0;background:#0d9488;color:#fff;font-weight:800;font-size:13px', 'Kaydet');
+    var ok = el('button', 'flex:1;padding:13px;border-radius:12px;border:0;background:#0d9488;color:#fff;font-weight:800;font-size:13px', 'Kaydet');
     ok.onclick = async function () {
       var b = tin.value.trim(), f = fin.value.trim();
       if (!b || !f) { toast('Başlık ve formülü yaz!', true); return; }
       var l = userList();
       if (item) {
-        l.forEach(function (x) { if (x.id === item.id) { x.ders = sel.value; x.baslik = b; x.formul = f; } });
+        l.forEach(function (x) { if (x.id === item.id) { x.ders = chosen; x.baslik = b; x.formul = f; } });
       } else {
-        l.push({ id: 'u' + Date.now(), ders: sel.value, baslik: b, formul: f });
+        l.push({ id: 'u' + Date.now(), ders: chosen, baslik: b, formul: f });
       }
       ov.remove();
       await persist();
       toast('Formül kaydedildi');
-      if (!root) open(); else paint();
+      if (host() && host().offsetParent !== null) paint(); else open();
     };
     row.appendChild(cancel); row.appendChild(ok);
     box.appendChild(row);
@@ -234,6 +269,7 @@
   window.__nkFormul = {
     open: open,
     openAdd: openAdd,
+    render: render,
     // Gemini'den gelen kayıt: ders listede varsa seçilir
     addFromParsed: function (p) {
       var cs = Object.keys((appState && appState.categories) || {});
