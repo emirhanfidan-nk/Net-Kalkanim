@@ -16,7 +16,7 @@
   var SETTINGS_KEYS = [
     'field', 'authState', 'dailyLimitQ', 'dailyLimitN', 'intervals', 'noteIntervals',
     'selectedCourses', 'selectedTopics', 'archSelectedCourses', 'archSelectedTopics',
-    'hasSeenOnboarding', 'activityDays', 'darkMode', 'hapticsEnabled', 'curriculum',
+    'hasSeenOnboarding', 'activityDays', 'darkMode', 'tema', 'hapticsEnabled', 'curriculum',
     'totalAnswered', 'totalCorrect', 'recallForgot', 'recallPartial', 'recallRemembered',
     'recallVeryEasy', 'denemeler', 'formuller', 'oyun'
   ];
