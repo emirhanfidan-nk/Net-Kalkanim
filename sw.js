@@ -1,6 +1,6 @@
 // Sürüm numarasını artık elle değiştirmen gerekmiyor: uygulama dosyaları her açılışta
 // internetten kontrol edilir, internet yoksa kayıtlı kopya kullanılır.
-const CACHE_NAME = 'net-kalkanim-v64';
+const CACHE_NAME = 'net-kalkanim-v65';
 
 const APP_SHELL = [
   './',
@@ -16,6 +16,7 @@ const APP_SHELL = [
   './bildirim.js',
   './ayarlar.js',
   './oyunlastirma.js',
+  './paylas.js',
   './manifest.json',
   './logo.png'
 ];
@@ -58,7 +59,7 @@ self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys()
       .then(keys => Promise.all(
-        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
+        keys.filter(key => key !== CACHE_NAME && key !== 'nk-share').map(key => caches.delete(key))
       ))
       .then(() => self.clients.claim())
   );
@@ -97,8 +98,29 @@ async function cacheFirst(request) {
   return response;
 }
 
+// Android "Paylaş" menüsünden (ör. Gemini) gelen metin/görseli sakla, uygulamaya yönlendir.
+async function handleShare(request) {
+  try {
+    const fd = await request.formData();
+    const cache = await caches.open('nk-share');
+    const data = { title: String(fd.get('title') || ''), text: String(fd.get('text') || ''), url: String(fd.get('url') || ''), t: Date.now() };
+    await cache.put('/__share/data', new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } }));
+    const img = fd.get('image');
+    if (img && typeof img !== 'string' && img.size) {
+      await cache.put('/__share/image', new Response(img, { headers: { 'Content-Type': img.type || 'image/jpeg' } }));
+    } else {
+      await cache.delete('/__share/image');
+    }
+  } catch (e) { /* paylaşım okunamadı, yine de uygulamayı aç */ }
+  return Response.redirect('/?shared=1', 303);
+}
+
 self.addEventListener('fetch', event => {
   const req = event.request;
+  if (req.method === 'POST' && new URL(req.url).pathname === '/share-target') {
+    event.respondWith(handleShare(req));
+    return;
+  }
   if (req.method !== 'GET') return;
   if (!req.url.startsWith('http')) return;
   // Bulut yedek ve lisans sunucusu istekleri asla önbelleğe alınmasın
