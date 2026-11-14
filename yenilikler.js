@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  var VERSION = '2026-11-14';
+  var VERSION = '2026-11-14b';
   var LS = 'nk_whatsnew_seen';
   var iOS = /iPhone|iPad|iPod/i.test(navigator.userAgent || '');
 
@@ -17,6 +17,8 @@
       title: 'Gemini ile Ekle', text: 'Ekle sekmesindeki "Gemini ile ekle" düğmesine bas, komutu kopyala ve Gemini\'ye yapıştır. Sorunu çözdürüp "soru hazırla" ya da "not hazırla" de, cevabı buraya yapıştır; ders, konu ve not hazır gelir.' + (iOS ? '' : ' Android\'de Gemini\'nin Paylaş menüsünden de gönderebilirsin.') },
     { c: '#60a5fa,#2563eb', icon: 'M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z',
       title: 'Notlarda Kalem', text: 'Not tekrarında da artık kalemle yazıp çizebilirsin. Kaydır, kalem, silgi ve geri al düğmeleri tekrar ekranının altında.' },
+    { c: '#f59e0b,#d97706', icon: 'M5 4v3h5.5v12h3V7H19V4z',
+      title: 'Formüller', text: 'Arşiv sekmesinde yeni "Formüller" bölümü var. Formülleri derse göre gör, arama yap, yıldızla. Tekrar kutularına karışmaz, sadece bakılacak yer. Kendi formülünü de ekleyebilirsin.' },
     { c: '#4ade80,#16a34a', icon: 'M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z',
       title: 'Denemelerin de Yedekte', text: 'Soruların, notların, denemelerin, serin ve XP\'ni artık hepsi bulut yedeğe giriyor. Uygulamayı silsen bile kurtarma koduyla geri gelir.' }
   ];

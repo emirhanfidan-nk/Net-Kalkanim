@@ -23,26 +23,27 @@
   function toast(m, err) { try { showToast(m, !!err); } catch (e) {} }
 
   /* ---------- Ayrıştırma ---------- */
-  var KEY_RE = /^\s*[*_#>\-\s]*(TÜR|TUR|DERS|KONU|CEVAP|NOT|ÖN|ON|ARKA|SORU|ŞIKLAR|SIKLAR|ŞIKLAR|SIK)(?:\s*YÜZ|\s*YUZ)?\s*[*_]*\s*[:：]\s*(.*)$/i;
+  var KEY_RE = /^\s*[*_#>\-\s]*(TÜR|TUR|DERS|KONU|CEVAP|NOT|ÖN|ON|ARKA|SORU|ŞIKLAR|SIKLAR|SIK|BAŞLIK|BASLIK|FORMÜL|FORMUL)(?:\s*YÜZ|\s*YUZ)?\s*[*_]*\s*[:：]\s*(.*)$/i;
 
   function parse(text) {
-    var out = { type: '', ders: '', konu: '', cevap: '', not: '', on: '', arka: '', soru: '', raw: String(text || '') };
+    var out = { type: '', ders: '', konu: '', cevap: '', not: '', on: '', arka: '', soru: '', baslik: '', formul: '', raw: String(text || '') };
     var cur = null, any = false;
     String(text || '').split(/\r?\n/).forEach(function (line) {
       var m = line.match(KEY_RE);
       if (m) {
         var k = m[1].toLocaleUpperCase('tr-TR').replace('Ö', 'O').replace('Ü', 'U').replace('Ş', 'S');
-        var map = { TUR: 'type', DERS: 'ders', KONU: 'konu', CEVAP: 'cevap', NOT: 'not', ON: 'on', ARKA: 'arka', SORU: 'soru', SIKLAR: 'siklar', SIK: 'siklar' };
+        var map = { TUR: 'type', DERS: 'ders', KONU: 'konu', CEVAP: 'cevap', NOT: 'not', ON: 'on', ARKA: 'arka', SORU: 'soru', SIKLAR: 'siklar', SIK: 'siklar', BASLIK: 'baslik', FORMUL: 'formul' };
         cur = map[k];
         if (cur && cur !== 'siklar') { out[cur] = m[2]; any = true; } else cur = cur === 'siklar' ? '_' : null;
       } else if (cur && cur !== '_' && line.trim()) {
         out[cur] += (out[cur] ? '\n' : '') + line;
       }
     });
-    ['type', 'ders', 'konu', 'cevap', 'not', 'on', 'arka', 'soru'].forEach(function (k) { out[k] = clean(out[k]); });
+    ['type', 'ders', 'konu', 'cevap', 'not', 'on', 'arka', 'soru', 'baslik', 'formul'].forEach(function (k) { out[k] = clean(out[k]); });
     out.any = any;
     var t = norm(out.type);
-    if (t.indexOf('kart') >= 0) out.kind = 'card';
+    if (t.indexOf('formul') >= 0 || out.formul) out.kind = 'formula';
+    else if (t.indexOf('kart') >= 0) out.kind = 'card';
     else if (t.indexOf('soru') >= 0) out.kind = 'question';
     else if (out.on || out.arka) out.kind = 'card';
     else out.kind = 'question';
@@ -83,6 +84,10 @@
   }
 
   function fill(p, image) {
+    if (p.kind === 'formula') {
+      if (window.__nkFormul) { window.__nkFormul.open(); window.__nkFormul.addFromParsed(p); }
+      return;
+    }
     switchTab('add');
     var notes = [];
     setEntryType(p.kind === 'card' ? 'note' : 'question');
@@ -124,9 +129,10 @@
   function buildPrompt() {
     var cats = (appState && appState.categories) || {};
     var lines = Object.keys(cats).map(function (c) { return c + ': ' + (cats[c] || []).join(' | '); });
-    return 'Bu sohbette benimle normal konuşmaya devam et: sorularımı çöz, anlamadığım yerleri anlat. Sadece ben "soru hazırla" ya da "not hazırla" dediğimde o ana kadarki konuşmadan Net Kalkanım uygulaması için bir kayıt hazırla. O zaman SADECE aşağıdaki formatı yaz, başka açıklama, ** veya markdown kullanma.\n\n' +
+    return 'Bu sohbette benimle normal konuşmaya devam et: sorularımı çöz, anlamadığım yerleri anlat. Sadece ben "soru hazırla", "not hazırla" ya da "formül hazırla" dediğimde o ana kadarki konuşmadan Net Kalkanım uygulaması için bir kayıt hazırla. O zaman SADECE ilgili formatı yaz, başka açıklama, ** veya markdown kullanma.\n\n' +
       'Ben "soru hazırla" dersem:\nTÜR: SORU\nDERS: (aşağıdaki listeden)\nKONU: (aşağıdaki listeden)\nCEVAP: (doğru şık harfi, A-E)\nNOT: (anlamadığım yerin kısa notu, en fazla 3-4 cümle)\n\n' +
       'Ben "not hazırla" dersem:\nTÜR: KART\nDERS: (aşağıdaki listeden)\nKONU: (aşağıdaki listeden)\nÖN: (kısa soru veya başlık)\nARKA: (kısa bilgi)\n\n' +
+      'Ben "formül hazırla" dersem:\nTÜR: FORMÜL\nDERS: (aşağıdaki listeden)\nBAŞLIK: (formülün kısa adı)\nFORMÜL: (formülün kendisi, sade metin; üs için ², kök için √ gibi karakterler kullan)\n\n' +
       'DERS ve KONU sadece şu listeden seçilmeli, aynen yazılmalı:\n' + lines.join('\n') + '\n\nŞimdi sadece "Hazır" de.';
   }
 

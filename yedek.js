@@ -18,7 +18,7 @@
     'selectedCourses', 'selectedTopics', 'archSelectedCourses', 'archSelectedTopics',
     'hasSeenOnboarding', 'activityDays', 'darkMode', 'hapticsEnabled', 'curriculum',
     'totalAnswered', 'totalCorrect', 'recallForgot', 'recallPartial', 'recallRemembered',
-    'recallVeryEasy', 'denemeler', 'oyun'
+    'recallVeryEasy', 'denemeler', 'formuller', 'oyun'
   ];
 
   /* ---------- Kurtarma kodu ---------- */
@@ -327,6 +327,17 @@
     return out;
   }
 
+  function mergeFormuller(local, cloud) {
+    var byId = {}, out = [];
+    (local || []).forEach(function (f) { byId[f.id] = f; out.push(f); });
+    (cloud || []).forEach(function (f) {
+      var m = byId[f.id];
+      if (!m) { out.push(f); return; }
+      if (f.deleted && !m.deleted) { var i = out.indexOf(m); out[i] = f; byId[f.id] = f; }   // silme her yerde geçerli
+    });
+    return out;
+  }
+
   function mergeKey(k, v) {
     if (k === 'activityDays') {
       var set = {};
@@ -338,6 +349,8 @@
       appState.hasSeenOnboarding = !!(appState.hasSeenOnboarding || v);
     } else if (k === 'denemeler') {
       appState.denemeler = mergeDenemeler(appState.denemeler, v);
+    } else if (k === 'formuller') {
+      appState.formuller = mergeFormuller(appState.formuller, v);
     } else if (k === 'oyun') {
       appState.oyun = mergeOyun(appState.oyun, v);
     }
@@ -349,7 +362,7 @@
       if (SETTINGS_KEYS.indexOf(k) === -1) return;
       if (k === 'authState') {
         if (d.authState === 'full' || !appState.authState || appState.authState === 'none') appState.authState = d.authState;
-      } else if (k === 'activityDays' || k === 'oyun' || k === 'denemeler' || k === 'hasSeenOnboarding' || COUNTER_KEYS.indexOf(k) >= 0) {
+      } else if (k === 'activityDays' || k === 'oyun' || k === 'denemeler' || k === 'formuller' || k === 'hasSeenOnboarding' || COUNTER_KEYS.indexOf(k) >= 0) {
         mergeKey(k, d[k]);          // ilerleme verisi: her zaman birleştir
       } else if (fresh) {
         appState[k] = d[k];
