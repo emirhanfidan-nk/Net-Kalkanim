@@ -10,39 +10,30 @@
      { id: 'benzersiz-kısa-ad', ders: 'TYT MATEMATİK', baslik: 'Başlık', formul: 'Formül metni', kaynak: 'İsteğe bağlı: nereden geldiği' }
      ders, uygulamadaki ders adıyla aynı olmalı (TYT MATEMATİK, AYT FİZİK ...). */
   var BUILTIN = [
-    { id: 'fz1', ders: 'AYT FİZİK', baslik: "Mekanik · Bağıl Hız", formul: "v_bağıl = v_gözlenen − v_gözlemci   (vektörel)" },
-    { id: 'fz2', ders: 'AYT FİZİK', baslik: "Mekanik · Newton'un 2. Yasası ve Sürtünme", formul: "F_net = m·a\nf_s = k·N" },
-    { id: 'fz3', ders: 'AYT FİZİK', baslik: "Mekanik · Sabit İvmeli Hareket", formul: "v = v₀ ± a·t\nx = v₀·t ± ½·a·t²\nv² = v₀² ± 2·a·x" },
-    { id: 'fz4', ders: 'AYT FİZİK', baslik: "Mekanik · Atışlar", formul: "h = ½·g·t²\nv = g·t\nt_çıkış = v₀y / g\nx_menzil = v₀x · t_uçuş" },
-    { id: 'fz5', ders: 'AYT FİZİK', baslik: "Mekanik · İş, Güç ve Enerji", formul: "W = F·Δx·cosθ\nE_k = ½·m·v²\nE_p = m·g·h\nE_yay = ½·k·x²\nP = W / t" },
-    { id: 'fz6', ders: 'AYT FİZİK', baslik: "Mekanik · İtme ve Momentum", formul: "I = F_ort·Δt = ΔP\nP = m·v\nP_ilk = P_son" },
-    { id: 'fz7', ders: 'AYT FİZİK', baslik: "Mekanik · Tork ve Basit Makineler", formul: "τ = F·d·sinθ\nF·x_F = P·x_P\nVerim = W_alınan / W_verilen" },
-    { id: 'fz8', ders: 'AYT FİZİK', baslik: "Elektrik · Elektriksel Kuvvet ve Alan", formul: "F = k·q₁·q₂ / d²\nE = F / q = k·q / d²" },
-    { id: 'fz9', ders: 'AYT FİZİK', baslik: "Elektrik · Potansiyel ve İş", formul: "V = k·q / d\nE_p = k·q₁·q₂ / d\nW = q·ΔV" },
-    { id: 'fz10', ders: 'AYT FİZİK', baslik: "Elektrik · Paralel Levhalar ve Sığa", formul: "E = V / d\nF = q·E = q·V / d\nC = Q / V = ε₀·A / d\nE_sığa = ½·C·V²" },
-    { id: 'fz11', ders: 'AYT FİZİK', baslik: "Manyetizma · Manyetik Alan (B)", formul: "Düz tel: B = 2k·i / d\nÇember merkezinde: B = 2kπ·i / r\nAkım makarası (bobin): B = 4kπ·N·i / L" },
-    { id: 'fz12', ders: 'AYT FİZİK', baslik: "Manyetizma · Manyetik Kuvvet ve Tork", formul: "Akım geçen tele: F = B·i·l·sinα\nHareketli yüke: F = q·v·B·sinα , r = m·v / (q·B)\nÇerçeveye etkiyen tork: τ = B·i·A·N" },
-    { id: 'fz13', ders: 'AYT FİZİK', baslik: "Manyetizma · İndüksiyon ve Öz İndüksiyon", formul: "Φ = B·A·cosα\nε = −ΔΦ / Δt = B·v·l\nε_öz = −L·Δi / Δt" },
-    { id: 'fz14', ders: 'AYT FİZİK', baslik: "Alternatif Akım · Etkin Değerler", formul: "V_etkin = V_max / √2\ni_etkin = i_max / √2" },
-    { id: 'fz15', ders: 'AYT FİZİK', baslik: "Alternatif Akım · Reaktans ve Empedans", formul: "X_L = ω·L = 2π·f·L\nX_C = 1 / (ω·C) = 1 / (2π·f·C)\nZ = √( R² + (X_L − X_C)² )" },
-    { id: 'fz16', ders: 'AYT FİZİK', baslik: "Alternatif Akım · Transformatör", formul: "V_p / V_s = N_p / N_s\nVerim = (V_s·i_s) / (V_p·i_p)" },
-    { id: 'fz17', ders: 'AYT FİZİK', baslik: "Çembersel Hareket · Hız ve Periyot", formul: "T·f = 1\nω = 2π / T = 2π·f\nv = ω·r = 2π·r / T" },
-    { id: 'fz18', ders: 'AYT FİZİK', baslik: "Çembersel Hareket · İvme ve Kuvvet", formul: "a_m = v² / r = ω²·r\nF_m = m·v² / r = m·ω²·r" },
-    { id: 'fz19', ders: 'AYT FİZİK', baslik: "Çembersel Hareket · Virajlar", formul: "v_yatay,max = √(k·g·r)\nv_eğimli = √(g·r·tanα)" },
-    { id: 'fz20', ders: 'AYT FİZİK', baslik: "Dönme · Eylemsizlik Momenti ve Enerji", formul: "I = Σ m·r²\nE_dönme = ½·I·ω²\nE_top = ½·m·v² + ½·I·ω²" },
-    { id: 'fz21', ders: 'AYT FİZİK', baslik: "Dönme · Açısal Momentum ve Tork", formul: "L = I·ω = m·v·r\nτ_net = I·α = ΔL / Δt" },
-    { id: 'fz22', ders: 'AYT FİZİK', baslik: "Kütle Çekim · Kuvvet ve İvme", formul: "F = G·m₁·m₂ / d²\ng = G·M / r²" },
-    { id: 'fz23', ders: 'AYT FİZİK', baslik: "Kütle Çekim · Yörünge ve Kurtulma Hızı", formul: "v_yörünge = √(G·M / r)\nv_kurtulma = √(2·G·M / r)" },
-    { id: 'fz24', ders: 'AYT FİZİK', baslik: "Kütle Çekim · Enerjiler", formul: "E_pot = −G·M·m / r\nE_top = −G·M·m / 2r\nE_bağlanma = +G·M·m / 2r" },
-    { id: 'fz25', ders: 'AYT FİZİK', baslik: "Kütle Çekim · Kepler Periyot Yasası", formul: "R³ / T² = sabit" },
-    { id: 'fz26', ders: 'AYT FİZİK', baslik: "Basit Harmonik Hareket · Konum, Hız, İvme, Kuvvet", formul: "x = r·sin(ω·t)\nv = ω·√(r² − x²)   (v_max = ω·r)\na = −ω²·x   (a_max = ω²·r)\nF = −m·ω²·x" },
-    { id: 'fz27', ders: 'AYT FİZİK', baslik: "Basit Harmonik Hareket · Periyotlar", formul: "T_yay = 2π·√(m / k)\nT_sarkaç = 2π·√(L / g)" },
-    { id: 'fz28', ders: 'AYT FİZİK', baslik: "Dalga · Çift Yarıkta Girişim (Young)", formul: "Δx = L·λ / (d·n)\nAydınlık: Δs = n·λ\nKaranlık: Δs = (n − ½)·λ" },
-    { id: 'fz29', ders: 'AYT FİZİK', baslik: "Dalga · Tek Yarıkta Kırınım", formul: "Δx = L·λ / (w·n)\nAydınlık: Δs = (n + ½)·λ\nKaranlık: Δs = n·λ" },
-    { id: 'fz30', ders: 'AYT FİZİK', baslik: "Dalga · Elektromanyetik Dalgalar", formul: "c = λ·f\nE / B = c" },
-    { id: 'fz31', ders: 'AYT FİZİK', baslik: "Modern Fizik · Bohr Atom Modeli", formul: "r_n = a₀·n² / Z\nE_n = −13,6·Z² / n²  eV\nL_n = n·h / 2π" },
-    { id: 'fz32', ders: 'AYT FİZİK', baslik: "Modern Fizik · Fotoelektrik Olay", formul: "E_foton = h·f = h·c / λ\nE_foton = E₀ + E_k,max\nE₀ = h·f₀ = h·c / λ₀\nE_k,max = e·V_kesme" },
-    { id: 'fz33', ders: 'AYT FİZİK', baslik: "Modern Fizik · Compton Saçılması ve De Broglie", formul: "E_gelen = E_saçılan + E_k,elektron\nΔλ = λ′ − λ = (h / m_e·c)·(1 − cosθ)\nλ = h / P = h / (m·v)" }
+    { id: 'fz1', ders: 'AYT FİZİK', baslik: "Bağıl Hız", formul: "$\\vec{v}_{\\text{bağıl}} = \\vec{v}_{\\text{gözlenen}} - \\vec{v}_{\\text{gözlemci}}$" },
+    { id: 'fz2', ders: 'AYT FİZİK', baslik: "Newton’un 2. Yasası ve Sürtünme", formul: "$F_{\\text{net}} = m \\cdot a$\n$f_s = k \\cdot N$" },
+    { id: 'fz3', ders: 'AYT FİZİK', baslik: "Sabit İvmeli Hareket", formul: "$v = v_0 \\pm a t$\n$x = v_0 t \\pm \\frac{1}{2} a t^2$\n$v^2 = v_0^2 \\pm 2 a x$" },
+    { id: 'fz4', ders: 'AYT FİZİK', baslik: "Atışlar", formul: "$h = \\frac{1}{2} g t^2$\n$v = g t$\n$t_{\\text{çıkış}} = \\frac{v_{0y}}{g}$\n$x_{\\text{menzil}} = v_{0x} \\cdot t_{\\text{uçuş}}$" },
+    { id: 'fz5', ders: 'AYT FİZİK', baslik: "İş, Güç ve Enerji", formul: "$W = F \\cdot \\Delta x \\cdot \\cos\\theta$\n$E_k = \\frac{1}{2} m v^2$\n$E_p = m g h$\n$E_{\\text{yay}} = \\frac{1}{2} k x^2$\n$P = \\frac{W}{t}$" },
+    { id: 'fz6', ders: 'AYT FİZİK', baslik: "İtme ve Momentum", formul: "$\\vec{I} = \\vec{F}_{\\text{ort}} \\cdot \\Delta t = \\Delta \\vec{P}$\n$\\vec{P} = m \\cdot \\vec{v}$\n$\\vec{P}_{\\text{ilk}} = \\vec{P}_{\\text{son}}$" },
+    { id: 'fz7', ders: 'AYT FİZİK', baslik: "Tork ve Basit Makineler", formul: "$\\tau = F \\cdot d \\cdot \\sin\\theta$\n$F \\cdot x_F = P \\cdot x_P$\n$\\text{Verim} = \\frac{W_{\\text{alınan}}}{W_{\\text{verilen}}}$" },
+    { id: 'fz8', ders: 'AYT FİZİK', baslik: "Elektriksel Kuvvet ve Alan", formul: "$F = k \\frac{q_1 q_2}{d^2}$\n$E = \\frac{F}{q} = k \\frac{q}{d^2}$" },
+    { id: 'fz9', ders: 'AYT FİZİK', baslik: "Elektriksel Potansiyel ve İş", formul: "$V = k \\frac{q}{d}$\n$E_p = k \\frac{q_1 q_2}{d}$\n$W = q \\cdot \\Delta V$" },
+    { id: 'fz10', ders: 'AYT FİZİK', baslik: "Paralel Levhalar ve Sığa", formul: "$E = \\frac{V}{d}$\n$F = q \\cdot E = \\frac{q V}{d}$\n$C = \\frac{Q}{V} = \\varepsilon_0 \\frac{A}{d}$\n$E_{\\text{sığa}} = \\frac{1}{2} C V^2$" },
+    { id: 'fz11', ders: 'AYT FİZİK', baslik: "Manyetik Alan (B)", formul: "Düz tel: $B = \\frac{2 k i}{d}$\nÇember merkezinde: $B = \\frac{2 k \\pi i}{r}$\nAkım makarası (bobin): $B = \\frac{4 k \\pi N i}{L}$" },
+    { id: 'fz12', ders: 'AYT FİZİK', baslik: "Manyetik Kuvvet ve Tork", formul: "Akım geçen tele: $F = B \\cdot i \\cdot l \\cdot \\sin\\alpha$\nHareketli yüke: $F = q \\cdot v \\cdot B \\cdot \\sin\\alpha$\n$r = \\frac{m v}{q B}$\nÇerçeveye etkiyen tork: $\\tau = B \\cdot i \\cdot A \\cdot N$" },
+    { id: 'fz13', ders: 'AYT FİZİK', baslik: "İndüksiyon ve Öz İndüksiyon", formul: "$\\Phi = B \\cdot A \\cdot \\cos\\alpha$\n$\\varepsilon = -\\frac{\\Delta \\Phi}{\\Delta t} = B \\cdot v \\cdot l$\n$\\varepsilon_{\\text{öz}} = -L \\frac{\\Delta i}{\\Delta t}$" },
+    { id: 'fz14', ders: 'AYT FİZİK', baslik: "Alternatif Akım ve Transformatörler", formul: "Etkin değerler: $V_{\\text{etkin}} = \\frac{V_{\\text{max}}}{\\sqrt{2}}$\n$i_{\\text{etkin}} = \\frac{i_{\\text{max}}}{\\sqrt{2}}$\nReaktans ve Empedans: $X_L = \\omega L = 2\\pi f L$\n$X_C = \\frac{1}{\\omega C} = \\frac{1}{2\\pi f C}$\n$Z = \\sqrt{R^2 + (X_L - X_C)^2}$\nTransformatör: $\\frac{V_p}{V_s} = \\frac{N_p}{N_s}$\n$\\text{Verim} = \\frac{V_s \\cdot i_s}{V_p \\cdot i_p}$" },
+    { id: 'fz15', ders: 'AYT FİZİK', baslik: "Düzgün Çembersel Hareket", formul: "Hız ve Periyot: $T \\cdot f = 1$\n$\\omega = \\frac{2\\pi}{T} = 2\\pi f$\n$v = \\omega \\cdot r = \\frac{2\\pi r}{T}$\nİvme ve Kuvvet: $a_m = \\frac{v^2}{r} = \\omega^2 r$\n$F_m = m \\frac{v^2}{r} = m \\omega^2 r$\nVirajlar: $v_{\\text{yatay, max}} = \\sqrt{k g r}$\n$v_{\\text{eğimli}} = \\sqrt{g r \\tan\\alpha}$" },
+    { id: 'fz16', ders: 'AYT FİZİK', baslik: "Dönme ve Açısal Momentum", formul: "Eylemsizlik Momenti ve Enerji: $I = \\sum m r^2$\n$E_{\\text{dönme}} = \\frac{1}{2} I \\omega^2$\n$E_{\\text{top}} = \\frac{1}{2} m v^2 + \\frac{1}{2} I \\omega^2$\nAçısal Momentum ve Tork: $L = I \\cdot \\omega = m \\cdot v \\cdot r$\n$\\tau_{\\text{net}} = I \\cdot \\alpha = \\frac{\\Delta L}{\\Delta t}$" },
+    { id: 'fz17', ders: 'AYT FİZİK', baslik: "Kütle Çekim ve Kepler", formul: "Çekim Kuvveti ve İvmesi: $F = G \\frac{m_1 m_2}{d^2}$\n$g = G \\frac{M}{r^2}$\nYörünge ve Kurtulma Hızı: $v_{\\text{yörünge}} = \\sqrt{\\frac{G M}{r}}$\n$v_{\\text{kurtulma}} = \\sqrt{\\frac{2 G M}{r}}$\nEnerjiler: $E_{\\text{pot}} = -G \\frac{M m}{r}$\n$E_{\\text{top}} = -G \\frac{M m}{2r}$\n$E_{\\text{bağlanma}} = +G \\frac{M m}{2r}$\nKepler Periyot Yasası: $\\frac{R^3}{T^2} = \\text{sabit}$" },
+    { id: 'fz18', ders: 'AYT FİZİK', baslik: "Basit Harmonik Hareket", formul: "Konum, Hız, İvme, Kuvvet: $x = r \\sin(\\omega t)$\n$v = \\omega \\sqrt{r^2 - x^2} \\; (v_{\\text{max}} = \\omega r)$\n$a = -\\omega^2 x \\; (a_{\\text{max}} = \\omega^2 r)$\n$F = -m \\omega^2 x$\nPeriyotlar: $T_{\\text{yay}} = 2\\pi \\sqrt{\\frac{m}{k}}$\n$T_{\\text{sarkaç}} = 2\\pi \\sqrt{\\frac{L}{g}}$" },
+    { id: 'fz19', ders: 'AYT FİZİK', baslik: "Çift Yarıkta Girişim (Young)", formul: "$\\Delta x = \\frac{L \\cdot \\lambda}{d \\cdot n}$\n$\\Delta s = n \\lambda$ (Aydınlık)\n$\\Delta s = \\left(n - \\frac{1}{2}\\right)\\lambda$ (Karanlık)" },
+    { id: 'fz20', ders: 'AYT FİZİK', baslik: "Tek Yarıkta Kırınım", formul: "$\\Delta x = \\frac{L \\cdot \\lambda}{w \\cdot n}$\n$\\Delta s = \\left(n + \\frac{1}{2}\\right)\\lambda$ (Aydınlık)\n$\\Delta s = n \\lambda$ (Karanlık)" },
+    { id: 'fz21', ders: 'AYT FİZİK', baslik: "Elektromanyetik Dalgalar", formul: "$c = \\lambda \\cdot f$\n$\\frac{E}{B} = c$" },
+    { id: 'fz22', ders: 'AYT FİZİK', baslik: "Bohr Atom Modeli", formul: "$r_n = a_0 \\frac{n^2}{Z}$\n$E_n = -13{,}6 \\frac{Z^2}{n^2}\\text{ eV}$\n$L_n = n \\frac{h}{2\\pi}$" },
+    { id: 'fz23', ders: 'AYT FİZİK', baslik: "Fotoelektrik Olay", formul: "$E_{\\text{foton}} = h \\cdot f = \\frac{h c}{\\lambda}$\n$E_{\\text{foton}} = E_0 + E_{k,\\text{max}}$\n$E_0 = h f_0 = \\frac{h c}{\\lambda_0}$\n$E_{k,\\text{max}} = e \\cdot V_{\\text{kesme}}$" },
+    { id: 'fz24', ders: 'AYT FİZİK', baslik: "Compton Saçılması ve De Broglie", formul: "$E_{\\text{gelen}} = E_{\\text{saçılan}} + E_{k,\\text{elektron}}$\n$\\Delta \\lambda = \\lambda' - \\lambda = \\frac{h}{m_e c}(1 - \\cos\\theta)$\n$\\lambda = \\frac{h}{P} = \\frac{h}{m v}$" }
   ];
 
   var FAV = 'nk_fav_formul';
@@ -61,6 +52,38 @@
     return String(c).toLocaleLowerCase('tr-TR').split(' ').map(function (w) {
       return /^(tyt|ayt)$/.test(w) ? w.toUpperCase() : w.charAt(0).toLocaleUpperCase('tr-TR') + w.slice(1);
     }).join(' ');
+  }
+  /* ---------- KaTeX (uygulamayla birlikte, internetsiz çalışır) ---------- */
+  var kx = { st: 0 };   // 0 yüklenmedi, 1 yükleniyor, 2 hazır, 3 hata
+  function loadKatex() {
+    if (window.katex) { kx.st = 2; return; }
+    if (kx.st) return;
+    kx.st = 1;
+    var l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'katex/katex.min.css'; document.head.appendChild(l);
+    var sc = document.createElement('script'); sc.src = 'katex/katex.min.js';
+    sc.onload = function () { kx.st = 2; try { if (host() && host().offsetParent !== null) list(); } catch (e) {} };
+    sc.onerror = function () { kx.st = 3; };
+    document.head.appendChild(sc);
+  }
+  function plainTex(t) { return t.replace(/\\text\{([^}]*)\}/g, '$1').replace(/\\(cdot|times)/g, '·').replace(/\\([a-zA-Z]+)/g, '$1').replace(/[{}]/g, ''); }
+  // "Etiket: $formül$ (not)" biçimindeki satırı çizer; $...$ arası matematik olarak gösterilir
+  function renderLine(line) {
+    var d = el('div', 'margin-top:6px;font-size:16px;line-height:1.5;color:#0f766e;font-weight:600;overflow-x:auto;overflow-y:hidden;max-width:100%');
+    var parts = line.split('$');
+    if (parts.length < 3) { d.textContent = line; return d; }
+    parts.forEach(function (p, i) {
+      if (i % 2 === 0) {
+        if (p) { var sp = el('span', 'color:#475569;font-weight:600;font-size:13px', p); d.appendChild(sp); }
+      } else if (kx.st === 2 && window.katex) {
+        var m = el('span', 'font-size:1.1em');
+        try { m.innerHTML = window.katex.renderToString(p, { throwOnError: false, displayMode: false }); }
+        catch (e) { m.textContent = plainTex(p); }
+        d.appendChild(m);
+      } else {
+        d.appendChild(el('span', '', plainTex(p)));
+      }
+    });
+    return d;
   }
   function favs() { try { return JSON.parse(localStorage.getItem(FAV) || '{}') || {}; } catch (e) { return {}; } }
   function setFav(id, on) { var f = favs(); if (on) f[id] = 1; else delete f[id]; try { localStorage.setItem(FAV, JSON.stringify(f)); } catch (e) {} }
@@ -85,10 +108,11 @@
   function host() { return document.getElementById('formul-root'); }
 
   function open() {
+    loadKatex();
     state.q = ''; state.course = '';
     try { switchTab('formul'); } catch (e) {}
   }
-  function render() { paint(); }
+  function render() { loadKatex(); paint(); }
 
   function paint() {
     var root = host();
@@ -174,7 +198,8 @@
       top.appendChild(star);
       card.appendChild(top);
       if (starred) card.appendChild(el('div', 'font-size:10px;font-weight:800;color:#64748b;margin-top:2px', pretty(x.ders)));
-      var body = el('div', 'margin-top:8px;font-size:16px;line-height:1.7;color:#0f766e;font-weight:600;white-space:pre-wrap;word-break:break-word', x.formul);
+      var body = el('div', 'margin-top:4px');
+      String(x.formul).split('\n').forEach(function (ln) { if (ln.trim()) body.appendChild(renderLine(ln)); });
       card.appendChild(body);
       if (x.kaynak) card.appendChild(el('div', 'margin-top:8px;font-size:10px;font-weight:600;color:#94a3b8', 'Kaynak: ' + x.kaynak));
       if (x.mine) {
@@ -237,7 +262,7 @@
     box.appendChild(tin);
     lab('Formül');
     var fin = el('textarea', 'width:100%;height:140px;border:1px solid #cbd5e1;border-radius:12px;padding:11px;font-size:15px;color:#0f172a;background:#fff');
-    fin.value = d.formul || ''; fin.placeholder = 'ör. τ = F · d · sinθ'; fin.maxLength = 1500;
+    fin.value = d.formul || ''; fin.placeholder = 'ör. $\\tau = F \\cdot d \\cdot \\sin\\theta$  (matematik $ $ arasına yazılır)'; fin.maxLength = 1500;
     box.appendChild(fin);
 
     var row = el('div', 'display:flex;gap:8px;margin-top:18px');
