@@ -124,10 +124,10 @@
   function buildPrompt() {
     var cats = (appState && appState.categories) || {};
     var lines = Object.keys(cats).map(function (c) { return c + ': ' + (cats[c] || []).join(' | '); });
-    return 'Bu konuşmadan Net Kalkanım uygulamasına kaydedilecek bir kayıt hazırla. SADECE aşağıdaki formatta yaz. Başka açıklama, ** veya markdown kullanma.\n\n' +
-      'Ben "soru kaydı hazırla" dersem:\nTÜR: SORU\nDERS: (aşağıdaki listeden)\nKONU: (aşağıdaki listeden)\nCEVAP: (doğru şık harfi, A-E)\nNOT: (anlamadığım yerin kısa notu, en fazla 3-4 cümle)\n\n' +
-      'Ben "kart çıkar" dersem:\nTÜR: KART\nDERS: (aşağıdaki listeden)\nKONU: (aşağıdaki listeden)\nÖN: (kısa soru veya başlık)\nARKA: (kısa bilgi)\n\n' +
-      'DERS ve KONU sadece şu listeden seçilmeli, aynen yazılmalı:\n' + lines.join('\n');
+    return 'Bu sohbette benimle normal konuşmaya devam et: sorularımı çöz, anlamadığım yerleri anlat. Sadece ben "soru hazırla" ya da "not hazırla" dediğimde o ana kadarki konuşmadan Net Kalkanım uygulaması için bir kayıt hazırla. O zaman SADECE aşağıdaki formatı yaz, başka açıklama, ** veya markdown kullanma.\n\n' +
+      'Ben "soru hazırla" dersem:\nTÜR: SORU\nDERS: (aşağıdaki listeden)\nKONU: (aşağıdaki listeden)\nCEVAP: (doğru şık harfi, A-E)\nNOT: (anlamadığım yerin kısa notu, en fazla 3-4 cümle)\n\n' +
+      'Ben "not hazırla" dersem:\nTÜR: KART\nDERS: (aşağıdaki listeden)\nKONU: (aşağıdaki listeden)\nÖN: (kısa soru veya başlık)\nARKA: (kısa bilgi)\n\n' +
+      'DERS ve KONU sadece şu listeden seçilmeli, aynen yazılmalı:\n' + lines.join('\n') + '\n\nŞimdi sadece "Hazır" de.';
   }
 
   function copy(text) {
@@ -160,7 +160,7 @@
         '<button id="nk-gm-x" type="button" style="padding:12px 16px;border-radius:12px;font-weight:600;font-size:13px;background:#f1f5f9;color:#475569;border:none">Kapat</button>' +
       '</div>' +
       '<button id="nk-gm-copy" type="button" style="width:100%;margin-top:10px;padding:12px;border-radius:12px;font-weight:700;font-size:12px;background:#f0fdfa;color:#0f766e;border:1px solid #99f6e4">Gemini komutunu kopyala (ders ve konu listemle)</button>' +
-      '<p style="font-size:11px;color:#94a3b8;margin-top:8px;line-height:1.5">Komutu Gemini\'de bir kez yapıştır, istersen Gem olarak kaydet. Sonra "soru kaydı hazırla" ya da "kart çıkar" demen yeter.</p>';
+      '<p style="font-size:11px;color:#94a3b8;margin-top:8px;line-height:1.5">Komutu Gemini\'de bir kez yapıştır, istersen Gem olarak kaydet. Her yeni sohbetin başında bir kez yapıştır. Sonra sorunu sor, işin bitince "soru hazırla" ya da "not hazırla" de.</p>';
     ov.appendChild(box);
     document.body.appendChild(ov);
     ov.addEventListener('click', function (e) { if (e.target === ov) ov.remove(); });
