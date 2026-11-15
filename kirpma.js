@@ -7,7 +7,7 @@
   'use strict';
 
   var Orig = window.Cropper;
-  var IDS = { 'image-to-crop': 'front', 'note-back-image-to-crop': 'back' };
+  var IDS = { 'image-to-crop': 'front', 'note-back-image-to-crop': 'back', 'nk-ask-crop': 'ask' };
   var Z = 2147483300;
 
   function el(tag, css, parent) {
@@ -83,7 +83,9 @@
       if (self.busy) return;
       self.busy = true;
       try {
-        if (self.kind === 'back') window.finishCropBack(); else window.finishCrop();
+        if (self.kind === 'back') window.finishCropBack();
+        else if (self.kind === 'ask') { window.__nkAskCrop.ok(); setTimeout(function () { self.busy = false; }, 600); }
+        else window.finishCrop();
       } catch (e) { console.warn(e); self.busy = false; }
     };
     var rot = el('button', 'width:46px;height:46px;border:0;border-radius:9999px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center', bar);
@@ -216,7 +218,9 @@
     var kind = this.kind;
     this.destroy();
     try {
-      if (kind === 'back') {
+      if (kind === 'ask') {
+        if (window.__nkAskCrop && window.__nkAskCrop.cancel) window.__nkAskCrop.cancel();
+      } else if (kind === 'back') {
         if (typeof clearBackImage === 'function') clearBackImage();
       } else {
         try { cropperInstance = null; } catch (e) {}

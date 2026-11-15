@@ -334,6 +334,7 @@
     cropBox.style.cssText = 'display:none;border-radius:16px;padding:10px;';
     var cropHost = row('', 'height:52vh;border-radius:12px;overflow:hidden;');
     var cropImg = document.createElement('img');
+    cropImg.id = 'nk-ask-crop';
     cropImg.style.cssText = 'max-width:100%;display:block;';
     cropHost.appendChild(cropImg);
     var cropBtns = row('', 'display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:10px;');
@@ -398,11 +399,14 @@
         cb('Döndür', 'bg-slate-200 text-slate-700', function () { if (state.cropper) state.cropper.rotate(90); });
         cb('Sıfırla', 'bg-slate-200 text-slate-700', function () { if (state.cropper) state.cropper.reset(); });
         cb('Kırpmadan Kullan', 'bg-slate-200 text-slate-700', function () { usePhoto(blob); });
-        cb('Kırpmayı Onayla', 'bg-emerald-600 text-white', function () {
+        var confirmCrop = function () {
           if (!state.cropper) { usePhoto(blob); return; }
           var cv = state.cropper.getCroppedCanvas({ maxWidth: 1400, maxHeight: 1400 });
           cv.toBlob(function (out) { usePhoto(out || blob); }, 'image/jpeg', 0.85);
-        });
+        };
+        cb('Kırpmayı Onayla', 'bg-emerald-600 text-white', confirmCrop);
+        // Tam ekran kırpma (kirpma.js) bu iki işlevi kullanır
+        window.__nkAskCrop = { ok: confirmCrop, cancel: clearPhoto };
       } catch (e) { console.warn(e); showToast('Fotoğraf açılamadı. Tekrar dene.', true); }
     }
     showOnly('ph');

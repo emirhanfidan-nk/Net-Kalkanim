@@ -45,6 +45,29 @@
     hint.textContent = 'Soruyu çerçeveye al ve çek';
     hint.style.cssText = 'position:absolute;top:calc(14px + env(safe-area-inset-top));left:0;right:0;text-align:center;color:#fff;font-size:13px;font-weight:600;text-shadow:0 1px 3px rgba(0,0,0,.7);pointer-events:none';
 
+    // Flaş (el feneri): destekleyen telefonlarda sağ üstte düğme çıkar
+    var flash = document.createElement('button');
+    flash.type = 'button';
+    flash.setAttribute('aria-label', 'Flaş');
+    flash.style.cssText = 'position:absolute;top:calc(8px + env(safe-area-inset-top));right:12px;width:46px;height:46px;border:0;border-radius:9999px;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:2;color:#fff';
+    var BOLT = '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>';
+    var SLASH = '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M3.27 3 2 4.27l5 5V13h3v9l3.58-6.14L17.73 20 19 18.73 3.27 3zM17 10h-4l4-8H7v2.18l8.46 8.46L17 10z"/></svg>';
+    var torchOn = false;
+    function paintFlash() {
+      flash.innerHTML = torchOn ? BOLT : SLASH;
+      flash.style.background = torchOn ? '#facc15' : 'rgba(0,0,0,.45)';
+      flash.style.color = torchOn ? '#1f1700' : '#fff';
+    }
+    paintFlash();
+    flash.onclick = function () {
+      var tr = stream && stream.getVideoTracks()[0];
+      if (!tr) return;
+      var want = !torchOn;
+      tr.applyConstraints({ advanced: [{ torch: want }] }).then(function () { torchOn = want; paintFlash(); })
+        .catch(function () { showToast('Bu telefonda flaş açılamadı.', true); });
+    };
+    ov.appendChild(flash);
+
     bar.appendChild(closeBtn);
     bar.appendChild(shutter);
     ov.appendChild(video);
@@ -91,6 +114,16 @@
       video.srcObject = s;
       var p = video.play();
       if (p && p.catch) p.catch(function () {});
+      // Flaş desteği kamera açıldıktan hemen sonra belli olur
+      var tryFlash = function (n) {
+        try {
+          var tr = s.getVideoTracks()[0];
+          var caps = tr && tr.getCapabilities ? tr.getCapabilities() : {};
+          if (caps && caps.torch) { flash.style.display = 'flex'; return; }
+        } catch (e) {}
+        if (n < 5 && !closed) setTimeout(function () { tryFlash(n + 1); }, 300);
+      };
+      tryFlash(0);
     }).catch(function (err) {
       close();
       var denied = err && (err.name === 'NotAllowedError' || err.name === 'SecurityError');
