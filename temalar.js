@@ -25,7 +25,18 @@
   ];
 
   function find(id) { if (id === 'gecemavi') id = 'neon-gece'; for (var i = 0; i < THEMES.length; i++) if (THEMES[i].id === id) return THEMES[i]; return THEMES[0]; }
-  function current() { var t = ''; try { t = (window.appState && appState.tema) || localStorage.getItem(LS) || ''; } catch (e) {} return find(t); }
+  var LS_R = 'nk_tema_rnd', LS_OFF = 'nk_tema_off', LS_LAST = 'nk_tema_last';
+  function rndOn() { try { return localStorage.getItem(LS_R) === '1'; } catch (e) { return false; } }
+  function offList() { try { return JSON.parse(localStorage.getItem(LS_OFF) || '[]') || []; } catch (e) { return []; } }
+  function pool() { var off = offList(); var p = THEMES.filter(function (t) { return off.indexOf(t.id) < 0; }); return p.length ? p : THEMES.slice(); }
+  function pickRandom() {
+    var p = pool(), last = ''; try { last = localStorage.getItem(LS_LAST) || ''; } catch (e) {}
+    var c = p.filter(function (t) { return t.id !== last; }); if (!c.length) c = p;
+    var t = c[Math.floor(Math.random() * c.length)];
+    try { localStorage.setItem(LS_LAST, t.id); localStorage.setItem(LS, t.id); } catch (e) {}
+    return t;
+  }
+  function current() { var t = ''; try { t = rndOn() ? (localStorage.getItem(LS) || '') : ((window.appState && appState.tema) || localStorage.getItem(LS) || ''); } catch (e) {} return find(t); }
   function isDark() { return document.body.classList.contains('dark-mode'); }
 
   function sheet() {
@@ -106,7 +117,18 @@
       S + ' .nk-hero{background:linear-gradient(135deg,color-mix(in srgb,var(--t1) 45%,#0b0b16),color-mix(in srgb,var(--t1) 75%,#0b0b16) 55%,color-mix(in srgb,var(--t2) 70%,#0b0b16))!important}' +
       S + ' .face-heading-front{background:var(--tsoft)!important;color:var(--ta)!important;border-color:color-mix(in srgb,var(--t1) 45%,transparent)!important}' +
       S + ' .face-heading-back{background:color-mix(in srgb,var(--t2) 18%,transparent)!important;color:color-mix(in srgb,var(--t2) 70%,var(--nk-ink))!important;border-color:color-mix(in srgb,var(--t2) 45%,transparent)!important}' +
-      M('dark') + ' .bg-white.text-amber-600{background-image:linear-gradient(135deg,var(--t2),var(--t1))!important;color:#fff!important}' +
+      M('dark') + ' .bg-white.text-amber-600{background-image:linear-gradient(135deg,var(--t2),color-mix(in srgb,var(--t2) 55%,#000))!important;color:#fff!important}' +
+      // Arşiv: kamp düğmesi, kutu filtreleri, kartlar
+      S + ' #btn-random-camp{background:color-mix(in srgb,var(--t2) 16%,transparent)!important;border-color:color-mix(in srgb,var(--t2) 50%,transparent)!important;color:var(--ta)!important}' +
+      S + ' #btn-random-camp:hover{background-image:linear-gradient(135deg,var(--t2),var(--t1))!important;color:#fff!important}' +
+      S + '[data-nk-ink="dark"] #btn-random-camp:hover{color:#2a1c00!important}' +
+      S + ' .nk-af-on{border-color:color-mix(in srgb,var(--bx) 75%,transparent)!important}' +
+      K('canli') + ' .nk-af-on,' + K('canli') + ' .nk-arch-card{box-shadow:0 8px 20px -12px var(--bx)!important}' +
+      K('neon') + ' .nk-af-on{box-shadow:0 0 0 1px color-mix(in srgb,var(--bx) 55%,transparent),0 0 18px -3px var(--bx)!important}' +
+      K('neon') + ' .nk-arch-card{box-shadow:0 0 0 1px color-mix(in srgb,var(--bx) 50%,transparent),0 0 20px -9px var(--bx)!important}' +
+      S + ' #library-list .bg-amber-50,' + S + ' #library-list .bg-amber-100\\/70{background-color:color-mix(in srgb,var(--t2) 15%,transparent)!important}' +
+      S + ' #library-list .text-amber-800,' + S + ' #library-list .text-amber-900{color:color-mix(in srgb,var(--t2) 55%,var(--nk-ink))!important}' +
+      M('dark') + ' #library-list .archive-back-tag{color:var(--ta)!important}' +
       S + ' #nk-cloud-card .bg-emerald-50{background-color:var(--tsoft)!important}' +
       S + ' #nk-cloud-card .text-emerald-600{color:var(--ta)!important}' +
       S + ' #nk-cloud-card .bg-emerald-600{background-image:linear-gradient(135deg,var(--t1),var(--t2))!important;background-color:var(--t1)!important}' +
@@ -154,6 +176,16 @@
       'body.dark-mode .nk-th.on i{border-color:#fff}' +
       '.nk-th span{display:block;margin-top:5px;font-size:11px;font-weight:700;color:#475569}' +
       'body.dark-mode .nk-th span{color:#c6c7d1}' +
+      '.nk-rnd{display:flex;align-items:center;gap:10px;margin:12px 0 2px;padding:9px 12px;border-radius:14px;background:var(--tsoft,#f1f5f9);border:0;width:100%;text-align:left;font-family:inherit}' +
+      '.nk-rnd b{flex:1;font-size:12px;font-weight:800;color:var(--nk-ink,#0f172a)}' +
+      '.nk-rnd small{display:block;font-size:10px;font-weight:600;color:var(--nk-mute,#475569);margin-top:1px}' +
+      '.nk-sw{width:38px;height:22px;border-radius:99px;background:#94a3b8;position:relative;transition:background .2s;flex:none}' +
+      '.nk-sw:after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .2s}' +
+      '.nk-rnd.on .nk-sw{background:linear-gradient(135deg,var(--t1,#0d9488),var(--t2,#14b8a6))}' +
+      '.nk-rnd.on .nk-sw:after{transform:translateX(16px)}' +
+      '.nk-th{position:relative}' +
+      '.nk-th.off i{opacity:.28;filter:grayscale(1)}' +
+      '.nk-th.chk:after{content:"✓";position:absolute;top:4px;right:6px;width:16px;height:16px;border-radius:50%;background:#fff;color:#0f172a;font-size:11px;font-weight:900;line-height:16px;box-shadow:0 1px 4px rgba(0,0,0,.3)}' +
       '.nk-th-g{margin:14px 0 6px;font-size:10px;font-weight:800;letter-spacing:.08em;color:#94a3b8;text-transform:uppercase}' +
       '';
     return css;
@@ -203,8 +235,16 @@
   function markSelected(id) {
     var g = document.getElementById('nk-th-wrap');
     if (!g) return;
-    var sub = document.getElementById('nk-th-sub'); if (sub) sub.textContent = find(id).name || 'Klasik';
-    g.querySelectorAll('.nk-th').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-id') === id); });
+    var sub = document.getElementById('nk-th-sub');
+    var r = rndOn(), off = offList();
+    var rb = document.getElementById('nk-rnd'); if (rb) { rb.classList.toggle('on', r); var rs = rb.querySelector('small'); if (rs) rs.textContent = r ? 'Her girişte havuzdan biri gelir. İstemediğine dokunup kapat.' : 'Her girişte farklı bir tema'; }
+    if (sub) sub.textContent = r ? 'Rastgele · ' + pool().length + ' tema havuzda' : (find(id).name || 'Klasik');
+    g.querySelectorAll('.nk-th').forEach(function (b) {
+      var bid = b.getAttribute('data-id'), isOff = off.indexOf(bid) >= 0;
+      b.classList.toggle('on', !r && bid === id);
+      b.classList.toggle('off', r && isOff);
+      b.classList.toggle('chk', r && !isOff);
+    });
   }
 
   async function choose(id) {
@@ -215,6 +255,13 @@
     paint(t);
     try { haptic(10); } catch (e) {}
     try { await saveSettings(); } catch (e) {}
+  }
+
+  function toggleOff(id) {
+    var off = offList(), i = off.indexOf(id);
+    if (i >= 0) off.splice(i, 1); else { if (THEMES.length - off.length <= 1) return; off.push(id); }
+    try { localStorage.setItem(LS_OFF, JSON.stringify(off)); haptic(8); } catch (e) {}
+    markSelected(current().id);
   }
 
   function buildPicker() {
@@ -231,7 +278,7 @@
     var head = '<button type="button" id="nk-th-head" class="w-full flex items-center gap-3 text-left"><div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center shrink-0">' +
       '<svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0 0 18c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.3-.5-.8-.5-1.2 0-1.1.9-2 2-2h2.3A4.9 4.9 0 0 0 22 11c0-4.4-4.5-8-10-8zm-5.5 9a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3-4a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3 4a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/></svg></div>' +
       '<div class="flex-1 min-w-0"><p class="text-sm font-medium text-slate-800">Renk Teması</p><p id="nk-th-sub" class="text-xs text-slate-500 mt-0.5"></p></div><svg id="nk-th-chev" class="w-4 h-4 fill-current text-slate-400 transition-transform shrink-0" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg></button><div id="nk-th-body" class="hidden">';
-    var html = head;
+    var html = head + '<button type="button" id="nk-rnd" class="nk-rnd"><span style="font-size:18px">🎲</span><span style="flex:1"><b>Rastgele tema</b><small></small></span><i class="nk-sw"></i></button>';
     ['Açık', 'Koyu'].forEach(function (g) {
       html += '<div class="nk-th-g">' + g + '</div><div class="nk-th-grid">';
       THEMES.filter(function (t) { return t.group === g; }).forEach(function (t) {
@@ -248,12 +295,19 @@
     setOpen(open);
     row.querySelector('#nk-th-head').onclick = function () { setOpen(row.querySelector('#nk-th-body').classList.contains('hidden')); };
     list.insertBefore(row, list.firstChild);
-    row.querySelectorAll('.nk-th').forEach(function (b) { b.onclick = function () { choose(b.getAttribute('data-id')); }; });
+    row.querySelectorAll('.nk-th').forEach(function (b) { b.onclick = function () { var bid = b.getAttribute('data-id'); if (rndOn()) toggleOff(bid); else choose(bid); }; });
+    row.querySelector('#nk-rnd').onclick = function () {
+      var on = !rndOn(); try { localStorage.setItem(LS_R, on ? '1' : '0'); } catch (e) {}
+      if (on) { try { localStorage.setItem(LS_LAST, current().id); } catch (e) {} }
+      try { haptic(10); } catch (e) {}
+      markSelected(current().id);
+    };
     markSelected(current().id);
     return true;
   }
 
   function start() {
+    if (rndOn()) { var rt = pickRandom(); try { window.__nkRndId = rt.id; } catch (e) {} }
     paint(current());
     // Başka bir yer karanlık modu değiştirirse temanın zeminine geri dön
     try {
@@ -265,7 +319,8 @@
       if (okApp) {
         var cloud = appState.tema;
         var local = ''; try { local = localStorage.getItem(LS) || ''; } catch (e) {}
-        if (typeof cloud === 'string' && cloud !== local) { try { localStorage.setItem(LS, cloud); } catch (e) {} }
+        if (rndOn()) { appState.tema = local; }
+        else if (typeof cloud === 'string' && cloud !== local) { try { localStorage.setItem(LS, cloud); } catch (e) {} }
         else if (typeof cloud !== 'string') {
           // Eski kullanıcı: tema seçmemiş ama karanlık modu açıksa Klasik Koyu olarak devam
           appState.tema = local || (appState.darkMode ? 'klasik-koyu' : '');
