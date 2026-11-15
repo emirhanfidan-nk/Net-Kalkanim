@@ -7,28 +7,21 @@
 
   var LS = 'nk_tema';
 
-  /* Tema = renk paleti. Açık/Koyu zemin ayrı seçilir (her palet ikisinde de çalışır).
+  /* Tema = renk paleti + sabit zemin (Açık ya da Koyu). Karanlık mod anahtarı yok; zemin temaya bağlı.
      kind: pastel (yumuşak) · canli (orta doygun) · neon (parlayan). lay: arka plan ışık düzeni (0/1/2). ink: 'dark' = gradyan üstünde koyu yazı. */
   var THEMES = [
-    { id: '', name: 'Klasik', group: 'Klasik', swatch: 'linear-gradient(135deg,#14b8a6,#0d9488)' },
-    { id: 'seker', name: 'Şeker', group: 'Pastel', kind: 'pastel', t1: '#f472b6', t2: '#a78bfa', lay: 0 },
-    { id: 'nane', name: 'Nane', group: 'Pastel', kind: 'pastel', t1: '#34d399', t2: '#38bdf8', lay: 1 },
-    { id: 'seftali', name: 'Şeftali', group: 'Pastel', kind: 'pastel', t1: '#fb923c', t2: '#f472b6', lay: 2 },
-    { id: 'bulut', name: 'Bulut', group: 'Pastel', kind: 'pastel', t1: '#60a5fa', t2: '#a5b4fc', lay: 0 },
-    { id: 'lila', name: 'Lila', group: 'Pastel', kind: 'pastel', t1: '#c084fc', t2: '#f0abfc', lay: 1 },
-    { id: 'okyanus', name: 'Okyanus', group: 'Canlı', kind: 'canli', t1: '#0ea5e9', t2: '#14b8a6', lay: 2 },
-    { id: 'orman', name: 'Orman', group: 'Canlı', kind: 'canli', t1: '#16a34a', t2: '#0f766e', lay: 0 },
-    { id: 'toprak', name: 'Toprak', group: 'Canlı', kind: 'canli', t1: '#c2410c', t2: '#a16207', lay: 1 },
-    { id: 'gunbatimi', name: 'Gün Batımı', group: 'Canlı', kind: 'canli', t1: '#f59e0b', t2: '#e11d48', lay: 1 },
-    { id: 'murdum', name: 'Mürdüm', group: 'Canlı', kind: 'canli', t1: '#7c3aed', t2: '#db2777', lay: 2 },
-    { id: 'gecemavi', name: 'Gece Mavisi', group: 'Canlı', kind: 'canli', t1: '#3b5bdb', t2: '#6741d9', lay: 0 },
-    { id: 'neon-gece', name: 'Neon Gece', group: 'Neon', kind: 'neon', t1: '#00b8ff', t2: '#d400ff', lay: 0 },
-    { id: 'zehir', name: 'Zehir', group: 'Neon', kind: 'neon', t1: '#00d68f', t2: '#00a3ff', lay: 2 },
-    { id: 'ates', name: 'Ateş', group: 'Neon', kind: 'neon', t1: '#ff6a00', t2: '#ff1f6b', lay: 1 },
-    { id: 'lazer', name: 'Lazer', group: 'Neon', kind: 'neon', t1: '#ff00c8', t2: '#7a00ff', lay: 2 },
-    { id: 'buz', name: 'Buz', group: 'Neon', kind: 'neon', t1: '#00e5ff', t2: '#4d7cff', lay: 0 },
-    { id: 'asit', name: 'Asit', group: 'Neon', kind: 'neon', t1: '#b6ff00', t2: '#00ffa3', lay: 1, ink: 'dark' },
-    { id: 'elektrik', name: 'Elektrik', group: 'Neon', kind: 'neon', t1: '#ffe600', t2: '#ff9d00', lay: 2, ink: 'dark' }
+    { id: '', name: 'Klasik', group: 'Açık', mode: 'light', swatch: 'linear-gradient(135deg,#14b8a6,#0d9488)' },
+    { id: 'seker', name: 'Şeker', group: 'Açık', mode: 'light', kind: 'pastel', t1: '#f472b6', t2: '#a78bfa', lay: 0 },
+    { id: 'nane', name: 'Nane', group: 'Açık', mode: 'light', kind: 'pastel', t1: '#34d399', t2: '#38bdf8', lay: 1 },
+    { id: 'seftali', name: 'Şeftali', group: 'Açık', mode: 'light', kind: 'pastel', t1: '#fb923c', t2: '#f472b6', lay: 2 },
+    { id: 'okyanus', name: 'Okyanus', group: 'Açık', mode: 'light', kind: 'canli', t1: '#0ea5e9', t2: '#14b8a6', lay: 2 },
+    { id: 'lazer', name: 'Lazer', group: 'Açık', mode: 'light', kind: 'neon', t1: '#ff2bd0', t2: '#7a3cff', lay: 0 },
+    { id: 'klasik-koyu', name: 'Klasik Koyu', group: 'Koyu', mode: 'dark', swatch: 'linear-gradient(135deg,#1d1e26,#0d9488)' },
+    { id: 'lila', name: 'Lila Gece', group: 'Koyu', mode: 'dark', kind: 'pastel', t1: '#a78bfa', t2: '#f0abfc', lay: 1 },
+    { id: 'gecemavi', name: 'Gece Mavisi', group: 'Koyu', mode: 'dark', kind: 'canli', t1: '#3b5bdb', t2: '#6741d9', lay: 0 },
+    { id: 'neon-gece', name: 'Neon Gece', group: 'Koyu', mode: 'dark', kind: 'neon', t1: '#00b8ff', t2: '#d400ff', lay: 0 },
+    { id: 'ates', name: 'Ateş', group: 'Koyu', mode: 'dark', kind: 'neon', t1: '#ff6a00', t2: '#ff1f6b', lay: 1 },
+    { id: 'zehir', name: 'Zehir', group: 'Koyu', mode: 'dark', kind: 'neon', t1: '#00d68f', t2: '#00a3ff', lay: 2 }
   ];
 
   function find(id) { for (var i = 0; i < THEMES.length; i++) if (THEMES[i].id === id) return THEMES[i]; return THEMES[0]; }
@@ -50,12 +43,12 @@
       M('light') + '{--tbase:color-mix(in srgb,var(--t1) 7%,#fff);--ta:color-mix(in srgb,var(--t1) 62%,#1a1030);--tsoft:color-mix(in srgb,var(--t1) 16%,#fff);--tcard:#ffffff}' +
       M('dark') + '{--tbase:color-mix(in srgb,var(--t1) 9%,#07070d);--ta:color-mix(in srgb,var(--t1) 62%,#fff);--tsoft:color-mix(in srgb,var(--t1) 22%,transparent);--tcard:color-mix(in srgb,var(--t1) 9%,#0a0a14);color:#eef0ff}' +
       // doygunluğa göre ışık ve parıltı miktarı
-      K('pastel', 'light') + '{--tA:26%;--tglow:color-mix(in srgb,var(--t1) 30%,transparent)}' +
-      K('canli', 'light') + '{--tA:34%;--tglow:color-mix(in srgb,var(--t1) 40%,transparent)}' +
-      K('neon', 'light') + '{--tA:44%;--tglow:color-mix(in srgb,var(--t1) 60%,transparent)}' +
+      K('pastel', 'light') + '{--tA:22%;--tglow:color-mix(in srgb,var(--t1) 30%,transparent)}' +
+      K('canli', 'light') + '{--tA:28%;--tglow:color-mix(in srgb,var(--t1) 40%,transparent)}' +
+      K('neon', 'light') + '{--tA:34%;--tglow:color-mix(in srgb,var(--t1) 45%,transparent)}' +
       K('pastel', 'dark') + '{--tA:22%;--tglow:color-mix(in srgb,var(--t1) 26%,transparent)}' +
       K('canli', 'dark') + '{--tA:30%;--tglow:color-mix(in srgb,var(--t1) 40%,transparent)}' +
-      K('neon', 'dark') + '{--tA:40%;--tglow:color-mix(in srgb,var(--t1) 62%,transparent)}' +
+      K('neon', 'dark') + '{--tA:32%;--tglow:color-mix(in srgb,var(--t1) 48%,transparent)}' +
       // arka plan: palet renklerinden ışık lekeleri (3 farklı düzen)
       S + '[data-nk-lay="0"]{--tbg:radial-gradient(120% 55% at 0% 0%,color-mix(in srgb,var(--t1) var(--tA),transparent),transparent 62%),radial-gradient(110% 55% at 100% 100%,color-mix(in srgb,var(--t2) var(--tA),transparent),transparent 62%)}' +
       S + '[data-nk-lay="1"]{--tbg:radial-gradient(110% 50% at 100% 0%,color-mix(in srgb,var(--t2) var(--tA),transparent),transparent 62%),radial-gradient(120% 55% at 0% 100%,color-mix(in srgb,var(--t1) var(--tA),transparent),transparent 62%)}' +
@@ -86,28 +79,37 @@
 
     // Pastel: yumuşak, renkli gölgeler
     css +=
-      K('pastel') + ' .bg-white{box-shadow:0 8px 22px -14px var(--tglow)}' +
       K('pastel') + ' #nav-add{box-shadow:0 14px 28px -10px var(--tglow)!important}';
 
     // Canlı: palet renginde kenarlık ve orta parıltı
     css +=
-      K('canli') + ' .bg-white{box-shadow:0 10px 26px -14px var(--tglow)}' +
       K('canli') + ' header.bg-white{border-bottom:1px solid color-mix(in srgb,var(--t1) 35%,transparent)!important}' +
       K('canli') + ' #nav-add{box-shadow:0 14px 30px -8px var(--tglow)!important}' +
       K('canli') + ' .nk-box{box-shadow:0 10px 26px -14px var(--bx)!important}';
 
     // Neon: parlayan kenar, gölge ve yazı ışıması
     css +=
-      K('neon') + ' .bg-white{box-shadow:0 0 0 1px color-mix(in srgb,var(--t1) 38%,transparent),0 0 20px -8px var(--tglow)}' +
-      K('neon') + ' .nk-box{box-shadow:0 0 0 1px color-mix(in srgb,var(--bx) 55%,transparent),0 0 26px -8px var(--bx)!important}' +
-      K('neon') + ' .nk-box-title{text-shadow:0 0 12px color-mix(in srgb,var(--bx) 70%,transparent)}' +
+      K('neon') + ' .nk-box{box-shadow:0 0 0 1px color-mix(in srgb,var(--bx) 55%,transparent),0 0 20px -10px var(--bx)!important}' +
       K('neon') + ' .nk-box-btn{box-shadow:0 0 16px -2px var(--bx)!important}' +
       K('neon') + ' #nav-add{box-shadow:0 0 28px 2px var(--tglow),0 0 0 4px color-mix(in srgb,var(--t2) 22%,transparent)!important;border-color:color-mix(in srgb,var(--t2) 35%,transparent)!important}' +
       K('neon') + ' button.bg-teal-600.rounded-2xl,' + K('neon') + ' button.bg-teal-600.rounded-xl{box-shadow:0 0 18px -4px var(--tglow)!important}' +
       K('neon') + ' header.bg-white{border-bottom:1px solid color-mix(in srgb,var(--t1) 55%,transparent)!important;box-shadow:0 6px 22px -10px var(--tglow)!important}' +
       K('neon') + ' #bottom-nav{border-top:1px solid color-mix(in srgb,var(--t2) 55%,transparent)!important;box-shadow:0 -6px 22px -10px var(--tglow)!important}' +
-      K('neon', 'dark') + ' h2.font-display,' + K('neon', 'dark') + ' h2.text-xl{text-shadow:0 0 14px var(--tglow)}' +
       K('neon', 'dark') + ' [style*="--box-yellow-accent"] .nk-box-btn,' + K('neon', 'dark') + ' [style*="--box-green-accent"] .nk-box-btn{color:#07110c!important}';
+
+
+    // Uygulamanın geneline yayılan renkler: kamera düğmesi, profil kartı, grafik, formüller, hocaya sor
+    css +=
+      S + ' .bg-sky-500,' + S + ' .bg-sky-600,' + S + ' .bg-sky-700,' + S + ' .hover\\:bg-sky-600:hover{background-image:linear-gradient(135deg,var(--t2),var(--t1))!important;background-color:var(--t2)!important}' +
+      S + ' .text-sky-600,' + S + ' .text-indigo-600{color:var(--ta)!important}' +
+      S + ' .bg-indigo-100,' + S + ' .bg-sky-100{background-color:var(--tsoft)!important}' +
+      S + ' .nk-hero{background:linear-gradient(135deg,color-mix(in srgb,var(--t1) 45%,#0b0b16),color-mix(in srgb,var(--t1) 75%,#0b0b16) 55%,var(--t2))!important}' +
+      S + '[data-nk-ink="dark"] .nk-hero{color:#fff}';
+    // Formüller vb. için ortak yüzey renkleri (açık / koyu)
+    css +=
+      'body{--nk-surf:#ffffff;--nk-soft:#f8fafc;--nk-ink:#0f172a;--nk-mute:#475569;--nk-line:#e2e8f0;--nk-line2:#cbd5e1}' +
+      'body.dark-mode{--nk-surf:#1d1e26;--nk-soft:#17181f;--nk-ink:#f0f0f4;--nk-mute:#c6c7d1;--nk-line:#34353f;--nk-line2:#44454f}' +
+      S + '[data-nk-mode="dark"]{--nk-surf:color-mix(in srgb,var(--tcard) 92%,#fff 4%);--nk-soft:color-mix(in srgb,var(--tcard) 80%,#000)}';
 
     // Ayarlar'daki tema seçici
     css +=
@@ -119,10 +121,7 @@
       '.nk-th span{display:block;margin-top:5px;font-size:11px;font-weight:700;color:#475569}' +
       'body.dark-mode .nk-th span{color:#c6c7d1}' +
       '.nk-th-g{margin:14px 0 6px;font-size:10px;font-weight:800;letter-spacing:.08em;color:#94a3b8;text-transform:uppercase}' +
-      '.nk-mode{display:flex;gap:6px;margin-top:12px;padding:4px;border-radius:14px;background:rgba(100,116,139,.14)}' +
-      '.nk-mode button{flex:1;border:0;border-radius:11px;padding:9px 0;font-size:12px;font-weight:800;color:#64748b;background:transparent;font-family:inherit}' +
-      '.nk-mode button.on{background:#fff;color:#0f172a;box-shadow:0 2px 8px rgba(15,23,42,.15)}' +
-      'body.dark-mode .nk-mode button.on{background:#2a2b36;color:#fff}';
+      '';
     return css;
   }
 
@@ -138,7 +137,15 @@
   function setMeta(t) {
     try {
       var m = document.getElementById('meta-theme-color');
-      if (m) m.setAttribute('content', isDark() ? (t.id ? '#07070d' : '#131319') : (t.id ? '#fbf7ff' : '#f8fafc'));
+      if (m) m.setAttribute('content', t.mode === 'dark' ? (t.id && t.t1 ? '#07070d' : '#131319') : (t.id ? '#fbf7ff' : '#f8fafc'));
+    } catch (e) {}
+  }
+
+  // Zemin (açık/koyu) temaya bağlıdır
+  function syncMode(t) {
+    var want = t.mode === 'dark';
+    try {
+      if (typeof applyDarkMode === 'function' && (isDark() !== want || !!appState.darkMode !== want)) { appState.darkMode = want; applyDarkMode(want); }
     } catch (e) {}
   }
 
@@ -146,11 +153,11 @@
     if (!document.getElementById('nk-tema-css')) injectCss();
     var b = document.body;
     if (!b) return;
-    if (t.id) {
+    if (t.t1) {
       b.setAttribute('data-nk-theme', t.id);
       b.setAttribute('data-nk-kind', t.kind);
       b.setAttribute('data-nk-lay', String(t.lay || 0));
-      b.setAttribute('data-nk-mode', isDark() ? 'dark' : 'light');
+      b.setAttribute('data-nk-mode', t.mode);
       if (t.ink) b.setAttribute('data-nk-ink', t.ink); else b.removeAttribute('data-nk-ink');
     } else {
       ['data-nk-theme', 'data-nk-kind', 'data-nk-lay', 'data-nk-mode', 'data-nk-ink'].forEach(function (a) { b.removeAttribute(a); });
@@ -163,22 +170,14 @@
     var g = document.getElementById('nk-th-wrap');
     if (!g) return;
     g.querySelectorAll('.nk-th').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-id') === id); });
-    var d = isDark();
-    g.querySelectorAll('.nk-mode button').forEach(function (b) { b.classList.toggle('on', (b.getAttribute('data-m') === 'dark') === d); });
   }
 
   async function choose(id) {
     var t = find(id);
     try { localStorage.setItem(LS, id); } catch (e) {}
     try { appState.tema = id; } catch (e) {}
+    syncMode(t);
     paint(t);
-    try { haptic(10); } catch (e) {}
-    try { await saveSettings(); } catch (e) {}
-  }
-
-  async function setMode(dark) {
-    if (typeof applyDarkMode === 'function') { appState.darkMode = !!dark; applyDarkMode(!!dark); }
-    paint(current());
     try { haptic(10); } catch (e) {}
     try { await saveSettings(); } catch (e) {}
   }
@@ -196,10 +195,9 @@
     row.id = 'nk-th-wrap';
     var head = '<div class="flex items-center gap-3"><div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center shrink-0">' +
       '<svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0 0 18c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.3-.5-.8-.5-1.2 0-1.1.9-2 2-2h2.3A4.9 4.9 0 0 0 22 11c0-4.4-4.5-8-10-8zm-5.5 9a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3-4a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3 4a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/></svg></div>' +
-      '<div class="flex-1 min-w-0"><p class="text-sm font-medium text-slate-800">Renk Teması</p><p class="text-xs text-slate-500 mt-0.5">Renk paletini ve zemini ayrı ayrı seç.</p></div></div>' +
-      '<div class="nk-mode"><button type="button" data-m="light">Açık zemin</button><button type="button" data-m="dark">Koyu zemin</button></div>';
+      '<div class="flex-1 min-w-0"><p class="text-sm font-medium text-slate-800">Renk Teması</p><p class="text-xs text-slate-500 mt-0.5">Açık ve koyu temalar.</p></div></div>';
     var html = head;
-    ['Klasik', 'Pastel', 'Canlı', 'Neon'].forEach(function (g) {
+    ['Açık', 'Koyu'].forEach(function (g) {
       html += '<div class="nk-th-g">' + g + '</div><div class="nk-th-grid">';
       THEMES.filter(function (t) { return t.group === g; }).forEach(function (t) {
         var sw = t.swatch || ('linear-gradient(135deg,' + t.t1 + ',' + t.t2 + ')');
@@ -211,31 +209,37 @@
     row.innerHTML = html;
     list.insertBefore(row, list.firstChild);
     row.querySelectorAll('.nk-th').forEach(function (b) { b.onclick = function () { choose(b.getAttribute('data-id')); }; });
-    row.querySelectorAll('.nk-mode button').forEach(function (b) { b.onclick = function () { setMode(b.getAttribute('data-m') === 'dark'); }; });
     markSelected(current().id);
     return true;
   }
 
   function start() {
     paint(current());
-    // karanlık/açık zemin değişince (başka yerden de olsa) palet modu eşleşsin
-    try { new MutationObserver(function () { paint(current()); }).observe(document.body, { attributes: true, attributeFilter: ['class'] }); } catch (e) {}
+    // Başka bir yer karanlık modu değiştirirse temanın zeminine geri dön
+    try {
+      new MutationObserver(function () { var t = current(); if (isDark() !== (t.mode === 'dark')) syncMode(t); }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    } catch (e) {}
     var tries = 0;
     (function wait() {
       var okApp = typeof appState !== 'undefined' && appState && appState.field !== undefined;
       if (okApp) {
-        // Buluttan gelen seçim yerelden farklıysa bulut kazanır
         var cloud = appState.tema;
         var local = ''; try { local = localStorage.getItem(LS) || ''; } catch (e) {}
         if (typeof cloud === 'string' && cloud !== local) { try { localStorage.setItem(LS, cloud); } catch (e) {} }
-        else if (typeof cloud !== 'string') { appState.tema = local; }
-        paint(current());
+        else if (typeof cloud !== 'string') {
+          // Eski kullanıcı: tema seçmemiş ama karanlık modu açıksa Klasik Koyu olarak devam
+          appState.tema = local || (appState.darkMode ? 'klasik-koyu' : '');
+          try { localStorage.setItem(LS, appState.tema); } catch (e) {}
+        }
+        var t = current();
+        syncMode(t);
+        paint(t);
       }
       var pick = buildPicker();
       if ((!okApp || !pick) && ++tries < 120) setTimeout(wait, 500);
     })();
   }
 
-  window.__nkTema = { choose: choose, setMode: setMode, themes: THEMES };
+  window.__nkTema = { choose: choose, themes: THEMES };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();

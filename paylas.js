@@ -196,7 +196,7 @@
     b.id = 'nk-gm-btn';
     b.type = 'button';
     b.style.cssText = 'width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:11px;border-radius:16px;font-weight:700;font-size:12px;' +
-      'color:#0f766e;background:#f0fdfa;border:1px solid #99f6e4';
+      'color:var(--ta,#0f766e);background:var(--tsoft,#f0fdfa);border:1px solid color-mix(in srgb,var(--t1,#14b8a6) 45%,transparent)';
     b.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z"/></svg>Gemini ile ekle';
     b.onclick = openSheet;
     var banner = $('add-deneme-banner');

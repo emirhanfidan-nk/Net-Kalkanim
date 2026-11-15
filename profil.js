@@ -116,7 +116,7 @@
         var cell = document.createElement('button');
         cell.type = 'button';
         var on = p.icon === ic;
-        cell.style.cssText = 'border-radius:9999px;padding:3px;border:2px solid ' + (on ? '#0d9488' : 'transparent') + ';background:transparent';
+        cell.style.cssText = 'border-radius:9999px;padding:3px;border:2px solid ' + (on ? 'var(--t1,#0d9488)' : 'transparent') + ';background:transparent';
         cell.appendChild(avatar({ icon: ic, grad: p.grad, name: p.name }, 40, false));
         cell.onclick = function () { p.icon = ic; repaint(); };
         iconGrid.appendChild(cell);
@@ -127,7 +127,7 @@
         sw.type = 'button';
         var on = p.grad === gi;
         sw.style.cssText = 'width:30px;height:30px;border-radius:9999px;background:linear-gradient(135deg,' + g[0] + ',' + g[1] + ');' +
-          'border:3px solid #fff;box-shadow:0 0 0 2px ' + (on ? '#0d9488' : '#e2e8f0');
+          'border:3px solid #fff;box-shadow:0 0 0 2px ' + (on ? 'var(--t1,#0d9488)' : '#e2e8f0');
         sw.onclick = function () { p.grad = gi; repaint(); };
         gradRow.appendChild(sw);
       });
@@ -229,7 +229,7 @@
     var card = el('div', 'space-y-3');
     card.id = 'nk-profile-card';
 
-    var hero = el('div', 'rounded-3xl p-5 text-white');
+    var hero = el('div', 'rounded-3xl p-5 text-white nk-hero');
     hero.style.background = 'linear-gradient(135deg,#134e4a,#0f766e 60%,#0d9488)';
 
     var frac = g ? Math.max(0.03, Math.min(1, (g.xp - g.from) / Math.max(1, g.to - g.from))) : 0;
@@ -286,7 +286,7 @@
       grid.appendChild(tile('simsek', '#7c3aed', g.xp, 'Toplam XP'));
       grid.appendChild(tile('kalkan', '#0891b2', g.shields, 'Kalkan'));
     }
-    grid.appendChild(tile('kitap', '#0d9488', qs, 'Soru'));
+    grid.appendChild(tile('kitap', 'var(--t1,#0d9488)', qs, 'Soru'));
     grid.appendChild(tile('not', '#d97706', ns, 'Not'));
     grid.appendChild(tile('hedef', '#e11d48', acc, 'Doğruluk'));
     card.appendChild(grid);

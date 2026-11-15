@@ -4014,15 +4014,15 @@ function denemeChartSVG(points) {
     points.forEach((p, i) => {
         const cx = x(i).toFixed(1), cy = y(p.v).toFixed(1);
         const isLast = i === n - 1;
-        dots += `<circle cx="${cx}" cy="${cy}" r="${isLast ? 4.5 : 3.2}" fill="${isLast ? '#0d9488' : '#fff'}" stroke="#0d9488" stroke-width="2"/>`;
+        dots += `<circle cx="${cx}" cy="${cy}" r="${isLast ? 4.5 : 3.2}" fill="${isLast ? 'currentColor' : '#fff'}" stroke="currentColor" stroke-width="2"/>`;
         if (n <= 8 || isLast || i === maxIdx) {
-            dots += `<text x="${cx}" y="${(+cy - 8).toFixed(1)}" text-anchor="middle" font-size="9.5" font-weight="700" fill="#0d9488">${denemeFmtNet(p.v)}</text>`;
+            dots += `<text x="${cx}" y="${(+cy - 8).toFixed(1)}" text-anchor="middle" font-size="9.5" font-weight="700" fill="currentColor">${denemeFmtNet(p.v)}</text>`;
         }
         if (n <= 6 || i === 0 || isLast || i % step === 0) {
             xl += `<text x="${cx}" y="${H - 8}" text-anchor="middle" font-size="9" fill="#94a3b8">${denemeShortDate(p.date)}</text>`;
         }
     });
-    return `<svg viewBox="0 0 ${W} ${H}" class="w-full" role="img" aria-label="Net grafiği">${g}${n > 1 ? `<path d="${path}" fill="none" stroke="#0d9488" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>` : ''}${dots}${xl}</svg>`;
+    return `<svg viewBox="0 0 ${W} ${H}" class="w-full" role="img" aria-label="Net grafiği" style="color:var(--t1,#0d9488)">${g}${n > 1 ? `<path d="${path}" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>` : ''}${dots}${xl}</svg>`;
 }
 
 let denemeChipsLeft = 0;

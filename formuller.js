@@ -82,7 +82,7 @@
     return m;
   }
   function renderLine(line) {
-    var d = el('div', 'margin-top:8px;color:#0f766e;font-weight:600;max-width:100%');
+    var d = el('div', 'margin-top:8px;color:var(--ta,#0f766e);font-weight:600;max-width:100%');
     var text = String(line).trim();
     if (text.indexOf('$') < 0 && /[\\^_=]/.test(text)) {
       var lm = text.match(/^([^=\\^_{}]{1,80}?):\s+(.*)$/);
@@ -96,7 +96,7 @@
     var row = el('div', 'font-size:16px;line-height:1.5;overflow-x:auto;overflow-y:hidden');
     for (var i = 1; i < parts.length; i++) {
       if (i % 2 === 1) { if (parts[i]) row.appendChild(mathHtml(parts[i])); }
-      else if (parts[i].trim()) row.appendChild(el('span', 'color:#475569;font-weight:600;font-size:13px', parts[i]));
+      else if (parts[i].trim()) row.appendChild(el('span', 'color:var(--nk-mute,#475569);font-weight:600;font-size:13px', parts[i]));
     }
     d.appendChild(row);
     return d;
@@ -137,13 +137,13 @@
     root.innerHTML = '';
 
     var head = el('div', 'display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e2e8f0;padding-bottom:8px;margin-bottom:12px');
-    head.appendChild(el('h2', 'font-size:20px;font-weight:600;color:#1e293b;font-family:inherit', 'Formüller'));
-    var add = el('button', 'padding:8px 14px;border-radius:12px;border:0;background:#0d9488;color:#fff;font-weight:800;font-size:12px;box-shadow:0 3px 0 #0f766e', '+ Ekle');
+    head.appendChild(el('h2', 'font-size:20px;font-weight:600;color:var(--nk-ink,#1e293b);font-family:inherit', 'Formüller'));
+    var add = el('button', 'padding:8px 14px;border-radius:12px;border:0;background:linear-gradient(135deg,var(--t1,#0d9488),var(--t2,#0d9488));color:#fff;font-weight:800;font-size:12px;box-shadow:0 3px 0 #0f766e', '+ Ekle');
     add.onclick = function () { openAdd(null); };
     head.appendChild(add);
     root.appendChild(head);
 
-    var inp = el('input', 'width:100%;border:1px solid #cbd5e1;border-radius:12px;padding:10px 12px;font-size:13px;color:#0f172a;background:#fff;margin-bottom:10px');
+    var inp = el('input', 'width:100%;border:1px solid var(--nk-line2,#cbd5e1);border-radius:12px;padding:10px 12px;font-size:13px;color:var(--nk-ink,#0f172a);background:#fff;margin-bottom:10px');
     inp.type = 'search';
     inp.placeholder = 'Formül ara (ör. tork, momentum)';
     inp.value = state.q;
@@ -156,7 +156,7 @@
     var chips = el('div', 'display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px');
     function chip(label, val) {
       var on = state.course === val;
-      var b = el('button', 'padding:6px 12px;border-radius:9999px;font-size:11px;font-weight:700;border:1px solid ' + (on ? '#0d9488' : '#cbd5e1') + ';background:' + (on ? '#0d9488' : '#fff') + ';color:' + (on ? '#fff' : '#475569'), label);
+      var b = el('button', 'padding:6px 12px;border-radius:9999px;font-size:11px;font-weight:700;border:1px solid ' + (on ? 'var(--t1,#0d9488)' : 'var(--nk-line2,#cbd5e1)') + ';background:' + (on ? 'var(--t1,#0d9488)' : 'var(--nk-surf,#fff)') + ';color:' + (on ? '#fff' : '#475569'), label);
       b.onclick = function () { state.course = val; paint(); };
       chips.appendChild(b);
     }
@@ -192,7 +192,7 @@
       var empty = el('div', 'text-align:center;color:#64748b;padding:48px 16px;font-size:13px;line-height:1.6');
       empty.innerHTML = all().length
         ? 'Bu aramayla eşleşen formül yok.'
-        : '<b style="color:#0f172a">Henüz formül yok.</b><br>Sağ üstten <b>+ Ekle</b> ile kendi formülünü ekleyebilirsin. Gemini ile de ekleyebilirsin: Ekle sekmesindeki "Gemini ile ekle" düğmesine bas ve adımları izle.';
+        : '<b style="color:var(--nk-ink,#0f172a)">Henüz formül yok.</b><br>Sağ üstten <b>+ Ekle</b> ile kendi formülünü ekleyebilirsin. Gemini ile de ekleyebilirsin: Ekle sekmesindeki "Gemini ile ekle" düğmesine bas ve adımları izle.';
       lst.appendChild(empty);
       return;
     }
@@ -204,9 +204,9 @@
         lastCourse = x.ders;
         lst.appendChild(el('div', 'margin:14px 2px 6px;font-size:11px;font-weight:800;letter-spacing:.06em;color:#64748b;text-transform:uppercase', pretty(x.ders)));
       }
-      var card = el('div', 'background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:14px;margin-bottom:10px;box-shadow:0 1px 2px rgba(15,23,42,.04)');
+      var card = el('div', 'background:var(--nk-surf,#fff);border:1px solid var(--nk-line,#e2e8f0);border-radius:18px;padding:14px;margin-bottom:10px;box-shadow:0 1px 2px rgba(15,23,42,.04)');
       var top = el('div', 'display:flex;align-items:flex-start;gap:8px');
-      var t = el('div', 'flex:1;font-weight:800;font-size:14px;color:#0f172a;line-height:1.3', x.baslik);
+      var t = el('div', 'flex:1;font-weight:800;font-size:14px;color:var(--nk-ink,#0f172a);line-height:1.3', x.baslik);
       top.appendChild(t);
       var star = el('button', 'border:0;background:transparent;font-size:20px;line-height:1;color:' + (starred ? '#f59e0b' : '#cbd5e1'), '★');
       star.setAttribute('aria-label', 'Yıldızla');
@@ -220,7 +220,7 @@
       if (x.kaynak) card.appendChild(el('div', 'margin-top:8px;font-size:10px;font-weight:600;color:#94a3b8', 'Kaynak: ' + x.kaynak));
       if (x.mine) {
         var row = el('div', 'display:flex;gap:14px;margin-top:10px');
-        var ed = el('button', 'border:0;background:transparent;font-size:11px;font-weight:700;color:#0d9488;padding:0', 'Düzenle');
+        var ed = el('button', 'border:0;background:transparent;font-size:11px;font-weight:700;color:var(--ta,#0d9488);padding:0', 'Düzenle');
         ed.onclick = function () { openAdd(x); };
         var del = el('button', 'border:0;background:transparent;font-size:11px;font-weight:700;color:#e11d48;padding:0', 'Sil');
         del.onclick = function () { remove(x.id); };
@@ -245,13 +245,13 @@
   /* ---------- Ekleme / düzenleme formu ---------- */
   function openAdd(item, pre) {
     var d = item || pre || {};
-    var ov = el('div', 'position:fixed;inset:0;z-index:2147483200;background:#fff;overflow-y:auto;font-family:inherit');
+    var ov = el('div', 'position:fixed;inset:0;z-index:2147483200;background:var(--nk-surf,#fff);overflow-y:auto;font-family:inherit');
     var box = el('div', 'max-width:480px;margin:0 auto;padding:18px 18px 40px');
     var hd = el('div', 'display:flex;align-items:center;gap:10px;margin-bottom:8px');
-    var bk = el('button', 'width:38px;height:38px;border-radius:12px;border:0;background:#f1f5f9;color:#334155;font-size:18px;font-weight:700', '←');
+    var bk = el('button', 'width:38px;height:38px;border-radius:12px;border:0;background:var(--nk-soft,#f1f5f9);color:var(--nk-ink,#334155);font-size:18px;font-weight:700', '←');
     bk.onclick = function () { ov.remove(); };
     hd.appendChild(bk);
-    hd.appendChild(el('div', 'font-weight:800;font-size:17px;color:#0f172a', item ? 'Formülü düzenle' : 'Yeni formül'));
+    hd.appendChild(el('div', 'font-weight:800;font-size:17px;color:var(--nk-ink,#0f172a)', item ? 'Formülü düzenle' : 'Yeni formül'));
     box.appendChild(hd);
 
     function lab(t) { box.appendChild(el('div', 'font-size:11px;font-weight:700;color:#64748b;margin:14px 0 6px', t)); }
@@ -265,7 +265,7 @@
       wrap.innerHTML = '';
       cs.forEach(function (c) {
         var on = c === chosen;
-        var b = el('button', 'padding:7px 12px;border-radius:9999px;font-size:11px;font-weight:700;border:1px solid ' + (on ? '#0d9488' : '#cbd5e1') + ';background:' + (on ? '#0d9488' : '#fff') + ';color:' + (on ? '#fff' : '#475569'), pretty(c));
+        var b = el('button', 'padding:7px 12px;border-radius:9999px;font-size:11px;font-weight:700;border:1px solid ' + (on ? 'var(--t1,#0d9488)' : 'var(--nk-line2,#cbd5e1)') + ';background:' + (on ? 'var(--t1,#0d9488)' : 'var(--nk-surf,#fff)') + ';color:' + (on ? '#fff' : '#475569'), pretty(c));
         b.onclick = function () { chosen = c; drawChips(); };
         wrap.appendChild(b);
       });
@@ -273,16 +273,16 @@
     drawChips();
     box.appendChild(wrap);
     lab('Başlık');
-    var tin = el('input', 'width:100%;border:1px solid #cbd5e1;border-radius:12px;padding:11px;font-size:14px;color:#0f172a;background:#fff');
+    var tin = el('input', 'width:100%;border:1px solid var(--nk-line2,#cbd5e1);border-radius:12px;padding:11px;font-size:14px;color:var(--nk-ink,#0f172a);background:#fff');
     tin.value = d.baslik || ''; tin.placeholder = 'ör. Tork'; tin.maxLength = 80;
     box.appendChild(tin);
     lab('Formül');
-    var fin = el('textarea', 'width:100%;height:140px;border:1px solid #cbd5e1;border-radius:12px;padding:11px;font-size:15px;color:#0f172a;background:#fff');
+    var fin = el('textarea', 'width:100%;height:140px;border:1px solid var(--nk-line2,#cbd5e1);border-radius:12px;padding:11px;font-size:15px;color:var(--nk-ink,#0f172a);background:#fff');
     fin.value = d.formul || ''; fin.placeholder = 'Her formülü ayrı satıra yaz. Örn: F = m \\cdot a'; fin.maxLength = 1500;
     var snips = [['a/b', '\\frac{a}{b}'], ['xⁿ', '^{n}'], ['xₙ', '_{n}'], ['√', '\\sqrt{x}'], ['·', ' \\cdot '], ['±', ' \\pm '], ['π', '\\pi '], ['Δ', '\\Delta '], ['ω', '\\omega '], ['θ', '\\theta '], ['λ', '\\lambda '], ['τ', '\\tau '], ['α', '\\alpha '], ['Σ', '\\sum ']];
     var bar = el('div', 'display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px');
     snips.forEach(function (sn) {
-      var b = el('button', 'padding:6px 10px;border-radius:9px;border:1px solid #cbd5e1;background:#f8fafc;color:#334155;font-size:13px;font-weight:700', sn[0]);
+      var b = el('button', 'padding:6px 10px;border-radius:9px;border:1px solid var(--nk-line2,#cbd5e1);background:var(--nk-soft,#f8fafc);color:#334155;font-size:13px;font-weight:700', sn[0]);
       b.type = 'button';
       b.onmousedown = function (e) { e.preventDefault(); };
       b.onclick = function () {
@@ -295,7 +295,7 @@
     });
     box.appendChild(bar);
     box.appendChild(fin);
-    var pv = el('div', 'margin-top:10px;padding:10px 12px;border:1px dashed #cbd5e1;border-radius:12px;background:#f8fafc;min-height:40px');
+    var pv = el('div', 'margin-top:10px;padding:10px 12px;border:1px dashed #cbd5e1;border-radius:12px;background:var(--nk-soft,#f8fafc);min-height:40px');
     function prev() {
       pv.innerHTML = '';
       var any = false;
@@ -310,9 +310,9 @@
     if (kx.st === 1) { var t = setInterval(function () { if (kx.st !== 1 || !document.body.contains(pv)) { clearInterval(t); prev(); } }, 200); }
 
     var row = el('div', 'display:flex;gap:8px;margin-top:18px');
-    var cancel = el('button', 'flex:1;padding:13px;border-radius:12px;border:0;background:#f1f5f9;color:#475569;font-weight:700;font-size:13px', 'Vazgeç');
+    var cancel = el('button', 'flex:1;padding:13px;border-radius:12px;border:0;background:var(--nk-soft,#f1f5f9);color:var(--nk-mute,#475569);font-weight:700;font-size:13px', 'Vazgeç');
     cancel.onclick = function () { ov.remove(); };
-    var ok = el('button', 'flex:1;padding:13px;border-radius:12px;border:0;background:#0d9488;color:#fff;font-weight:800;font-size:13px', 'Kaydet');
+    var ok = el('button', 'flex:1;padding:13px;border-radius:12px;border:0;background:linear-gradient(135deg,var(--t1,#0d9488),var(--t2,#0d9488));color:#fff;font-weight:800;font-size:13px', 'Kaydet');
     ok.onclick = async function () {
       var b = tin.value.trim(), f = fin.value.trim();
       if (!b || !f) { toast('Başlık ve formülü yaz!', true); return; }

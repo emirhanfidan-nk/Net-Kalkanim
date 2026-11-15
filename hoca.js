@@ -91,11 +91,11 @@
     card.className = 'w-full bg-white rounded-2xl p-4 flex items-center gap-3 text-left';
     card.style.boxShadow = 'var(--card-shadow)';
     card.innerHTML =
-      '<div style="width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:#6366f122;color:#6366f1;flex-shrink:0">' +
+      '<div style="width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:var(--t1,#6366f1)22;color:var(--t1,#6366f1);flex-shrink:0">' +
       fillIcon(I_Q, 20) + '</div>' +
       '<div class="flex-1 min-w-0"><p class="text-sm font-bold text-slate-700">Hocaya Sorulacaklar</p>' +
       '<p id="nk-hoca-sub" class="text-xs text-slate-400"></p></div>' +
-      '<span id="nk-hoca-count" class="text-sm font-bold text-white rounded-full px-2.5 py-1" style="background:#6366f1;min-width:28px;text-align:center">0</span>';
+      '<span id="nk-hoca-count" class="text-sm font-bold text-white rounded-full px-2.5 py-1" style="background:var(--t1,#6366f1);min-width:28px;text-align:center">0</span>';
     if (anchor && anchor.parentNode === home) home.insertBefore(card, anchor);
     else home.appendChild(card);
     card.onclick = openSheet;
@@ -142,7 +142,7 @@
 
     if (!cache.length) {
       var empty = row('flex flex-col items-center text-center bg-white rounded-2xl border-2 border-dashed border-slate-200', 'padding:44px 24px;');
-      var ic = row('', 'width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:#6366f122;color:#6366f1;margin-bottom:14px');
+      var ic = row('', 'width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:var(--t1,#6366f1)22;color:var(--t1,#6366f1);margin-bottom:14px');
       ic.innerHTML = fillIcon(I_Q, 28);
       empty.appendChild(ic);
       empty.appendChild(el('p', 'text-sm font-bold text-slate-600', 'Henüz bir şey yok'));
@@ -166,7 +166,7 @@
         im.onclick = function () { if (typeof openLightbox === 'function') openLightbox(u); };
         head.appendChild(im);
       } else {
-        var ph = row('', 'width:76px;height:76px;border-radius:14px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#6366f114;color:#6366f1');
+        var ph = row('', 'width:76px;height:76px;border-radius:14px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--t1,#6366f1)14;color:var(--t1,#6366f1)');
         ph.innerHTML = fillIcon(I_NOTE, 28);
         head.appendChild(ph);
       }
@@ -214,13 +214,13 @@
     var head = el('div', 'bg-white border-b border-slate-200');
     head.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:max(14px, env(safe-area-inset-top)) 16px 12px;';
     var left = row('', 'display:flex;align-items:center;gap:10px;');
-    var ic = row('', 'width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:#6366f122;color:#6366f1');
+    var ic = row('', 'width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:var(--t1,#6366f1)22;color:var(--t1,#6366f1)');
     ic.innerHTML = fillIcon(I_Q, 20);
     left.appendChild(ic);
     left.appendChild(el('h3', 'text-base font-semibold text-slate-800', 'Hocaya Sorulacaklar'));
     var tc = el('span', 'text-xs font-bold text-white rounded-full');
     tc.id = 'nk-hoca-title-count';
-    tc.style.cssText = 'background:#6366f1;padding:2px 9px;';
+    tc.style.cssText = 'background:var(--t1,#6366f1);padding:2px 9px;';
     left.appendChild(tc);
     head.appendChild(left);
     var close = iconBtn(I_CLOSE, '', 'text-slate-500', closeSheet, 22);
