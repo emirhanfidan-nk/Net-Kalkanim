@@ -23,6 +23,12 @@
   var BOOK_D = 'M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z';
   var CHECK_D = 'M9 16.2l-3.5-3.5L4 14.2 9 19.2 20 8.2l-1.5-1.5z';
   var CHART_D = 'M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z';
+  var MOON_D = 'M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z';
+  var SUN_D = 'M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10zM11 1h2v3h-2zM11 20h2v3h-2zM1 11h3v2H1zM20 11h3v2h-3zM4.2 5.6l1.4-1.4 2.1 2.1-1.4 1.4zM16.3 17.7l1.4-1.4 2.1 2.1-1.4 1.4zM4.2 18.4l2.1-2.1 1.4 1.4-2.1 2.1zM16.3 6.3l2.1-2.1 1.4 1.4-2.1 2.1z';
+  var NOTE_D = 'M19 3H4.99C3.89 3 3 3.9 3 5l.01 14c0 1.1.89 2 1.99 2h10l6-6V5c0-1.1-.9-2-2-2zM7 8h10v2H7V8zm5 6H7v-2h5v2zm2 5.5V14h5.5L14 19.5z';
+  var TROPHY_D = 'M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z';
+  var SIGMA_D = 'M18 4H6v2l6.5 6L6 18v2h12v-3h-7l5-5-5-5h7z';
+  var PALETTE_D = 'M12 3a9 9 0 0 0 0 18c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.3-.5-.8-.5-1.2 0-1.1.9-2 2-2h2.3A4.9 4.9 0 0 0 22 11c0-4.4-4.5-8-10-8z';
   var MAX_SHIELDS = 2;
   var TITLES = ['', 'Çaylak', 'Azimli', 'Kararlı', 'Gayretli', 'Usta', 'Uzman', 'Efsane'];
   function titleOf(lv) { return TITLES[Math.min(lv, TITLES.length - 1)]; }
@@ -36,6 +42,29 @@
     { id: 's7',  name: '7 Gün Seri',  desc: '7 gün üst üste tekrar yap',  ok: function (c) { return c.streak >= 7; }, icon: FLAME_D, c: '#fb923c,#ef4444' },
     { id: 's14', name: '14 Gün Seri', desc: '14 gün üst üste tekrar yap', ok: function (c) { return c.streak >= 14; }, icon: FLAME_D, c: '#fb923c,#ef4444' },
     { id: 's30', name: '30 Gün Seri', desc: '30 gün üst üste tekrar yap', ok: function (c) { return c.streak >= 30; }, icon: FLAME_D, c: '#fb923c,#ef4444' },
+    { id: 's60', name: '60 Gün Seri', desc: '60 gün üst üste tekrar yap', ok: function (c) { return c.streak >= 60; }, icon: FLAME_D, c: '#f97316,#b91c1c' },
+    { id: 's100', name: '100 Gün Seri', desc: '100 gün üst üste tekrar yap', ok: function (c) { return c.streak >= 100; }, icon: FLAME_D, c: '#facc15,#dc2626' },
+    { id: 'g7', name: '7 Hedef', desc: 'Günlük hedefi 7 kez doldur', ok: function (c) { return c.goals >= 7; }, icon: CHECK_D, c: '#4ade80,#15803d' },
+    { id: 'g30', name: '30 Hedef', desc: 'Günlük hedefi 30 kez doldur', ok: function (c) { return c.goals >= 30; }, icon: CHECK_D, c: '#34d399,#047857' },
+    { id: 'x2500', name: '2500 XP', desc: 'Toplam 2500 XP topla', ok: function (c) { return c.xp >= 2500; }, icon: BOLT_D, c: '#c084fc,#6d28d9' },
+    { id: 'x5000', name: '5000 XP', desc: 'Toplam 5000 XP topla', ok: function (c) { return c.xp >= 5000; }, icon: BOLT_D, c: '#e879f9,#7e22ce' },
+    { id: 'lv5', name: 'Usta', desc: '5. seviyeye ulaş', ok: function (c) { return c.lv >= 5; }, icon: STAR_D, c: '#fbbf24,#d97706' },
+    { id: 'lv7', name: 'Efsane', desc: '7. seviyeye ulaş', ok: function (c) { return c.lv >= 7; }, icon: TROPHY_D, c: '#fde047,#ea580c' },
+    { id: 'q100', name: '100 Soru', desc: '100 soru çöz', ok: function (c) { return c.answered >= 100; }, icon: BOOK_D, c: '#2dd4bf,#0e7490' },
+    { id: 'q500', name: '500 Soru', desc: '500 soru çöz', ok: function (c) { return c.answered >= 500; }, icon: BOOK_D, c: '#22d3ee,#0369a1' },
+    { id: 'q1000', name: '1000 Soru', desc: '1000 soru çöz', ok: function (c) { return c.answered >= 1000; }, icon: BOOK_D, c: '#38bdf8,#1d4ed8' },
+    { id: 'q2500', name: '2500 Soru', desc: '2500 soru çöz', ok: function (c) { return c.answered >= 2500; }, icon: TROPHY_D, c: '#818cf8,#4338ca' },
+    { id: 'dn1', name: 'İlk Deneme', desc: 'İlk denemeni ekle', ok: function (c) { return c.deneme >= 1; }, icon: CHART_D, c: '#93c5fd,#3b82f6' },
+    { id: 'dn5', name: '5 Deneme', desc: '5 deneme ekle', ok: function (c) { return c.deneme >= 5; }, icon: CHART_D, c: '#60a5fa,#1d4ed8' },
+    { id: 'dn10', name: '10 Deneme', desc: '10 deneme ekle', ok: function (c) { return c.deneme >= 10; }, icon: CHART_D, c: '#3b82f6,#1e3a8a' },
+    { id: 'dn25', name: '25 Deneme', desc: '25 deneme ekle', ok: function (c) { return c.deneme >= 25; }, icon: TROPHY_D, c: '#6366f1,#312e81' },
+    { id: 'n1', name: 'İlk Not', desc: 'İlk notunu ekle', ok: function (c) { return c.notes >= 1; }, icon: NOTE_D, c: '#fcd34d,#f59e0b' },
+    { id: 'n25', name: '25 Not', desc: '25 not ekle', ok: function (c) { return c.notes >= 25; }, icon: NOTE_D, c: '#fbbf24,#b45309' },
+    { id: 'f1', name: 'Formülcü', desc: 'Kendi formülünü ekle', ok: function (c) { return c.formul >= 1; }, icon: SIGMA_D, c: '#f472b6,#be185d' },
+    { id: 'th5', name: 'Renk Avcısı', desc: '5 farklı temayı dene', ok: function (c) { return c.themes >= 5; }, icon: PALETTE_D, c: '#f0abfc,#c026d3' },
+    { id: 'sh1', name: 'Kurtarıldın', desc: 'Seri kalkanı serini kurtarsın', ok: function (c) { return c.shield; }, icon: SHIELD_D, c: '#38bdf8,#2563eb' },
+    { id: 'night', name: 'Gece Kuşu', desc: 'Gece 00:00 – 05:00 arası çalış', ok: function (c) { return c.night; }, icon: MOON_D, c: '#6366f1,#1e1b4b' },
+    { id: 'early', name: 'Erkenci', desc: 'Sabah 05:00 – 07:00 arası çalış', ok: function (c) { return c.early; }, icon: SUN_D, c: '#fde047,#f97316' },
     { id: 'x100', name: '100 XP',  desc: 'Toplam 100 XP topla',  ok: function (c) { return c.xp >= 100; }, icon: BOLT_D, c: '#a78bfa,#7c3aed' },
     { id: 'x500', name: '500 XP',  desc: 'Toplam 500 XP topla',  ok: function (c) { return c.xp >= 500; }, icon: BOLT_D, c: '#a78bfa,#7c3aed' },
     { id: 'x1000', name: '1000 XP', desc: 'Toplam 1000 XP topla', ok: function (c) { return c.xp >= 1000; }, icon: BOLT_D, c: '#a78bfa,#7c3aed' },
@@ -541,7 +570,12 @@
     var ctx = {
       streak: streak, xp: o.xp, answered: appState.totalAnswered || 0,
       goals: o.goals || (o.goalDay ? 1 : 0),
-      analyzed: (appState.denemeler || []).filter(function (d) { return d.analyzed; }).length
+      analyzed: (appState.denemeler || []).filter(function (d) { return d.analyzed; }).length,
+      deneme: (appState.denemeler || []).filter(function (d) { return d && !d.deleted; }).length,
+      notes: (appState.notes || []).length,
+      formul: (appState.formuller || []).filter(function (f) { return f && !f.deleted; }).length,
+      lv: levelOf(o.xp), shield: !!o.shieldUsedFor, night: !!o.night, early: !!o.early,
+      themes: (function () { try { return (JSON.parse(localStorage.getItem('nk_th_seen') || '[]') || []).length; } catch (e) { return 0; } })()
     };
     var fresh = [];
     BADGES.forEach(function (b) {
@@ -597,7 +631,7 @@
     }
     var ov = makeOverlay(
       '<div class="nk-o-title">' + title + '</div>' + (text ? '<div class="nk-o-text">' + text + '</div>' : '') +
-      '<div class="nk-o-bgrid">' + cells + '</div>' +
+      '<div class="nk-o-bgrid"' + (fresh && fresh.length && fresh.length < 3 ? ' style="grid-template-columns:repeat(' + fresh.length + ',minmax(0,110px));justify-content:center"' : '') + '>' + cells + '</div>' +
       '<button type="button" class="nk-o-btn">Devam</button>');
     wireClose(ov, done);
     if (fresh && fresh.length) { vibrate([30, 30, 80]); confetti(ov); }
@@ -616,6 +650,7 @@
     var o = O();
     o.xp += n;
     o.dayXp += n;
+    try { var hr = getNowTR().getHours(); if (hr < 5) o.night = 1; else if (hr < 7) o.early = 1; } catch (e) {}
     if (sess && !isBonus) { sess.xp += n; }
     popXp(n, label);
     try { renderCard(); } catch (e) {}

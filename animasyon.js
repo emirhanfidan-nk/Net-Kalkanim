@@ -105,4 +105,54 @@
       return r;
     };
   }
+
+  /* ---------- Basma hissi, cevap tepkisi, açma/kapama anahtarı ---------- */
+  var css2 = document.createElement('style');
+  css2.textContent =
+    'button:not(#nav-add):not(.nk-o-btn):not(:disabled):active{scale:.97}' +
+    'button:not([class*="transition"]){transition:scale .1s}' +
+    '#review-modal [id^="choice-btn-"].bg-green-500{animation:popCorrect .35s ease-out}' +
+    '#review-modal [id^="choice-btn-"].bg-red-500{animation:shakeWrong .4s ease-in-out}' +
+    '#nk-anim-knob{transition:transform .32s cubic-bezier(.34,1.56,.64,1)}' +
+    'body.nk-noanim .tab-content.active,body.nk-noanim .tab-content.active>*,body.nk-noanim #library-list>*{animation:none!important}' +
+    'body.nk-noanim .toast-msg{animation-duration:.01ms!important}' +
+    'body.nk-noanim #review-modal [id^="choice-btn-"]{animation:none!important}' +
+    'body.nk-noanim button:active{scale:1!important}' +
+    '@media (prefers-reduced-motion:reduce){#review-modal [id^="choice-btn-"]{animation:none!important}}';
+  document.head.appendChild(css2);
+
+  var LS_A = 'nk_anim';
+  function animOn() { try { return localStorage.getItem(LS_A) !== '0'; } catch (e) { return true; } }
+  function applyAnim() {
+    var on = animOn();
+    document.body.classList.toggle('nk-noanim', !on);
+    var t = document.getElementById('nk-anim-toggle'), k = document.getElementById('nk-anim-knob');
+    if (t) { t.classList.toggle('bg-teal-600', on); t.classList.toggle('bg-slate-300', !on); }
+    if (k) k.style.transform = on ? 'translateX(20px)' : 'translateX(0)';
+  }
+  function buildAnimRow() {
+    if (document.getElementById('nk-anim-toggle')) return true;
+    var h = document.getElementById('haptics-toggle');
+    var rowH = h && h.closest('.p-4');
+    if (!rowH) return false;
+    var row = document.createElement('div');
+    row.className = 'p-4 flex items-center gap-3';
+    row.innerHTML =
+      '<div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center shrink-0">' +
+        '<svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 2l2.4 7.2H22l-6.2 4.5 2.4 7.3L12 16.5 5.8 21l2.4-7.3L2 9.2h7.6z"/></svg></div>' +
+      '<div class="flex-1 min-w-0"><p class="text-sm font-medium text-slate-800">Animasyonlar</p>' +
+        '<p class="text-xs text-slate-500 mt-0.5">Kartların belirmesi, buton basma ve cevap tepkileri.</p></div>' +
+      '<button id="nk-anim-toggle" type="button" class="relative w-12 h-7 rounded-full transition-colors bg-teal-600 shrink-0">' +
+        '<span id="nk-anim-knob" class="absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow-md" style="transform:translateX(20px)"></span></button>';
+    rowH.parentNode.insertBefore(row, rowH.nextSibling);
+    row.querySelector('#nk-anim-toggle').onclick = function () {
+      try { localStorage.setItem(LS_A, animOn() ? '0' : '1'); } catch (e) {}
+      applyAnim();
+      try { if (typeof haptic === 'function') haptic(8); } catch (e) {}
+    };
+    applyAnim();
+    return true;
+  }
+  applyAnim();
+  (function wait(n) { if (!buildAnimRow() && n < 60) setTimeout(function () { wait(n + 1); }, 500); })(0);
 })();

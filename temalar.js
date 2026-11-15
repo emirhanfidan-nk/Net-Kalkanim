@@ -119,6 +119,8 @@
       S + ' .face-heading-back{background:color-mix(in srgb,var(--t2) 18%,transparent)!important;color:color-mix(in srgb,var(--t2) 70%,var(--nk-ink))!important;border-color:color-mix(in srgb,var(--t2) 45%,transparent)!important}' +
       M('dark') + ' .bg-white.text-amber-600{background-image:linear-gradient(135deg,var(--t2),color-mix(in srgb,var(--t2) 55%,#000))!important;color:#fff!important}' +
       // Arşiv: kamp düğmesi, kutu filtreleri, kartlar
+      S + ' .toast-msg:not(.toast-error){background:linear-gradient(135deg,var(--t1),var(--t2))!important}' +
+      S + '[data-nk-ink="dark"] .toast-msg:not(.toast-error){color:#2a1c00!important}' +
       S + ' #btn-random-camp{background:color-mix(in srgb,var(--t2) 16%,transparent)!important;border-color:color-mix(in srgb,var(--t2) 50%,transparent)!important;color:var(--ta)!important}' +
       S + ' #btn-random-camp:hover{background-image:linear-gradient(135deg,var(--t2),var(--t1))!important;color:#fff!important}' +
       S + '[data-nk-ink="dark"] #btn-random-camp:hover{color:#2a1c00!important}' +
@@ -229,6 +231,7 @@
       ['data-nk-theme', 'data-nk-kind', 'data-nk-lay', 'data-nk-mode', 'data-nk-ink'].forEach(function (a) { b.removeAttribute(a); });
     }
     setMeta(t);
+    try { var sn = JSON.parse(localStorage.getItem('nk_th_seen') || '[]') || []; var sid = t.id || 'klasik'; if (sn.indexOf(sid) < 0) { sn.push(sid); localStorage.setItem('nk_th_seen', JSON.stringify(sn)); } } catch (e) {}
     markSelected(t.id);
   }
 
