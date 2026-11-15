@@ -167,12 +167,15 @@
       R + ' #review-question-text{border-color:color-mix(in srgb,var(--t1) 30%,transparent)!important}' +
       R + ' #review-unified-board{border-color:color-mix(in srgb,var(--t1) 38%,transparent)!important}' +
       R + ' > .bg-white.border-t{background-color:color-mix(in srgb,var(--tcard) 84%,transparent)!important;border-top:2px solid color-mix(in srgb,var(--t2) 40%,transparent)!important;backdrop-filter:blur(10px)}' +
-      R + ' [id^="choice-btn-"]{border-color:color-mix(in srgb,var(--t1) 45%,transparent)!important;color:var(--ta);font-weight:800}' +
-      R + ' [id^="choice-btn-"]:hover,' + R + ' [id^="choice-btn-"]:active{background-image:linear-gradient(135deg,var(--t1),var(--t2))!important;color:#fff!important;border-color:transparent!important}' +
+      R + ' [id^="choice-btn-"]:not(:disabled):not(.bg-green-500):not(.bg-red-500){border-color:color-mix(in srgb,var(--t1) 45%,transparent)!important;color:var(--ta);font-weight:800}' +
+      R + ' [id^="choice-btn-"]:not(:disabled):not(.bg-green-500):not(.bg-red-500):hover,' + R + ' [id^="choice-btn-"]:not(:disabled):not(.bg-green-500):not(.bg-red-500):active{background-image:linear-gradient(135deg,var(--t1),var(--t2))!important;color:#fff!important;border-color:transparent!important}' +
       R + ' #btn-rev-prev,' + R + ' #btn-rev-next{border-color:color-mix(in srgb,var(--t1) 35%,transparent)!important;color:var(--ta)!important}' +
       R + ' #review-text-val{border-color:color-mix(in srgb,var(--t1) 40%,transparent)!important}' +
       // 4 hatırlama düğmesi ve ilerleme parçaları anlam taşıyor: mavi kalsın
-      R + ' #recall-btn-veryeasy,' + R + ' #review-progress-bar .bg-sky-500{background-image:none!important;background-color:#0284c7!important;border-color:#0284c7!important}' +
+      R + ' #recall-btn-veryeasy{background-image:none!important}' +
+      R + ' #recall-btn-veryeasy:disabled{background-color:#e2e8f0!important;border-color:#cbd5e1!important}' +
+      M('dark') + ' #review-modal #recall-btn-veryeasy:disabled{background-color:#34353f!important;border-color:#34353f!important}' +
+      R + ' #recall-btn-veryeasy:not(:disabled),' + R + ' #review-progress-bar .bg-sky-500{background-image:none!important;background-color:#0284c7!important;border-color:#0284c7!important}' +
       // Neon: çerçeveye hafif parıltı
       K('neon') + ' #review-modal #review-frame-box{box-shadow:0 0 0 1px color-mix(in srgb,var(--t1) 35%,transparent),0 0 26px -10px var(--tglow)!important}' +
       // Koyu temalarda yeşil kutu daha açık ve okunur
