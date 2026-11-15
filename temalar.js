@@ -98,16 +98,24 @@
       K('canli') + ' #nav-add{box-shadow:0 14px 30px -8px var(--tglow)!important}' +
       K('canli') + ' .nk-box{box-shadow:0 10px 26px -14px var(--bx)!important}';
 
-    // Neon: parlayan kenar, gölge ve yazı ışıması
+    // Neon: koyu zemin + ince parlak çizgi; ışıma sadece öne çıkan yerlerde (tüp ışığı gibi katmanlı)
+    var tube = function (c) { return '0 0 0 1px color-mix(in srgb,' + c + ' 70%,transparent),0 0 9px -1px color-mix(in srgb,' + c + ' 55%,transparent),0 0 26px -6px color-mix(in srgb,' + c + ' 45%,transparent)'; };
     css +=
-      K('neon') + ' .nk-box{box-shadow:0 0 0 1px color-mix(in srgb,var(--bx) 55%,transparent),0 0 20px -10px var(--bx)!important}' +
-      K('neon') + ' .nk-box-btn{box-shadow:0 0 16px -2px var(--bx)!important}' +
-      K('neon') + ' #nav-add{box-shadow:0 0 28px 2px var(--tglow),0 0 0 4px color-mix(in srgb,var(--t2) 22%,transparent)!important;border-color:color-mix(in srgb,var(--t2) 35%,transparent)!important}' +
-      K('neon') + ' button.bg-teal-600.rounded-2xl,' + K('neon') + ' button.bg-teal-600.rounded-xl{box-shadow:0 0 18px -4px var(--tglow)!important}' +
-      K('neon') + ' header.bg-white{border-bottom:1px solid color-mix(in srgb,var(--t1) 55%,transparent)!important;box-shadow:0 6px 22px -10px var(--tglow)!important}' +
-      K('neon') + ' #bottom-nav{border-top:1px solid color-mix(in srgb,var(--t2) 55%,transparent)!important;box-shadow:0 -6px 22px -10px var(--tglow)!important}' +
-      K('neon', 'dark') + ' [style*="--box-yellow-accent"] .nk-box-btn,' + K('neon', 'dark') + ' [style*="--box-green-accent"] .nk-box-btn{color:#07110c!important}';
-
+      K('neon') + ' .nk-box{box-shadow:0 0 0 1px color-mix(in srgb,var(--bx) 36%,transparent),0 0 22px -13px var(--bx)!important}' +
+      K('neon') + ' .nk-box-btn{box-shadow:0 0 14px -6px var(--bx)!important}' +
+      K('neon') + ' #nav-add{box-shadow:' + tube('var(--t1)') + ',0 0 46px -10px var(--tglow)!important;border-color:transparent!important}' +
+      K('neon') + ' button.bg-teal-600.rounded-2xl,' + K('neon') + ' button.bg-teal-600.rounded-xl{box-shadow:0 0 14px -7px var(--tglow)!important}' +
+      K('neon') + ' header.bg-white{border-bottom:1px solid color-mix(in srgb,var(--t1) 42%,transparent)!important;box-shadow:0 12px 26px -20px var(--tglow)!important}' +
+      K('neon') + ' #bottom-nav{border-top:1px solid color-mix(in srgb,var(--t2) 42%,transparent)!important;box-shadow:0 -12px 26px -20px var(--tglow)!important}' +
+      K('neon') + ' .nk-af-on{box-shadow:' + tube('var(--bx)') + '!important}' +
+      K('neon') + ' .nk-arch-card{box-shadow:0 0 0 1px color-mix(in srgb,var(--bx) 32%,transparent),0 0 20px -13px var(--bx)!important}' +
+      K('neon', 'dark') + ' h2.font-display{text-shadow:0 0 16px color-mix(in srgb,var(--t1) 50%,transparent)}' +
+      K('neon', 'dark') + ' [style*="--box-yellow-accent"] .nk-box-btn,' + K('neon', 'dark') + ' [style*="--box-green-accent"] .nk-box-btn{color:#07110c!important}' +
+      // açık zeminde neon: çizgi ve tüp ışığı yerine renkli yumuşak gölge
+      K('neon', 'light') + ' .nk-box,' + K('neon', 'light') + ' .nk-arch-card{box-shadow:0 10px 24px -15px var(--bx)!important}' +
+      K('neon', 'light') + ' .nk-af-on{box-shadow:0 8px 20px -10px var(--bx)!important}' +
+      K('neon', 'light') + ' #nav-add{box-shadow:0 12px 28px -8px var(--tglow)!important}' +
+      K('neon', 'light') + ' header.bg-white,' + K('neon', 'light') + ' #bottom-nav{box-shadow:none!important}';
 
     // Uygulamanın geneline yayılan renkler: kamera düğmesi, profil kartı, grafik, formüller, hocaya sor
     css +=
@@ -125,9 +133,10 @@
       S + ' #btn-random-camp:hover{background-image:linear-gradient(135deg,var(--t2),var(--t1))!important;color:#fff!important}' +
       S + '[data-nk-ink="dark"] #btn-random-camp:hover{color:#2a1c00!important}' +
       S + ' .nk-af-on{border-color:color-mix(in srgb,var(--bx) 75%,transparent)!important}' +
+      M('dark') + ' .nk-af-on{background-color:color-mix(in srgb,var(--bx) 14%,var(--tcard))!important;color:color-mix(in srgb,var(--bx) 55%,#fff)!important}' +
+      M('dark') + ' .nk-af:not(.nk-af-on)>div.absolute{background-color:rgba(255,255,255,.07)!important}' +
+      S + ' .nk-af-on>div.absolute{background:var(--bx)!important}' +
       K('canli') + ' .nk-af-on,' + K('canli') + ' .nk-arch-card{box-shadow:0 8px 20px -12px var(--bx)!important}' +
-      K('neon') + ' .nk-af-on{box-shadow:0 0 0 1px color-mix(in srgb,var(--bx) 55%,transparent),0 0 18px -3px var(--bx)!important}' +
-      K('neon') + ' .nk-arch-card{box-shadow:0 0 0 1px color-mix(in srgb,var(--bx) 50%,transparent),0 0 20px -9px var(--bx)!important}' +
       S + ' #library-list .bg-amber-50,' + S + ' #library-list .bg-amber-100\\/70{background-color:color-mix(in srgb,var(--t2) 15%,transparent)!important}' +
       S + ' #library-list .text-amber-800,' + S + ' #library-list .text-amber-900{color:color-mix(in srgb,var(--t2) 55%,var(--nk-ink))!important}' +
       M('dark') + ' #library-list .archive-back-tag{color:var(--ta)!important}' +
