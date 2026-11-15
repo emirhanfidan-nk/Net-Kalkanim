@@ -114,7 +114,7 @@
     '#review-modal [id^="choice-btn-"].bg-green-500{animation:popCorrect .35s ease-out}' +
     '#review-modal [id^="choice-btn-"].bg-red-500{animation:shakeWrong .4s ease-in-out}' +
     '#nk-anim-knob{transition:transform .32s cubic-bezier(.34,1.56,.64,1)}' +
-    'body.nk-noanim .tab-content.active,body.nk-noanim .tab-content.active>*,body.nk-noanim #library-list>*{animation:none!important}' +
+    'body.nk-noanim .tab-content.active{animation:none!important;opacity:1!important}body.nk-noanim .tab-content.active>*,body.nk-noanim #library-list>*{animation:none!important;opacity:1!important}' +
     'body.nk-noanim .toast-msg{animation-duration:.01ms!important}' +
     'body.nk-noanim #review-modal [id^="choice-btn-"]{animation:none!important}' +
     'body.nk-noanim button:active{scale:1!important}' +
