@@ -111,6 +111,33 @@
       'body.dark-mode{--nk-surf:#1d1e26;--nk-soft:#17181f;--nk-ink:#f0f0f4;--nk-mute:#c6c7d1;--nk-line:#34353f;--nk-line2:#44454f}' +
       S + '[data-nk-mode="dark"]{--nk-surf:color-mix(in srgb,var(--tcard) 92%,#fff 4%);--nk-soft:color-mix(in srgb,var(--tcard) 80%,#000)}';
 
+
+    // Soru / not çözme ekranı: tema zemini, renkli üst/alt şerit, çerçeve ve düğmeler
+    var R = S + ' #review-modal';
+    css +=
+      R + '{background-color:var(--tbase)!important;background-image:var(--tbg)!important;background-attachment:scroll!important}' +
+      R + ' #review-header{background-color:color-mix(in srgb,var(--tcard) 82%,transparent)!important;border-bottom:2px solid color-mix(in srgb,var(--t1) 45%,transparent)!important;box-shadow:0 8px 20px -14px var(--tglow)!important;backdrop-filter:blur(10px)}' +
+      R + ' #review-progress-bar{background-color:color-mix(in srgb,var(--tcard) 70%,transparent)!important;border-bottom-color:transparent!important}' +
+      R + ' #review-progress-bar .bg-slate-200{background-color:color-mix(in srgb,var(--t1) 18%,transparent)!important}' +
+      R + ' #review-progress-bar .bg-teal-600{background-image:linear-gradient(90deg,var(--t1),var(--t2))!important}' +
+      R + ' .bg-slate-100\\/50{background-color:transparent!important}' +
+      R + ' #review-breadcrumbs{color:var(--ta)!important;font-weight:800}' +
+      R + ' #review-frame-box{border:1.5px solid color-mix(in srgb,var(--t1) 40%,transparent)!important;box-shadow:0 14px 34px -18px var(--tglow)!important;background:color-mix(in srgb,var(--tcard) 92%,transparent)!important}' +
+      R + ' #review-flip-front{background:transparent!important}' +
+      R + ' #review-question-text{border-color:color-mix(in srgb,var(--t1) 30%,transparent)!important}' +
+      R + ' #review-unified-board{border-color:color-mix(in srgb,var(--t1) 38%,transparent)!important}' +
+      R + ' > .bg-white.border-t{background-color:color-mix(in srgb,var(--tcard) 84%,transparent)!important;border-top:2px solid color-mix(in srgb,var(--t2) 40%,transparent)!important;backdrop-filter:blur(10px)}' +
+      R + ' [id^="choice-btn-"]{border-color:color-mix(in srgb,var(--t1) 45%,transparent)!important;color:var(--ta);font-weight:800}' +
+      R + ' [id^="choice-btn-"]:hover,' + R + ' [id^="choice-btn-"]:active{background-image:linear-gradient(135deg,var(--t1),var(--t2))!important;color:#fff!important;border-color:transparent!important}' +
+      R + ' #btn-rev-prev,' + R + ' #btn-rev-next{border-color:color-mix(in srgb,var(--t1) 35%,transparent)!important;color:var(--ta)!important}' +
+      R + ' #review-text-val{border-color:color-mix(in srgb,var(--t1) 40%,transparent)!important}' +
+      // 4 hatırlama düğmesi ve ilerleme parçaları anlam taşıyor: mavi kalsın
+      R + ' #recall-btn-veryeasy,' + R + ' #review-progress-bar .bg-sky-500{background-image:none!important;background-color:#0284c7!important;border-color:#0284c7!important}' +
+      // Neon: çerçeveye hafif parıltı
+      K('neon') + ' #review-modal #review-frame-box{box-shadow:0 0 0 1px color-mix(in srgb,var(--t1) 35%,transparent),0 0 26px -10px var(--tglow)!important}' +
+      // Koyu temalarda yeşil kutu daha açık ve okunur
+      M('dark') + '{--box-green-accent:#34d399;--board-bg:color-mix(in srgb,var(--tcard) 82%,#fff 9%)}';
+
     // Ayarlar'daki tema seçici
     css +=
       '.nk-th-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}' +
