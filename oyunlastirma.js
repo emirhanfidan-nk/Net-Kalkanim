@@ -725,7 +725,7 @@
       var r = origClose.apply(this, arguments);
       sess = null;
       try {
-        if (finished) {
+        if (finished && s.cards > 0) {
           var data = { sec: (Date.now() - s.t0) / 1000, cards: s.cards, xp: s.xp, dayBefore: s.dayBefore };
           enqueue(1, function (done) { showSummary(data, done); });
         }

@@ -5119,7 +5119,8 @@ function renderReviewItem() {
     const item = currentReviewQueue[currentReviewIndex];
     if (reviewIntroPending) {
         reviewIntroPending = false;
-        showReviewTransition(isCampMode ? 'Kamp Başlıyor!' : 'Hazır Ol!', `${currentReviewQueue.length} kart seni bekliyor`, ICON_PLAY);
+        // Günlük tekrarda direkt ilk karta geçilir; sadece kampta kısa giriş gösterilir
+        if (isCampMode) showReviewTransition('Kamp Başlıyor!', `${currentReviewQueue.length} kart seni bekliyor`, ICON_PLAY);
     } else if (item && item._retry && !retryTransitionShown) {
         retryTransitionShown = true;
         showReviewTransition('Tekrar Zamanı!', 'Az önce unuttuklarını tekrar ediyoruz', ICON_RETRY);
@@ -5993,7 +5994,8 @@ function closeReview() {
         campAnswers = {};
     }
 
-    if (finished) {
+    // Günlük tekrarın bitiş ekranını oyunlaştırma özeti gösterir; eski yeşil ekran sadece kampta (ya da özet yoksa) çıkar
+    if (finished && (wasCamp || !window.__nkOyun)) {
         showReviewTransition(
             wasCamp ? 'Kamp Tamamlandı!' : 'Tekrar Tamamlandı!',
             wasCamp ? 'Bugünkü kampını bitirdin, harikasın' : 'Bugünkü tüm kartları bitirdin, harikasın',
