@@ -12,6 +12,15 @@
 <script src="duzeltme.js" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+    // Giriş yapmış ya da denemeyi başlatmış kullanıcıda şifre ekranı hiç görünmesin (ilk karede parlamasın)
+    try {
+        var _a = localStorage.getItem('nk_auth');
+        if (_a === 'trial' || _a === 'full' || localStorage.getItem('authorized') === 'true') {
+            document.write('<style id="nk-pre-login">#login-screen{display:none}</style>');
+        }
+    } catch (e) {}
+    </script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <!-- Firebase Bağlantı Kütüphaneleri -->
@@ -2387,6 +2396,7 @@ window.onload = async function() {
         
         initCanvasDrawing('upload-canvas', () => uploadDrawMode, () => uploadPenSize);
         
+        try { localStorage.setItem('nk_auth', appState.authState || 'none'); } catch (e) {}
         if (appState.authState === "none") {
             document.getElementById('login-screen').style.display = 'flex';
             document.getElementById('login-fields').style.display = 'none';
