@@ -15,16 +15,16 @@
     { id: 'nane', name: 'Nane', group: 'Açık', mode: 'light', kind: 'pastel', t1: '#34d399', t2: '#38bdf8', lay: 1 },
     { id: 'seftali', name: 'Şeftali', group: 'Açık', mode: 'light', kind: 'pastel', t1: '#fb923c', t2: '#f472b6', lay: 2 },
     { id: 'okyanus', name: 'Okyanus', group: 'Açık', mode: 'light', kind: 'canli', t1: '#0ea5e9', t2: '#14b8a6', lay: 2 },
-    { id: 'lazer', name: 'Lazer', group: 'Açık', mode: 'light', kind: 'neon', t1: '#ff2bd0', t2: '#7a3cff', lay: 0 },
+    { id: 'gunes', name: 'Güneş', group: 'Açık', mode: 'light', kind: 'canli', t1: '#f6c200', t2: '#ff9a1f', lay: 1, ink: 'dark' },
+    { id: 'lazer', name: 'Lazer', group: 'Açık', mode: 'light', kind: 'neon', t1: '#ff3bd4', t2: '#a24bff', lay: 0 },
     { id: 'klasik-koyu', name: 'Klasik Koyu', group: 'Koyu', mode: 'dark', swatch: 'linear-gradient(135deg,#1d1e26,#0d9488)' },
     { id: 'lila', name: 'Lila Gece', group: 'Koyu', mode: 'dark', kind: 'pastel', t1: '#a78bfa', t2: '#f0abfc', lay: 1 },
-    { id: 'gecemavi', name: 'Gece Mavisi', group: 'Koyu', mode: 'dark', kind: 'canli', t1: '#3b5bdb', t2: '#6741d9', lay: 0 },
-    { id: 'neon-gece', name: 'Neon Gece', group: 'Koyu', mode: 'dark', kind: 'neon', t1: '#00b8ff', t2: '#d400ff', lay: 0 },
+        { id: 'neon-gece', name: 'Neon Gece', group: 'Koyu', mode: 'dark', kind: 'neon', t1: '#38bdf8', t2: '#818cf8', lay: 0 },
     { id: 'ates', name: 'Ateş', group: 'Koyu', mode: 'dark', kind: 'neon', t1: '#ff6a00', t2: '#ff1f6b', lay: 1 },
-    { id: 'zehir', name: 'Zehir', group: 'Koyu', mode: 'dark', kind: 'neon', t1: '#00d68f', t2: '#00a3ff', lay: 2 }
+    { id: 'zehir', name: 'Zehir', group: 'Koyu', mode: 'dark', kind: 'neon', t1: '#00e0a0', t2: '#00c2d4', lay: 2 }
   ];
 
-  function find(id) { for (var i = 0; i < THEMES.length; i++) if (THEMES[i].id === id) return THEMES[i]; return THEMES[0]; }
+  function find(id) { if (id === 'gecemavi') id = 'neon-gece'; for (var i = 0; i < THEMES.length; i++) if (THEMES[i].id === id) return THEMES[i]; return THEMES[0]; }
   function current() { var t = ''; try { t = (window.appState && appState.tema) || localStorage.getItem(LS) || ''; } catch (e) {} return find(t); }
   function isDark() { return document.body.classList.contains('dark-mode'); }
 
@@ -69,7 +69,7 @@
       S + ' .nk-o-card.lit{box-shadow:0 10px 26px -10px var(--tglow)!important}' +
       S + ' .nk-o-dot.on{background:var(--t1)!important}' +
       S + ' header.bg-white,' + S + ' #bottom-nav{background-color:color-mix(in srgb,var(--tcard) 78%,transparent)!important;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}' +
-      S + '[data-nk-ink="dark"] .bg-teal-600,' + S + '[data-nk-ink="dark"] .nk-o-card.lit,' + S + '[data-nk-ink="dark"] #nav-add{color:#07110c!important}';
+      S + '[data-nk-ink="dark"] .bg-teal-600,' + S + '[data-nk-ink="dark"] .bg-teal-700,' + S + '[data-nk-ink="dark"] .nk-o-card.lit,' + S + '[data-nk-ink="dark"] #nav-add{color:#07110c!important}';
 
     // Koyu zemin: yüzeyler palete boyanır
     css +=
@@ -103,8 +103,15 @@
       S + ' .bg-sky-500,' + S + ' .bg-sky-600,' + S + ' .bg-sky-700,' + S + ' .hover\\:bg-sky-600:hover{background-image:linear-gradient(135deg,var(--t2),var(--t1))!important;background-color:var(--t2)!important}' +
       S + ' .text-sky-600,' + S + ' .text-indigo-600{color:var(--ta)!important}' +
       S + ' .bg-indigo-100,' + S + ' .bg-sky-100{background-color:var(--tsoft)!important}' +
-      S + ' .nk-hero{background:linear-gradient(135deg,color-mix(in srgb,var(--t1) 45%,#0b0b16),color-mix(in srgb,var(--t1) 75%,#0b0b16) 55%,var(--t2))!important}' +
-      S + '[data-nk-ink="dark"] .nk-hero{color:#fff}';
+      S + ' .nk-hero{background:linear-gradient(135deg,color-mix(in srgb,var(--t1) 45%,#0b0b16),color-mix(in srgb,var(--t1) 75%,#0b0b16) 55%,color-mix(in srgb,var(--t2) 70%,#0b0b16))!important}' +
+      S + ' .face-heading-front{background:var(--tsoft)!important;color:var(--ta)!important;border-color:color-mix(in srgb,var(--t1) 45%,transparent)!important}' +
+      S + ' .face-heading-back{background:color-mix(in srgb,var(--t2) 18%,transparent)!important;color:color-mix(in srgb,var(--t2) 70%,var(--nk-ink))!important;border-color:color-mix(in srgb,var(--t2) 45%,transparent)!important}' +
+      M('dark') + ' .bg-white.text-amber-600{background-image:linear-gradient(135deg,var(--t2),var(--t1))!important;color:#fff!important}' +
+      S + ' #nk-cloud-card .bg-emerald-50{background-color:var(--tsoft)!important}' +
+      S + ' #nk-cloud-card .text-emerald-600{color:var(--ta)!important}' +
+      S + ' #nk-cloud-card .bg-emerald-600{background-image:linear-gradient(135deg,var(--t1),var(--t2))!important;background-color:var(--t1)!important}' +
+      S + ' #nk-cloud-card .border-emerald-200{border-color:color-mix(in srgb,var(--t1) 50%,transparent)!important}' +
+      S + '[data-nk-ink="dark"] #nk-cloud-card .bg-emerald-600,' + S + '[data-nk-ink="dark"] .bg-sky-600,' + S + '[data-nk-ink="dark"] .bg-sky-500{color:#2a1c00!important}';
     // Formüller vb. için ortak yüzey renkleri (açık / koyu)
     css +=
       'body{--nk-surf:#ffffff;--nk-soft:#f8fafc;--nk-ink:#0f172a;--nk-mute:#475569;--nk-line:#e2e8f0;--nk-line2:#cbd5e1}' +
@@ -196,6 +203,7 @@
   function markSelected(id) {
     var g = document.getElementById('nk-th-wrap');
     if (!g) return;
+    var sub = document.getElementById('nk-th-sub'); if (sub) sub.textContent = find(id).name || 'Klasik';
     g.querySelectorAll('.nk-th').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-id') === id); });
   }
 
@@ -220,9 +228,9 @@
     var row = document.createElement('div');
     row.className = 'p-4';
     row.id = 'nk-th-wrap';
-    var head = '<div class="flex items-center gap-3"><div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center shrink-0">' +
+    var head = '<button type="button" id="nk-th-head" class="w-full flex items-center gap-3 text-left"><div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center shrink-0">' +
       '<svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 3a9 9 0 0 0 0 18c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.3-.5-.8-.5-1.2 0-1.1.9-2 2-2h2.3A4.9 4.9 0 0 0 22 11c0-4.4-4.5-8-10-8zm-5.5 9a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3-4a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3 4a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/></svg></div>' +
-      '<div class="flex-1 min-w-0"><p class="text-sm font-medium text-slate-800">Renk Teması</p><p class="text-xs text-slate-500 mt-0.5">Açık ve koyu temalar.</p></div></div>';
+      '<div class="flex-1 min-w-0"><p class="text-sm font-medium text-slate-800">Renk Teması</p><p id="nk-th-sub" class="text-xs text-slate-500 mt-0.5"></p></div><svg id="nk-th-chev" class="w-4 h-4 fill-current text-slate-400 transition-transform shrink-0" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg></button><div id="nk-th-body" class="hidden">';
     var html = head;
     ['Açık', 'Koyu'].forEach(function (g) {
       html += '<div class="nk-th-g">' + g + '</div><div class="nk-th-grid">';
@@ -233,7 +241,12 @@
       });
       html += '</div>';
     });
+    html += '</div>';
     row.innerHTML = html;
+    var open = false; try { open = localStorage.getItem('nk_th_open') === '1'; } catch (e) {}
+    var setOpen = function (o) { row.querySelector('#nk-th-body').classList.toggle('hidden', !o); row.querySelector('#nk-th-chev').style.transform = o ? 'rotate(180deg)' : ''; try { localStorage.setItem('nk_th_open', o ? '1' : '0'); } catch (e) {} };
+    setOpen(open);
+    row.querySelector('#nk-th-head').onclick = function () { setOpen(row.querySelector('#nk-th-body').classList.contains('hidden')); };
     list.insertBefore(row, list.firstChild);
     row.querySelectorAll('.nk-th').forEach(function (b) { b.onclick = function () { choose(b.getAttribute('data-id')); }; });
     markSelected(current().id);
