@@ -129,6 +129,8 @@
     try { switchTab('formul'); } catch (e) {}
   }
   function render() { loadKatex(); paint(); }
+  // KaTeX'i uygulama boştayken önceden yükle; sekme ilk açılışta beklemesin
+  try { if ('requestIdleCallback' in window) requestIdleCallback(loadKatex, { timeout: 4000 }); else setTimeout(loadKatex, 2500); } catch (e) {}
 
   function paint() {
     var root = host();
@@ -136,8 +138,14 @@
     var oldList = root.querySelector('#nk-fm-list');
     root.innerHTML = '';
 
-    var head = el('div', 'display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e2e8f0;padding-bottom:8px;margin-bottom:12px');
-    head.appendChild(el('h2', 'font-size:20px;font-weight:600;color:var(--nk-ink,#1e293b);font-family:inherit', 'Formüller'));
+    // Diğer sekmelerle aynı başlık: ikon + Sora yazı tipi
+    var head = document.createElement('div');
+    head.className = 'flex justify-between items-center border-b border-slate-200 pb-2';
+    head.style.marginBottom = '12px';
+    var h2 = document.createElement('h2');
+    h2.className = 'text-xl font-semibold text-slate-800 flex items-center gap-2 font-display tracking-tight';
+    h2.innerHTML = '<svg class="w-6 h-6 fill-current text-teal-600" viewBox="0 0 24 24"><path d="M18 4H6v2l6.5 6L6 18v2h12v-3h-7l5-5-5-5h7z"/></svg>Formüller';
+    head.appendChild(h2);
     var add = el('button', 'padding:8px 14px;border-radius:12px;border:0;background:linear-gradient(135deg,var(--t1,#0d9488),var(--t2,#0d9488));color:#fff;font-weight:800;font-size:12px;box-shadow:0 3px 0 #0f766e', '+ Ekle');
     add.onclick = function () { openAdd(null); };
     head.appendChild(add);
@@ -171,6 +179,7 @@
     list();
   }
 
+  var listTok = 0;
   function list() {
     var lst = document.getElementById('nk-fm-list');
     if (!lst) return;
@@ -198,7 +207,8 @@
     }
 
     var lastCourse = null;
-    items.forEach(function (x) {
+    var token = ++listTok;
+    function addCard(x) {
       var starred = !!f[x.id];
       if (!state.course && !starred && x.ders !== lastCourse) {
         lastCourse = x.ders;
@@ -228,7 +238,15 @@
         card.appendChild(row);
       }
       lst.appendChild(card);
-    });
+    }
+    // İlk kartlar hemen, kalanlar parça parça: sekme açılırken takılma olmasın
+    var idx = 0;
+    (function step() {
+      if (token !== listTok) return;
+      var n = 0;
+      while (idx < items.length && n < 4) { addCard(items[idx++]); n++; }
+      if (idx < items.length) requestAnimationFrame(step);
+    })();
   }
 
   /* ---------- Kaydetme ---------- */

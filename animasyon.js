@@ -68,7 +68,7 @@
       var r = origSwitch.apply(this, arguments);
       try {
         if (!reduce) {
-          var map = { home: 'nav-home-pill', add: 'nav-add', library: 'nav-library-pill', profile: 'nav-profile', deneme: 'nav-deneme' };
+          var map = { home: 'nav-home-pill', add: 'nav-add', library: 'nav-library-pill', profile: 'nav-profile', deneme: 'nav-deneme', formul: 'nav-formul' };
           var el = document.getElementById(map[tabId]);
           if (el) {
             el.classList.remove('nk-bounce');

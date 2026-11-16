@@ -132,7 +132,7 @@
       S + ' #btn-random-camp{background:color-mix(in srgb,var(--t2) 16%,transparent)!important;border-color:color-mix(in srgb,var(--t2) 50%,transparent)!important;color:var(--ta)!important}' +
       S + ' #btn-random-camp:hover{background-image:linear-gradient(135deg,var(--t2),var(--t1))!important;color:#fff!important}' +
       S + '[data-nk-ink="dark"] #btn-random-camp:hover{color:#2a1c00!important}' +
-      S + ' .nk-af-on{border-color:color-mix(in srgb,var(--bx) 75%,transparent)!important}' +
+      S + ' .nk-af-on{border-color:color-mix(in srgb,var(--bx) 75%,transparent)!important;background-color:color-mix(in srgb,var(--bx) 12%,#fff)!important;color:color-mix(in srgb,var(--bx) 72%,#000)!important}' +
       M('dark') + ' .nk-af-on{background-color:color-mix(in srgb,var(--bx) 14%,var(--tcard))!important;color:color-mix(in srgb,var(--bx) 55%,#fff)!important}' +
       M('dark') + ' .nk-af:not(.nk-af-on)>div.absolute{background-color:rgba(255,255,255,.07)!important}' +
       S + ' .nk-af-on>div.absolute{background:var(--bx)!important}' +
