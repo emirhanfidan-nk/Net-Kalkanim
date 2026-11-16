@@ -191,7 +191,7 @@
         var already = !q || q._retry ||
           (isCampMode ? campAnswers[currentReviewIndex] !== undefined : (q.lastReviewedDate === today && !!q.userTodayAnswer));
         var r = await origSub.apply(this, arguments);
-        if (already) return r;
+        if (already || String(userAns) === '__GOSTER__') return r;
         try {
           var given = String(userAns).trim().toUpperCase();
           var right = String(q.answer).trim().toUpperCase();

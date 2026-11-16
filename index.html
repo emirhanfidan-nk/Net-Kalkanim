@@ -1428,6 +1428,7 @@
                     <button id="choice-btn-D" onclick="submitQuestionAnswer('D')" class="w-11 h-11 bg-slate-50 border border-slate-300 hover:bg-teal-600 hover:border-teal-600 hover:text-white font-semibold text-base transition-all rounded-xl shadow-sm">D</button>
                     <button id="choice-btn-E" onclick="submitQuestionAnswer('E')" class="w-11 h-11 bg-slate-50 border border-slate-300 hover:bg-teal-600 hover:border-teal-600 hover:text-white font-semibold text-base transition-all rounded-xl shadow-sm">E</button>
                 </div>
+                <div id="review-reveal" class="hidden"><button type="button" id="review-reveal-btn" onclick="revealTextAnswer()" class="w-full py-3 bg-teal-600 text-white font-semibold hover:bg-teal-700 transition-colors rounded-xl shadow-sm text-xs flex items-center justify-center gap-2"><svg id="review-reveal-ico" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><span id="review-reveal-txt">Doğru cevabı göster</span></button></div>
                 <div id="review-text-input" class="flex gap-2 hidden">
                     <input type="text" id="review-text-val" placeholder="Metin gir..." class="flex-1 bg-slate-50 p-3 border border-slate-300 outline-none focus:border-teal-600 text-slate-800 font-medium tracking-wider transition-colors rounded-xl shadow-sm text-xs">
                     <button onclick="submitQuestionAnswer(document.getElementById('review-text-val').value)" class="bg-teal-600 text-white px-5 font-semibold hover:bg-teal-700 transition-colors rounded-xl shadow-sm text-xs">İlet</button>
@@ -5399,6 +5400,7 @@ reviewUndoStack = [];
 
     choiceInput.classList.add('hidden');
     textInput.classList.add('hidden');
+    document.getElementById('review-reveal').classList.add('hidden');
     recallInput.classList.add('invisible');
     
     // Arşiv modunda cevap/hatırlama giriş butonları gösterilmez, ama çizim yapılabilsin diye
@@ -5440,6 +5442,8 @@ if (currentArchiveMode) {
                             }
                         }
                     });
+                } else if (effectiveUserAnswer === '__GOSTER__') {
+                    setRevealUI(item, true);
                 } else {
                     textInput.classList.remove('hidden');
                     const textInputEl = document.getElementById('review-text-val');
@@ -5469,7 +5473,7 @@ if (currentArchiveMode) {
                         }
                     });
                 } else {
-                    textInput.classList.remove('hidden');
+                    setRevealUI(item, false);
                     const textInputEl = document.getElementById('review-text-val');
                     textInputEl.value = '';
                     textInputEl.disabled = false;
@@ -5631,6 +5635,36 @@ function navigateReview(dir) {
     }
 }
 
+// Metin cevaplı sorularda yazma yok: "Doğru cevabı göster / gizle" (göz) butonu.
+window.__nkRevealHide = {};
+function setRevealUI(item, answered) {
+    const wrap = document.getElementById('review-reveal');
+    const fb = document.getElementById('review-feedback-box');
+    const txt = document.getElementById('review-reveal-txt');
+    const ico = document.getElementById('review-reveal-ico');
+    document.getElementById('review-text-input').classList.add('hidden');
+    wrap.classList.remove('hidden');
+    const hidden = answered && window.__nkRevealHide[item.id];
+    if (answered && !hidden) {
+        fb.innerHTML = `Doğru Cevap: <strong>${item.answer}</strong>`;
+        fb.className = 'w-full p-3 text-xs font-extrabold text-center rounded-xl transition-colors shadow-sm shrink-0 bg-amber-100 text-amber-800 border border-amber-300';
+        fb.classList.remove('hidden');
+    }
+    txt.textContent = (answered && !hidden) ? 'Cevabı gizle' : 'Doğru cevabı göster';
+    ico.innerHTML = (answered && !hidden)
+        ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 19c-6.5 0-10-7-10-7a18.5 18.5 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 5c6.5 0 10 7 10 7a18.5 18.5 0 0 1-2.16 3.19M1 1l22 22"/>'
+        : '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>';
+}
+function revealTextAnswer() {
+    const q = currentReviewQueue[currentReviewIndex];
+    if (!q) return;
+    const answered = isCampMode ? campAnswers[currentReviewIndex] !== undefined
+        : (q.lastReviewedDate === formatDate(getNowTR()) && !!q.userTodayAnswer);
+    if (!answered) { submitQuestionAnswer('__GOSTER__'); return; }
+    window.__nkRevealHide[q.id] = !window.__nkRevealHide[q.id];
+    renderReviewItem();
+}
+
 async function submitQuestionAnswer(userAns) {
     let q = currentReviewQueue[currentReviewIndex];
     if (!q || q._retry) return;
@@ -5642,7 +5676,7 @@ async function submitQuestionAnswer(userAns) {
         if (campAnswers[currentReviewIndex] !== undefined) return; // kampta zaten cevaplanmış
         campAnswers[currentReviewIndex] = String(userAns).trim().toUpperCase();
         campCompletedIndices.add(currentReviewIndex); saveCampSession();
-        flashAnswerFeedback(campAnswers[currentReviewIndex] === String(q.answer).trim().toUpperCase());
+        if (campAnswers[currentReviewIndex] !== '__GOSTER__') flashAnswerFeedback(campAnswers[currentReviewIndex] === String(q.answer).trim().toUpperCase());
         renderReviewItem();
         return;
     }
@@ -5655,13 +5689,14 @@ async function submitQuestionAnswer(userAns) {
 
     q.userTodayAnswer = String(userAns).trim().toUpperCase();
     q.lastReviewedDate = todayStr;
-    const isCorrectAnswer = q.userTodayAnswer === String(q.answer).trim().toUpperCase();
-    flashAnswerFeedback(isCorrectAnswer);
+    const isReveal = q.userTodayAnswer === '__GOSTER__';
+    const isCorrectAnswer = !isReveal && q.userTodayAnswer === String(q.answer).trim().toUpperCase();
+    if (!isReveal) flashAnswerFeedback(isCorrectAnswer);
 
     // Tüm zamanlar performans sayaçları: kamp hariç, gerçek günlük tekrarda verilen
     // her ilk cevap burada birikir (yukarıdaki "bugün zaten cevaplanmış" kontrolü sayesinde
     // aynı soru aynı gün iki kez sayılmaz).
-    appState.totalAnswered = (appState.totalAnswered || 0) + 1;
+    if (!isReveal) appState.totalAnswered = (appState.totalAnswered || 0) + 1;
     if (isCorrectAnswer) appState.totalCorrect = (appState.totalCorrect || 0) + 1;
 
     await saveQuestion(q);
