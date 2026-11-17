@@ -248,9 +248,6 @@
     h2.className = 'text-xl font-semibold text-slate-800 flex items-center gap-2 font-display tracking-tight';
     h2.innerHTML = '<svg class="w-6 h-6 fill-current text-teal-600" viewBox="0 0 24 24"><path d="M18 4H6v2l6.5 6L6 18v2h12v-3h-7l5-5-5-5h7z"/></svg>Formüller';
     head.appendChild(h2);
-    var add = el('button', 'padding:8px 14px;border-radius:12px;border:0;background:linear-gradient(135deg,var(--t1,#0d9488),var(--t2,#0d9488));color:#fff;font-weight:800;font-size:12px;box-shadow:0 3px 0 #0f766e', '+ Ekle');
-    add.onclick = function () { openAdd(null); };
-    head.appendChild(add);
     root.appendChild(head);
 
     var inp = el('input', 'width:100%;border:1px solid var(--nk-line2,#cbd5e1);border-radius:12px;padding:10px 12px;font-size:13px;color:var(--nk-ink,#0f172a);background:#fff;margin-bottom:10px');
@@ -352,7 +349,7 @@
       var empty = el('div', 'text-align:center;color:#64748b;padding:48px 16px;font-size:13px;line-height:1.6');
       empty.innerHTML = isFav && !q ? 'Henüz yıldızladığın formül yok.<br>Bir formülün sağ üstündeki <b>★</b> işaretine basınca burada toplanır.' : all().length
         ? 'Bu aramayla eşleşen formül yok.'
-        : '<b style="color:var(--nk-ink,#0f172a)">Henüz formül yok.</b><br>Sağ üstten <b>+ Ekle</b> ile kendi formülünü ekleyebilirsin. Gemini ile de ekleyebilirsin: Ekle sekmesindeki "Gemini ile ekle" düğmesine bas ve adımları izle.';
+        : '<b style="color:var(--nk-ink,#0f172a)">Henüz formül yok.</b>';
       lst.appendChild(empty);
       return;
     }
@@ -512,12 +509,7 @@
     openAdd: openAdd,
     render: render,
     // Gemini'den gelen kayıt: ders listede varsa seçilir
-    addFromParsed: function (p) {
-      var cs = Object.keys((appState && appState.categories) || {});
-      var w = norm(p.ders), found = '';
-      cs.forEach(function (c) { var n = norm(c); if (!found && w && (n === w || n.indexOf(w) >= 0 || w.indexOf(n) >= 0)) found = c; });
-      openAdd(null, { ders: found, baslik: p.baslik || p.on || '', formul: p.formul || p.not || '' });
-    }
+    addFromParsed: function () { toast('Formül ekleme kapalı: formüller hazır geliyor', true); }
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();
