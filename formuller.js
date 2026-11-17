@@ -42,7 +42,7 @@
     { id: "mt1", ders: "AYT MATEMATİK", konu: "Çarpanlara Ayırma ve Özdeşlikler", baslik: "İki Kare Farkı", formul: "$a^2 - b^2 = (a - b)(a + b)$" },
     { id: "mt2", ders: "AYT MATEMATİK", konu: "Çarpanlara Ayırma ve Özdeşlikler", baslik: "Tam Kare Açılımları", formul: "$(a \\pm b)^2 = a^2 \\pm 2ab + b^2$\nÜç terimli tam kare: $(a + b + c)^2 = a^2 + b^2 + c^2 + 2(ab + ac + bc)$" },
     { id: "mt3", ders: "AYT MATEMATİK", konu: "Çarpanlara Ayırma ve Özdeşlikler", baslik: "İki Küp Toplamı ve Farkı", formul: "$a^3 + b^3 = (a + b)(a^2 - ab + b^2)$\n$a^3 - b^3 = (a - b)(a^2 + ab + b^2)$" },
-    { id: "mt4", ders: "AYT MATEMATİK", konu: "Çarpanlara Ayırma ve Özdeşlikler", baslik: "Küp Açılımları", formul: "$(a + b)^3 = a^3 + 3a^2b + 3ab^2 + b^3 = a^3 + b^3 + 3ab(a + b)$\n$(a - b)^3 = a^3 - 3a^2b + 3ab^2 - b^3 = a^3 - b^3 - 3ab(a - b)$" },
+    { id: "mt4", ders: "AYT MATEMATİK", konu: "Çarpanlara Ayırma ve Özdeşlikler", baslik: "Küp Açılımları", formul: "$(a + b)^3 = a^3 + 3a^2b + 3ab^2 + b^3$\n$= a^3 + b^3 + 3ab(a + b)$\n$(a - b)^3 = a^3 - 3a^2b + 3ab^2 - b^3$\n$= a^3 - b^3 - 3ab(a - b)$" },
     { id: "mt5", ders: "AYT MATEMATİK", konu: "Fonksiyonlar ve Dönüşümler", baslik: "Ortalama Değişim Hızı ([a, b] aralığında)", formul: "$m = \\frac{f(b) - f(a)}{b - a}$" },
     { id: "mt6", ders: "AYT MATEMATİK", konu: "Fonksiyonlar ve Dönüşümler", baslik: "Tek ve Çift Fonksiyon Şartları", formul: "Çift fonksiyon (y eksenine göre simetrik): $f(-x) = f(x)$\nTek fonksiyon (orijine göre simetrik): $f(-x) = -f(x)$" },
     { id: "mt7", ders: "AYT MATEMATİK", konu: "Fonksiyonlar ve Dönüşümler", baslik: "Bileşke ve Ters Fonksiyon", formul: "$(f \\circ g)(x) = f(g(x))$\nBileşkenin tersi: $(f \\circ g)^{-1}(x) = (g^{-1} \\circ f^{-1})(x)$" },
@@ -71,6 +71,39 @@
     { id: "mt30", ders: "AYT MATEMATİK", konu: "Permütasyon, Kombinasyon, Binom ve Olasılık", baslik: "Kombinasyon Özellikleri", formul: "$\\binom{n}{r} = \\binom{n}{n-r}$\nAlt kümeler toplamı: $\\binom{n}{0} + \\binom{n}{1} + \\dots + \\binom{n}{n} = 2^n$\nPascal özdeşliği: $\\binom{n}{r} + \\binom{n}{r+1} = \\binom{n+1}{r+1}$" },
     { id: "mt31", ders: "AYT MATEMATİK", konu: "Permütasyon, Kombinasyon, Binom ve Olasılık", baslik: "Binom Açılımı Genel Terim", formul: "$(x + y)^n$ açılımında baştan $(r + 1)$. terim: $T_{r+1} = \\binom{n}{r} \\cdot x^{n-r} \\cdot y^r$ (toplam terim sayısı $= n + 1$)" },
     { id: "mt32", ders: "AYT MATEMATİK", konu: "Permütasyon, Kombinasyon, Binom ve Olasılık", baslik: "Olasılık Kuralları", formul: "Olay olasılığı ve tümleyeni: $P(A) = \\frac{s(A)}{s(E)}$ ve $P(A) + P(A') = 1$\nBirleşim olasılığı: $P(A \\cup B) = P(A) + P(B) - P(A \\cap B)$\nBağımsız olaylar: $P(A \\cap B) = P(A) \\cdot P(B)$\nKoşullu olasılık (B bilindiğinde A olasılığı): $P(A \\mid B) = \\frac{P(A \\cap B)}{P(B)}$" },
+    { id: "mt33", ders: "AYT MATEMATİK", konu: "Trigonometri", baslik: "Derece - Radyan Dönüşümü", formul: "$\\frac{D}{180} = \\frac{R}{\\pi}$" },
+    { id: "mt34", ders: "AYT MATEMATİK", konu: "Trigonometri", baslik: "Temel Özdeşlikler", formul: "Pisagor özdeşliği: $\\sin^2 x + \\cos^2 x = 1$\nTanjant ve kotanjant: $\\tan x = \\frac{\\sin x}{\\cos x}, \\quad \\cot x = \\frac{\\cos x}{\\sin x}$\n$\\tan x \\cdot \\cot x = 1$\nSekant ve kosekant: $\\sec x = \\frac{1}{\\cos x}, \\quad \\csc x = \\frac{1}{\\sin x}$\n$1 + \\tan^2 x = \\sec^2 x, \\quad 1 + \\cot^2 x = \\csc^2 x$" },
+    { id: "mt35", ders: "AYT MATEMATİK", konu: "Trigonometri", baslik: "Bölge İşaretleri ve İndirgeme Kuralları", formul: "İşaret sırası (I, II, III, IV. bölgeler):\n$\\sin$: $(+, +, -, -)$\n$\\cos$: $(+, -, -, +)$\n$\\tan$ ve $\\cot$: $(+, -, +, -)$\n$\\pi$ ve $2\\pi$ kullanıldığında fonksiyon adı değişmez.\n$\\frac{\\pi}{2}$ ve $\\frac{3\\pi}{2}$ kullanıldığında isim değişir: $\\sin \\leftrightarrow \\cos, \\ \\tan \\leftrightarrow \\cot$\nTümler açı: $x + y = 90^\\circ \\implies \\sin x = \\cos y, \\ \\tan x = \\cot y$" },
+    { id: "mt36", ders: "AYT MATEMATİK", konu: "Trigonometri", baslik: "Kosinüs ve Sinüs Teoremleri", formul: "ABC üçgeninde:\nKosinüs teoremi: $a^2 = b^2 + c^2 - 2bc \\cos A$\nSinüs teoremi: $\\frac{a}{\\sin A} = \\frac{b}{\\sin B} = \\frac{c}{\\sin C} = 2R$\nR: çevrel çember yarıçapı\nSinüslü alan formülü: $\\text{Alan}(ABC) = \\frac{1}{2} \\cdot b \\cdot c \\cdot \\sin A$" },
+    { id: "mt37", ders: "AYT MATEMATİK", konu: "Trigonometri", baslik: "Toplam - Fark Formülleri", formul: "Sinüs: $\\sin(a \\pm b) = \\sin a \\cos b \\pm \\cos a \\sin b$\nKosinüs: $\\cos(a \\pm b) = \\cos a \\cos b \\mp \\sin a \\sin b$\nTanjant: $\\tan(a \\pm b) = \\frac{\\tan a \\pm \\tan b}{1 \\mp \\tan a \\tan b}$\nKotanjant: $\\cot(a \\pm b) = \\frac{\\cot a \\cot b \\mp 1}{\\cot b \\pm \\cot a}$" },
+    { id: "mt38", ders: "AYT MATEMATİK", konu: "Trigonometri", baslik: "İki Kat (Yarım) Açı Formülleri", formul: "Sinüs: $\\sin(2x) = 2 \\sin x \\cos x$\nKosinüs: $\\cos(2x) = \\cos^2 x - \\sin^2 x$\n$\\cos(2x) = 2\\cos^2 x - 1 = 1 - 2\\sin^2 x$\nTanjant: $\\tan(2x) = \\frac{2 \\tan x}{1 - \\tan^2 x}$" },
+    { id: "mt39", ders: "AYT MATEMATİK", konu: "Trigonometri", baslik: "Periyot Formülleri", formul: "Fonksiyon: $f(x) = a \\cdot \\text{trig}^n(bx + c) + d$\n$\\sin$ ve $\\cos$, $n$ tek ise: $T = \\frac{2\\pi}{\\vert{}b\\vert{}}$\n$\\sin$ ve $\\cos$, $n$ çift ise: $T = \\frac{\\pi}{\\vert{}b\\vert{}}$\n$\\tan$ ve $\\cot$ ($n$ tek veya çift): $T = \\frac{\\pi}{\\vert{}b\\vert{}}$" },
+    { id: "mt40", ders: "AYT MATEMATİK", konu: "Trigonometri", baslik: "Ters Trigonometrik Fonksiyonların Değer Aralıkları", formul: "$\\arcsin x \\in \\left[-\\frac{\\pi}{2}, \\frac{\\pi}{2}\\right]$\n$\\arccos x \\in [0, \\pi]$\n$\\arctan x \\in \\left(-\\frac{\\pi}{2}, \\frac{\\pi}{2}\\right)$\n$\\operatorname{arccot} x \\in (0, \\pi)$" },
+    { id: "mt41", ders: "AYT MATEMATİK", konu: "Trigonometri", baslik: "Trigonometrik Denklemler", formul: "$k \\in \\mathbb{Z}$ için:\nSinüs: $\\sin x = \\sin \\alpha \\implies$\n$x = \\alpha + 2k\\pi$ veya $x = (\\pi - \\alpha) + 2k\\pi$\nKosinüs: $\\cos x = \\cos \\alpha \\implies$\n$x = \\alpha + 2k\\pi$ veya $x = -\\alpha + 2k\\pi$\nTanjant: $\\tan x = \\tan \\alpha \\implies x = \\alpha + k\\pi$\nKotanjant: $\\cot x = \\cot \\alpha \\implies x = \\alpha + k\\pi$\nLineer denklem: $a \\sin x + b \\cos x = c$ çözümlü olması için $a^2 + b^2 \\ge c^2$ olmalıdır." },
+    { id: "mt42", ders: "AYT MATEMATİK", konu: "Logaritma", baslik: "Tanım ve En Geniş Tanım Kümesi", formul: "$y = a^x \\iff x = \\log_a y$\nŞart: $a > 0, \\ a \\neq 1, \\ y > 0$" },
+    { id: "mt43", ders: "AYT MATEMATİK", konu: "Logaritma", baslik: "Temel Özellikler ve Özel Tabanlar", formul: "Temel değerler: $\\log_a 1 = 0, \\quad \\log_a a = 1$\n$\\log_a(a^x) = x, \\quad a^{\\log_a x} = x$\nOnluk logaritma: $\\log_{10} x = \\log x$\nDoğal logaritma: $\\log_e x = \\ln x$, $e \\approx 2{,}718$" },
+    { id: "mt44", ders: "AYT MATEMATİK", konu: "Logaritma", baslik: "Çarpım, Bölüm ve Kuvvet Kuralları", formul: "Çarpım: $\\log_a(x \\cdot y) = \\log_a x + \\log_a y$\nBölüm: $\\log_a\\left(\\frac{x}{y}\\right) = \\log_a x - \\log_a y$\nÜs başa iner: $\\log_a(x^n) = n \\cdot \\log_a x$\nTaban ve sayının üssü: $\\log_{a^m}(x^n) = \\frac{n}{m} \\log_a x$" },
+    { id: "mt45", ders: "AYT MATEMATİK", konu: "Logaritma", baslik: "Taban Değiştirme ve Zincir Kuralı", formul: "Taban değiştirme: $\\log_a b = \\frac{\\log_c b}{\\log_c a}$\nÇarpmaya göre tersi: $\\log_a b = \\frac{1}{\\log_b a}$\nZincir kuralı: $\\log_a b \\cdot \\log_b c = \\log_a c$\nÜstteki logaritma yer değiştirme: $a^{\\log_b c} = c^{\\log_b a}$" },
+    { id: "mt46", ders: "AYT MATEMATİK", konu: "Logaritma", baslik: "Logaritmik Eşitsizlikler", formul: "Eşitsizlik: $\\log_a f(x) > \\log_a g(x)$\n$a > 1$ ise (artan, yön değişmez): $f(x) > g(x) > 0$\n$0 < a < 1$ ise (azalan, yön değişir): $0 < f(x) < g(x)$" },
+    { id: "mt47", ders: "AYT MATEMATİK", konu: "Diziler", baslik: "Genel Terim ve İlk n Terim Toplamı (Sₙ) İlişkisi", formul: "$a_1 = S_1$\n$n \\ge 2$ için: $a_n = S_n - S_{n-1}$" },
+    { id: "mt48", ders: "AYT MATEMATİK", konu: "Diziler", baslik: "Sabit Dizi Şartı", formul: "$a_n = \\frac{an + b}{cn + d}$ sabit dizi ise: $\\frac{a}{c} = \\frac{b}{d}$" },
+    { id: "mt49", ders: "AYT MATEMATİK", konu: "Diziler", baslik: "Aritmetik Dizi (Ortak Fark d)", formul: "Genel terim: $a_n = a_1 + (n - 1)d$\nİki terim arası: $a_n = a_p + (n - p)d$\nOrta terim: $a_n = \\frac{a_{n-k} + a_{n+k}}{2}$\nEşit uzaklık: $n + m = p + k \\implies a_n + a_m = a_p + a_k$\nİlk n terim toplamı: $S_n = \\frac{n}{2}(a_1 + a_n)$\n$S_n = \\frac{n}{2}[2a_1 + (n - 1)d]$" },
+    { id: "mt50", ders: "AYT MATEMATİK", konu: "Diziler", baslik: "Geometrik Dizi (Ortak Çarpan r)", formul: "Genel terim: $a_n = a_1 \\cdot r^{n-1}$\nİki terim arası: $a_n = a_p \\cdot r^{n-p}$\nOrta terim: $a_n^2 = a_{n-k} \\cdot a_{n+k}$\nEşit uzaklık: $n + m = p + k \\implies a_n \\cdot a_m = a_p \\cdot a_k$\nİlk n terim toplamı: $S_n = a_1 \\cdot \\frac{1 - r^n}{1 - r}$ ($r \\neq 1$)" },
+    { id: "mt51", ders: "AYT MATEMATİK", konu: "Diziler", baslik: "Özel Toplam Formülleri", formul: "Ardışık sayılar: $1 + 2 + 3 + \\dots + n = \\frac{n(n + 1)}{2}$\nArdışık kareler: $1^2 + 2^2 + 3^2 + \\dots + n^2 = \\frac{n(n + 1)(2n + 1)}{6}$" },
+    { id: "mt52", ders: "AYT MATEMATİK", konu: "Limit ve Süreklilik", baslik: "Limitin Varlık Şartı", formul: "$\\lim_{x \\to a^-} f(x) = \\lim_{x \\to a^+} f(x) = L$\n$\\iff \\lim_{x \\to a} f(x) = L$" },
+    { id: "mt53", ders: "AYT MATEMATİK", konu: "Limit ve Süreklilik", baslik: "0/0 Belirsizliği Çözüm Yolları", formul: "Pay ve payda çarpanlarına ayrılır ya da köklü ifade varsa eşleniği ile çarpılır.\nL'Hôpital Kuralı: $\\lim_{x \\to a} \\frac{f(x)}{g(x)} = \\lim_{x \\to a} \\frac{f'(x)}{g'(x)}$" },
+    { id: "mt54", ders: "AYT MATEMATİK", konu: "Limit ve Süreklilik", baslik: "Süreklilik Şartı", formul: "$x = a$ noktasında süreklilik için:\n$f(a)$ tanımlı olmalıdır.\n$\\lim_{x \\to a^-} f(x) = \\lim_{x \\to a^+} f(x) = f(a)$ eşitliği sağlanmalıdır." },
+    { id: "mt55", ders: "AYT MATEMATİK", konu: "Türev", baslik: "Türevin Limit Tanımı (Anlık Değişim Hızı)", formul: "$f'(a) = \\lim_{h \\to 0} \\frac{f(a + h) - f(a)}{h}$\n$f'(a) = \\lim_{x \\to a} \\frac{f(x) - f(a)}{x - a}$" },
+    { id: "mt56", ders: "AYT MATEMATİK", konu: "Türev", baslik: "Türevlenebilirlik Şartı", formul: "Bir noktada türev varsa fonksiyon o noktada kesinlikle süreklidir.\nSağdan ve soldan türevler eşit olmalıdır: $f'(a^-) = f'(a^+)$\nKırılma (sivri uç) noktalarında türev yoktur." },
+    { id: "mt57", ders: "AYT MATEMATİK", konu: "Türev", baslik: "Temel Türev Alma Kuralları", formul: "Sabit ve kuvvet: $(c)' = 0, \\quad (x^n)' = n \\cdot x^{n-1}$\nKöklü: $(\\sqrt{x})' = \\frac{1}{2\\sqrt{x}}, \\quad (\\sqrt{u})' = \\frac{u'}{2\\sqrt{u}}$\nÇarpım: $(f \\cdot g)' = f' \\cdot g + f \\cdot g'$\nBölüm: $\\left(\\frac{f}{g}\\right)' = \\frac{f' \\cdot g - f \\cdot g'}{g^2}$\nZincir kuralı: $(f \\circ g)'(x) = f'(g(x)) \\cdot g'(x)$\nKuvvet zinciri: $(u^n)' = n \\cdot u^{n-1} \\cdot u'$\nParametrik fonksiyon: $\\frac{dy}{dx} = \\frac{dy/dt}{dx/dt}$\nTers fonksiyon: $f(a) = b \\implies (f^{-1})'(b) = \\frac{1}{f'(a)}$" },
+    { id: "mt58", ders: "AYT MATEMATİK", konu: "Türev", baslik: "Türevin Geometrik Yorumu", formul: "$A(x_0, y_0)$ noktasında:\nTeğet eğimi: $m_{\\text{teğet}} = f'(x_0)$\nNormal eğimi: $m_{\\text{normal}} = -\\frac{1}{f'(x_0)}$\nTeğet doğrusu: $y - y_0 = f'(x_0)(x - x_0)$" },
+    { id: "mt59", ders: "AYT MATEMATİK", konu: "Türev", baslik: "Artan - Azalanlık ve Ekstremum Noktaları", formul: "Artan aralık: $f'(x) > 0$\nAzalan aralık: $f'(x) < 0$\nYerel ekstremum (maksimum/minimum): türevin işaret değiştirdiği noktalardır.\nFonksiyon o noktada türevli ise: $f'(x_0) = 0$" },
+    { id: "mt60", ders: "AYT MATEMATİK", konu: "Türev", baslik: "Türevin Fiziksel Yorumu", formul: "Konum: $s(t)$\nHız: $v(t) = s'(t)$\nİvme: $a(t) = v'(t) = s''(t)$" },
+    { id: "mt61", ders: "AYT MATEMATİK", konu: "İntegral", baslik: "Belirsiz İntegral ve Diferansiyel İlişkisi", formul: "Tanım: $\\int f(x)\\,dx = F(x) + c \\iff F'(x) = f(x)$\n$d\\left(\\int f(x)\\,dx\\right) = f(x)\\,dx$\n$\\frac{d}{dx}\\left(\\int f(x)\\,dx\\right) = f(x)$\n$\\int d(f(x)) = f(x) + c$" },
+    { id: "mt62", ders: "AYT MATEMATİK", konu: "İntegral", baslik: "Temel İntegral Kuralları", formul: "Sabit: $\\int a\\,dx = ax + c$\nKuvvet kuralı: $\\int x^n\\,dx = \\frac{x^{n+1}}{n+1} + c$ ($n \\neq -1$)\nDoğrusal içli kuvvet: $\\int (ax + b)^n\\,dx = \\frac{(ax + b)^{n+1}}{a(n+1)} + c$" },
+    { id: "mt63", ders: "AYT MATEMATİK", konu: "İntegral", baslik: "Değişken Değiştirme Yöntemi", formul: "$\\int f(g(x)) \\cdot g'(x)\\,dx$ integralinde $g(x) = u$ dönüşümü yapılır.\n$g'(x)\\,dx = du$ olur ve integral $\\int f(u)\\,du$ haline gelir." },
+    { id: "mt64", ders: "AYT MATEMATİK", konu: "İntegral", baslik: "Belirli İntegral ve Özellikleri", formul: "Newton-Leibniz: $\\int_a^b f(x)\\,dx = F(b) - F(a)$\n$\\int_a^a f(x)\\,dx = 0$\n$\\int_a^b f(x)\\,dx = -\\int_b^a f(x)\\,dx$\n$\\int_a^b f(x)\\,dx = \\int_a^c f(x)\\,dx + \\int_c^b f(x)\\,dx$\n$[-a, a]$ aralığında, $f$ tek ise: $\\int_{-a}^a f(x)\\,dx = 0$\n$f$ çift ise: $\\int_{-a}^a f(x)\\,dx = 2\\int_0^a f(x)\\,dx$" },
+    { id: "mt65", ders: "AYT MATEMATİK", konu: "İntegral", baslik: "İntegral ile Alan Hesabı ve Riemann Toplamı", formul: "$x$ ekseni ile sınırlı alan: $A = \\int_a^b \\vert{}f(x)\\vert{}\\,dx$\nEksen üstündeki bölgeler pozitif, altındakiler mutlak değerce alınır.\nİki eğri arasında kalan alan: $A = \\int_a^b [f(x) - g(x)]\\,dx$ ($f(x) \\ge g(x)$ için)\n$y$ ekseni ile sınırlı alan: $A = \\int_c^d \\vert{}f^{-1}(y)\\vert{}\\,dy$\nRiemann: $[a, b]$ aralığı $n$ eşit parçaya bölününce $\\Delta x = \\frac{b - a}{n}$" },
   ];
 
   // Konu başlıkları (ders → konu). Hazır formüllerde konu yoksa buradan, kişisel formüllerde kullanıcının seçtiğinden gelir.
@@ -129,6 +162,26 @@
     } else m.textContent = plainTex(tex);
     return m;
   }
+  // Uzun formüller satır kırmasın: tek satırda kalır, sığmıyorsa yazı küçülür (en fazla 11px'e kadar), yine sığmazsa kaydırılır.
+  (function () {
+    var st = document.createElement('style');
+    st.textContent = '.nk-fm-row .katex{white-space:nowrap}';
+    document.head.appendChild(st);
+  })();
+  function fitRow(row) {
+    if (!row.clientWidth) return;
+    var fs = 16;
+    row.style.fontSize = fs + 'px';
+    while (fs > 11 && row.scrollWidth > row.clientWidth + 1) { fs -= 1; row.style.fontSize = fs + 'px'; }
+  }
+  var fitQ = [];
+  function watchFit(root) {
+    root.querySelectorAll('.nk-fm-row').forEach(function (r) { fitQ.push(r); });
+  }
+  function flushFit() {
+    var q = fitQ; fitQ = [];
+    requestAnimationFrame(function () { q.forEach(function (r) { if (r.isConnected) fitRow(r); }); });
+  }
   function renderLine(line) {
     var d = el('div', 'margin-top:8px;color:var(--ta,#0f766e);font-weight:600;max-width:100%');
     var text = String(line).trim();
@@ -142,6 +195,7 @@
     if (parts[0].trim()) { label = parts[0].trim().replace(/:$/, ''); }
     if (label) d.appendChild(el('div', 'font-size:11px;font-weight:700;color:#64748b;margin-bottom:1px', label));
     var row = el('div', 'font-size:16px;line-height:1.5;overflow-x:auto;overflow-y:hidden');
+    row.className = 'nk-fm-row';
     for (var i = 1; i < parts.length; i++) {
       if (i % 2 === 1) { if (parts[i]) row.appendChild(mathHtml(parts[i])); }
       else if (parts[i].trim()) row.appendChild(el('span', 'color:var(--nk-mute,#475569);font-weight:600;font-size:13px', parts[i]));
@@ -312,7 +366,7 @@
         lastCourse = gkey;
         lst.appendChild(el('div', 'margin:14px 2px 6px;font-size:11px;font-weight:800;letter-spacing:.06em;color:#64748b;text-transform:uppercase', state.course && !isFav ? gkey : pretty(x.ders) + (x.konu ? ' · ' + x.konu : '')));
       }
-      var card = el('div', 'content-visibility:auto;contain-intrinsic-size:auto 110px;background:var(--nk-surf,#fff);border:1px solid var(--nk-line,#e2e8f0);border-radius:18px;padding:14px;margin-bottom:10px;box-shadow:0 1px 2px rgba(15,23,42,.04)');
+      var card = el('div', 'background:var(--nk-surf,#fff);border:1px solid var(--nk-line,#e2e8f0);border-radius:18px;padding:14px;margin-bottom:10px;box-shadow:0 1px 2px rgba(15,23,42,.04)');
       var top = el('div', 'display:flex;align-items:flex-start;gap:8px');
       var t = el('div', 'flex:1;font-weight:800;font-size:14px;color:var(--nk-ink,#0f172a);line-height:1.3', x.baslik);
       top.appendChild(t);
@@ -336,6 +390,7 @@
         card.appendChild(row);
       }
       lst.appendChild(card);
+      watchFit(card);
     }
     // İlk kartlar hemen, kalanlar parça parça: sekme açılırken takılma olmasın
     var idx = 0;
@@ -343,6 +398,7 @@
       if (token !== listTok) return;
       var n = 0;
       while (idx < items.length && n < 4) { addCard(items[idx++]); n++; }
+      flushFit();
       if (idx < items.length) requestAnimationFrame(step);
     })();
   }
