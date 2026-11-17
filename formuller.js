@@ -75,16 +75,19 @@
 
   // Konu başlıkları (ders → konu). Hazır formüllerde konu yoksa buradan, kişisel formüllerde kullanıcının seçtiğinden gelir.
   var KONU = {
-    fz1: 'Vektör ve Denge', fz2: 'Vektör ve Denge', fz3: 'Vektör ve Denge', fz4: 'Vektör ve Denge',
-    fz5: 'Kuvvet ve Hareket', fz6: 'Kuvvet ve Hareket', fz7: 'Kuvvet ve Hareket',
-    fz8: 'Enerji ve Momentum', fz9: 'Enerji ve Momentum',
-    fz10: 'Elektrostatik', fz11: 'Elektrostatik', fz12: 'Elektrostatik',
-    fz13: 'Manyetizma ve İndüksiyon', fz14: 'Manyetizma ve İndüksiyon', fz15: 'Manyetizma ve İndüksiyon', fz16: 'Manyetizma ve İndüksiyon',
-    fz17: 'Dairesel Hareket ve Dönme', fz18: 'Dairesel Hareket ve Dönme',
-    fz19: 'Çekim ve Salınım', fz20: 'Çekim ve Salınım',
-    fz21: 'Dalgalar', fz22: 'Dalgalar', fz23: 'Dalgalar', fz24: 'Dalgalar', fz25: 'Dalgalar',
-    fz26: 'Modern Fizik', fz27: 'Modern Fizik', fz28: 'Modern Fizik', fz29: 'Modern Fizik'
+    fz1: 'Vektörler', fz2: 'Hareket', fz3: 'Kuvvet, Tork ve Denge', fz4: 'Basit Makineler',
+    fz5: "Newton'ın Hareket Yasaları", fz6: 'Hareket', fz7: 'Atışlar',
+    fz8: 'İş, Güç ve Enerji', fz9: 'İtme ve Momentum',
+    fz10: 'Elektrik Alan ve Potansiyel', fz11: 'Elektrik Alan ve Potansiyel', fz12: 'Paralel Levhalar ve Sığa',
+    fz13: 'Manyetik Alan ve Manyetik Kuvvet', fz14: 'Manyetik Alan ve Manyetik Kuvvet',
+    fz15: 'İndüksiyon, Alternatif Akım ve Transformatörler', fz16: 'İndüksiyon, Alternatif Akım ve Transformatörler',
+    fz17: 'Çembersel Hareket', fz18: 'Dönme, Yuvarlanma ve Açısal Momentum',
+    fz19: 'Kütle Çekim ve Kepler Yasaları', fz20: 'Basit Harmonik Hareket',
+    fz21: 'Dalga Mekaniği ve Elektromanyetik Dalgalar', fz22: 'Dalga Mekaniği ve Elektromanyetik Dalgalar', fz23: 'Dalga Mekaniği ve Elektromanyetik Dalgalar', fz24: 'Dalga Mekaniği ve Elektromanyetik Dalgalar', fz25: 'Dalga Mekaniği ve Elektromanyetik Dalgalar',
+    fz26: 'Atom Modelleri', fz27: 'Radyoaktivite ve Kara Cisim Işıması',
+    fz28: 'Fotoelektrik Olay ve Compton Olayı', fz29: 'Fotoelektrik Olay ve Compton Olayı'
   };
+
 
   var FAV = 'nk_fav_formul';
 
@@ -205,7 +208,7 @@
 
     // Çipler alt alta sarılır (yatay kaydırma yok); sadece formülü olan dersler gösterilir
     var have = courses().filter(function (c) { return all().some(function (x) { return x.ders === c; }); });
-    if (state.course && have.indexOf(state.course) < 0) state.course = '';
+    if (state.course && state.course !== '__fav' && have.indexOf(state.course) < 0) state.course = '';
     var chips = el('div', 'display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px');
     function chip(label, val) {
       var on = state.course === val;
@@ -213,24 +216,36 @@
       b.onclick = function () { state.course = val; state.konu = ''; paint(); };
       chips.appendChild(b);
     }
-    chip('Tümü', '');
+    chip('★ Yıldızlılar', '__fav');
     have.forEach(function (c) { chip(pretty(c), c); });
     chips.id = 'nk-fm-chips';
     root.appendChild(chips);
 
     // Seçili dersin konu başlıkları (ikinci satır)
-    if (state.course) {
+    if (state.course && state.course !== '__fav') {
       var ks = [];
       all().forEach(function (x) { if (x.ders === state.course && x.konu && ks.indexOf(x.konu) < 0) ks.push(x.konu); });
       if (state.konu && ks.indexOf(state.konu) < 0) state.konu = '';
       if (ks.length > 1) {
-        var sel = el('select', 'width:100%;border:1px solid var(--nk-line2,#cbd5e1);border-radius:12px;padding:10px 12px;font-size:13px;font-weight:700;color:var(--nk-ink,#0f172a);background:var(--nk-surf,#fff);margin:-2px 0 12px;appearance:auto');
-        sel.setAttribute('aria-label', 'Konu seç');
-        var o0 = document.createElement('option'); o0.value = ''; o0.textContent = 'Tüm konular (' + ks.length + ')'; sel.appendChild(o0);
-        ks.forEach(function (k) { var o = document.createElement('option'); o.value = k; o.textContent = k; sel.appendChild(o); });
-        sel.value = state.konu;
-        sel.onchange = function () { state.konu = sel.value; paint(); };
-        root.appendChild(sel);
+        var wrap = el('div', 'margin:-2px 0 12px');
+        var btn = el('button', 'width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;text-align:left;border:1px solid var(--nk-line2,#cbd5e1);border-radius:12px;padding:10px 12px;font-size:13px;font-weight:700;color:var(--nk-ink,#0f172a);background:var(--nk-surf,#fff)');
+        btn.appendChild(el('span', 'flex:1', state.konu || 'Tüm konular (' + ks.length + ')'));
+        var chev = el('span', 'font-size:11px;color:var(--ta,#0d9488);transition:transform .2s', '▼');
+        btn.appendChild(chev);
+        var panel = el('div', 'display:none;margin-top:6px;max-height:46vh;overflow-y:auto;border:1px solid var(--nk-line2,#cbd5e1);border-radius:12px;background:var(--nk-surf,#fff);box-shadow:0 6px 18px rgba(15,23,42,.10)');
+        var pick = function (label, val) {
+          var on = state.konu === val;
+          var r = el('button', 'display:flex;width:100%;align-items:center;justify-content:space-between;text-align:left;padding:11px 12px;font-size:13px;font-weight:' + (on ? '800' : '600') + ';border:0;border-bottom:1px solid var(--nk-line,#e2e8f0);background:' + (on ? 'var(--tsoft,rgba(13,148,136,.12))' : 'transparent') + ';color:' + (on ? 'var(--ta,#0f766e)' : 'var(--nk-ink,#0f172a)'));
+          r.appendChild(el('span', '', label));
+          if (on) r.appendChild(el('span', '', '✓'));
+          r.onclick = function () { state.konu = val; paint(); };
+          panel.appendChild(r);
+        };
+        pick('Tüm konular (' + ks.length + ')', '');
+        ks.forEach(function (k) { pick(k, k); });
+        btn.onclick = function () { var o = panel.style.display === 'none'; panel.style.display = o ? 'block' : 'none'; chev.style.transform = o ? 'rotate(180deg)' : ''; };
+        wrap.appendChild(btn); wrap.appendChild(panel);
+        root.appendChild(wrap);
       }
     }
 
@@ -247,7 +262,8 @@
     lst.innerHTML = '';
     var f = favs(), q = norm(state.q).trim();
     var items = all().filter(function (x) {
-      if (state.course && x.ders !== state.course) return false;
+      if (state.course === '__fav') { if (!f[x.id]) return false; }
+      else if (state.course && x.ders !== state.course) return false;
       if (state.konu && x.konu !== state.konu) return false;
       if (q && norm(x.baslik + ' ' + x.formul + ' ' + x.ders).indexOf(q) < 0) return false;
       return true;
@@ -261,8 +277,8 @@
 
     // Ders seçilmemiş ve arama yok: yıldızlılar + ders kutuları (ağır liste yerine hızlı özet)
     var overview = !state.course && !q;
+    var isFav = state.course === '__fav';
     if (overview) {
-      var starredItems = items.filter(function (x) { return f[x.id]; });
       var tiles = el('div', 'display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px');
       courses().forEach(function (c) {
         var its = all().filter(function (x) { return x.ders === c; });
@@ -275,14 +291,12 @@
         tiles.appendChild(tile);
       });
       lst.appendChild(tiles);
-      items = starredItems;
-      if (!items.length) return;
-      lst.appendChild(el('div', 'margin:14px 2px 6px;font-size:11px;font-weight:800;letter-spacing:.06em;color:#64748b;text-transform:uppercase', '★ Yıldızlılar'));
+      return;
     }
 
     if (!items.length) {
       var empty = el('div', 'text-align:center;color:#64748b;padding:48px 16px;font-size:13px;line-height:1.6');
-      empty.innerHTML = all().length
+      empty.innerHTML = isFav && !q ? 'Henüz yıldızladığın formül yok.<br>Bir formülün sağ üstündeki <b>★</b> işaretine basınca burada toplanır.' : all().length
         ? 'Bu aramayla eşleşen formül yok.'
         : '<b style="color:var(--nk-ink,#0f172a)">Henüz formül yok.</b><br>Sağ üstten <b>+ Ekle</b> ile kendi formülünü ekleyebilirsin. Gemini ile de ekleyebilirsin: Ekle sekmesindeki "Gemini ile ekle" düğmesine bas ve adımları izle.';
       lst.appendChild(empty);
@@ -293,10 +307,10 @@
     var token = ++listTok;
     function addCard(x) {
       var starred = !!f[x.id];
-      var gkey = (state.course ? '' : x.ders + ' · ') + (x.konu || '');
+      var gkey = (state.course && !isFav ? '' : x.ders + ' · ') + (x.konu || '');
       if (!overview && gkey && gkey !== lastCourse) {
         lastCourse = gkey;
-        lst.appendChild(el('div', 'margin:14px 2px 6px;font-size:11px;font-weight:800;letter-spacing:.06em;color:#64748b;text-transform:uppercase', state.course ? gkey : pretty(x.ders) + (x.konu ? ' · ' + x.konu : '')));
+        lst.appendChild(el('div', 'margin:14px 2px 6px;font-size:11px;font-weight:800;letter-spacing:.06em;color:#64748b;text-transform:uppercase', state.course && !isFav ? gkey : pretty(x.ders) + (x.konu ? ' · ' + x.konu : '')));
       }
       var card = el('div', 'content-visibility:auto;contain-intrinsic-size:auto 110px;background:var(--nk-surf,#fff);border:1px solid var(--nk-line,#e2e8f0);border-radius:18px;padding:14px;margin-bottom:10px;box-shadow:0 1px 2px rgba(15,23,42,.04)');
       var top = el('div', 'display:flex;align-items:flex-start;gap:8px');
