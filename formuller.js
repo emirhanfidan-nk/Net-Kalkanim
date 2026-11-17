@@ -38,8 +38,53 @@
     { id: 'fz26', ders: 'AYT FİZİK', baslik: "Bohr Atom Modeli", formul: "Yörünge yarıçapı: $r_n = a_0 \\frac{n^2}{Z}$\nEnerji seviyeleri: $E_n = -13{,}6 \\frac{Z^2}{n^2}\\text{ eV}$\nAçısal momentum: $L_n = n \\frac{h}{2\\pi}$\nSalınan foton enerjisi: $E_{\\text{foton}} = E_{\\text{üst}} - E_{\\text{alt}} = \\frac{h c}{\\lambda}$" },
     { id: 'fz27', ders: 'AYT FİZİK', baslik: "Radyoaktivite ve Kara Cisim Işıması", formul: "Yarılanma sonrası kalan çekirdek: $N = N_0 \\left(\\frac{1}{2}\\right)^n$\nWien kayma yasası: $\\lambda_{\\text{max}} \\cdot T = \\text{sabit}$" },
     { id: 'fz28', ders: 'AYT FİZİK', baslik: "Fotoelektrik Olay", formul: "Foton enerjisi: $E_{\\text{foton}} = h \\cdot f = \\frac{h c}{\\lambda}$\nFotoelektrik denklemi: $E_{\\text{foton}} = E_{\\text{bağlanma}} + E_{k,\\text{max}}$\nEşik (bağlanma) enerjisi: $E_{\\text{bağlanma}} = h \\cdot f_0 = \\frac{h c}{\\lambda_0}$\nKesme gerilimi ilişkisi: $E_{k,\\text{max}} = e \\cdot V_{\\text{kesme}}$" },
-    { id: 'fz29', ders: 'AYT FİZİK', baslik: "Compton Saçılması ve De Broglie", formul: "Enerji korunumu: $E_{\\text{gelen}} = E_{\\text{saçılan}} + E_{k,\\text{elektron}}$\nDalga boyu artışı: $\\Delta \\lambda = \\lambda' - \\lambda = \\frac{h}{m_e c}(1 - \\cos\\theta)$\nDe Broglie madde dalga boyu: $\\lambda = \\frac{h}{P} = \\frac{h}{m v}$" }
+    { id: 'fz29', ders: 'AYT FİZİK', baslik: "Compton Saçılması ve De Broglie", formul: "Enerji korunumu: $E_{\\text{gelen}} = E_{\\text{saçılan}} + E_{k,\\text{elektron}}$\nDalga boyu artışı: $\\Delta \\lambda = \\lambda' - \\lambda = \\frac{h}{m_e c}(1 - \\cos\\theta)$\nDe Broglie madde dalga boyu: $\\lambda = \\frac{h}{P} = \\frac{h}{m v}$" },
+    { id: "mt1", ders: "AYT MATEMATİK", konu: "Çarpanlara Ayırma ve Özdeşlikler", baslik: "İki Kare Farkı", formul: "$a^2 - b^2 = (a - b)(a + b)$" },
+    { id: "mt2", ders: "AYT MATEMATİK", konu: "Çarpanlara Ayırma ve Özdeşlikler", baslik: "Tam Kare Açılımları", formul: "$(a \\pm b)^2 = a^2 \\pm 2ab + b^2$\nÜç terimli tam kare: $(a + b + c)^2 = a^2 + b^2 + c^2 + 2(ab + ac + bc)$" },
+    { id: "mt3", ders: "AYT MATEMATİK", konu: "Çarpanlara Ayırma ve Özdeşlikler", baslik: "İki Küp Toplamı ve Farkı", formul: "$a^3 + b^3 = (a + b)(a^2 - ab + b^2)$\n$a^3 - b^3 = (a - b)(a^2 + ab + b^2)$" },
+    { id: "mt4", ders: "AYT MATEMATİK", konu: "Çarpanlara Ayırma ve Özdeşlikler", baslik: "Küp Açılımları", formul: "$(a + b)^3 = a^3 + 3a^2b + 3ab^2 + b^3 = a^3 + b^3 + 3ab(a + b)$\n$(a - b)^3 = a^3 - 3a^2b + 3ab^2 - b^3 = a^3 - b^3 - 3ab(a - b)$" },
+    { id: "mt5", ders: "AYT MATEMATİK", konu: "Fonksiyonlar ve Dönüşümler", baslik: "Ortalama Değişim Hızı ([a, b] aralığında)", formul: "$m = \\frac{f(b) - f(a)}{b - a}$" },
+    { id: "mt6", ders: "AYT MATEMATİK", konu: "Fonksiyonlar ve Dönüşümler", baslik: "Tek ve Çift Fonksiyon Şartları", formul: "Çift fonksiyon (y eksenine göre simetrik): $f(-x) = f(x)$\nTek fonksiyon (orijine göre simetrik): $f(-x) = -f(x)$" },
+    { id: "mt7", ders: "AYT MATEMATİK", konu: "Fonksiyonlar ve Dönüşümler", baslik: "Bileşke ve Ters Fonksiyon", formul: "$(f \\circ g)(x) = f(g(x))$\nBileşkenin tersi: $(f \\circ g)^{-1}(x) = (g^{-1} \\circ f^{-1})(x)$" },
+    { id: "mt8", ders: "AYT MATEMATİK", konu: "Fonksiyonlar ve Dönüşümler", baslik: "Doğrusal Fonksiyonun Tersi", formul: "$f(x) = ax + b \\implies f^{-1}(x) = \\frac{x - b}{a}$" },
+    { id: "mt9", ders: "AYT MATEMATİK", konu: "Fonksiyonlar ve Dönüşümler", baslik: "Kesirli (Rasyonel) Fonksiyonun Tersi", formul: "$f(x) = \\frac{ax + b}{cx + d} \\implies f^{-1}(x) = \\frac{-dx + b}{cx - a}$" },
+    { id: "mt10", ders: "AYT MATEMATİK", konu: "Fonksiyonlar ve Dönüşümler", baslik: "Grafik Öteleme ve Simetri", formul: "Düşey öteleme: $y = f(x) \\pm k$ (k birim yukarı / aşağı)\nYatay öteleme: $y = f(x \\mp k)$ (k birim sağa / sola)\nx eksenine göre simetri: $y = -f(x)$\ny eksenine göre simetri: $y = f(-x)$\nOrijine göre simetri: $y = -f(-x)$" },
+    { id: "mt11", ders: "AYT MATEMATİK", konu: "Polinomlar", baslik: "Polinom Olma Şartı", formul: "$P(x) = a_n x^n + a_{n-1} x^{n-1} + \\dots + a_0$ ifadesinde tüm x üsleri doğal sayı olmalıdır ($n \\in \\mathbb{N}$)." },
+    { id: "mt12", ders: "AYT MATEMATİK", konu: "Polinomlar", baslik: "Bölme Özdeşliği", formul: "$P(x) = B(x) \\cdot Q(x) + K(x)$ ve kalan derecesi şartı $\\text{der}[K(x)] < \\text{der}[B(x)]$" },
+    { id: "mt13", ders: "AYT MATEMATİK", konu: "Polinomlar", baslik: "Kalan Bulma Kuralı", formul: "$P(x)$ polinomunun $(ax + b)$ ile bölümünden kalan $P\\left(-\\frac{b}{a}\\right)$ değeridir." },
+    { id: "mt14", ders: "AYT MATEMATİK", konu: "Polinomlar", baslik: "Katsayılar Toplamı ve Sabit Terim", formul: "Katsayılar toplamı: $P(1)$\nSabit terim: $P(0)$" },
+    { id: "mt15", ders: "AYT MATEMATİK", konu: "Polinomlar", baslik: "Çift ve Tek Dereceli Terimlerin Katsayıları Toplamı", formul: "Çift dereceli terimler toplamı: $\\frac{P(1) + P(-1)}{2}$\nTek dereceli terimler toplamı: $\\frac{P(1) - P(-1)}{2}$" },
+    { id: "mt16", ders: "AYT MATEMATİK", konu: "Polinomlar", baslik: "Polinom Dereceleri (der[P] = m, der[Q] = n ve m > n için)", formul: "Toplama/çıkarma derecesi: $\\text{der}[P(x) \\pm Q(x)] = m$\nÇarpım ve bölüm derecesi: $\\text{der}[P(x) \\cdot Q(x)] = m + n$\n$\\text{der}\\left[\\frac{P(x)}{Q(x)}\\right] = m - n$\nKuvvet ve bileşke derecesi: $\\text{der}[P^k(x)] = k \\cdot m$\n$\\text{der}[P(x^k)] = k \\cdot m$\n$\\text{der}[P(Q(x))] = m \\cdot n$" },
+    { id: "mt17", ders: "AYT MATEMATİK", konu: "İkinci Dereceden Denklemler ve Karmaşık Sayılar", baslik: "Diskriminant (Δ) ve Kök Formülü", formul: "$ax^2 + bx + c = 0$ ($a \\neq 0$) için $\\Delta = b^2 - 4ac$\nKökler: $x_{1,2} = \\frac{-b \\pm \\sqrt{\\Delta}}{2a}$" },
+    { id: "mt18", ders: "AYT MATEMATİK", konu: "İkinci Dereceden Denklemler ve Karmaşık Sayılar", baslik: "Diskriminant Kök Durumları", formul: "$\\Delta > 0$ ⇒ İki farklı reel kök vardır.\n$\\Delta = 0$ ⇒ Çakışık (eşit) iki reel kök vardır (ifade tam karedir).\n$\\Delta < 0$ ⇒ Reel kök yoktur (birbirinin eşleniği iki karmaşık kök vardır)." },
+    { id: "mt19", ders: "AYT MATEMATİK", konu: "İkinci Dereceden Denklemler ve Karmaşık Sayılar", baslik: "Kök-Katsayı İlişkileri (Vieta Formülleri)", formul: "Kökler toplamı: $x_1 + x_2 = -\\frac{b}{a}$\nKökler çarpımı: $x_1 \\cdot x_2 = \\frac{c}{a}$\nKökler farkı mutlak değeri: $\\vert{}x_1 - x_2\\vert{} = \\frac{\\sqrt{\\Delta}}{\\vert{}a\\vert{}}$" },
+    { id: "mt20", ders: "AYT MATEMATİK", konu: "İkinci Dereceden Denklemler ve Karmaşık Sayılar", baslik: "Kökleri Bilinen Denklemi Kurma", formul: "$x^2 - T x + Ç = 0$ ($T = x_1 + x_2$, $Ç = x_1 \\cdot x_2$)" },
+    { id: "mt21", ders: "AYT MATEMATİK", konu: "İkinci Dereceden Denklemler ve Karmaşık Sayılar", baslik: "Simetrik Kök Şartı (x₁ = −x₂)", formul: "$b = 0$ ve $\\frac{c}{a} < 0$" },
+    { id: "mt22", ders: "AYT MATEMATİK", konu: "İkinci Dereceden Denklemler ve Karmaşık Sayılar", baslik: "Karmaşık Sayılar (i² = −1)", formul: "Sanal birim kuvvetleri: $i^{4k} = 1, \\quad i^{4k+1} = i, \\quad i^{4k+2} = -1, \\quad i^{4k+3} = -i$\nEşlenik ve eşlenik çarpımı: $z = a + bi \\implies \\bar{z} = a - bi$\n$z \\cdot \\bar{z} = a^2 + b^2$" },
+    { id: "mt23", ders: "AYT MATEMATİK", konu: "İkinci Dereceden Eşitsizlikler", baslik: "İşaret Tablosu Kuralı", formul: "En sağdan baş katsayının (a) işaretiyle başlanır; tek katlı kökte işaret değişir, çift katlı kökte (tam kare çarpan) işaret değişmez." },
+    { id: "mt24", ders: "AYT MATEMATİK", konu: "İkinci Dereceden Eşitsizlikler", baslik: "Daimi Pozitif / Negatif Olma Şartları (∀x∈ℝ için ax² + bx + c)", formul: "Daimi pozitif ($> 0$): $a > 0$ ve $\\Delta < 0$\nDaimi negatif ($< 0$): $a < 0$ ve $\\Delta < 0$" },
+    { id: "mt25", ders: "AYT MATEMATİK", konu: "Parabol (İkinci Dereceden Fonksiyonlar)", baslik: "Tepe Noktası Koordinatları T(r, k)", formul: "Simetri ekseni (apsis): $r = -\\frac{b}{2a} = \\frac{x_1 + x_2}{2}$\nTepe noktası ordinatı (en büyük / en küçük değer): $k = f(r) = \\frac{4ac - b^2}{4a}$" },
+    { id: "mt26", ders: "AYT MATEMATİK", konu: "Parabol (İkinci Dereceden Fonksiyonlar)", baslik: "Parabol Denklemi Kurma", formul: "Tepe noktası biliniyorsa: $f(x) = a(x - r)^2 + k$\nx eksenini kestiği noktalar biliniyorsa: $f(x) = a(x - x_1)(x - x_2)$" },
+    { id: "mt27", ders: "AYT MATEMATİK", konu: "Parabol (İkinci Dereceden Fonksiyonlar)", baslik: "Doğru ile Parabolün Durumu (ortak denklemin Δ değerine göre)", formul: "$\\Delta_{\\text{ortak}} > 0$ ⇒ İki farklı noktada kesişirler.\n$\\Delta_{\\text{ortak}} = 0$ ⇒ Doğru parabole teğettir.\n$\\Delta_{\\text{ortak}} < 0$ ⇒ Kesişmezler." },
+    { id: "mt28", ders: "AYT MATEMATİK", konu: "Permütasyon, Kombinasyon, Binom ve Olasılık", baslik: "Permütasyon (Sıralama)", formul: "$P(n, r) = \\frac{n!}{(n - r)!}$\nTekrarlı permütasyon: $\\frac{n!}{n_1! \\cdot n_2! \\cdot \\dots \\cdot n_k!}$" },
+    { id: "mt29", ders: "AYT MATEMATİK", konu: "Permütasyon, Kombinasyon, Binom ve Olasılık", baslik: "Kombinasyon (Seçme)", formul: "$C(n, r) = \\binom{n}{r} = \\frac{n!}{(n - r)! \\cdot r!}$" },
+    { id: "mt30", ders: "AYT MATEMATİK", konu: "Permütasyon, Kombinasyon, Binom ve Olasılık", baslik: "Kombinasyon Özellikleri", formul: "$\\binom{n}{r} = \\binom{n}{n-r}$\nAlt kümeler toplamı: $\\binom{n}{0} + \\binom{n}{1} + \\dots + \\binom{n}{n} = 2^n$\nPascal özdeşliği: $\\binom{n}{r} + \\binom{n}{r+1} = \\binom{n+1}{r+1}$" },
+    { id: "mt31", ders: "AYT MATEMATİK", konu: "Permütasyon, Kombinasyon, Binom ve Olasılık", baslik: "Binom Açılımı Genel Terim", formul: "$(x + y)^n$ açılımında baştan $(r + 1)$. terim: $T_{r+1} = \\binom{n}{r} \\cdot x^{n-r} \\cdot y^r$ (toplam terim sayısı $= n + 1$)" },
+    { id: "mt32", ders: "AYT MATEMATİK", konu: "Permütasyon, Kombinasyon, Binom ve Olasılık", baslik: "Olasılık Kuralları", formul: "Olay olasılığı ve tümleyeni: $P(A) = \\frac{s(A)}{s(E)}$ ve $P(A) + P(A') = 1$\nBirleşim olasılığı: $P(A \\cup B) = P(A) + P(B) - P(A \\cap B)$\nBağımsız olaylar: $P(A \\cap B) = P(A) \\cdot P(B)$\nKoşullu olasılık (B bilindiğinde A olasılığı): $P(A \\mid B) = \\frac{P(A \\cap B)}{P(B)}$" },
   ];
+
+  // Konu başlıkları (ders → konu). Hazır formüllerde konu yoksa buradan, kişisel formüllerde kullanıcının seçtiğinden gelir.
+  var KONU = {
+    fz1: 'Vektör ve Denge', fz2: 'Vektör ve Denge', fz3: 'Vektör ve Denge', fz4: 'Vektör ve Denge',
+    fz5: 'Kuvvet ve Hareket', fz6: 'Kuvvet ve Hareket', fz7: 'Kuvvet ve Hareket',
+    fz8: 'Enerji ve Momentum', fz9: 'Enerji ve Momentum',
+    fz10: 'Elektrostatik', fz11: 'Elektrostatik', fz12: 'Elektrostatik',
+    fz13: 'Manyetizma ve İndüksiyon', fz14: 'Manyetizma ve İndüksiyon', fz15: 'Manyetizma ve İndüksiyon', fz16: 'Manyetizma ve İndüksiyon',
+    fz17: 'Dairesel Hareket ve Dönme', fz18: 'Dairesel Hareket ve Dönme',
+    fz19: 'Çekim ve Salınım', fz20: 'Çekim ve Salınım',
+    fz21: 'Dalgalar', fz22: 'Dalgalar', fz23: 'Dalgalar', fz24: 'Dalgalar', fz25: 'Dalgalar',
+    fz26: 'Modern Fizik', fz27: 'Modern Fizik', fz28: 'Modern Fizik', fz29: 'Modern Fizik'
+  };
 
   var FAV = 'nk_fav_formul';
 
@@ -116,16 +161,16 @@
   }
   function all() {
     var mine = userList().filter(function (f) { return !f.deleted; }).map(function (f) { return Object.assign({ mine: true }, f); });
-    return BUILTIN.map(function (f) { return Object.assign({ mine: false }, f); }).concat(mine);
+    return BUILTIN.map(function (f) { return Object.assign({ mine: false, konu: KONU[f.id] || '' }, f); }).concat(mine);
   }
 
   /* ---------- Sekme (denemeler gibi) ---------- */
-  var state = { q: '', course: '' };
+  var state = { q: '', course: '', konu: '' };
   function host() { return document.getElementById('formul-root'); }
 
   function open() {
     loadKatex();
-    state.q = ''; state.course = '';
+    state.q = ''; state.course = ''; state.konu = '';
     try { switchTab('formul'); } catch (e) {}
   }
   function render() { loadKatex(); paint(); }
@@ -165,13 +210,29 @@
     function chip(label, val) {
       var on = state.course === val;
       var b = el('button', 'padding:6px 12px;border-radius:9999px;font-size:11px;font-weight:700;border:1px solid ' + (on ? 'var(--t1,#0d9488)' : 'var(--nk-line2,#cbd5e1)') + ';background:' + (on ? 'var(--t1,#0d9488)' : 'var(--nk-surf,#fff)') + ';color:' + (on ? '#fff' : '#475569'), label);
-      b.onclick = function () { state.course = val; paint(); };
+      b.onclick = function () { state.course = val; state.konu = ''; paint(); };
       chips.appendChild(b);
     }
     chip('Tümü', '');
     have.forEach(function (c) { chip(pretty(c), c); });
     chips.id = 'nk-fm-chips';
     root.appendChild(chips);
+
+    // Seçili dersin konu başlıkları (ikinci satır)
+    if (state.course) {
+      var ks = [];
+      all().forEach(function (x) { if (x.ders === state.course && x.konu && ks.indexOf(x.konu) < 0) ks.push(x.konu); });
+      if (state.konu && ks.indexOf(state.konu) < 0) state.konu = '';
+      if (ks.length > 1) {
+        var sel = el('select', 'width:100%;border:1px solid var(--nk-line2,#cbd5e1);border-radius:12px;padding:10px 12px;font-size:13px;font-weight:700;color:var(--nk-ink,#0f172a);background:var(--nk-surf,#fff);margin:-2px 0 12px;appearance:auto');
+        sel.setAttribute('aria-label', 'Konu seç');
+        var o0 = document.createElement('option'); o0.value = ''; o0.textContent = 'Tüm konular (' + ks.length + ')'; sel.appendChild(o0);
+        ks.forEach(function (k) { var o = document.createElement('option'); o.value = k; o.textContent = k; sel.appendChild(o); });
+        sel.value = state.konu;
+        sel.onchange = function () { state.konu = sel.value; paint(); };
+        root.appendChild(sel);
+      }
+    }
 
     var lst = el('div', '');
     lst.id = 'nk-fm-list';
@@ -187,15 +248,37 @@
     var f = favs(), q = norm(state.q).trim();
     var items = all().filter(function (x) {
       if (state.course && x.ders !== state.course) return false;
+      if (state.konu && x.konu !== state.konu) return false;
       if (q && norm(x.baslik + ' ' + x.formul + ' ' + x.ders).indexOf(q) < 0) return false;
       return true;
     });
     var order = courses();
     items.sort(function (a, b) {
       var fa = f[a.id] ? 0 : 1, fb = f[b.id] ? 0 : 1;
-      if (fa !== fb) return fa - fb;
+      if (!state.course && !q && fa !== fb) return fa - fb;
       return order.indexOf(a.ders) - order.indexOf(b.ders);
     });
+
+    // Ders seçilmemiş ve arama yok: yıldızlılar + ders kutuları (ağır liste yerine hızlı özet)
+    var overview = !state.course && !q;
+    if (overview) {
+      var starredItems = items.filter(function (x) { return f[x.id]; });
+      var tiles = el('div', 'display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px');
+      courses().forEach(function (c) {
+        var its = all().filter(function (x) { return x.ders === c; });
+        if (!its.length) return;
+        var ks = []; its.forEach(function (x) { if (x.konu && ks.indexOf(x.konu) < 0) ks.push(x.konu); });
+        var tile = el('button', 'text-align:left;padding:14px;border-radius:18px;border:1px solid var(--nk-line,#e2e8f0);background:var(--nk-surf,#fff);box-shadow:0 1px 2px rgba(15,23,42,.04)');
+        tile.appendChild(el('div', 'font-weight:800;font-size:13px;color:var(--nk-ink,#0f172a);line-height:1.25', pretty(c)));
+        tile.appendChild(el('div', 'margin-top:6px;font-size:11px;font-weight:700;color:#64748b', its.length + ' formül' + (ks.length ? ' · ' + ks.length + ' konu' : '')));
+        tile.onclick = function () { state.course = c; state.konu = ''; paint(); };
+        tiles.appendChild(tile);
+      });
+      lst.appendChild(tiles);
+      items = starredItems;
+      if (!items.length) return;
+      lst.appendChild(el('div', 'margin:14px 2px 6px;font-size:11px;font-weight:800;letter-spacing:.06em;color:#64748b;text-transform:uppercase', '★ Yıldızlılar'));
+    }
 
     if (!items.length) {
       var empty = el('div', 'text-align:center;color:#64748b;padding:48px 16px;font-size:13px;line-height:1.6');
@@ -210,11 +293,12 @@
     var token = ++listTok;
     function addCard(x) {
       var starred = !!f[x.id];
-      if (!state.course && !starred && x.ders !== lastCourse) {
-        lastCourse = x.ders;
-        lst.appendChild(el('div', 'margin:14px 2px 6px;font-size:11px;font-weight:800;letter-spacing:.06em;color:#64748b;text-transform:uppercase', pretty(x.ders)));
+      var gkey = (state.course ? '' : x.ders + ' · ') + (x.konu || '');
+      if (!overview && gkey && gkey !== lastCourse) {
+        lastCourse = gkey;
+        lst.appendChild(el('div', 'margin:14px 2px 6px;font-size:11px;font-weight:800;letter-spacing:.06em;color:#64748b;text-transform:uppercase', state.course ? gkey : pretty(x.ders) + (x.konu ? ' · ' + x.konu : '')));
       }
-      var card = el('div', 'background:var(--nk-surf,#fff);border:1px solid var(--nk-line,#e2e8f0);border-radius:18px;padding:14px;margin-bottom:10px;box-shadow:0 1px 2px rgba(15,23,42,.04)');
+      var card = el('div', 'content-visibility:auto;contain-intrinsic-size:auto 110px;background:var(--nk-surf,#fff);border:1px solid var(--nk-line,#e2e8f0);border-radius:18px;padding:14px;margin-bottom:10px;box-shadow:0 1px 2px rgba(15,23,42,.04)');
       var top = el('div', 'display:flex;align-items:flex-start;gap:8px');
       var t = el('div', 'flex:1;font-weight:800;font-size:14px;color:var(--nk-ink,#0f172a);line-height:1.3', x.baslik);
       top.appendChild(t);
