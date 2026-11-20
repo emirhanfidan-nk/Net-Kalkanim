@@ -1309,30 +1309,6 @@
                         </div>
                     </div>
 
-                    <!-- Gelişmiş Ayarlar (katlanır, varsayılan kapalı) -->
-                    <div>
-                        <button onclick="toggleAdvancedSettings()" class="w-full p-4 flex items-center gap-3 text-left">
-                            <div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-500 flex items-center justify-center shrink-0">
-                                <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></svg>
-                            </div>
-                            <span class="flex-1 text-sm font-medium text-slate-600">Gelişmiş Ayarlar</span>
-                            <svg id="advanced-settings-chevron" class="w-4 h-4 fill-current text-slate-400 transition-transform shrink-0" viewBox="0 0 24 24" style="transform: rotate(0deg);">
-                                <path d="M7 10l5 5 5-5z"/>
-                            </svg>
-                        </button>
-                        <div id="advanced-settings-content" class="hidden px-4 pb-4 space-y-3">
-                            <div class="bg-slate-50 border border-slate-200 p-4 space-y-3 rounded-xl">
-                                <p class="text-xs font-semibold text-slate-600">Algoritma Döngüsü (Sorular)</p>
-                                <input type="text" id="setting-intervals" class="w-full bg-white p-2.5 border border-slate-300 font-mono text-center text-sm text-slate-700 font-medium outline-none focus:border-teal-500 transition-colors rounded-lg">
-                                <button onclick="saveIntervals()" class="w-full bg-teal-600 hover:bg-teal-700 text-white py-2.5 text-xs font-semibold rounded-lg shadow-sm">Geriye Dönük Güncelle</button>
-                            </div>
-                            <div class="bg-slate-50 border border-slate-200 p-4 space-y-3 rounded-xl">
-                                <p class="text-xs font-semibold text-slate-600">Algoritma Döngüsü (Notlar)</p>
-                                <input type="text" id="setting-note-intervals" class="w-full bg-white p-2.5 border border-slate-300 font-mono text-center text-sm text-slate-700 font-medium outline-none focus:border-amber-500 transition-colors rounded-lg">
-                                <button onclick="saveNoteIntervals()" class="w-full bg-amber-500 hover:bg-amber-600 text-white py-2.5 text-xs font-semibold rounded-lg shadow-sm">Geriye Dönük Güncelle</button>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -3940,8 +3916,8 @@ async function saveState() {
 function syncSystemUI() {
     buildHomeFilters(); populateCategoryDropdowns(); populateArchiveFilters(); updateHomeStats();
     renderLibrary();
-    document.getElementById('setting-intervals').value = appState.intervals.join(',');
-    document.getElementById('setting-note-intervals').value = appState.noteIntervals.join(',');
+    var _si=document.getElementById('setting-intervals'); if(_si) _si.value = appState.intervals.join(',');
+    var _sn=document.getElementById('setting-note-intervals'); if(_sn) _sn.value = appState.noteIntervals.join(',');
     updateFieldDisplay();
     // Depolama bilgisi güncelle
     checkStorageUsage();
@@ -4026,14 +4002,47 @@ function denemeChartSVG(points) {
         const cx = x(i).toFixed(1), cy = y(p.v).toFixed(1);
         const isLast = i === n - 1;
         dots += `<circle cx="${cx}" cy="${cy}" r="${isLast ? 4.5 : 3.2}" fill="${isLast ? 'currentColor' : '#fff'}" stroke="currentColor" stroke-width="2"/>`;
-        if (n <= 8 || isLast || i === maxIdx) {
+        if (n <= 8) {
             dots += `<text x="${cx}" y="${(+cy - 8).toFixed(1)}" text-anchor="middle" font-size="9.5" font-weight="700" fill="currentColor">${denemeFmtNet(p.v)}</text>`;
         }
         if (n <= 6 || i === 0 || isLast || i % step === 0) {
             xl += `<text x="${cx}" y="${H - 8}" text-anchor="middle" font-size="9" fill="#94a3b8">${denemeShortDate(p.date)}</text>`;
         }
     });
-    return `<svg viewBox="0 0 ${W} ${H}" class="w-full" role="img" aria-label="Net grafiği" style="color:var(--t1,#0d9488)">${g}${n > 1 ? `<path d="${path}" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>` : ''}${dots}${xl}</svg>`;
+    denemeChartPts = points.map((p, i) => ({ p: p, x: +x(i).toFixed(1), y: +y(p.v).toFixed(1) }));
+    denemeChartSel = n - 1;
+    const sel = '<line id="dn-sel-line" y1="' + T + '" y2="' + (H - B) + '" stroke="currentColor" stroke-opacity=".35" stroke-dasharray="3 3"/><circle id="dn-sel-ring" r="8" fill="currentColor" fill-opacity=".18" stroke="currentColor" stroke-width="1.5"/>';
+    const svg = `<svg id="dn-chart" viewBox="0 0 ${W} ${H}" class="w-full" role="img" aria-label="Net grafiği" style="color:var(--t1,#0d9488);touch-action:pan-y;-webkit-tap-highlight-color:transparent" onpointerdown="denemeChartTap(event)" onpointermove="if(event.buttons||event.pointerType==='touch')denemeChartTap(event)">${g}${n > 1 ? `<path d="${path}" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>` : ''}${sel}${dots}${xl}</svg>`;
+    return `<div id="dn-info" class="rounded-xl px-3 py-2 mb-1" style="background:rgba(148,163,184,.12)"></div>` + svg + `<p class="text-[10px] text-slate-400 text-center -mt-1">Bir noktaya dokun, ayrıntısı yukarıda görünsün</p>`;
+}
+let denemeChartPts = [], denemeChartSel = 0;
+function denemeChartSelect(i) {
+    if (!denemeChartPts.length) return;
+    i = Math.max(0, Math.min(denemeChartPts.length - 1, i));
+    denemeChartSel = i;
+    const q = denemeChartPts[i], prev = i > 0 ? denemeChartPts[i - 1].p.v : null;
+    const ln = document.getElementById('dn-sel-line'), rg = document.getElementById('dn-sel-ring');
+    if (ln) { ln.setAttribute('x1', q.x); ln.setAttribute('x2', q.x); }
+    if (rg) { rg.setAttribute('cx', q.x); rg.setAttribute('cy', q.y); }
+    const box = document.getElementById('dn-info');
+    if (!box) return;
+    let diff = '';
+    if (prev !== null) {
+        const d = q.p.v - prev;
+        const col = d > 0 ? '#16a34a' : (d < 0 ? '#e11d48' : '#94a3b8');
+        diff = '<span style="color:' + col + '" class="text-xs font-bold tabular-nums">' + (d > 0 ? '▲ +' : (d < 0 ? '▼ ' : '')) + denemeFmtNet(d) + '</span>';
+    }
+    box.innerHTML = '<div class="flex items-center justify-between gap-3"><div class="min-w-0"><p class="text-sm font-bold text-slate-800 truncate">' + denemeEsc(q.p.name) + '</p><p class="text-[11px] text-slate-500">' + denemeDateTR(q.p.date) + ' · ' + q.p.c + ' doğru · ' + q.p.w + ' yanlış</p></div><div class="text-right shrink-0"><p class="text-xl font-black tabular-nums" style="color:var(--t1,#0d9488)">' + denemeFmtNet(q.p.v) + '</p><div>' + diff + '</div></div></div>';
+}
+function denemeChartTap(ev) {
+    const svg = document.getElementById('dn-chart');
+    if (!svg || !denemeChartPts.length) return;
+    const r = svg.getBoundingClientRect();
+    const vb = svg.viewBox.baseVal;
+    const px = (ev.clientX - r.left) * vb.width / r.width;
+    let best = 0, bd = 1e9;
+    denemeChartPts.forEach((q, i) => { const d = Math.abs(q.x - px); if (d < bd) { bd = d; best = i; } });
+    denemeChartSelect(best);
 }
 
 let denemeChipsLeft = 0;
@@ -4050,10 +4059,16 @@ function renderDenemeList() {
     denemeChipList = ['TOPLAM', ...courses];
     if (!denemeChipList.includes(denemeChartCourse)) denemeChartCourse = 'TOPLAM';
 
-    const points = all.map(d => ({
-        date: d.date,
-        v: denemeChartCourse === 'TOPLAM' ? denemeTotalNet(d) : (d.scores[denemeChartCourse] ? denemeCourseNet(d.scores[denemeChartCourse]) : null)
-    })).filter(p => p.v !== null);
+    denemeChartPts = [];
+    const points = all.map(d => {
+        let c = 0, w = 0;
+        if (denemeChartCourse === 'TOPLAM') { Object.values(d.scores || {}).forEach(sc => { c += sc.c || 0; w += sc.w || 0; }); }
+        else if (d.scores && d.scores[denemeChartCourse]) { c = d.scores[denemeChartCourse].c || 0; w = d.scores[denemeChartCourse].w || 0; }
+        return {
+            name: d.name, date: d.date, c: c, w: w,
+            v: denemeChartCourse === 'TOPLAM' ? denemeTotalNet(d) : (d.scores[denemeChartCourse] ? denemeCourseNet(d.scores[denemeChartCourse]) : null)
+        };
+    }).filter(p => p.v !== null);
 
     let stats = '';
     if (points.length) {
@@ -4111,6 +4126,7 @@ function renderDenemeList() {
         <div class="space-y-3">${cards}</div>`;
     // Ders çipleri yatay kayıyor; yeniden çizimde en sola dönmesin, kaldığı yerde dursun.
     { const nc = root.querySelector('.nk-dn-chips'); if (nc) nc.scrollLeft = denemeChipsLeft; }
+    if (denemeChartPts.length) denemeChartSelect(denemeChartPts.length - 1);
 }
 
 function openDeneme(id) {

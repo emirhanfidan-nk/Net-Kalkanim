@@ -125,6 +125,9 @@
       S + ' .nk-hero{background:linear-gradient(135deg,color-mix(in srgb,var(--t1) 45%,#0b0b16),color-mix(in srgb,var(--t1) 75%,#0b0b16) 55%,color-mix(in srgb,var(--t2) 70%,#0b0b16))!important}' +
       S + ' .face-heading-front{background:var(--tsoft)!important;color:var(--ta)!important;border-color:color-mix(in srgb,var(--t1) 45%,transparent)!important}' +
       S + ' .face-heading-back{background:color-mix(in srgb,var(--t2) 18%,transparent)!important;color:color-mix(in srgb,var(--t2) 70%,var(--nk-ink))!important;border-color:color-mix(in srgb,var(--t2) 45%,transparent)!important}' +
+      S + ' .bg-amber-500,' + S + ' .bg-amber-600,' + S + ' .hover\\:bg-amber-600:hover{background-image:linear-gradient(135deg,var(--t2),color-mix(in srgb,var(--t2) 62%,#000))!important;background-color:var(--t2)!important;border-color:var(--t2)!important;color:#fff!important}' +
+      S + ' .bg-white.text-amber-600{color:var(--t2)!important}' +
+      S + ' .hover\\:text-amber-600:hover{color:var(--t2)!important}' +
       M('dark') + ' .bg-white.text-amber-600{background-image:linear-gradient(135deg,var(--t2),color-mix(in srgb,var(--t2) 55%,#000))!important;color:#fff!important}' +
       // Arşiv: kamp düğmesi, kutu filtreleri, kartlar
       S + ' .toast-msg:not(.toast-error){background:linear-gradient(135deg,var(--t1),var(--t2))!important}' +
