@@ -2121,6 +2121,7 @@ function saveSettings() {
         recallVeryEasy: appState.recallVeryEasy,
         denemeler: appState.denemeler,
         formuller: appState.formuller,
+        denemeSilinen: appState.denemeSilinen,
         oyun: appState.oyun
     };
     return new Promise((resolve, reject) => {
@@ -2204,7 +2205,8 @@ let appState = {
     recallRemembered: 0,
     recallVeryEasy: 0,
     denemeler: [],
-    formuller: []
+    formuller: [],
+    denemeSilinen: []
 };
 
 let currentEntryType = 'question'; 
@@ -2313,6 +2315,7 @@ window.onload = async function() {
         appState.notes = data.notes || [];
         if (!Array.isArray(appState.denemeler)) appState.denemeler = [];
         if (!Array.isArray(appState.formuller)) appState.formuller = [];
+        if (!Array.isArray(appState.denemeSilinen)) appState.denemeSilinen = [];
         
         // Alan ve kategori düzeltmeleri
         if (appState.field && FIELD_DATA[appState.field]) {
@@ -4379,6 +4382,8 @@ function deleteDeneme(id) {
     showCustomConfirm(msg, async () => {
         for (const q of qs) { delete q.denemeId; await saveQuestion(q); }
         appState.denemeler = appState.denemeler.filter(d => d.id !== id);
+        if (!Array.isArray(appState.denemeSilinen)) appState.denemeSilinen = [];
+        appState.denemeSilinen.push(id);
         await saveSettings();
         denemeOpenId = null;
         renderDeneme();

@@ -18,7 +18,7 @@
     'selectedCourses', 'selectedTopics', 'archSelectedCourses', 'archSelectedTopics',
     'hasSeenOnboarding', 'activityDays', 'darkMode', 'tema', 'hapticsEnabled', 'curriculum',
     'totalAnswered', 'totalCorrect', 'recallForgot', 'recallPartial', 'recallRemembered',
-    'recallVeryEasy', 'denemeler', 'formuller', 'oyun'
+    'recallVeryEasy', 'denemeler', 'denemeSilinen', 'formuller', 'oyun'
   ];
 
   /* ---------- Kurtarma kodu ---------- */
@@ -406,6 +406,10 @@
   }
 
   function mergeDenemeler(local, cloud) {
+    var tomb = {};
+    (appState.denemeSilinen || []).forEach(function (x) { tomb[x] = 1; });
+    local = (local || []).filter(function (d) { return !tomb[d.id]; });
+    cloud = (cloud || []).filter(function (d) { return !tomb[d.id]; });
     var byId = {}, out = [];
     (local || []).forEach(function (d) { byId[d.id] = d; out.push(d); });
     (cloud || []).forEach(function (d) {
@@ -437,6 +441,8 @@
       appState[k] = Math.max(appState[k] || 0, v || 0);
     } else if (k === 'hasSeenOnboarding') {
       appState.hasSeenOnboarding = !!(appState.hasSeenOnboarding || v);
+    } else if (k === 'denemeSilinen') {
+      // applySettings başında işlendi
     } else if (k === 'denemeler') {
       appState.denemeler = mergeDenemeler(appState.denemeler, v);
     } else if (k === 'formuller') {
@@ -448,11 +454,17 @@
 
   function applySettings(d) {
     var fresh = !appState.field;
+    if (d && Array.isArray(d.denemeSilinen)) {                 // silinen denemeler önce işlenir
+      var ts = {};
+      (appState.denemeSilinen || []).concat(d.denemeSilinen).forEach(function (x) { ts[x] = 1; });
+      appState.denemeSilinen = Object.keys(ts).map(function (x) { return isNaN(+x) ? x : +x; });
+      appState.denemeler = (appState.denemeler || []).filter(function (x) { return !ts[x.id]; });
+    }
     Object.keys(d || {}).forEach(function (k) {
       if (SETTINGS_KEYS.indexOf(k) === -1) return;
       if (k === 'authState') {
         if (d.authState === 'full' || !appState.authState || appState.authState === 'none') appState.authState = d.authState;
-      } else if (k === 'activityDays' || k === 'oyun' || k === 'denemeler' || k === 'formuller' || k === 'hasSeenOnboarding' || COUNTER_KEYS.indexOf(k) >= 0) {
+      } else if (k === 'activityDays' || k === 'oyun' || k === 'denemeler' || k === 'denemeSilinen' || k === 'formuller' || k === 'hasSeenOnboarding' || COUNTER_KEYS.indexOf(k) >= 0) {
         mergeKey(k, d[k]);          // ilerleme verisi: her zaman birleştir
       } else if (fresh) {
         appState[k] = d[k];
