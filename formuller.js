@@ -600,7 +600,9 @@
       var gkey = (state.course && !isFav ? '' : x.ders + ' · ') + (x.konu || '');
       if (!overview && gkey && gkey !== lastCourse) {
         lastCourse = gkey;
-        lst.appendChild(el('div', 'margin:14px 2px 6px;font-size:11px;font-weight:800;letter-spacing:.06em;color:#64748b;text-transform:uppercase', state.course && !isFav ? gkey : pretty(x.ders) + (x.konu ? ' · ' + x.konu : '')));
+        var gh = el('div', 'margin:14px 2px 6px;font-size:11px;font-weight:800;letter-spacing:.06em;color:#64748b;text-transform:uppercase', state.course && !isFav ? gkey : pretty(x.ders) + (x.konu ? ' · ' + x.konu : ''));
+        gh.className = 'nk-fm-gh';
+        lst.appendChild(gh);
       }
       var card = el('div', 'background:var(--nk-surf,#fff);border:1px solid var(--nk-line,#e2e8f0);border-radius:18px;padding:14px;margin-bottom:10px;box-shadow:0 1px 2px rgba(15,23,42,.04)');
       var top = el('div', 'display:flex;align-items:flex-start;gap:8px');
