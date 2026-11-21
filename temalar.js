@@ -211,6 +211,8 @@
   function injectCss() {
     var old = document.getElementById('nk-tema-css');
     if (old) old.remove();
+    var early = document.getElementById('nk-tema-early');
+    if (early) early.remove();
     var st = document.createElement('style');
     st.id = 'nk-tema-css';
     st.textContent = sheet();
@@ -248,6 +250,14 @@
     setMeta(t);
     try { var sn = JSON.parse(localStorage.getItem('nk_th_seen') || '[]') || []; var sid = t.id || 'klasik'; if (sn.indexOf(sid) < 0) { sn.push(sid); localStorage.setItem('nk_th_seen', JSON.stringify(sn)); } } catch (e) {}
     markSelected(t.id);
+    // Bir sonraki açılışta ilk çizimden itibaren doğru tema görünsün diye önbelleğe al
+    try {
+      var cs = document.getElementById('nk-tema-css');
+      if (t.t1 && cs && !rndOn()) {
+        localStorage.setItem('nk_tema_cache', JSON.stringify({ id: t.id, css: cs.textContent, dark: t.mode === 'dark',
+          attrs: { 'data-nk-theme': t.id, 'data-nk-kind': t.kind, 'data-nk-lay': String(t.lay || 0), 'data-nk-mode': t.mode, 'data-nk-ink': t.ink || '' } }));
+      } else { localStorage.removeItem('nk_tema_cache'); }
+    } catch (e) {}
   }
 
   function markSelected(id) {

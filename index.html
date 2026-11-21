@@ -798,6 +798,14 @@
 </style>
 </head>
 <body class="flex justify-center min-h-screen">
+<script>
+/* Tema önbelleği: modüller yüklenmeden ilk çizimde son seçilen tema hazır olsun (renk sıçraması olmasın) */
+(function(){try{var c=JSON.parse(localStorage.getItem('nk_tema_cache')||'null');if(!c||!c.css||localStorage.getItem('nk_tema_rnd')==='1')return;
+var s=document.createElement('style');s.id='nk-tema-early';s.textContent=c.css;document.head.appendChild(s);
+var b=document.body;for(var k in c.attrs){if(c.attrs[k])b.setAttribute(k,c.attrs[k]);}
+if(c.dark)b.classList.add('dark-mode');}catch(e){}})();
+</script>
+
     <script>
         // Karanlık mod tercihini, tüm veri (IndexedDB) yüklenmeden önce localStorage'dan
         // hemen uygula — böylece sayfa açılırken kısa bir "aydınlık" yanıp sönmesi olmaz.

@@ -13,6 +13,9 @@
   var XP_N = 2;           // not tekrarı
   var XP_DENEME = 10;     // deneme analiz etme
   var XP_BONUS = 20;      // günlük hedefi bitirme
+  var XP_ADDQ = 3;        // yeni soru ekleme
+  var XP_ADDN = 2;        // yeni not ekleme
+  var ADD_CAP = 8;        // günde en fazla bu kadar ekleme XP verir (kötüye kullanım olmasın)
 
   var reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   var FLAME_D = 'M12.5 2.5c1.2 3-2.3 4.4-2.3 7.6a2.8 2.8 0 005.6 0c0-1-.4-1.9-1-2.8 2 1.1 3.2 3.3 3.2 5.6a5.5 5.5 0 11-11 0c0-4.6 3.5-6.7 5.5-10.4z';
@@ -82,7 +85,7 @@
     if (!appState.oyun || typeof appState.oyun !== 'object') appState.oyun = {};
     var o = appState.oyun, t = today();
     if (typeof o.xp !== 'number') o.xp = 0;
-    if (o.day !== t) { o.day = t; o.dayXp = 0; o.paid = []; }
+    if (o.day !== t) { o.day = t; o.dayXp = 0; o.paid = []; o.addN = 0; }
     if (typeof o.dayXp !== 'number') o.dayXp = 0;
     if (!Array.isArray(o.paid)) o.paid = [];
     if (typeof o.shields !== 'number') o.shields = 1;      // başlangıçta 1 seri kalkanı
@@ -685,6 +688,27 @@
       var already = !eligible(q) || (q.lastReviewedDate === today() && !!q.userTodayAnswer);
       var r = await origSubmit.apply(this, arguments);
       try { if (!already && q.userTodayAnswer) award('q', q.id, XP_Q, 'Soru'); } catch (e) { console.warn(e); }
+      return r;
+    };
+  }
+
+  var origSave = window.saveData;
+  if (typeof origSave === 'function') {
+    window.saveData = async function () {
+      var q0 = (appState.questions || []).length, n0 = (appState.notes || []).length;
+      var r = await origSave.apply(this, arguments);
+      try {
+        var qs = appState.questions || [], ns = appState.notes || [];
+        var isQ = qs.length > q0, isN = ns.length > n0;
+        if (isQ || isN) {
+          var o = O();
+          if ((o.addN || 0) < ADD_CAP) {
+            var it = isQ ? qs[qs.length - 1] : ns[ns.length - 1];
+            o.addN = (o.addN || 0) + 1;
+            award(isQ ? 'aq' : 'an', it && it.id !== undefined ? it.id : Date.now(), isQ ? XP_ADDQ : XP_ADDN, isQ ? 'Soru eklendi' : 'Not eklendi');
+          }
+        }
+      } catch (e) { console.warn(e); }
       return r;
     };
   }
