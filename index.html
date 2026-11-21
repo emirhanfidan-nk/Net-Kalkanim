@@ -3063,6 +3063,74 @@ function onbToggleSection(id) {
     renderTourHub();
 }
 
+const APP_TOUR = [
+ {tab:'home', sel:'#yks-countdown-badge', t:'Sınava Kalan Gün', x:'Burada tahmini YKS tarihine kaç gün kaldığını görürsün. Her gün bir tekrar şansı, kaçırdığın günü geri alamazsın.'},
+ {tab:'home', sel:'.nk-box-red', t:'Kırmızı Kutu', x:'Bugün tekrar etmen gerekenler burada toplanır. Sayılar bekleyen soru ve not adedini, "tahmini" yazısı da ne kadar süreceğini söyler. Hedefin her gün bu kutuyu boşaltmak. Dokununca o günün tekrarı başlar.'},
+ {tab:'home', sel:'.nk-box-sm', t:'Sarı ve Yeşil Kutu', x:'Sarı kutu yaklaşan, ara sıra bakacağın kartlar. Yeşil kutu ustalaştıkların, ayda bir göz atarsın. Dokununca o kutudaki kayıtlar arşivde açılır.'},
+ {tab:'home', sel:'#home-streak-badge', t:'Seri (Alev)', x:'Her gün en az bir tekrar yaparsan serin uzar. Bir gün atlarsan sıfırlanır. Seri tehlikedeyse akşam bildirim gelir.'},
+ {tab:'add', sel:"button[onclick=\"switchTab('add')\"]", t:'Ekle Butonu', x:'Ortadaki büyük yeşil buton. Tüm soru ve notların buradan girer. Şu an Ekle ekranındasın.'},
+ {tab:'add', sel:'#btn-entry-question', t:'Soru / Not Seçici', x:'Buradaki iki sekmeyle ne ekleyeceğini seçersin: Görsel (soru fotoğrafı) ya da Yazı (not).'},
+ {tab:'add', sel:'#upload-placeholder', t:'Soru Fotoğrafı', x:'Çözemediğin sorunun fotoğrafını buradan çek veya galeriden seç, sonra kırp. Ders, konu ve doğru cevabı da aşağıda işaretlersin.'},
+ {tab:'add', sel:'#btn-save-data', t:'Kaydet', x:'Kaydedince kayıt tekrar sistemine girer ve zamanı gelince Günlük Tekrar\'da karşına çıkar. Her yeni soru veya not +2 XP verir.'},
+ {tab:'library', sel:'#nav-library', t:'Arşiv ve Kamp', x:'Eklediğin bütün soru ve notlar burada. Arama ve filtreyle bulur, düzenler veya silebilirsin. Telefon ve tablet arasında senkron olur.'},
+ {tab:'library', sel:'#btn-random-camp', t:'Rastgele Kamp', x:'İstediğin konulardan karışık soru çekip kendini sınarsın. Tekrar takvimini bozmaz.'},
+ {tab:'home', sel:'#nav-home', t:'Günlük Tekrar', x:'Ana sayfa. Soruları ve notları tekrar oturumuna buradan başlarsın. Soruyu kalemle çözebilir, renk ve fosforlu kalem seçebilirsin. Tablette bu alan daha geniştir.'},
+ {tab:'home', sel:'#nav-deneme', t:'Denemeler', x:'Deneme netlerini ders ders gir, grafikte takip et. Grafikteki noktaya dokununca o denemenin detayı açılır.'},
+ {tab:'home', sel:'#nav-formul', t:'Formüller', x:'Ders ders formül ve şekil kartları. Konu başlığına dokununca açılır.'},
+ {tab:'home', sel:'#nav-profile', t:'Ayarlar', x:'Profil, tema, bildirim, bulut yedek ve senkron burada. Kurtarma kodunu kaydet ve telefon ile tableti aynı kodla eşitle. "Tekrar Gör" ile bu turu yeniden açabilirsin.'},
+ {tab:'home', sel:null, t:'Hazırsın!', x:'Her gün kırmızı kutuyu boşalt, serini uzat. İlk sorunu eklemek için Başla\'ya bas.'}
+];
+let __tourI = 0, __tourEl = null;
+function startAppTour() {
+    const m = document.getElementById('onboarding-modal'); if (m) m.classList.add('hidden');
+    __tourI = 0;
+    if (!__tourEl) {
+        __tourEl = document.createElement('div');
+        __tourEl.id = 'app-tour';
+        __tourEl.style.cssText = 'position:fixed;inset:0;z-index:300;';
+        __tourEl.innerHTML = '<div id="tour-block" style="position:absolute;inset:0"></div>' +
+          '<div id="tour-spot" style="position:fixed;border-radius:16px;box-shadow:0 0 0 9999px rgba(8,12,24,.72);transition:all .25s;pointer-events:none"></div>' +
+          '<div id="tour-card" style="position:fixed;left:12px;right:12px;max-width:420px;margin:0 auto;background:#fff;color:#0f172a;border-radius:20px;padding:16px;box-shadow:0 12px 40px rgba(0,0,0,.35);font-family:inherit"></div>' +
+          '<div id="tour-btns" style="position:fixed;left:12px;right:12px;max-width:420px;margin:0 auto;display:flex;gap:10px"></div>';
+        document.body.appendChild(__tourEl);
+        window.addEventListener('resize', () => { if (__tourEl && __tourEl.style.display !== 'none') renderTourStep(); });
+    }
+    __tourEl.style.display = 'block';
+    renderTourStep();
+}
+function renderTourStep() {
+    const st = APP_TOUR[__tourI], n = APP_TOUR.length;
+    try { switchTab(st.tab); } catch (e) {}
+    const spot = document.getElementById('tour-spot'), card = document.getElementById('tour-card'), btns = document.getElementById('tour-btns');
+    setTimeout(() => {
+        let el = st.sel ? document.querySelector(st.sel) : null, r = null;
+        if (el) { try { el.scrollIntoView({block: 'center'}); } catch (e) {} r = el.getBoundingClientRect(); if (!r.width || !r.height) r = null; }
+        const H = innerHeight;
+        if (r) {
+            spot.style.display = 'block';
+            spot.style.left = (r.left - 6) + 'px'; spot.style.top = (r.top - 6) + 'px';
+            spot.style.width = (r.width + 12) + 'px'; spot.style.height = (r.height + 12) + 'px';
+        } else { spot.style.display = 'none'; }
+        const last = __tourI === n - 1;
+        btns.innerHTML = (__tourI > 0 ? '<button id="tour-back" style="flex:0 0 28%;padding:14px 0;border-radius:14px;background:#fff;color:#334155;font-weight:700;font-size:13px">Geri</button>' : '') +
+          '<button id="tour-next" style="flex:1;padding:14px 0;border-radius:14px;background:#0d9488;color:#fff;font-weight:700;font-size:14px;box-shadow:0 6px 18px rgba(0,0,0,.3)">' + (last ? 'Başla' : 'İleri') + '</button>';
+        card.innerHTML = '<div style="font-size:11px;font-weight:700;color:#94a3b8;margin-bottom:4px">' + (__tourI + 1) + ' / ' + n + '</div>' +
+          '<div style="font-size:16px;font-weight:800;margin-bottom:6px">' + st.t + '</div><div style="font-size:13px;line-height:1.5;color:#475569;font-weight:500">' + st.x + '</div>';
+        // yerleşim: buton altta; hedef altta ise buton hedefin üstüne çıkar
+        const low = r && r.bottom > H - 120;
+        const bBottom = low ? (H - r.top + 14) : 16;
+        btns.style.bottom = bBottom + 'px'; btns.style.top = 'auto';
+        const cardBottomLimit = H - bBottom - 56 - 10;
+        card.style.top = 'auto'; card.style.bottom = 'auto';
+        if (!r) { card.style.top = Math.max(12, (H - card.offsetHeight) / 2 - 40) + 'px'; }
+        else if (r.top + r.height / 2 > H / 2) { card.style.top = Math.max(12, r.top - 12 - card.offsetHeight - (low ? 70 : 0)) + 'px'; }
+        else { card.style.top = Math.min(r.bottom + 14, cardBottomLimit - card.offsetHeight) + 'px'; }
+        document.getElementById('tour-next').onclick = () => { if (last) endAppTour(); else { __tourI++; renderTourStep(); } };
+        const bk = document.getElementById('tour-back'); if (bk) bk.onclick = () => { __tourI--; renderTourStep(); };
+    }, 120);
+}
+function endAppTour() { if (__tourEl) __tourEl.style.display = 'none'; finishOnboarding(); }
+
 function showOnboarding() {
     window.__onbOpened = {};
     currentOnboardingStep = 1;
@@ -3140,7 +3208,7 @@ function renderOnboardingStep() {
     if (stepLabel) stepLabel.textContent = `${currentOnboardingStep} / ${totalOnboardingSteps}`;
 
 
-    if (currentOnboardingStep >= 2) { renderTourHub(); onbAnimate(); return; }
+    if (currentOnboardingStep >= 2) { startAppTour(); return; }
     if (currentOnboardingStep === 1) {
         iconEl.innerHTML = `<path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z"/>`;
         titleEl.innerText = "Hangi Alana Hazırlanıyorsun?";
