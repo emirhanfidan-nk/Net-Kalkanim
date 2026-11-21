@@ -84,15 +84,20 @@
   function loadState() {
     try {
       var s = JSON.parse(localStorage.getItem(LS_STATE) || 'null');
-      if (s && s.h && s.img) return s;
+      if (s && s.h && s.img) { if (!s.c) s.c = {}; return s; }
     } catch (e) {}
-    return { h: {}, img: {} };
+    return { h: {}, img: {}, c: {} };
   }
   function saveState(s) { try { localStorage.setItem(LS_STATE, JSON.stringify(s)); } catch (e) {} }
   function hash(str) {
     var h = 5381;
     for (var i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0;
     return (h >>> 0).toString(36) + str.length;
+  }
+  function canon(v) {
+    if (v === null || typeof v !== 'object') return JSON.stringify(v === undefined ? null : v);
+    if (Array.isArray(v)) return '[' + v.map(canon).join(',') + ']';
+    return '{' + Object.keys(v).sort().filter(function (k) { return v[k] !== undefined; }).map(function (k) { return JSON.stringify(k) + ':' + canon(v[k]); }).join(',') + '}';
   }
   function split(item) {
     var o = {}, imgs = {};
@@ -176,6 +181,7 @@
         await rpc('nk_upsert', { p_code: code, p_items: b });
         for (var i = 0; i < k.length; i++) {
           st.h[k[i]] = hh[i];
+          st.c[k[i]] = hash(canon(b[i].data));
           if (k[i].indexOf('settings:') !== 0) progress.done++;
         }
         saveState(st);
@@ -247,7 +253,7 @@
           return { kind: p[0], id: p[1], deleted: true };
         });
         await rpc('nk_upsert', { p_code: code, p_items: dels });
-        missing.forEach(function (k) { delete st.h[k]; });
+        missing.forEach(function (k) { delete st.h[k]; delete st.c[k]; });
         saveState(st);
       }
 
@@ -278,6 +284,90 @@
       updateStatus();
       if (again) { again = false; schedulePush(1500); }
     }
+  }
+
+  /* ---------- Çift yönlü eşitleme: diğer cihazdaki değişiklikleri çek ---------- */
+  var pulling = false;
+  async function buildItem(r) {
+    var item = {}, d = r.data || {};
+    await Promise.all(Object.keys(d).map(async function (k) {
+      var v = d[k];
+      if (v && typeof v === 'object' && v.__img) item[k] = await downloadImage(v.__img);
+      else item[k] = v;
+    }));
+    return item;
+  }
+  async function pullAll() {
+    if (pulling || running) return;
+    if (typeof appState === 'undefined' || !appState.field) return;
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) return;
+    var code = rawCode();
+    if (code.length < 16) return;
+    pulling = true;
+    try {
+      var since = null;
+      try { since = localStorage.getItem('nk_pull_since'); } catch (e) {}
+      var first = !since;
+      var rows = await rpc('nk_fetch', { p_code: code, p_since: since });
+      if (!rows || !rows.length) return;
+      var st = loadState(), changed = false, settingsChanged = false, failed = false, maxAt = since;
+      for (var i = 0; i < rows.length; i++) {
+        var r = rows[i];
+        if (!maxAt || r.updated_at > maxAt) maxAt = r.updated_at;
+        var key = r.kind + ':' + r.item_id;
+        try {
+          if (r.kind === 'settings') {
+            if (r.deleted || r.item_id !== 'main') continue;
+            var sh = hash(canon(r.data));
+            if (st.c[key] === sh) continue;
+            applySettings(r.data);
+            st.c[key] = sh; settingsChanged = true; changed = true;
+            continue;
+          }
+          var arr = r.kind === 'question' ? appState.questions : (r.kind === 'note' ? appState.notes : null);
+          if (!arr) continue;                                   // "ask" kayıtları sadece kodla geri yüklemede gelir
+          var local = null;
+          for (var j = 0; j < arr.length; j++) { if (String(arr[j].id) === String(r.item_id)) { local = arr[j]; break; } }
+          if (r.deleted) {
+            if (local && st.h[key] && !first) {
+              if (r.kind === 'question') { appState.questions = appState.questions.filter(function (x) { return x !== local; }); await deleteQuestion(local.id); }
+              else { appState.notes = appState.notes.filter(function (x) { return x !== local; }); await deleteNote(local.id); }
+              delete st.h[key]; delete st.c[key]; changed = true;
+            }
+            continue;
+          }
+          var ch = hash(canon(r.data));
+          if (!local) {
+            if (st.h[key]) continue;                            // burada silinmiş, silme bilgisi henüz gitmedi
+            var it = await buildItem(r);
+            if (r.kind === 'question') { await saveQuestion(it); appState.questions.push(it); }
+            else { await saveNote(it); appState.notes.push(it); }
+            var sp1 = split(it); st.h[key] = itemHash(sp1.o, sp1.imgs); st.c[key] = ch; changed = true;
+          } else if (!first) {
+            if (st.c[key] === ch) continue;                     // bu cihazın kendi gönderdiği
+            var sp0 = split(local);
+            if (st.h[key] !== itemHash(sp0.o, sp0.imgs)) continue; // burada da değişmiş: yerel olan kazanır
+            var nw = await buildItem(r);
+            var idx = arr.indexOf(local); arr[idx] = nw;
+            if (r.kind === 'question') await saveQuestion(nw); else await saveNote(nw);
+            var sp2 = split(nw); st.h[key] = itemHash(sp2.o, sp2.imgs); st.c[key] = ch; changed = true;
+          }
+        } catch (e) { failed = true; console.warn('Eşitleme kaydı alınamadı:', key, e); }
+      }
+      saveState(st);
+      if (!failed && maxAt) { try { localStorage.setItem('nk_pull_since', maxAt); } catch (e) {} }
+      if (changed) {
+        try { if (settingsChanged) await saveSettings(); } catch (e) {}
+        try {
+          if (typeof renderLibrary === 'function') renderLibrary();
+          if (typeof updateHomeStats === 'function') updateHomeStats();
+          if (typeof syncSystemUI === 'function') syncSystemUI();
+          if (typeof renderDeneme === 'function') renderDeneme();
+        } catch (e) {}
+      }
+    } catch (e) {
+      console.warn('Eşitleme hatası:', e);
+    } finally { pulling = false; }
   }
 
   /* ---------- Geri yükleme ---------- */
@@ -556,7 +646,7 @@
             '<svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/></svg>' +
           '</div>' +
           '<div class="flex-1 min-w-0">' +
-            '<p class="text-sm font-medium text-slate-800">Bulut Yedek</p>' +
+            '<p class="text-sm font-medium text-slate-800">Bulut Yedek ve Senkron</p>' +
             '<p id="nk-cloud-status" class="text-xs text-slate-500 mt-0.5"></p>' +
           '</div>' +
           '<svg id="nk-cloud-chevron" class="w-4 h-4 fill-current text-slate-400 transition-transform shrink-0" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>' +
@@ -568,9 +658,9 @@
             '<code id="nk-cloud-code" class="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-2 py-2 text-[11px] font-mono text-slate-700 text-center"></code>' +
             '<button id="nk-cloud-copy" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 text-xs font-semibold rounded-lg">Kopyala</button>' +
           '</div>' +
-          '<p class="text-[11px] text-slate-500">Bu kodu bir yere yaz. Telefon değişir ya da veriler silinirse bununla geri getirirsin. Kimseyle paylaşma.</p>' +
+          '<p class="text-[11px] text-slate-500">Bu kodu bir yere yaz. Telefon değişir ya da veriler silinirse bununla geri getirirsin. Tablet gibi ikinci bir cihazda da aynı kodla \'Kodla Geri Yükle\' dersen iki cihaz birbirini otomatik günceller. Kimseyle paylaşma.</p>' +
           '<div class="flex gap-2">' +
-            '<button id="nk-cloud-now" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 text-xs font-semibold rounded-lg">Şimdi Yedekle</button>' +
+            '<button id="nk-cloud-now" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 text-xs font-semibold rounded-lg">Şimdi Eşitle</button>' +
             '<button id="nk-cloud-restore" class="flex-1 bg-emerald-50 border border-emerald-200 text-emerald-600 hover:bg-emerald-100 px-3 py-2 text-xs font-semibold rounded-lg">Kodla Geri Yükle</button>' +
           '</div>' +
         '</div>';
@@ -584,7 +674,7 @@
       document.getElementById('nk-cloud-copy').onclick = function () {
         copyText(pretty(getCode())).then(function (ok) { showToast(ok ? 'Kod kopyalandı.' : 'Kopyalanamadı, kodu elle yaz.', !ok); });
       };
-      document.getElementById('nk-cloud-now').onclick = function () { showToast('Yedekleme başlatıldı...'); pushAll(); };
+      document.getElementById('nk-cloud-now').onclick = function () { showToast('Eşitleniyor...'); pushAll().then(function () { return pullAll(); }); };
       document.getElementById('nk-cloud-restore').onclick = function () { askCode(restoreFromCode); };
     }
     var ls = document.getElementById('login-screen');
@@ -614,18 +704,20 @@
       }
     });
     setTimeout(pushAll, 3000);
+    setTimeout(pullAll, 8000);
+    setInterval(pullAll, 30000);
     setTimeout(autoRestore, 5000);
     setTimeout(computeDiag, 2000);
     setInterval(computeDiag, 60000);
     setInterval(pushAll, 20000);
     setInterval(updateStatus, 5000);
     document.addEventListener('visibilitychange', function () {
-      if (document.visibilityState === 'hidden') pushAll();
+      if (document.visibilityState === 'hidden') pushAll(); else setTimeout(pullAll, 800);
     });
-    window.addEventListener('online', function () { setTimeout(pushAll, 1500); });
+    window.addEventListener('online', function () { setTimeout(pushAll, 1500); setTimeout(pullAll, 3000); });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
   else start();
 
-  window.__nkBackup = { pushAll: pushAll, restoreFromCode: restoreFromCode, getCode: getCode, autoRestore: autoRestore };
+  window.__nkBackup = { pushAll: pushAll, pullAll: pullAll, restoreFromCode: restoreFromCode, getCode: getCode, autoRestore: autoRestore };
 })();
