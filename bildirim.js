@@ -16,8 +16,7 @@
   var standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone;
 
   function getHour() {
-    var h = parseInt(localStorage.getItem(LS_HOUR) || '20', 10);
-    return (h >= 5 && h <= 23) ? h : 20;
+    return 19;   // saat artık sabit: sunucu akşam 19:00-22:59 arasında gönderir
   }
   function getCode() {
     try { if (window.__nkBackup) return window.__nkBackup.getCode(); } catch (e) {}
@@ -171,7 +170,7 @@
     setToggle(on);
     if (chip) chip.textContent = hourLabel(getHour());
     if (on) {
-      st.textContent = 'Açık. Her gün seçtiğin saatte tekrarlarını hatırlatırım.';
+      st.textContent = 'Açık. Akşam 19:00 sonrası tekrarların varsa, 21:00 sonrası serin tehlikedeyse haber veririm.';
       extra.classList.remove('hidden');
     } else {
       st.textContent = 'Kapalı. Açarsan her gün tekrar vakti gelince haber veririm.';
@@ -266,10 +265,6 @@
         '</button>' +
       '</div>' +
       '<div id="nk-push-extra" class="hidden flex items-center gap-3 mt-3 pl-12">' +
-        '<button id="nk-push-hour-btn" type="button" class="inline-flex items-center gap-1.5 bg-teal-50 border border-teal-200 text-teal-700 rounded-full pl-3 pr-2.5 py-1.5 text-xs font-semibold">' +
-          '<span class="text-slate-500 font-medium">Saat</span><span id="nk-push-hour-text" class="tabular-nums">20:00</span>' +
-          '<svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>' +
-        '</button>' +
         '<button id="nk-push-test" type="button" class="text-xs font-semibold text-teal-600 px-1 py-1.5">Test et</button>' +
       '</div>';
     list.insertBefore(d, list.lastElementChild);
@@ -289,7 +284,6 @@
       }
     };
     $('nk-push-test').onclick = sendTest;
-    $('nk-push-hour-btn').onclick = openHourPicker;
     refresh();
   }
 
@@ -329,7 +323,7 @@
           '<svg class="w-8 h-8 fill-current" viewBox="0 0 24 24"><path d="' + BELL + '"/></svg>' +
         '</div>' +
         '<h3 class="font-display font-bold text-lg text-slate-800 mb-2">Tekrarlarını hatırlatayım mı?</h3>' +
-        '<p class="text-xs leading-relaxed font-medium text-slate-500 mb-5">Her gün seçtiğin saatte "Bugün X soru ve Y not tekrarın var" diye haber veririm. Seriyi kaçırmazsın. Saati istediğin zaman Ayarlar\'dan değiştirebilirsin.</p>' +
+        '<p class="text-xs leading-relaxed font-medium text-slate-500 mb-5">Akşamları (19:00 sonrası) "Bugün X soru ve Y not tekrarın var" diye, serin tehlikedeyse de (21:00 sonrası) haber veririm. O sırada uygulamayı kullanıyorsan rahatsız etmem.</p>' +
         '<div class="flex gap-3">' +
           '<button id="nk-ask-no" type="button" class="flex-1 bg-slate-100 text-slate-600 py-3.5 font-semibold text-sm rounded-xl">Şimdi değil</button>' +
           '<button id="nk-ask-yes" type="button" class="flex-1 text-white py-3.5 font-semibold text-sm rounded-xl" style="background:#0d9488;box-shadow:0 3px 0 rgba(0,0,0,.16)">Aç</button>' +
