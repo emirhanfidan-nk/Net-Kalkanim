@@ -783,6 +783,18 @@
   #library-list:has(> :nth-child(2)) > *, #nk-fm-list:has(> :nth-child(2)) > * { margin: 0 !important; }
   #nk-fm-list > .nk-fm-gh { grid-column: 1 / -1; margin: 10px 2px 0 !important; }
 }
+@media (min-width: 700px) {
+  /* Tekrar ekranı: kalemle çözmek için geniş çizim alanı */
+  #review-frame-box { min-height: 62vh !important; max-height: none !important; }
+  #review-unified-board { min-height: 62vh !important; }
+  #review-img { max-width: 94% !important; max-height: 94% !important; }
+  #review-unified-text { align-items: flex-start !important; padding-top: 16px !important; font-size: 1.3rem !important; }
+  #review-draw-tools button { padding-top: 8px !important; padding-bottom: 8px !important; }
+}
+@media (min-width: 700px) and (orientation: landscape) {
+  #review-frame-box, #review-unified-board { min-height: 38vh !important; }
+  #review-unified-text { font-size: 1.1rem !important; padding-top: 10px !important; }
+}
 </style>
 </head>
 <body class="flex justify-center min-h-screen">
@@ -3603,61 +3615,94 @@ function initCanvasDrawing(canvasId, getModeFunc, getWidthFunc) {
         } catch(e){}
     }, 200);
 
-    const startPos = (e) => { 
-        const currentMode = getModeFunc();
-        if (currentMode === 'none' || currentMode === 'move' || !currentMode) return;
-        activeReviewCanvasId = canvasId;
-        isDrawing = true; 
-        draw(e); 
+    /* Pointer Events: kalem (basınç hassas), parmak ve fare. Kalem görülünce parmak avucu çizmesin diye
+       dokunmatik girişler yok sayılır. Çizgiler yumuşatılır, tuval ekran yoğunluğuna göre keskin çizilir. */
+    const P = (window.__nkPen = window.__nkPen || { color: '#e11d48', hl: false, penSeen: false });
+    canvas.style.touchAction = 'none';
+    let pid = null, lx = 0, ly = 0, snap = null, pts = null;
+    const inkColor = () => {
+        if (canvasId === 'upload-canvas') return '#e11d48';
+        if (P.color === 'ink') return document.body.classList.contains('dark-mode') ? '#f8fafc' : '#111827';
+        return P.color || '#e11d48';
     };
-    const endPos = () => { 
-    if (isDrawing) {
-        isDrawing = false; 
-        ctx.beginPath(); 
+    const pt = (e) => {
+        const r = canvas.getBoundingClientRect();
+        return { x: (e.clientX - r.left) * canvas.width / (r.width || 1), y: (e.clientY - r.top) * canvas.height / (r.height || 1), sf: canvas.width / (r.width || 1) };
+    };
+    const setup = (mode, e, sf) => {
+        const base = getWidthFunc ? getWidthFunc() : 3;
+        const useHl = P.hl && canvasId !== 'upload-canvas' && mode !== 'eraser';
+        ctx.lineCap = useHl ? 'butt' : 'round';
+        ctx.lineJoin = 'round';
+        ctx.globalCompositeOperation = mode === 'eraser' ? 'destination-out' : 'source-over';
+        ctx.strokeStyle = useHl ? 'rgba(250,204,21,0.38)' : inkColor();
+        let w;
+        if (mode === 'eraser') w = 28 * sf;
+        else if (useHl) w = Math.max(base, 4) * 3.2 * sf;
+        else {
+            const pr = (e.pointerType === 'pen' && e.pressure > 0) ? e.pressure : 0.5;
+            w = base * sf * (e.pointerType === 'pen' ? (0.55 + pr * 0.9) : 1);
+        }
+        ctx.lineWidth = w;
+        return useHl;
+    };
+    const startPos = (e) => {
+        const mode = getModeFunc();
+        if (mode === 'none' || mode === 'move' || !mode) return;
+        if (e.pointerType === 'pen') P.penSeen = true;
+        if (e.pointerType === 'touch' && P.penSeen) return;       // avuç içi reddi
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        e.preventDefault();
+        try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
+        activeReviewCanvasId = canvasId;
+        isDrawing = true; pid = e.pointerId;
+        const p = pt(e); lx = p.x; ly = p.y; pts = [p];
+        const hl = setup(mode, e, p.sf);
+        snap = hl ? ctx.getImageData(0, 0, canvas.width, canvas.height) : null;
+        if (!hl) { ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x + 0.01, p.y + 0.01); ctx.stroke(); }
+    };
+    const moveOne = (e) => {
+        const mode = getModeFunc();
+        const p = pt(e);
+        const hl = setup(mode, e, p.sf);
+        if (hl && snap) {
+            pts.push(p);
+            ctx.putImageData(snap, 0, 0);
+            ctx.beginPath(); ctx.moveTo(pts[0].x, pts[0].y);
+            for (let k = 1; k < pts.length; k++) ctx.lineTo(pts[k].x, pts[k].y);
+            ctx.stroke();
+            return;
+        }
+        const mx = (lx + p.x) / 2, my = (ly + p.y) / 2;
+        ctx.beginPath(); ctx.moveTo(lx, ly);
+        ctx.quadraticCurveTo(lx, ly, mx, my);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+        lx = p.x; ly = p.y;
+    };
+    const draw = (e) => {
+        if (!isDrawing || e.pointerId !== pid) return;
+        const mode = getModeFunc();
+        if (mode === 'none' || mode === 'move' || !mode) return;
+        e.preventDefault();
+        const list = (e.getCoalescedEvents && e.getCoalescedEvents().length) ? e.getCoalescedEvents() : [e];
+        list.forEach(moveOne);
+    };
+    const endPos = (e) => {
+        if (!isDrawing) return;
+        if (e && e.pointerId !== undefined && e.pointerId !== pid) return;
+        isDrawing = false; pid = null; snap = null; pts = null;
+        ctx.beginPath();
+        ctx.globalCompositeOperation = 'source-over';
         if (!canvas.history) canvas.history = [];
         if (canvas.history.length > 25) canvas.history.shift();
-        try {
-            canvas.history.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
-        } catch(e){}
-        // Global yığına bu canvas'ı ekle
+        try { canvas.history.push(ctx.getImageData(0, 0, canvas.width, canvas.height)); } catch (_) {}
         reviewUndoStack.push(canvasId);
-    }
-};
-    const draw = (e) => {
-        if (!isDrawing) return;
-        const currentMode = getModeFunc();
-        if (currentMode === 'none' || currentMode === 'move' || !currentMode) return;
-        e.preventDefault();
-        const rect = canvas.getBoundingClientRect();
-        
-        let clientX, clientY;
-        if (e.touches && e.touches.length > 0) {
-            clientX = e.touches[0].clientX;
-            clientY = e.touches[0].clientY;
-        } else if (e.clientX !== undefined) {
-            clientX = e.clientX;
-            clientY = e.clientY;
-        }
-        
-        if (clientX === undefined || clientY === undefined) return;
-        
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-        const x = (clientX - rect.left) * scaleX;
-        const y = (clientY - rect.top) * scaleY;
-
-        ctx.lineWidth = currentMode === 'eraser' ? 25 : (getWidthFunc ? getWidthFunc() : 3);
-        ctx.lineCap = 'round';
-        ctx.globalCompositeOperation = currentMode === 'eraser' ? 'destination-out' : 'source-over';
-        ctx.strokeStyle = '#e11d48'; 
-
-        ctx.lineTo(x, y); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(x, y);
     };
-
-    canvas.addEventListener('mousedown', startPos); canvas.addEventListener('mouseup', endPos); canvas.addEventListener('mousemove', draw);
-    canvas.addEventListener('touchstart', startPos, {passive: false}); canvas.addEventListener('touchend', endPos); canvas.addEventListener('touchmove', draw, {passive: false});
-    canvas.addEventListener('mouseout', endPos);
+    canvas.addEventListener('pointerdown', startPos);
+    canvas.addEventListener('pointermove', draw);
+    canvas.addEventListener('pointerup', endPos);
+    canvas.addEventListener('pointercancel', endPos);
 }
 
 function undoCanvas(canvasId) {
@@ -5555,8 +5600,9 @@ if (unifiedBoard && canvas) {
     // Görselsiz notlarda çizim alanı 0 genişlikte/yükseklikte olabiliyor;
     // bu durumda getImageData hata fırlatıp render'ın geri kalanını (Önceki/Sonraki,
     // Hatırladım/Kısmen Hatırladım/Unuttum butonlarını) bozuyordu. En az 1px kullanarak bunu önlüyoruz.
-    canvas.width = unifiedBoard.clientWidth || 1;
-    canvas.height = unifiedBoard.clientHeight || 1;
+    var _dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round((unifiedBoard.clientWidth || 1) * _dpr);
+    canvas.height = Math.round((unifiedBoard.clientHeight || 1) * _dpr);
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     canvas.history = [ctx.getImageData(0, 0, canvas.width, canvas.height)];
