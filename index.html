@@ -800,10 +800,12 @@
 <body class="flex justify-center min-h-screen">
 <script>
 /* Tema önbelleği: modüller yüklenmeden ilk çizimde son seçilen tema hazır olsun (renk sıçraması olmasın) */
-(function(){try{var c=JSON.parse(localStorage.getItem('nk_tema_cache')||'null');if(!c||!c.css||localStorage.getItem('nk_tema_rnd')==='1')return;
+(function(){try{var c=JSON.parse(localStorage.getItem('nk_tema_cache')||'null');if(!c||!c.css||!c.map)return;
+var rnd=localStorage.getItem('nk_tema_rnd')==='1',id=c.id;if(rnd){id=localStorage.getItem('nk_tema_nxt');}
+var m=c.map[id];if(!m)return;
 var s=document.createElement('style');s.id='nk-tema-early';s.textContent=c.css;document.head.appendChild(s);
-var b=document.body;for(var k in c.attrs){if(c.attrs[k])b.setAttribute(k,c.attrs[k]);}
-if(c.dark)b.classList.add('dark-mode');}catch(e){}})();
+var b=document.body;for(var k in m.a){if(m.a[k])b.setAttribute(k,m.a[k]);}
+if(m.d)b.classList.add('dark-mode');}catch(e){}})();
 </script>
 
     <script>
@@ -1581,7 +1583,7 @@ if(c.dark)b.classList.add('dark-mode');}catch(e){}})();
                 </div>
 
                 <div class="w-full flex gap-3">
-                    <button onclick="finishOnboarding()" id="btn-onboarding-skip" class="hidden flex-1 bg-slate-100 hover:bg-slate-200 text-slate-500 py-3.5 font-semibold text-xs rounded-xl transition-colors">Atla</button>
+                    
                     <button id="btn-onboarding-next" onclick="nextOnboardingStep()" class="flex-1 bg-teal-600 hover:bg-teal-700 text-white py-3.5 font-semibold text-xs rounded-xl shadow-md transition-all">Devam Et</button>
                 </div>
             </div>
@@ -2984,7 +2986,85 @@ async function submitCode() {
     });
 }
 
+window.__onbOpened = {};
+const ONB_SECTIONS = [
+ {id:'unut', ic:'⏳', t:'Neden Tekrar?', d:'Tekrar etmezsen bilginin ~%66\'sı ilk gün siliniyor, 1 ayda %79\'u gidiyor.', it:[
+   ['Silinme çubukları','Hiçbir şey yapmazsan bilgilerinin 1 gün, 1 hafta, 1 ay sonra ne kadar eridiğini gösterir.'],
+   ['YKS\'ye kalan gün','Tahmini sınav tarihine kaç günün kaldığını gösterir. Her gün bir tekrar şansıdır.']]},
+ {id:'ekle', ic:'➕', t:'Soru ve Not Ekle', d:'Ortadaki büyük yeşil + butonu. Tüm içeriğin buradan girer.', it:[
+   ['Soru / Not seçici','Üstteki iki sekme: Soru mu ekleyeceksin (görsel + doğru cevap), not mu (yazı). Not rengi mordur.'],
+   ['Fotoğraf çek / Galeriden seç','Çözemediğin sorunun fotoğrafını ekler; kırpıp kaydedebilirsin.'],
+   ['Ders ve Konu','Soru hangi dersin hangi konusuna ait, burada seçersin. Tekrarlar konuya göre gruplanır.'],
+   ['Çözüm Notu / Açıklama','Neden yanlış yaptığını veya püf noktasını yaz; tekrarda karşına çıkar.'],
+   ['SORUYU KAYDET','Kaydeder ve tekrar sistemine alır. Her yeni soru veya not +2 XP verir (günlük sınırlı).']]},
+ {id:'gunluk', ic:'🔁', t:'Günlük Tekrar', d:'Ana sayfa. Bugün karşına çıkması gereken her şey burada.', it:[
+   ['Kırmızı kutu','Bugün tekrar etmen gerekenler. Her gün boşaltmayı hedefle.'],
+   ['Sarı kutu','Yaklaşan tekrarlar. Zamanı gelince kırmızıya geçer.'],
+   ['Yeşil kutu','Ustalaştığın, seyrek tekrar edilen konular.'],
+   ['Soruları Başlat / Notları Başlat','Günlük tekrar oturumunu açar. Soruyu görürsün, kalemle çözersin, cevabı kontrol edip "bildim / bilemedim" dersin.'],
+   ['Kalem araçları','Tekrar ekranında renk, kalınlık, fosforlu kalem ve silgi bulunur. Tablette kalemle geniş alanda çözebilirsin.']]},
+ {id:'arsiv', ic:'📚', t:'Arşiv ve Kamp', d:'Alt menüde sağdaki sekme. Tüm soru ve notların burada.', it:[
+   ['Arama ve filtreler','Ders, konu veya yazıya göre bul.'],
+   ['Kart üzerindeki düzenle / sil','Bir kaydı açıp değiştirebilir ya da silebilirsin. Telefon ve tablet arasında senkron olur.'],
+   ['Rastgele Kamp','Seçtiğin konulardan karışık soru çekip kendini sınarsın, tekrar takvimini bozmaz.']]},
+ {id:'deneme', ic:'📈', t:'Denemeler', d:'Üstteki grafik ikonu. Deneme netlerini takip et.', it:[
+   ['Deneme Ekle','Ders bazında doğru/yanlış girersin, net otomatik hesaplanır.'],
+   ['Net grafiği','Noktalara dokununca o denemenin detayı açılır, gelişimini görürsün.'],
+   ['Denemeye soru bağla','Denemede yanlış yaptığın soruyu o denemeye bağlayıp arşive eklersin.']]},
+ {id:'formul', ic:'∑', t:'Formüller', d:'Üstteki formül ikonu. Ders ders formül ve şekil kartları.', it:[
+   ['Ders ve konu başlıkları','Dokununca o konunun formülleri ve şekilleri açılır.'],
+   ['Şekilli açıklamalar','Formülün hangi değişkenin neyi gösterdiğini şekil üzerinde görürsün.']]},
+ {id:'hoca', ic:'🙋', t:'Hocaya Sor', d:'Anlamadığın soruyu kenara at.', it:[
+   ['Hocaya sor listesi','Sorular burada bekler; cevabı gelince arşivine eklersin.']]},
+ {id:'seri', ic:'🔥', t:'Seri, XP ve Rozetler', d:'Her gün tekrar yap, zinciri uzat.', it:[
+   ['Seri (alev)','Her gün en az bir tekrar yaparsan uzar; bir gün atlarsan sıfırlanır.'],
+   ['XP ve seviye','Tekrar, soru/not ekleme ve deneme XP kazandırır; seviye atlarsın.'],
+   ['Akşam bildirimi','Bildirimleri açarsan akşam tekrarların varsa veya serin tehlikedeyse haber verilir. Saati ayarlanmaz, sabittir.']]},
+ {id:'ayar', ic:'⚙️', t:'Ayarlar, Yedek ve Temalar', d:'Sağ üstteki dişli. Kişiselleştirme ve güvenlik.', it:[
+   ['Bulut Yedek ve Senkron','Kurtarma kodunla verin buluta yedeklenir; aynı kodla tablet ve telefon eşitlenir. Güncellemeler için Wi-Fi gerekir.'],
+   ['Şimdi Eşitle','Hemen yedekle ve diğer cihazdaki değişiklikleri çek.'],
+   ['Temalar','Renk temasını seç ya da her açılışta rastgele olmasını sağla.'],
+   ['Alan / Müfredat','Alanını ve müfredatını buradan değiştirirsin.'],
+   ['Tekrar Gör','Bu tanıtımı yeniden açar.']]}
+];
+window.__onbOpened = window.__onbOpened || {};
+function renderTourHub() {
+    const iconEl = document.getElementById('onboarding-icon');
+    const titleEl = document.getElementById('onboarding-title');
+    const descEl = document.getElementById('onboarding-desc');
+    const previewEl = document.getElementById('onboarding-preview');
+    const btnNext = document.getElementById('btn-onboarding-next');
+    const op = window.__onbOpened;
+    const n = ONB_SECTIONS.filter(x => op[x.id]).length, tot = ONB_SECTIONS.length;
+    iconEl.innerHTML = '<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>';
+    titleEl.innerText = 'Uygulamayı Keşfet';
+    descEl.innerText = 'Bölümlere dokunup aç. Her birinde o ekrandaki yazıların ve butonların ne işe yaradığını anlatıyoruz. Hepsini açınca başlayabilirsin.';
+    const pf = document.getElementById('onboarding-progress-fill'), sl = document.getElementById('onboarding-step-label');
+    if (pf) pf.style.width = (n / tot * 100) + '%';
+    if (sl) sl.textContent = n + ' / ' + tot + ' bölüm';
+    previewEl.className = 'w-full text-left';
+    previewEl.innerHTML = ONB_SECTIONS.map(x => {
+        const open = op[x.id] === 2;
+        const items = open ? '<div class="mt-3 space-y-2.5">' + x.it.map(i => '<div class="flex gap-3 items-start"><span class="shrink-0 bg-teal-600 text-white text-[10px] font-bold px-2 py-1 rounded-lg leading-tight w-[40%] text-center">' + i[0] + '</span><span class="text-[11px] leading-snug font-medium text-slate-600 pt-0.5">' + i[1] + '</span></div>').join('') + '</div>' : '';
+        return '<div class="mb-2.5 bg-slate-50 border ' + (op[x.id] ? 'border-teal-300' : 'border-slate-200') + ' rounded-2xl p-3.5">' +
+          '<button type="button" onclick="onbToggleSection(\'' + x.id + '\')" class="w-full flex items-center gap-3 text-left">' +
+          '<span class="text-xl w-8 text-center">' + x.ic + '</span><span class="flex-1"><span class="block text-[13px] font-bold text-teal-950">' + x.t + '</span><span class="block text-[10.5px] text-slate-500 font-medium">' + x.d + '</span></span>' +
+          '<span class="text-[11px] font-bold ' + (op[x.id] ? 'text-teal-600' : 'text-slate-400') + '">' + (op[x.id] ? '✓' : '＋') + '</span></button>' + items + '</div>';
+    }).join('');
+    const done = n >= tot;
+    btnNext.innerText = done ? 'Başlayalım' : 'Bölümleri aç (' + n + '/' + tot + ')';
+    btnNext.disabled = !done;
+    btnNext.classList.toggle('opacity-50', !done);
+    btnNext.classList.toggle('cursor-not-allowed', !done);
+}
+function onbToggleSection(id) {
+    const op = window.__onbOpened;
+    op[id] = op[id] === 2 ? 1 : 2;   // 2 = açık, 1 = görüldü ama kapalı
+    renderTourHub();
+}
+
 function showOnboarding() {
+    window.__onbOpened = {};
     currentOnboardingStep = 1;
     fieldSelectedInOnboarding = false;
     switchTab('home');
@@ -2998,7 +3078,8 @@ function renderOnboardingStep() {
     const descEl = document.getElementById('onboarding-desc');
     const previewEl = document.getElementById('onboarding-preview');
     const btnNext = document.getElementById('btn-onboarding-next');
-    const btnSkip = document.getElementById('btn-onboarding-skip');
+    const btnSkip = {classList:{add(){},remove(){}}, set innerText(v){}};
+    previewEl.className = 'w-full bg-slate-50 border border-slate-200 p-4 rounded-2xl text-left';
     const onbBody = document.getElementById('onboarding-body');
     if (onbBody) { onbBody.classList.remove('onb-step'); void onbBody.offsetWidth; onbBody.classList.add('onb-step'); }
 
@@ -3058,6 +3139,8 @@ function renderOnboardingStep() {
     if (progressFill) progressFill.style.width = ((currentOnboardingStep / totalOnboardingSteps) * 100) + '%';
     if (stepLabel) stepLabel.textContent = `${currentOnboardingStep} / ${totalOnboardingSteps}`;
 
+
+    if (currentOnboardingStep >= 2) { renderTourHub(); onbAnimate(); return; }
     if (currentOnboardingStep === 1) {
         iconEl.innerHTML = `<path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z"/>`;
         titleEl.innerText = "Hangi Alana Hazırlanıyorsun?";
@@ -3342,8 +3425,10 @@ function nextOnboardingStep() {
         }
     }
 
+    if (currentOnboardingStep >= 2) { finishOnboarding(); return; }
     if (currentOnboardingStep < 10) {
         currentOnboardingStep++;
+        renderOnboardingStep(); return;
         const modal = document.getElementById('onboarding-modal');
         
         if (currentOnboardingStep === 4 || currentOnboardingStep === 6 || currentOnboardingStep === 7 || currentOnboardingStep === 8) {

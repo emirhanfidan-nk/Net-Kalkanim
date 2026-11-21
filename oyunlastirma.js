@@ -13,7 +13,7 @@
   var XP_N = 2;           // not tekrarı
   var XP_DENEME = 10;     // deneme analiz etme
   var XP_BONUS = 20;      // günlük hedefi bitirme
-  var XP_ADDQ = 3;        // yeni soru ekleme
+  var XP_ADDQ = 2;        // yeni soru ekleme
   var XP_ADDN = 2;        // yeni not ekleme
   var ADD_CAP = 8;        // günde en fazla bu kadar ekleme XP verir (kötüye kullanım olmasın)
 

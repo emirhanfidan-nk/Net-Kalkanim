@@ -250,13 +250,21 @@
     setMeta(t);
     try { var sn = JSON.parse(localStorage.getItem('nk_th_seen') || '[]') || []; var sid = t.id || 'klasik'; if (sn.indexOf(sid) < 0) { sn.push(sid); localStorage.setItem('nk_th_seen', JSON.stringify(sn)); } } catch (e) {}
     markSelected(t.id);
-    // Bir sonraki açılışta ilk çizimden itibaren doğru tema görünsün diye önbelleğe al
+    cacheAll(t);
+  }
+
+  function attrsOf(t) { return { 'data-nk-theme': t.id, 'data-nk-kind': t.kind, 'data-nk-lay': String(t.lay || 0), 'data-nk-mode': t.mode, 'data-nk-ink': t.ink || '' }; }
+  // Bir sonraki açılışta ilk çizimden itibaren doğru tema görünsün diye (rastgele modda da) önbelleğe al
+  function cacheAll(t) {
     try {
       var cs = document.getElementById('nk-tema-css');
-      if (t.t1 && cs && !rndOn()) {
-        localStorage.setItem('nk_tema_cache', JSON.stringify({ id: t.id, css: cs.textContent, dark: t.mode === 'dark',
-          attrs: { 'data-nk-theme': t.id, 'data-nk-kind': t.kind, 'data-nk-lay': String(t.lay || 0), 'data-nk-mode': t.mode, 'data-nk-ink': t.ink || '' } }));
-      } else { localStorage.removeItem('nk_tema_cache'); }
+      if (!cs) return;
+      var map = {};
+      THEMES.forEach(function (x) { if (x.id) map[x.id] = { a: attrsOf(x), d: x.mode === 'dark' }; });
+      var nxt = '';
+      if (rndOn()) { var p = pool(), c = p.filter(function (x) { return x.id !== t.id; }); if (!c.length) c = p; nxt = c[Math.floor(Math.random() * c.length)].id; }
+      localStorage.setItem('nk_tema_nxt', nxt);
+      localStorage.setItem('nk_tema_cache', JSON.stringify({ id: t.id, css: cs.textContent, map: map }));
     } catch (e) {}
   }
 
@@ -335,7 +343,7 @@
   }
 
   function start() {
-    if (rndOn()) { var rt = pickRandom(); try { window.__nkRndId = rt.id; } catch (e) {} }
+    if (rndOn()) { var rt = null; try { var nx = localStorage.getItem('nk_tema_nxt'); if (nx) { rt = find(nx); localStorage.setItem(LS_LAST, rt.id); localStorage.setItem(LS, rt.id); } } catch (e) {} if (!rt) rt = pickRandom(); try { window.__nkRndId = rt.id; } catch (e) {} }
     paint(current());
     // Başka bir yer karanlık modu değiştirirse temanın zeminine geri dön
     try {
