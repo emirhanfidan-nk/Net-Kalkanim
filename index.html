@@ -1231,6 +1231,8 @@ if(m.d)b.classList.add('dark-mode');}catch(e){}})();
                 <div id="formul-root"></div>
             </div>
 
+            <div id="arkadas" class="tab-content space-y-4"></div>
+
             <div id="profile" class="tab-content space-y-5">
 
                 <!-- Ayarlar başlığı (diğer sekmelerle aynı stil) -->
@@ -4645,7 +4647,7 @@ function cancelPendingDeneme() {
     if (id) { denemeOpenId = id; switchTab('deneme'); }
 }
 
-const TAB_ORDER = ['home', 'add', 'library', 'formul', 'deneme', 'profile'];
+const TAB_ORDER = ['home', 'add', 'library', 'formul', 'arkadas', 'deneme', 'profile'];
 function switchTab(tabId) {
     {
         const prev = document.querySelector('.tab-content.active');
@@ -4665,6 +4667,8 @@ function switchTab(tabId) {
     const btnProfile = document.getElementById('nav-profile');
     const btnDeneme = document.getElementById('nav-deneme');
     const btnFormul = document.getElementById('nav-formul');
+    const btnFr = document.getElementById('nkf-btn');
+    if (btnFr) { btnFr.classList.remove('text-teal-600', 'bg-teal-50'); btnFr.classList.add('text-slate-400'); if (tabId === 'arkadas') { btnFr.classList.remove('text-slate-400'); btnFr.classList.add('text-teal-600', 'bg-teal-50'); } }
 
     // Deneme ekleme modundayken başka sekmeye geçilirse bağlantı iptal olur.
     if (tabId !== 'add' && pendingDenemeId) { pendingDenemeId = null; updateAddDenemeBanner(); }
@@ -4713,6 +4717,7 @@ function switchTab(tabId) {
     if(tabId === 'home') { updateHomeStats(); }
     if(tabId === 'deneme') { renderDeneme(); }
     if(tabId === 'formul' && window.__nkFormul) { window.__nkFormul.render(); }
+    if(tabId === 'arkadas' && window.__nkFr) { window.__nkFr.onTab(); }
 }
 
 function getEstimatedTime(count) {
