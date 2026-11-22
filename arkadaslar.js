@@ -107,7 +107,7 @@
     var d = document.getElementById('nkf');
     if (!d || !d.classList.contains('on') || document.hidden) return;
     var typing = document.activeElement && document.activeElement.id === 'nkf-msg' && document.activeElement.value;
-    try { await pullInbox(); if (!typing) render(); } catch (e) {}
+    try { await pullInbox(); if (!typing && (S.view || S.tab === 'kutu')) render(); else badge(); } catch (e) {}
   }
 
   function render(loading) {
@@ -154,16 +154,20 @@
     };
   }
   function tabGrup(inn) {
-    var h = '<div class="card"><div class="sub">Yeni grup</div><input id="nkf-gn" maxlength="30" placeholder="Grup adı" style="margin:6px 0">';
-    h += S.friends.length ? S.friends.map(function (f) { return '<label style="display:flex;gap:8px;align-items:center;padding:4px 0;font-size:13px"><input type="checkbox" class="nkf-gc" value="' + esc(f.fcode) + '" style="width:auto"> ' + esc(f.name) + '</label>'; }).join('') : '<div class="sub">Önce Arkadaşlar sekmesinden arkadaş ekle.</div>';
-    h += '<button class="b" id="nkf-gmk" style="margin-top:8px">Grubu oluştur</button></div>';
+    S.sel = S.sel || []; if (S.gname == null) S.gname = '';
+    var h = '<div class="card"><div class="sub">Yeni grup</div><input id="nkf-gn" maxlength="30" placeholder="Grup adı" value="' + esc(S.gname) + '" style="margin:6px 0 10px">';
+    h += '<div class="sub" style="margin-bottom:6px">Üyeleri seç (dokun)</div>';
+    h += S.friends.length ? '<div style="display:flex;gap:8px;flex-wrap:wrap">' + S.friends.map(function (f) { var on = S.sel.indexOf(f.fcode) >= 0; return '<button class="nkf-gc" data-f="' + esc(f.fcode) + '" style="padding:8px 14px;border-radius:20px;font-weight:700;font-size:13px;border:2px solid #0d9488;' + (on ? 'background:#0d9488;color:#fff' : 'background:transparent;color:inherit') + '">' + (on ? '✓ ' : '') + esc(f.name) + '</button>'; }).join('') + '</div>' : '<div class="sub">Önce Arkadaşlar sekmesinden arkadaş ekle.</div>';
+    h += '<button class="b" id="nkf-gmk" style="margin-top:12px">Grubu oluştur' + (S.sel.length ? ' (' + (S.sel.length + 1) + ' kişi)' : '') + '</button></div>';
     h += S.groups.map(function (g) { var u = unreadGroup(g.id); return '<div class="card" data-g="' + g.id + '" style="cursor:pointer"><div style="display:flex;justify-content:space-between"><b>👥 ' + esc(g.name) + '</b>' + (u > 0 ? '<span class="dot">' + u + '</span>' : '') + '</div><div class="sub">' + (g.members || []).map(function (m) { return esc(m.name); }).join(', ') + '</div></div>'; }).join('');
     inn.innerHTML = h;
-    var mk = document.getElementById('nkf-gmk');
-    mk.onclick = async function () {
-      var n = document.getElementById('nkf-gn').value.trim(); var fc = [].map.call(inn.querySelectorAll('.nkf-gc:checked'), function (c) { return c.value; });
-      if (!n) return toast('Grup adı yaz', true);
-      try { await rpc('nk_group_create', { p_code: code(), p_name: n, p_fcodes: fc }); await refreshLists(); toast('Grup kuruldu'); render(); } catch (e) { toast('Olmadı', true); }
+    var gn = document.getElementById('nkf-gn'); gn.oninput = function () { S.gname = gn.value; };
+    inn.querySelectorAll('.nkf-gc').forEach(function (c) { c.onclick = function () { var i = S.sel.indexOf(c.dataset.f); if (i >= 0) S.sel.splice(i, 1); else S.sel.push(c.dataset.f); render(); }; });
+    document.getElementById('nkf-gmk').onclick = async function () {
+      var n = gn.value.trim();
+      if (!n) return toast('Önce grup adı yaz', true);
+      if (!S.sel.length) return toast('En az bir arkadaş seç', true);
+      try { var r = await rpc('nk_group_create', { p_code: code(), p_name: n, p_fcodes: S.sel }); if (!r.ok) return toast('Grup kurulamadı', true); S.sel = []; S.gname = ''; await refreshLists(); toast('Grup kuruldu ✓'); render(); } catch (e) { toast('Grup kurulamadı', true); }
     };
     inn.querySelectorAll('[data-g]').forEach(function (c) { c.onclick = function () { S.view = { t: 'group', id: c.dataset.g }; render(); }; });
   }
@@ -212,7 +216,11 @@
     inn.innerHTML = h;
     inn.querySelectorAll('.nkf-ga').forEach(function (b) { b.onclick = async function () { try { await rpc('nk_group_add', { p_code: code(), p_group: g.id, p_fcodes: [b.dataset.f] }); await refreshLists(); render(); } catch (e) { toast('Olmadı', true); } }; });
     inn.querySelectorAll('[data-s]').forEach(function (c) { c.onclick = function () { S.view = { t: 'share', id: c.dataset.s }; render(); }; });
-    document.getElementById('nkf-leave').onclick = async function () { if (!confirm('Gruptan ayrılmak istiyor musun?')) return; try { await rpc('nk_group_leave', { p_code: code(), p_group: g.id }); await refreshLists(); S.view = null; render(); } catch (e) { toast('Olmadı', true); } };
+    var lv = document.getElementById('nkf-leave'), armed = false;
+    lv.onclick = async function () {
+      if (!armed) { armed = true; lv.textContent = 'Emin misin? Tekrar bas'; toast('Ayrılmak için bir kez daha bas'); setTimeout(function () { armed = false; if (lv) lv.textContent = 'Gruptan ayrıl'; }, 4000); return; }
+      try { await rpc('nk_group_leave', { p_code: code(), p_group: g.id }); await refreshLists(); S.view = null; toast('Gruptan ayrıldın'); render(); } catch (e) { toast('Ayrılamadın, tekrar dene', true); }
+    };
     footInput(foot, function (v) { return rpc('nk_group_msg', { p_code: code(), p_group: g.id, p_body: v }); });
   }
 
