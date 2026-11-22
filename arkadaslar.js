@@ -18,7 +18,7 @@
     if (!r.ok) throw new Error(name + ' ' + r.status);
     return r.json();
   }
-  var S = { me: null, friends: [], groups: [], shares: {}, gmsgs: {}, since: null, tab: 'kutu', view: null, seen: {} };
+  var S = { me: null, friends: [], groups: [], shares: {}, gmsgs: {}, dms: {}, since: null, tab: 'sohbet', view: null, seen: {}, pend: null, back: null };
   try { S.seen = JSON.parse(localStorage.getItem('nk_fr_seen') || '{}') || {}; } catch (e) {}
   function saveSeen() { try { localStorage.setItem('nk_fr_seen', JSON.stringify(S.seen)); } catch (e) {} }
   function myName() { try { var p = JSON.parse(localStorage.getItem('nk_profile') || 'null'); if (p && p.name) return p.name; } catch (e) {} return 'Öğrenci'; }
@@ -37,15 +37,20 @@
     var r = await rpc('nk_inbox', { p_code: code(), p_since: S.since });
     (r.shares || []).forEach(function (s) { S.shares[s.id] = s; });
     (r.gmsgs || []).forEach(function (m) { var a = S.gmsgs[m.group_id] = S.gmsgs[m.group_id] || {}; a[m.id] = m; });
+    (r.dms || []).forEach(function (m) { var a = S.dms[m.peer_fcode] = S.dms[m.peer_fcode] || {}; a[m.id] = m; });
     S.since = r.now;
     badge();
+    return (r.shares || []).length + (r.gmsgs || []).length + (r.dms || []).length;
   }
+  function dmList(f) { return S.dms[f] ? Object.keys(S.dms[f]).map(function (k) { return S.dms[f][k]; }) : []; }
+  function unreadDm(f) { var n = dmList(f).filter(function (m) { return !m.mine; }).length; return n - (S.seen['d' + f] || 0); }
   function unreadOf(s) { var n = (s.msgs || []).length + (s.incoming ? 1 : 0); return n - (S.seen[s.id] || 0); }
-  function unreadGroup(gid) { var a = S.gmsgs[gid] ? Object.keys(S.gmsgs[gid]).length : 0; return a - (S.seen['g' + gid] || 0); }
+  function unreadGroup(gid) { var a = S.gmsgs[gid] ? Object.keys(S.gmsgs[gid]).filter(function (k) { return !S.gmsgs[gid][k].mine; }).length : 0; return a - (S.seen['g' + gid] || 0); }
   function totalUnread() {
     var n = 0;
     Object.keys(S.shares).forEach(function (id) { var s = S.shares[id]; if (s.incoming || (s.msgs || []).length) { var u = unreadOf(s); if (u > 0) n += u; } });
     Object.keys(S.gmsgs).forEach(function (g) { var u = unreadGroup(g); if (u > 0) n += u; });
+    Object.keys(S.dms).forEach(function (f) { var u = unreadDm(f); if (u > 0) n += u; });
     return n;
   }
   function badge() {
@@ -67,7 +72,7 @@
     '#nkf .bub{max-width:80%;padding:8px 11px;border-radius:14px;font-size:13px;margin:4px 0;line-height:1.35;word-break:break-word}' +
     '#nkf .me{margin-left:auto;background:#0d9488;color:#fff}#nkf .ot{background:var(--nkf-card,#e2e8f0);border:1px solid var(--nkf-line,transparent)}' +
     '#nkf img.qi{width:100%;border-radius:12px;margin-top:8px}#nkf .sub{font-size:11px;opacity:.65;font-weight:600}' +
-    '#nkf-pick{position:fixed;inset:0;z-index:160;background:rgba(0,0,0,.6);display:none;align-items:flex-end;justify-content:center}#nkf-pick.on{display:flex}' +
+    '#nkf img.chim{max-width:200px;max-height:220px;border-radius:12px;display:block;cursor:zoom-in}#nkf .emo{display:flex;gap:2px;flex-wrap:wrap;padding:6px 0;max-height:96px;overflow:auto}#nkf .emo button{font-size:22px;padding:3px 5px}#nkf-viewer{position:fixed;inset:0;z-index:170;background:rgba(0,0,0,.94);display:none;flex-direction:column;align-items:center;justify-content:center}#nkf-viewer.on{display:flex}#nkf-viewer .vb{position:absolute;left:0;right:0;bottom:max(14px,env(safe-area-inset-bottom));display:flex;gap:10px;justify-content:center}#nkf-viewer .vb button{background:#fff;color:#0f172a;font-weight:800;font-size:14px;padding:11px 16px;border-radius:14px}#nkf-pick{position:fixed;inset:0;z-index:160;background:rgba(0,0,0,.6);display:none;align-items:flex-end;justify-content:center}#nkf-pick.on{display:flex}' +
     '#nkf-pick>div{background:#fff;color:#0f172a;width:100%;max-width:560px;border-radius:22px 22px 0 0;padding:16px;max-height:75vh;overflow:auto}' +
     'body.dark-mode #nkf-pick>div{background:#14141f;color:#eef0ff}';
   function build() {
@@ -80,7 +85,8 @@
     document.body.appendChild(d);
     var p = document.createElement('div'); p.id = 'nkf-pick'; document.body.appendChild(p);
     d.querySelector('#nkf-close').onclick = close;
-    d.querySelector('#nkf-back').onclick = function () { S.view = null; render(); };
+    d.querySelector('#nkf-in').addEventListener('click', function (e) { var t = e.target; if (t && t.tagName === 'IMG' && (t.classList.contains('chim') || t.classList.contains('qi'))) { e.stopPropagation(); openViewer(t.src); } }, true);
+    d.querySelector('#nkf-back').onclick = function () { if (S.view && S.view.t === 'share' && S.back) { S.view = S.back; S.back = null; S.fresh = true; } else S.view = null; render(); };
     p.onclick = function (e) { if (e.target === p) p.classList.remove('on'); };
   }
   function addHeaderBtn() {
@@ -95,7 +101,7 @@
   async function open() {
     build();
     document.getElementById('nkf').classList.add('on');
-    S.view = null; S.tab = 'kutu';
+    S.view = null; S.tab = 'sohbet';
     render('Yükleniyor...');
     try { await ensureMe(); await refreshLists(); await pullInbox(); }
     catch (e) { document.getElementById('nkf-in').innerHTML = '<div class="card">Bağlantı kurulamadı. İnternetini kontrol et.</div>'; return; }
@@ -107,19 +113,52 @@
     var d = document.getElementById('nkf');
     if (!d || !d.classList.contains('on') || document.hidden) return;
     var typing = document.activeElement && document.activeElement.id === 'nkf-msg' && document.activeElement.value;
-    try { await pullInbox(); if (!typing && (S.view || S.tab === 'kutu')) render(); else badge(); } catch (e) {}
+    try { var n = await pullInbox(); if (n > 0 && !typing && S.tab !== 'arkadas' && !(S.tab === 'grup' && !S.view)) render(); else badge(); } catch (e) {}
   }
 
   function render(loading) {
     var tabs = document.getElementById('nkf-tabs'), inn = document.getElementById('nkf-in'), foot = document.getElementById('nkf-foot'), back = document.getElementById('nkf-back'), title = document.getElementById('nkf-title');
     foot.style.display = 'none'; back.style.display = S.view ? '' : 'none';
     if (loading) { inn.innerHTML = '<div class="card">' + loading + '</div>'; return; }
-    if (S.view) { tabs.style.display = 'none'; return S.view.t === 'share' ? viewShare(inn, foot, title) : viewGroup(inn, foot, title); }
+    if (S.view) { tabs.style.display = 'none'; var t = S.view.t; return t === 'share' ? viewShare(inn, foot, title) : t === 'group' ? viewGroup(inn, foot, title) : viewDm(inn, foot, title); }
     tabs.style.display = 'flex'; title.textContent = 'Arkadaşlar';
-    var un = totalUnread();
-    tabs.innerHTML = [['kutu', 'Kutu' + (un > 0 ? ' <span class="dot">' + (un > 9 ? '9+' : un) + '</span>' : '')], ['arkadas', 'Arkadaşlar'], ['grup', 'Gruplar']].map(function (t) { return '<button class="tab ' + (S.tab === t[0] ? 'on' : '') + '" data-t="' + t[0] + '">' + t[1] + '</button>'; }).join('');
+    var cu = 0, su = 0;
+    Object.keys(S.dms).forEach(function (f) { var u = unreadDm(f); if (u > 0) cu += u; });
+    Object.keys(S.gmsgs).forEach(function (g) { var u = unreadGroup(g); if (u > 0) cu += u; });
+    Object.keys(S.shares).forEach(function (id) { var s = S.shares[id]; var u = unreadOf(s); if (u > 0 && (s.incoming || (s.msgs || []).length)) su += u; });
+    var dot = function (n) { return n > 0 ? ' <span class="dot">' + (n > 9 ? '9+' : n) + '</span>' : ''; };
+    tabs.innerHTML = [['sohbet', 'Sohbet' + dot(cu)], ['kutu', 'Sorular' + dot(su)], ['arkadas', 'Arkadaşlar'], ['grup', 'Gruplar']].map(function (t) { return '<button class="tab ' + (S.tab === t[0] ? 'on' : '') + '" data-t="' + t[0] + '" style="font-size:12px">' + t[1] + '</button>'; }).join('');
     tabs.querySelectorAll('.tab').forEach(function (b) { b.onclick = function () { S.tab = b.dataset.t; render(); }; });
-    if (S.tab === 'kutu') tabKutu(inn); else if (S.tab === 'arkadas') tabArk(inn); else tabGrup(inn);
+    if (S.tab === 'sohbet') tabSohbet(inn); else if (S.tab === 'kutu') tabKutu(inn); else if (S.tab === 'arkadas') tabArk(inn); else tabGrup(inn);
+  }
+  function hhmm(t) { var d = new Date(t); return ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2); }
+  function msgPrev(m) { return m ? (m.img ? '📷 ' : '') + esc(String(m.body || '').slice(0, 50)) : ''; }
+  function convos() {
+    var arr = [];
+    S.friends.forEach(function (f) {
+      var l = dmList(f.fcode), ss = Object.keys(S.shares).map(function (k) { return S.shares[k]; }).filter(function (x) { return !x.group_id && x.peer_fcode === f.fcode; });
+      var last = null, lt = 0;
+      l.forEach(function (m) { var t = new Date(m.at).getTime(); if (t >= lt) { lt = t; last = '<span>' + msgPrev(m) + '</span>'; } });
+      ss.forEach(function (x) { var t = new Date(x.created_at).getTime(); if (t >= lt) { lt = t; last = '<span>' + (x.kind === 'question' ? '❓ Soru' : '📝 Not') + '</span>'; } });
+      arr.push({ v: { t: 'dm', f: f.fcode }, name: f.name, ic: '👤', last: last, at: lt, u: unreadDm(f.fcode) });
+    });
+    S.groups.forEach(function (g) {
+      var l = S.gmsgs[g.id] ? Object.keys(S.gmsgs[g.id]).map(function (k) { return S.gmsgs[g.id][k]; }) : [], ss = Object.keys(S.shares).map(function (k) { return S.shares[k]; }).filter(function (x) { return x.group_id === g.id; });
+      var last = null, lt = 0;
+      l.forEach(function (m) { var t = new Date(m.at).getTime(); if (t >= lt) { lt = t; last = '<span>' + esc(m.who) + ': ' + msgPrev(m) + '</span>'; } });
+      ss.forEach(function (x) { var t = new Date(x.created_at).getTime(); if (t >= lt) { lt = t; last = '<span>' + esc(x.sender) + ': ' + (x.kind === 'question' ? '❓ Soru' : '📝 Not') + '</span>'; } });
+      arr.push({ v: { t: 'group', id: g.id }, name: g.name, ic: '👥', last: last, at: lt, u: unreadGroup(g.id) });
+    });
+    arr.sort(function (a, b) { return b.at - a.at; });
+    return arr;
+  }
+  function tabSohbet(inn) {
+    var c = convos();
+    if (!c.length) { inn.innerHTML = '<div class="card" style="text-align:center">Sohbet etmek için önce <b>Arkadaşlar</b> sekmesinden arkadaş ekle.</div>'; return; }
+    inn.innerHTML = c.map(function (x, i) {
+      return '<div class="card" data-i="' + i + '" style="cursor:pointer;display:flex;gap:10px;align-items:center"><div style="font-size:24px">' + x.ic + '</div><div style="flex:1;min-width:0"><div style="font-weight:800;font-size:14px">' + esc(x.name) + '</div><div class="sub" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + (x.last || 'Mesaj yaz...') + '</div></div>' + (x.at ? '<div class="sub">' + hhmm(x.at) + '</div>' : '') + (x.u > 0 ? '<span class="dot">' + x.u + '</span>' : '') + '</div>';
+    }).join('');
+    inn.querySelectorAll('[data-i]').forEach(function (e) { e.onclick = function () { S.view = c[+e.dataset.i].v; S.fresh = true; render(); }; });
   }
   function sharePreview(s) {
     var d = s.data || {}; var t = d.text_question || d.note || '';
@@ -133,7 +172,7 @@
       var u = unreadOf(s), d = s.data || {};
       return '<div class="card" data-s="' + s.id + '" style="cursor:pointer"><div style="display:flex;gap:8px;align-items:center"><span>' + (s.kind === 'question' ? '❓' : '📝') + '</span><div style="flex:1;min-width:0"><div style="font-weight:800;font-size:13px">' + (s.group_id ? '👥 ' + esc(s.peer) + ' · ' : '') + (s.incoming ? esc(s.sender) + ' gönderdi' : 'Sen gönderdin' + (s.group_id ? '' : ' → ' + esc(s.peer))) + '</div><div class="sub">' + esc(d.course) + ' › ' + esc(d.topic) + '</div></div>' + (u > 0 && s.incoming || u > 0 && (s.msgs || []).length ? '<span class="dot">' + u + '</span>' : '') + '</div><div style="font-size:12px;margin-top:6px;opacity:.8">' + sharePreview(s) + '</div>' + (s.incoming && !s.added ? '<div class="sub" style="margin-top:4px;color:#0d9488">Henüz arşivine eklenmedi</div>' : '') + '</div>';
     }).join('');
-    inn.querySelectorAll('[data-s]').forEach(function (c) { c.onclick = function () { S.view = { t: 'share', id: c.dataset.s }; render(); }; });
+    inn.querySelectorAll('[data-s]').forEach(function (c) { c.onclick = function () { S.back = null; S.view = { t: 'share', id: c.dataset.s }; render(); }; });
   }
   function lastAt(s) { var m = s.msgs && s.msgs.length ? s.msgs[s.msgs.length - 1].at : s.created_at; return new Date(m).getTime(); }
 
@@ -172,15 +211,86 @@
     inn.querySelectorAll('[data-g]').forEach(function (c) { c.onclick = function () { S.view = { t: 'group', id: c.dataset.g }; render(); }; });
   }
   function chatHTML(list) {
-    return list.map(function (m) { return '<div style="display:flex;flex-direction:column;align-items:' + (m.mine ? 'flex-end' : 'flex-start') + '">' + (m.mine ? '' : '<span class="sub" style="margin-left:6px">' + esc(m.who) + '</span>') + '<div class="bub ' + (m.mine ? 'me' : 'ot') + '">' + esc(m.body) + '</div></div>'; }).join('');
+    return list.map(function (m) {
+      if (m.share) {
+        var x = m.share, d = x.data || {};
+        return '<div class="card" data-s="' + x.id + '" style="cursor:pointer;border-color:#0d9488;margin:8px 0"><div style="font-weight:800;font-size:12px">' + (x.kind === 'question' ? '❓ Soru' : '📝 Not') + ' · ' + (x.incoming ? esc(x.sender) : 'Sen') + '</div><div class="sub">' + esc(d.course) + ' › ' + esc(d.topic) + '</div>' + (d.img ? '<img class="chim" src="' + d.img + '" style="max-height:120px;margin-top:6px">' : '') + '<div style="font-size:12px;opacity:.85;margin-top:4px">' + sharePreview(x) + '</div><div class="sub" style="color:#0d9488;margin-top:4px">Aç · ' + ((x.msgs || []).length) + ' yanıt</div></div>';
+      }
+      return '<div style="display:flex;flex-direction:column;align-items:' + (m.mine ? 'flex-end' : 'flex-start') + '">' + (m.mine || !m.who ? '' : '<span class="sub" style="margin-left:6px">' + esc(m.who) + '</span>') + '<div class="bub ' + (m.mine ? 'me' : 'ot') + '">' + (m.img ? '<img class="chim" src="' + m.img + '">' : '') + (m.body ? esc(m.body) : '') + '<span style="font-size:9px;opacity:.6;margin-left:8px;float:right;margin-top:6px">' + hhmm(m.at) + '</span></div></div>';
+    }).join('');
   }
-  function footInput(foot, onSend) {
+  var EMO = '😀 😂 🤣 😊 😍 🥰 😎 🤔 😅 😭 😡 🥳 👍 👎 👏 🙏 💪 🔥 ✨ 💯 ❤️ 🎉 📚 ✏️ 🧠 😴 🤯 😤 🙌 👀 ✅ ❌ ❓ ⏰ ☕ 🍀'.split(' ');
+  function compress(file) {
+    return new Promise(function (res, rej) {
+      var fr = new FileReader();
+      fr.onerror = rej;
+      fr.onload = function () {
+        var im = new Image();
+        im.onerror = rej;
+        im.onload = function () {
+          var mx = 1280, sc = Math.min(1, mx / Math.max(im.width, im.height)), c = document.createElement('canvas');
+          c.width = Math.round(im.width * sc); c.height = Math.round(im.height * sc);
+          c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+          res(c.toDataURL('image/jpeg', 0.72));
+        };
+        im.src = fr.result;
+      };
+      fr.readAsDataURL(file);
+    });
+  }
+  // onSend(text, imgDataURL); opts.pick: soru/not seç butonu (hedef verilir)
+  function footInput(foot, onSend, opts) {
+    opts = opts || {};
     foot.style.display = 'block';
-    foot.innerHTML = '<div style="display:flex;gap:8px"><input id="nkf-msg" placeholder="Mesaj yaz..." maxlength="1000"><button class="b" id="nkf-send">Gönder</button></div>';
-    var go = async function () { var i = document.getElementById('nkf-msg'), v = i.value.trim(); if (!v) return; i.value = ''; try { await onSend(v); await pullInbox(); render(); var b = document.getElementById('nkf-body'); b.scrollTop = b.scrollHeight; } catch (e) { toast('Gönderilemedi', true); i.value = v; } };
+    foot.innerHTML = '<div id="nkf-pend" style="display:' + (S.pend ? 'flex' : 'none') + ';gap:8px;align-items:center;margin-bottom:6px">' + (S.pend ? '<img src="' + S.pend + '" style="height:56px;border-radius:10px"><button class="g" id="nkf-pendx">Kaldır</button>' : '') + '</div>' +
+      '<div id="nkf-emo" class="emo" style="display:none">' + EMO.map(function (e) { return '<button type="button" data-e="' + e + '">' + e + '</button>'; }).join('') + '</div>' +
+      '<div style="display:flex;gap:6px;align-items:center"><button class="g" id="nkf-eb" style="padding:8px 10px;font-size:16px">😊</button><button class="g" id="nkf-pb" style="padding:8px 10px;font-size:16px">📷</button>' + (opts.pick ? '<button class="g" id="nkf-qb" style="padding:8px 10px;font-size:16px">❓</button>' : '') +
+      '<input id="nkf-msg" placeholder="Mesaj yaz..." maxlength="1000" style="flex:1;min-width:0"><button class="b" id="nkf-send">Gönder</button></div><input type="file" id="nkf-file" accept="image/*" style="display:none">';
+    var inp = document.getElementById('nkf-msg');
+    document.getElementById('nkf-eb').onclick = function () { var e = document.getElementById('nkf-emo'); e.style.display = e.style.display === 'none' ? 'flex' : 'none'; };
+    document.querySelectorAll('#nkf-emo button').forEach(function (b) { b.onclick = function () { var p = inp.selectionStart == null ? inp.value.length : inp.selectionStart; inp.value = inp.value.slice(0, p) + b.dataset.e + inp.value.slice(p); inp.focus(); try { inp.setSelectionRange(p + b.dataset.e.length, p + b.dataset.e.length); } catch (x) {} }; });
+    var fi = document.getElementById('nkf-file');
+    document.getElementById('nkf-pb').onclick = function () { fi.click(); };
+    fi.onchange = async function () { var f = fi.files && fi.files[0]; if (!f) return; try { S.pend = await compress(f); footInput(foot, onSend, opts); document.getElementById('nkf-msg').value = inp.value; } catch (e) { toast('Fotoğraf okunamadı', true); } };
+    var px = document.getElementById('nkf-pendx'); if (px) px.onclick = function () { S.pend = null; var v = inp.value; footInput(foot, onSend, opts); document.getElementById('nkf-msg').value = v; };
+    var qb = document.getElementById('nkf-qb'); if (qb) qb.onclick = function () { pickItem(opts.pick); };
+    var busy = false;
+    var go = async function () {
+      var v = inp.value.trim(); if ((!v && !S.pend) || busy) return; busy = true;
+      var im = S.pend; inp.value = ''; S.pend = null;
+      try { await onSend(v, im); await pullInbox(); S.fresh = true; render(); } catch (e) { toast('Gönderilemedi', true); S.pend = im; inp.value = v; footInput(foot, onSend, opts); document.getElementById('nkf-msg').value = v; }
+      busy = false;
+    };
     document.getElementById('nkf-send').onclick = go;
-    document.getElementById('nkf-msg').onkeydown = function (e) { if (e.key === 'Enter') go(); };
+    inp.onkeydown = function (e) { if (e.key === 'Enter') go(); };
   }
+  function scrollEnd() { if (S.fresh) { S.fresh = false; var b = document.getElementById('nkf-body'); if (b) setTimeout(function () { b.scrollTop = b.scrollHeight; }, 30); } }
+  function wireInn(inn) {
+    inn.querySelectorAll('[data-s]').forEach(function (c) { c.onclick = function () { S.back = S.view; S.view = { t: 'share', id: c.dataset.s }; render(); }; });
+  }
+
+  /* ---------- Fotoğraf görüntüleyici: çevir / yakınlaştır ---------- */
+  var V = { rot: 0, z: 1 };
+  function openViewer(src) {
+    var v = document.getElementById('nkf-viewer');
+    if (!v) { v = document.createElement('div'); v.id = 'nkf-viewer'; document.body.appendChild(v); }
+    V.rot = 0; V.z = 1;
+    v.innerHTML = '<div id="nkf-vbox" style="width:100%;height:100%;overflow:auto;display:flex;align-items:center;justify-content:center"><img id="nkf-vimg" src="' + src + '" style="max-width:96vw;max-height:78vh;transition:transform .2s;transform-origin:center"></div><div class="vb"><button id="nkf-vrot">↻ Çevir</button><button id="nkf-vzm">－</button><button id="nkf-vzp">＋</button><button id="nkf-vx">Kapat</button></div>';
+    v.classList.add('on');
+    var im = document.getElementById('nkf-vimg');
+    function fit() {
+      var w = im.offsetWidth, h = im.offsetHeight, sc = 1;
+      if (V.rot % 180 !== 0 && w && h) sc = Math.min(innerWidth * 0.96 / h, innerHeight * 0.78 / w);
+      im.style.transform = 'rotate(' + V.rot + 'deg) scale(' + (sc * V.z) + ')';
+    }
+    im.onload = fit; fit();
+    document.getElementById('nkf-vrot').onclick = function () { V.rot = (V.rot + 90) % 360; fit(); };
+    document.getElementById('nkf-vzp').onclick = function () { V.z = Math.min(4, V.z + 0.5); fit(); };
+    document.getElementById('nkf-vzm').onclick = function () { V.z = Math.max(0.5, V.z - 0.5); fit(); };
+    im.onclick = function () { V.z = V.z >= 2 ? 1 : 2; fit(); };
+    document.getElementById('nkf-vx').onclick = function () { v.classList.remove('on'); v.innerHTML = ''; };
+  }
+
   function viewShare(inn, foot, title) {
     var s = S.shares[S.view.id]; if (!s) { S.view = null; return render(); }
     var d = s.data || {};
@@ -198,30 +308,47 @@
     if (s.incoming) h += '<div style="margin-top:10px">' + (s.added ? '<span class="sub" style="color:#0d9488">✓ Arşivine eklendi</span>' : '<button class="b" id="nkf-addarch">Arşivime ekle</button>') + '</div>';
     h += '</div><div>' + chatHTML(s.msgs || []) + '</div>';
     inn.innerHTML = h;
+    wireInn(inn); inn.querySelectorAll('[data-s]').forEach(function (c) { c.onclick = null; });
     var ab = document.getElementById('nkf-addarch'); if (ab) ab.onclick = function () { addToArchive(s); };
-    footInput(foot, function (v) { return rpc('nk_msg_send', { p_code: code(), p_share: s.id, p_body: v }); });
+    footInput(foot, function (v, im) { return rpc('nk_msg_send', { p_code: code(), p_share: s.id, p_body: v, p_img: im || null }); });
+  }
+  function timeline(msgs, shares) {
+    var arr = msgs.map(function (m) { return { at: new Date(m.at).getTime(), m: m }; });
+    shares.forEach(function (x) { arr.push({ at: new Date(x.created_at).getTime(), m: { share: x } }); });
+    arr.sort(function (a, b) { return a.at - b.at; });
+    return arr.map(function (x) { return x.m; });
+  }
+  function viewDm(inn, foot, title) {
+    var f = S.friends.filter(function (x) { return x.fcode === S.view.f; })[0]; if (!f) { S.view = null; return render(); }
+    title.textContent = '👤 ' + f.name;
+    var l = dmList(f.fcode); S.seen['d' + f.fcode] = l.filter(function (m) { return !m.mine; }).length; saveSeen(); badge();
+    var ss = Object.keys(S.shares).map(function (k) { return S.shares[k]; }).filter(function (x) { return !x.group_id && x.peer_fcode === f.fcode; });
+    var tl = timeline(l, ss);
+    inn.innerHTML = tl.length ? chatHTML(tl) : '<div class="sub" style="text-align:center;margin-top:30px">Henüz mesaj yok. İlk mesajı sen yaz 👋</div>';
+    wireInn(inn); scrollEnd();
+    footInput(foot, function (v, im) { return rpc('nk_dm_msg', { p_code: code(), p_fcode: f.fcode, p_body: v, p_img: im || null }); }, { pick: { f: f.fcode } });
   }
   function viewGroup(inn, foot, title) {
     var g = S.groups.filter(function (x) { return x.id === S.view.id; })[0]; if (!g) { S.view = null; return render(); }
     title.textContent = '👥 ' + g.name;
-    var msgs = S.gmsgs[g.id] ? Object.keys(S.gmsgs[g.id]).map(function (k) { return S.gmsgs[g.id][k]; }).sort(function (a, b) { return new Date(a.at) - new Date(b.at); }) : [];
-    S.seen['g' + g.id] = msgs.length; saveSeen(); badge();
+    var msgs = S.gmsgs[g.id] ? Object.keys(S.gmsgs[g.id]).map(function (k) { return S.gmsgs[g.id][k]; }) : [];
+    S.seen['g' + g.id] = msgs.filter(function (m) { return !m.mine; }).length; saveSeen(); badge();
     var addable = S.friends.filter(function (f) { return !(g.members || []).some(function (m) { return m.fcode === f.fcode; }); });
     var gs = Object.keys(S.shares).map(function (k) { return S.shares[k]; }).filter(function (s) { return s.group_id === g.id; });
-    var h = '<div class="card"><div class="sub">Üyeler: ' + (g.members || []).map(function (m) { return esc(m.name); }).join(', ') + '</div>' +
+    var tl = timeline(msgs, gs);
+    var h = '<details class="card"><summary style="font-weight:800;font-size:13px;cursor:pointer">Üyeler (' + (g.members || []).length + ') ve ayarlar</summary><div class="sub" style="margin-top:6px">' + (g.members || []).map(function (m) { return esc(m.name); }).join(', ') + '</div>' +
       (addable.length ? '<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">' + addable.map(function (f) { return '<button class="g nkf-ga" data-f="' + esc(f.fcode) + '">+ ' + esc(f.name) + '</button>'; }).join('') + '</div>' : '') +
-      '<button class="g" id="nkf-leave" style="margin-top:8px;color:#e11d48">Gruptan ayrıl</button></div>';
-    if (gs.length) h += '<div class="sub" style="margin:8px 2px">Gruba gönderilenler</div>' + gs.map(function (s) { return '<div class="card" data-s="' + s.id + '" style="cursor:pointer"><b style="font-size:13px">' + (s.kind === 'question' ? '❓' : '📝') + ' ' + esc(s.sender) + '</b> <span class="sub">' + esc((s.data || {}).course) + ' › ' + esc((s.data || {}).topic) + '</span><div style="font-size:12px;opacity:.8">' + sharePreview(s) + '</div></div>'; }).join('');
-    h += '<div class="sub" style="margin:8px 2px">Sohbet</div>' + (msgs.length ? chatHTML(msgs) : '<div class="sub">Henüz mesaj yok.</div>');
+      '<button class="g" id="nkf-leave" style="margin-top:8px;color:#e11d48">Gruptan ayrıl</button></details>';
+    h += tl.length ? chatHTML(tl) : '<div class="sub" style="text-align:center;margin-top:20px">Henüz mesaj yok.</div>';
     inn.innerHTML = h;
-    inn.querySelectorAll('.nkf-ga').forEach(function (b) { b.onclick = async function () { try { await rpc('nk_group_add', { p_code: code(), p_group: g.id, p_fcodes: [b.dataset.f] }); await refreshLists(); render(); } catch (e) { toast('Olmadı', true); } }; });
-    inn.querySelectorAll('[data-s]').forEach(function (c) { c.onclick = function () { S.view = { t: 'share', id: c.dataset.s }; render(); }; });
+    wireInn(inn); scrollEnd();
+    inn.querySelectorAll('.nkf-ga').forEach(function (b) { b.onclick = async function () { try { await rpc('nk_group_add', { p_code: code(), p_group: g.id, p_fcodes: [b.dataset.f] }); await refreshLists(); toast('Üye eklendi'); render(); } catch (e) { toast('Olmadı', true); } }; });
     var lv = document.getElementById('nkf-leave'), armed = false;
     lv.onclick = async function () {
       if (!armed) { armed = true; lv.textContent = 'Emin misin? Tekrar bas'; toast('Ayrılmak için bir kez daha bas'); setTimeout(function () { armed = false; if (lv) lv.textContent = 'Gruptan ayrıl'; }, 4000); return; }
       try { await rpc('nk_group_leave', { p_code: code(), p_group: g.id }); await refreshLists(); S.view = null; toast('Gruptan ayrıldın'); render(); } catch (e) { toast('Ayrılamadın, tekrar dene', true); }
     };
-    footInput(foot, function (v) { return rpc('nk_group_msg', { p_code: code(), p_group: g.id, p_body: v }); });
+    footInput(foot, function (v, im) { return rpc('nk_group_msg', { p_code: code(), p_group: g.id, p_body: v, p_img: im || null }); }, { pick: { g: g.id } });
   }
 
   /* ---------- Arşive ekle ---------- */
@@ -254,6 +381,14 @@
     else { p.note = it.note || ''; p.note_back = it.note_back || ''; p.img = await du(it.img); p.note_back_img = await du(it.note_back_img); }
     return p;
   }
+  async function doSend(type, id, t) {
+    toast('Gönderiliyor...');
+    try {
+      var pl = await payloadOf(type, id); if (!pl) return toast('Bulunamadı', true);
+      var r = t.g ? await rpc('nk_share_send_group', { p_code: code(), p_group: t.g, p_kind: type, p_data: pl }) : await rpc('nk_share_send', { p_code: code(), p_fcode: t.f, p_kind: type, p_data: pl });
+      if (r.ok) { toast('Gönderildi ✓'); try { await pullInbox(); S.fresh = true; var d = document.getElementById('nkf'); if (d && d.classList.contains('on')) render(); } catch (e) {} } else toast(r.err || 'Olmadı', true);
+    } catch (e) { toast('Gönderilemedi', true); }
+  }
   async function sendItem(type, id) {
     build();
     try { await ensureMe(); await refreshLists(); } catch (e) { return toast('İnternet gerekli', true); }
@@ -261,16 +396,17 @@
     if (!S.friends.length && !S.groups.length) { p.innerHTML = '<div><b>Önce arkadaş ekle</b><p class="sub" style="margin:8px 0">Arkadaşlar ekranından arkadaş kodunla birini ekle.</p><button class="b" id="nkf-go">Arkadaşlar\'ı aç</button></div>'; p.classList.add('on'); document.getElementById('nkf-go').onclick = function () { p.classList.remove('on'); open(); }; return; }
     p.innerHTML = '<div><b style="font-size:15px">Kime gönderelim?</b>' + S.groups.map(function (g) { return '<button class="card nkf-t" data-g="' + g.id + '" style="width:100%;text-align:left;margin-top:8px;font-weight:700">👥 ' + esc(g.name) + '</button>'; }).join('') + S.friends.map(function (f) { return '<button class="card nkf-t" data-f="' + esc(f.fcode) + '" style="width:100%;text-align:left;margin-top:8px;font-weight:700">👤 ' + esc(f.name) + '</button>'; }).join('') + '</div>';
     p.classList.add('on');
-    p.querySelectorAll('.nkf-t').forEach(function (b) {
-      b.onclick = async function () {
-        p.classList.remove('on'); toast('Gönderiliyor...');
-        try {
-          var pl = await payloadOf(type, id); if (!pl) return toast('Bulunamadı', true);
-          var r = b.dataset.g ? await rpc('nk_share_send_group', { p_code: code(), p_group: b.dataset.g, p_kind: type, p_data: pl }) : await rpc('nk_share_send', { p_code: code(), p_fcode: b.dataset.f, p_kind: type, p_data: pl });
-          if (r.ok) toast('Gönderildi ✓'); else toast(r.err || 'Olmadı', true);
-        } catch (e) { toast('Gönderilemedi', true); }
-      };
-    });
+    p.querySelectorAll('.nkf-t').forEach(function (b) { b.onclick = function () { p.classList.remove('on'); doSend(type, id, b.dataset.g ? { g: b.dataset.g } : { f: b.dataset.f }); }; });
+  }
+  function pickItem(target) {
+    var p = document.getElementById('nkf-pick'), rows = [];
+    (appState.questions || []).forEach(function (q) { rows.push({ t: 'question', id: q.id, c: q.course, tp: q.topic, tx: q.text_question || (q.img ? '📷 Görselli soru' : ''), o: q.sortOrder || q.id }); });
+    (appState.notes || []).forEach(function (n) { rows.push({ t: 'note', id: n.id, c: n.course, tp: n.topic, tx: n.note || (n.img ? '📷 Görselli not' : ''), o: n.sortOrder || n.id }); });
+    rows.sort(function (a, b) { return b.o - a.o; }); rows = rows.slice(0, 40);
+    if (!rows.length) { toast('Arşivinde gönderilecek soru yok', true); return; }
+    p.innerHTML = '<div><b style="font-size:15px">Hangisini gönderelim?</b>' + rows.map(function (r, i) { return '<button class="card nkf-r" data-i="' + i + '" style="width:100%;text-align:left;margin-top:8px"><div class="sub">' + (r.t === 'question' ? '❓' : '📝') + ' ' + esc(r.c) + ' › ' + esc(r.tp) + '</div><div style="font-size:13px;font-weight:600">' + esc(String(r.tx).slice(0, 70)) + '</div></button>'; }).join('') + '</div>';
+    p.classList.add('on');
+    p.querySelectorAll('.nkf-r').forEach(function (b) { b.onclick = function () { p.classList.remove('on'); var r = rows[+b.dataset.i]; doSend(r.t, r.id, target); }; });
   }
 
   /* ---------- Arşiv kartlarına gönder butonu ---------- */
