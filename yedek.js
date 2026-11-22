@@ -9,6 +9,7 @@
   var SB_URL = 'https://bswhmwgcytxitdhvvuok.supabase.co';
   var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJzd2htd2djeXR4aXRkaHZ2dW9rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA3NjgzMTksImV4cCI6MjEwNjM0NDMxOX0.RrH67fDFVHxBZZJ7PKH46JSuLHd57y0EAWXXm5_w1TQ';
 
+  window.__nkSbKey = SB_KEY;
   var LS_CODE = 'nk_code';
   var LS_STATE = 'nk_sync_v1';
   var LS_SHOWN = 'nk_code_shown';
