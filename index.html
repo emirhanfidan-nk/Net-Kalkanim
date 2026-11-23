@@ -24,9 +24,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <!-- Firebase Bağlantı Kütüphaneleri -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <style>
         body { background-color: #f8fafc; color: #1e293b; font-family: 'Plus Jakarta Sans', sans-serif; }
 
@@ -7166,32 +7163,6 @@ async function changeField(field) {
     </script>
 
     <script>
-        const firebaseConfig = {
-  apiKey: "AIzaSyDWD2RqdFiEq4cva5kEjF1FK8_Y7DLA6aQ",
-  authDomain: "hadiartik-60685.firebaseapp.com",
-  databaseURL: "https://hadiartik-60685-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "hadiartik-60685",
-  storageBucket: "hadiartik-60685.firebasestorage.app",
-  messagingSenderId: "455447491032",
-  appId: "1:455447491032:web:e954fe4282fef5257f82ad"
-};
-
-    firebase.initializeApp(firebaseConfig);
-    window.database = firebase.database();
-
-    // Anonim girişi başlat ve tamamlanınca authReady çözülsün
-    window.authReady = new Promise((resolve) => {
-        firebase.auth().signInAnonymously()
-            .then(() => {
-                console.log("Anonim giriş başarılı");
-                resolve(true);
-            })
-            .catch((error) => {
-                console.error("Anonim giriş hatası:", error);
-                resolve(false);
-            });
-    });
-
     async function checkPassword() {
         const errorDisplay = document.getElementById("error-msg");
         if (errorDisplay) {
@@ -7205,33 +7176,28 @@ async function changeField(field) {
             return;
         }
 
-        // Anonim giriş tamamlanana kadar bekle
-        await window.authReady;
-
         try {
-            const keyRef = window.database.ref("keys/" + enteredKey);
-            const snapshot = await keyRef.once("value");
-
-            if (snapshot.val() === true) {
-                try {
-                    await keyRef.remove();
-                    appState.authState = "full";
-                    await saveSettings();
-                    localStorage.setItem("authorized", "true");
-                    const curtain = document.getElementById("login-screen");
-                    if (curtain) curtain.style.display = 'none';
-                    const codeBtn = document.getElementById("btn-code-enter");
-                    if (codeBtn) codeBtn.classList.add('hidden');
-                    if (errorDisplay) errorDisplay.innerText = "Giriş başarılı!";
-                    if (window.openInstallPromptGate) window.openInstallPromptGate();
-                } catch (err) {
-                    if (errorDisplay) errorDisplay.innerText = "Şifre silinirken hata oluştu: " + err.message;
-                }
+            const r = await fetch(window.__nkSbUrl + '/rest/v1/rpc/nk_redeem_code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', apikey: window.__nkSbKey, Authorization: 'Bearer ' + window.__nkSbKey },
+                body: JSON.stringify({ p_key: enteredKey })
+            });
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            if ((await r.json()) === true) {
+                appState.authState = "full";
+                await saveSettings();
+                localStorage.setItem("authorized", "true");
+                const curtain = document.getElementById("login-screen");
+                if (curtain) curtain.style.display = 'none';
+                const codeBtn = document.getElementById("btn-code-enter");
+                if (codeBtn) codeBtn.classList.add('hidden');
+                if (errorDisplay) errorDisplay.innerText = "Giriş başarılı!";
+                if (window.openInstallPromptGate) window.openInstallPromptGate();
             } else {
                 if (errorDisplay) errorDisplay.innerText = "Geçersiz veya kullanılmış şifre!";
             }
         } catch (error) {
-            if (errorDisplay) errorDisplay.innerText = "Veritabanı Bağlantı Hatası: " + error.message;
+            if (errorDisplay) errorDisplay.innerText = "Bağlantı hatası, internetini kontrol et: " + error.message;
         }
     }
 </script>
