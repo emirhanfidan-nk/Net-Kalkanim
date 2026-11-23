@@ -225,7 +225,7 @@
   })();
 
   /* ---------- 4) DİĞER MODÜLLER (Bulut yedek + Profil) ---------- */
-  ['kirpma.js', 'yedek.js', 'profil.js', 'kamera.js', 'duzen.js', 'animasyon.js', 'hoca.js', 'analiz.js', 'bildirim.js', 'ayarlar.js', 'oyunlastirma.js', 'paylas.js', 'formuller.js', 'kalem.js', 'arkadaslar.js', 'temalar.js', 'yamalar.js', 'yenilikler.js'].forEach(function (src) {
+  ['kirpma.js', 'yedek.js', 'profil.js', 'kamera.js', 'duzen.js', 'animasyon.js', 'hoca.js', 'analiz.js', 'bildirim.js', 'ayarlar.js', 'oyunlastirma.js', 'paylas.js', 'formuller.js', 'kalem.js', 'soruduzenle.js', 'arkadaslar.js', 'temalar.js', 'yamalar.js', 'yenilikler.js'].forEach(function (src) {
     try {
       const s = document.createElement('script');
       s.src = src;
