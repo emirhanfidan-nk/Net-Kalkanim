@@ -1,10 +1,11 @@
 // Sürüm numarasını artık elle değiştirmen gerekmiyor: uygulama dosyaları her açılışta
 // internetten kontrol edilir, internet yoksa kayıtlı kopya kullanılır.
-const CACHE_NAME = 'net-kalkanim-v118';
+const CACHE_NAME = 'net-kalkanim-v119';
 
 const APP_SHELL = [
   './',
   './index.html',
+  './metin.js',
   './duzeltme.js',
   './yedek.js',
   './profil.js',

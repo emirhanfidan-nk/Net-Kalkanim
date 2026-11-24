@@ -9,6 +9,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default" id="meta-apple-status-bar">
     <meta name="format-detection" content="telephone=no">
     <title>Net Kalkanım</title>
+<script src="metin.js"></script>
 <script src="duzeltme.js" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -5521,12 +5522,12 @@ reviewUndoStack = [];
         qTextEl.innerText = '';
         qTextEl.classList.add('hidden');
         if (unifiedTextEl) {
-            unifiedTextEl.innerText = item.text_question;
+            unifiedTextEl.innerHTML = (window.__nkFmt ? window.__nkFmt(item.text_question) : item.text_question);
             unifiedTextEl.classList.remove('hidden');
         }
     } else if (item.text_question) {
         // Görselle birlikte soru metni varsa, üstteki ayrı kutuda göstermeye devam ediyoruz.
-        qTextEl.innerText = item.text_question;
+        qTextEl.innerHTML = (window.__nkFmt ? window.__nkFmt(item.text_question) : item.text_question);
         qTextEl.classList.remove('hidden');
         if (unifiedTextEl) { unifiedTextEl.innerText = ''; unifiedTextEl.classList.add('hidden'); }
     } else {
@@ -5546,7 +5547,7 @@ reviewUndoStack = [];
 
     if (item.note_text) {
         hasNote = true;
-        noteContent = item.note_text;
+        noteContent = (window.__nkFmt ? window.__nkFmt(item.note_text) : item.note_text);
     }
     if (item.note_img) {
         hasNote = true;
@@ -5559,7 +5560,7 @@ reviewUndoStack = [];
     }
     if (!hasNote && item.note) {
         hasNote = true;
-        noteContent = item.note;
+        noteContent = (window.__nkFmt ? window.__nkFmt(item.note) : item.note);
     }
 
     if (flipInner) {
@@ -5603,7 +5604,7 @@ reviewUndoStack = [];
 
         if (item.note_back) {
             hasBack = true;
-            backContent = item.note_back;
+            backContent = (window.__nkFmt ? window.__nkFmt(item.note_back) : item.note_back);
         }
         if (item.note_back_img) {
             hasBack = true;
@@ -6545,10 +6546,10 @@ if (appState.archSelectedTopics.length > 0) {
             contentHTML += `<img src="" loading="lazy" data-blob-id="${blobId}" data-original-blob-id="${blobId}" class="w-full h-36 object-contain rounded-xl bg-slate-50 cursor-zoom-in" onclick="event.stopPropagation(); openLightboxFromBlob('${blobId}')">`;
         }
         if(item.text_question) {
-            contentHTML += `<div class="text-xs font-bold text-slate-800 bg-slate-50 p-2.5 rounded-xl">${item.text_question}</div>`;
+            contentHTML += `<div class="text-xs font-bold text-slate-800 bg-slate-50 p-2.5 rounded-xl">${(window.__nkFmt ? window.__nkFmt(item.text_question) : item.text_question)}</div>`;
         }
         if(item.note_text) {
-            contentHTML += `<div class="text-[11px] font-semibold text-amber-800 bg-amber-50 p-2 rounded-xl">${item.note_text}</div>`;
+            contentHTML += `<div class="text-[11px] font-semibold text-amber-800 bg-amber-50 p-2 rounded-xl">${(window.__nkFmt ? window.__nkFmt(item.note_text) : item.note_text)}</div>`;
         }
         if(item.note_img) {
             const blobId = `blob-${Date.now()}-${Math.random()}`;
@@ -6557,7 +6558,7 @@ if (appState.archSelectedTopics.length > 0) {
             contentHTML += `<img src="" loading="lazy" data-blob-id="${blobId}" data-original-blob-id="${blobId}" class="w-full h-36 object-contain rounded-xl bg-amber-50 cursor-zoom-in mt-1" onclick="event.stopPropagation(); openLightboxFromBlob('${blobId}')">`;
         }
         if(!item.note_text && !item.note_img && item.note) {
-            contentHTML += `<div class="text-[11px] font-semibold text-amber-800 bg-amber-50 p-2 rounded-xl">${item.note}</div>`;
+            contentHTML += `<div class="text-[11px] font-semibold text-amber-800 bg-amber-50 p-2 rounded-xl">${(window.__nkFmt ? window.__nkFmt(item.note) : item.note)}</div>`;
         }
 
         // Not arka yüzü (Cevap): sadece doluysa gösterilir, otomatik açık (flip gerekmez).
@@ -6565,7 +6566,7 @@ if (appState.archSelectedTopics.length > 0) {
         if (item.note_back || item.note_back_img) {
             contentHTML += `<div class="archive-back-tag pt-1">Cevap:</div>`;
             if (item.note_back) {
-                contentHTML += `<div class="text-[11px] font-semibold text-amber-900 bg-amber-100/70 p-2 rounded-xl">${item.note_back}</div>`;
+                contentHTML += `<div class="text-[11px] font-semibold text-amber-900 bg-amber-100/70 p-2 rounded-xl">${(window.__nkFmt ? window.__nkFmt(item.note_back) : item.note_back)}</div>`;
             }
             if (item.note_back_img) {
                 const backBlobId = `blob-${Date.now()}-${Math.random()}`;
@@ -6850,7 +6851,7 @@ function renderCampItem() {
     }
 
     if (item.text_question) {
-        qTextEl.innerText = item.text_question;
+        qTextEl.innerHTML = (window.__nkFmt ? window.__nkFmt(item.text_question) : item.text_question);
         qTextEl.classList.remove('hidden');
     } else {
         qTextEl.innerText = '';
@@ -6877,16 +6878,16 @@ function revealCampAnswer() {
 
     if (campMode === 'questions') {
         let noteHtml = '';
-        if (item.note_text) noteHtml = `<br><span class="text-amber-700 mt-1 block">${item.note_text}</span>`;
+        if (item.note_text) noteHtml = `<br><span class="text-amber-700 mt-1 block">${(window.__nkFmt ? window.__nkFmt(item.note_text) : item.note_text)}</span>`;
         if (item.note_img) {
             const noteImgURL = createObjectURL(item.note_img);
             campNoteObjectURL = noteImgURL;
             noteHtml += `<br><img src="${noteImgURL}" class="max-h-32 object-contain rounded-lg mt-1 mx-auto">`;
         }
-        if (!noteHtml && item.note) noteHtml = `<br><span class="text-amber-700 mt-1 block">${item.note}</span>`;
+        if (!noteHtml && item.note) noteHtml = `<br><span class="text-amber-700 mt-1 block">${(window.__nkFmt ? window.__nkFmt(item.note) : item.note)}</span>`;
         ansBox.innerHTML = `DOĞRU CEVAP: <strong>${item.answer}</strong>${noteHtml}`;
     } else {
-        ansBox.innerHTML = `NOT: <strong>${item.note}</strong>`;
+        ansBox.innerHTML = `NOT: <strong>${(window.__nkFmt ? window.__nkFmt(item.note) : item.note)}</strong>`;
     }
 
     ansBox.classList.remove('hidden');

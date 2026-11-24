@@ -150,6 +150,7 @@
     try { var n = await pullInbox(); if (n > 0 && !typing && !focusIn && !(S.view && S.view.t === 'gset') && !(S.tab === 'arkadas' && !S.view) && !(S.tab === 'grup' && !S.view)) render(); else badge(); } catch (e) {}
   }
 
+  function fmt(x) { return window.__nkFmt ? window.__nkFmt(x) : esc(x); }
   function avColor(n) { var P = ['#0d9488', '#6366f1', '#ec4899', '#f59e0b', '#8b5cf6', '#ef4444', '#0ea5e9', '#22c55e']; var h = 0; String(n || '?').split('').forEach(function (c) { h = (h * 31 + c.charCodeAt(0)) >>> 0; }); return P[h % P.length]; }
   var ICON = {
     group: ['#0d9488', '#14b8a6', '<circle cx="9" cy="8" r="3.2"/><circle cx="17" cy="9" r="2.6"/><path d="M3 19c0-3.300 2.700-5.500 6-5.500s6 2.200 6 5.500zM15.500 14.200c2.800-.5 5.500 1.200 5.500 4.300h-4.500c0-1.700-.4-3.200-1-4.300z"/>'],
@@ -310,7 +311,7 @@
       }
       var q = m.reply_to ? findMsg(m.reply_to) : null;
       var quote = m.reply_to ? '<div style="border-left:3px solid ' + (m.mine ? '#fff' : '#0d9488') + ';background:rgba(0,0,0,.12);border-radius:8px;padding:4px 8px;margin-bottom:5px;font-size:11px;opacity:.9"><b>' + (q ? (q.mine ? 'Sen' : esc(q.who || 'Arkadaş')) : 'Mesaj') + '</b><div>' + (q ? (q.img ? '📷 ' : '') + esc(String(q.body || 'Fotoğraf').slice(0, 60)) : 'Silinmiş mesaj') + '</div></div>' : '';
-      return '<div data-mid="' + m.id + '" style="display:flex;flex-direction:column;align-items:' + (m.mine ? 'flex-end' : 'flex-start') + '">' + (m.mine || !m.who ? '' : '<span class="sub" style="margin-left:6px">' + esc(m.who) + '</span>') + '<div class="bub ' + (m.mine ? 'me' : 'ot') + '" style="cursor:pointer">' + quote + (m.img ? '<img class="chim" src="' + m.img + '">' : '') + (m.body ? esc(m.body) : '') + '<span style="font-size:9px;opacity:.6;margin-left:8px;float:right;margin-top:6px">' + hhmm(m.at) + (m.mine && m.dm ? '<span style="font-size:11px;margin-left:3px;' + (m.read ? 'color:#7dd3fc' : '') + '">' + (m.read ? '✓✓' : '✓') + '</span>' : '') + '</span></div>' + reactHTML(m.id, m.mine) + (m.seenBy ? '<div class="sub" style="font-size:10px;margin:0 4px 4px">Görenler: ' + esc(m.seenBy) + '</div>' : '') + '</div>';
+      return '<div data-mid="' + m.id + '" style="display:flex;flex-direction:column;align-items:' + (m.mine ? 'flex-end' : 'flex-start') + '">' + (m.mine || !m.who ? '' : '<span class="sub" style="margin-left:6px">' + esc(m.who) + '</span>') + '<div class="bub ' + (m.mine ? 'me' : 'ot') + '" style="cursor:pointer">' + quote + (m.img ? '<img class="chim" src="' + m.img + '">' : '') + (m.body ? fmt(m.body) : '') + '<span style="font-size:9px;opacity:.6;margin-left:8px;float:right;margin-top:6px">' + hhmm(m.at) + (m.mine && m.dm ? '<span style="font-size:11px;margin-left:3px;' + (m.read ? 'color:#7dd3fc' : '') + '">' + (m.read ? '✓✓' : '✓') + '</span>' : '') + '</span></div>' + reactHTML(m.id, m.mine) + (m.seenBy ? '<div class="sub" style="font-size:10px;margin:0 4px 4px">Görenler: ' + esc(m.seenBy) + '</div>' : '') + '</div>';
     }).join('');
   }
   async function react(mid, emoji) {
@@ -455,13 +456,13 @@
     S.seen[s.id] = (s.msgs || []).length + (s.incoming ? 1 : 0); saveSeen(); badge();
     var h = '<div class="card"><div class="sub">' + esc(d.course) + ' › ' + esc(d.topic) + (s.incoming ? ' · ' + esc(s.sender) : '') + '</div>';
     if (s.incoming) h += '<div style="margin-top:8px">' + (s.added ? '<span class="sub" style="color:#0d9488">✓ Arşivine eklendi</span>' : '<button class="b" id="nkf-addarch">✚ Arşivime ekle</button> <button class="g" id="nkf-editarch" style="margin-left:8px">✏️ Düzenleyip ekle</button>') + '</div>';
-    if (d.text_question) h += '<div style="margin-top:6px;font-size:14px">' + esc(d.text_question) + '</div>';
-    if (d.note) h += '<div style="margin-top:6px;font-size:14px">' + esc(d.note) + '</div>';
+    if (d.text_question) h += '<div style="margin-top:6px;font-size:14px">' + fmt(d.text_question) + '</div>';
+    if (d.note) h += '<div style="margin-top:6px;font-size:14px">' + fmt(d.note) + '</div>';
     if (d.img) h += '<img class="qi" src="' + d.img + '">';
     if (s.kind === 'question' && d.answer) h += '<details style="margin-top:8px"><summary style="font-weight:700;font-size:13px;cursor:pointer">Doğru cevap</summary><div style="margin-top:4px">' + esc(d.answer) + '</div></details>';
-    if (d.note_text) h += '<details style="margin-top:6px"><summary style="font-weight:700;font-size:13px;cursor:pointer">Çözüm notu</summary><div style="margin-top:4px">' + esc(d.note_text) + '</div></details>';
+    if (d.note_text) h += '<details style="margin-top:6px"><summary style="font-weight:700;font-size:13px;cursor:pointer">Çözüm notu</summary><div style="margin-top:4px">' + fmt(d.note_text) + '</div></details>';
     if (d.note_img) h += '<img class="qi" src="' + d.note_img + '">';
-    if (d.note_back) h += '<details style="margin-top:6px"><summary style="font-weight:700;font-size:13px;cursor:pointer">Arka yüz</summary><div style="margin-top:4px">' + esc(d.note_back) + '</div></details>';
+    if (d.note_back) h += '<details style="margin-top:6px"><summary style="font-weight:700;font-size:13px;cursor:pointer">Arka yüz</summary><div style="margin-top:4px">' + fmt(d.note_back) + '</div></details>';
     if (d.note_back_img) h += '<img class="qi" src="' + d.note_back_img + '">';
     h += '</div><div>' + chatHTML(s.msgs || []) + '</div>';
     inn.innerHTML = h;
