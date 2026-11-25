@@ -2,6 +2,7 @@
 (function () {
   'use strict';
   function toast(m, e) { try { showToast(m, !!e); } catch (x) {} }
+  function I(n) { return window.__nkIco ? window.__nkIco(n) : ''; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
 
   /* ---------- Fotoğraf: kamera/galeri -> kırpma -> küçük JPEG ---------- */
@@ -77,7 +78,7 @@
     var ov = document.createElement('div'); ov.id = 'nke';
     function imgBox(key, label) {
       return '<label class="l">' + label + '</label><div class="im" data-k="' + key + '">' + (d[key] ? '<img src="' + d[key] + '">' : '<div style="opacity:.55;font-size:13px;margin-bottom:10px">Görsel yok</div>') +
-        '<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="g" data-a="cam">📷 Kamera</button><button class="g" data-a="gal">🖼️ Galeri</button>' + (d[key] ? '<button class="g" data-a="del" style="color:#e11d48">Kaldır</button>' : '') + '</div></div>';
+        '<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="g" data-a="cam">' + I('camera') + ' Kamera</button><button class="g" data-a="gal">' + I('image') + ' Galeri</button>' + (d[key] ? '<button class="g" data-a="del" style="color:#e11d48">Kaldır</button>' : '') + '</div></div>';
     }
     function draw() {
       var courses = Object.keys(cats); if (d.course && courses.indexOf(d.course) < 0) courses.unshift(d.course);

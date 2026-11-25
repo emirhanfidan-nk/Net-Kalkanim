@@ -133,14 +133,14 @@
     b.onclick = function () { switchTab('arkadas'); };
     ref.parentNode.insertBefore(b, ref);
   }
-  function skeleton() { return '<div style="text-align:center;margin:26px 0 18px"><div class="bob" style="font-size:44px">💬</div><div style="font-weight:800;margin-top:6px">Sohbetlerin getiriliyor</div><div class="sub">Birkaç saniye sürebilir</div></div><div class="sk"></div><div class="sk" style="opacity:.8"></div><div class="sk" style="opacity:.6"></div>'; }
+  function skeleton() { return '<div style="text-align:center;margin:26px 0 18px"><div class="bob" style="font-size:44px">' + I('chat') + '</div><div style="font-weight:800;margin-top:6px">Sohbetlerin getiriliyor</div><div class="sub">Birkaç saniye sürebilir</div></div><div class="sk"></div><div class="sk" style="opacity:.8"></div><div class="sk" style="opacity:.6"></div>'; }
   async function onTab() {
     build();
     S.view = null; if (!S.tab) S.tab = 'sohbet';
     document.getElementById('nkf').classList.remove('on');
     if (S.me) { render(); } else { render('load'); }
     try { await ensureMe(); S.needName = !S.me.name || S.me.name === 'Öğrenci'; await refreshLists(); await pullInbox(); if (S.admin === undefined || S.admin === null) { rpc('nk_admin_stats', { p_code: code() }).then(function (r) { S.admin = r && r.ok ? r : false; if (S.admin && S.tab === 'arkadas' && !S.view) render(); }).catch(function () {}); } }
-    catch (e) { var i = document.getElementById('nkfi'); if (i) i.innerHTML = '<div class="card" style="text-align:center"><div style="font-size:34px">📡</div><b>Bağlantı kurulamadı</b><div class="sub" style="margin:4px 0 10px">İnternetini kontrol edip tekrar dene.</div><button class="b" id="nkf-retry">Tekrar dene</button></div>'; var rb = document.getElementById('nkf-retry'); if (rb) rb.onclick = function () { S.me = null; onTab(); }; return; }
+    catch (e) { var i = document.getElementById('nkfi'); if (i) i.innerHTML = '<div class="card" style="text-align:center"><div style="font-size:34px">' + I('wifioff') + '</div><b>Bağlantı kurulamadı</b><div class="sub" style="margin:4px 0 10px">İnternetini kontrol edip tekrar dene.</div><button class="b" id="nkf-retry">Tekrar dene</button></div>'; var rb = document.getElementById('nkf-retry'); if (rb) rb.onclick = function () { S.me = null; onTab(); }; return; }
     render();
   }
   function isActive() { var t = document.getElementById('arkadas'), o = document.getElementById('nkf'); return !!((t && t.classList.contains('active')) || (o && o.classList.contains('on'))); }
@@ -151,6 +151,7 @@
     try { var n = await pullInbox(); if (n > 0 && !typing && !focusIn && !(S.view && S.view.t === 'gset') && !(S.tab === 'arkadas' && !S.view) && !(S.tab === 'grup' && !S.view)) render(); else badge(); } catch (e) {}
   }
 
+  function I(n) { return window.__nkIco ? window.__nkIco(n) : ''; }
   function fmt(x) { return window.__nkFmt ? window.__nkFmt(x) : esc(x); }
   function avColor(n) { var P = ['#0d9488', '#6366f1', '#ec4899', '#f59e0b', '#8b5cf6', '#ef4444', '#0ea5e9', '#22c55e']; var h = 0; String(n || '?').split('').forEach(function (c) { h = (h * 31 + c.charCodeAt(0)) >>> 0; }); return P[h % P.length]; }
   var ICON = {
@@ -195,7 +196,7 @@
     Object.keys(S.gmsgs).forEach(function (g) { var u = unreadGroup(g); if (u > 0) cu += u; });
     Object.keys(S.shares).forEach(function (id) { var s = S.shares[id]; var u = unreadOf(s); if (u > 0 && (s.incoming || (s.msgs || []).length)) su += u; });
     var dot = function (n) { return n > 0 ? '<span class="dot" style="position:absolute;top:3px;right:10px">' + (n > 9 ? '9+' : n) + '</span>' : ''; };
-    var TABS = [['sohbet', '💬', 'Sohbet', cu, 'Arkadaşların ve gruplarınla yazış'], ['kutu', '❓', 'Sorular', su, 'Gönderilen ve gelen sorular, notlar'], ['arkadas', '🤝', 'Kişiler', 0, 'Arkadaş ekle, kodunu paylaş'], ['grup', '👥', 'Gruplar', 0, 'Grup kur, üye ekle']];
+    var TABS = [['sohbet', '' + I('chat') + '', 'Sohbet', cu, 'Arkadaşların ve gruplarınla yazış'], ['kutu', '' + I('question') + '', 'Sorular', su, 'Gönderilen ve gelen sorular, notlar'], ['arkadas', '' + I('user') + '', 'Kişiler', 0, 'Arkadaş ekle, kodunu paylaş'], ['grup', '' + I('users') + '', 'Gruplar', 0, 'Grup kur, üye ekle']];
     tabs.innerHTML = TABS.map(function (t) { return '<button class="tab ' + (S.tab === t[0] ? 'on' : '') + '" data-t="' + t[0] + '" style="position:relative"><span style="display:block;font-size:22px;line-height:1.1">' + t[1] + '</span><span style="display:block;font-size:12px;margin-top:2px">' + t[2] + '</span>' + dot(t[3]) + '</button>'; }).join('');
     tabs.querySelectorAll('.tab').forEach(function (b) { b.onclick = function () { S.tab = b.dataset.t; render(); }; });
     var sb = document.getElementById('nkft-sub'); if (sb) sb.textContent = TABS.filter(function (t) { return t[0] === S.tab; })[0][4];
@@ -211,21 +212,21 @@
     document.getElementById('nkf-gnb').onclick = go; document.getElementById('nkf-gname').onkeydown = function (e) { if (e.key === 'Enter') go(); };
   }
   function hhmm(t) { var d = new Date(t); return ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2); }
-  function msgPrev(m) { return m ? (m.img ? '📷 ' : '') + esc(String(m.body || '').slice(0, 50)) : ''; }
+  function msgPrev(m) { return m ? (m.img ? '' + I('camera') + ' ' : '') + esc(String(m.body || '').slice(0, 50)) : ''; }
   function convos() {
     var arr = [];
     S.friends.forEach(function (f) {
       var l = dmList(f.fcode), ss = Object.keys(S.shares).map(function (k) { return S.shares[k]; }).filter(function (x) { return !x.group_id && x.peer_fcode === f.fcode; });
       var last = null, lt = 0;
       l.forEach(function (m) { var t = new Date(m.at).getTime(); if (t >= lt) { lt = t; last = '<span>' + msgPrev(m) + '</span>'; } });
-      ss.forEach(function (x) { var t = new Date(x.created_at).getTime(); if (t >= lt) { lt = t; last = '<span>' + (x.kind === 'question' ? '❓ Soru' : '📝 Not') + '</span>'; } });
-      arr.push({ v: { t: 'dm', f: f.fcode }, name: f.name, ic: '👤', last: last, at: lt, u: unreadDm(f.fcode) });
+      ss.forEach(function (x) { var t = new Date(x.created_at).getTime(); if (t >= lt) { lt = t; last = '<span>' + (x.kind === 'question' ? '' + I('question') + ' Soru' : '' + I('note') + ' Not') + '</span>'; } });
+      arr.push({ v: { t: 'dm', f: f.fcode }, name: f.name, ic: '' + I('user') + '', last: last, at: lt, u: unreadDm(f.fcode) });
     });
     S.groups.forEach(function (g) {
       var l = S.gmsgs[g.id] ? Object.keys(S.gmsgs[g.id]).map(function (k) { return S.gmsgs[g.id][k]; }) : [], ss = Object.keys(S.shares).map(function (k) { return S.shares[k]; }).filter(function (x) { return x.group_id === g.id; });
       var last = null, lt = 0;
       l.forEach(function (m) { var t = new Date(m.at).getTime(); if (t >= lt) { lt = t; last = '<span>' + esc(m.who) + ': ' + msgPrev(m) + '</span>'; } });
-      ss.forEach(function (x) { var t = new Date(x.created_at).getTime(); if (t >= lt) { lt = t; last = '<span>' + esc(x.sender) + ': ' + (x.kind === 'question' ? '❓ Soru' : '📝 Not') + '</span>'; } });
+      ss.forEach(function (x) { var t = new Date(x.created_at).getTime(); if (t >= lt) { lt = t; last = '<span>' + esc(x.sender) + ': ' + (x.kind === 'question' ? '' + I('question') + ' Soru' : '' + I('note') + ' Not') + '</span>'; } });
       arr.push({ v: { t: 'group', id: g.id }, name: g.name, ic: g.icon || 'i:group', last: last, at: lt, u: unreadGroup(g.id) });
     });
     arr.sort(function (a, b) { return b.at - a.at; });
@@ -234,8 +235,8 @@
   function empty(ic, t, d, btn, id) { return '<div class="card" style="text-align:center;padding:26px 16px"><div style="font-size:46px">' + ic + '</div><div style="font-weight:800;font-size:16px;margin-top:6px">' + t + '</div><div class="sub" style="margin:6px 0 14px">' + d + '</div>' + (btn ? '<button class="b" id="' + id + '">' + btn + '</button>' : '') + '</div>'; }
   function tabSohbet(inn) {
     var c = convos();
-    if (!c.length) { inn.innerHTML = empty('🫂', 'Henüz kimse yok', 'Önce Kişiler sekmesinden arkadaş kodunla birini ekle.', '🤝 Arkadaş ekle', 'nkf-e1'); document.getElementById('nkf-e1').onclick = function () { S.tab = 'arkadas'; render(); }; return; }
-    inn.innerHTML = '<div class="sec"><span class="i">💬</span>Sohbetler</div>' + c.map(function (x, i) {
+    if (!c.length) { inn.innerHTML = empty('' + I('users') + '', 'Henüz kimse yok', 'Önce Kişiler sekmesinden arkadaş kodunla birini ekle.', '' + I('user') + ' Arkadaş ekle', 'nkf-e1'); document.getElementById('nkf-e1').onclick = function () { S.tab = 'arkadas'; render(); }; return; }
+    inn.innerHTML = '<div class="sec"><span class="i">' + I('chat') + '</span>Sohbetler</div>' + c.map(function (x, i) {
       var isG = x.v.t === 'group';
       return '<div class="card" data-i="' + i + '" style="cursor:pointer;padding:12px"><div class="row">' + av(x.name, 52, isG ? x.ic : null) + '<div style="flex:1;min-width:0"><div style="font-weight:800;font-size:16px;display:flex;gap:6px;align-items:center">' + esc(x.name) + (isG ? '<span class="pill">Grup</span>' : '') + '</div><div class="sub" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px">' + (x.last || 'Mesaj yaz...') + '</div></div><div style="text-align:right;display:flex;flex-direction:column;gap:6px;align-items:flex-end">' + (x.at ? '<div class="sub">' + hhmm(x.at) + '</div>' : '') + (x.u > 0 ? '<span class="dot">' + x.u + '</span>' : '<span></span>') + '</div></div></div>';
     }).join('');
@@ -243,15 +244,15 @@
   }
   function sharePreview(s) {
     var d = s.data || {}; var t = d.text_question || d.note || '';
-    return t ? esc(String(t).slice(0, 90)) : (d.img ? '📷 Görselli' : '');
+    return t ? esc(String(t).slice(0, 90)) : (d.img ? '' + I('camera') + ' Görselli' : '');
   }
   function tabKutu(inn) {
     var arr = Object.keys(S.shares).map(function (k) { return S.shares[k]; });
     arr.sort(function (a, b) { return lastAt(b) - lastAt(a); });
-    if (!arr.length) { inn.innerHTML = empty('📭', 'Henüz soru yok', 'Arşivde bir sorunun yanındaki gönder butonuna bas, arkadaşına veya grubuna yolla.', null); return; }
+    if (!arr.length) { inn.innerHTML = empty('' + I('inbox') + '', 'Henüz soru yok', 'Arşivde bir sorunun yanındaki gönder butonuna bas, arkadaşına veya grubuna yolla.', null); return; }
     inn.innerHTML = arr.map(function (s) {
       var u = unreadOf(s), d = s.data || {}, q = s.kind === 'question', col = q ? '#f59e0b' : '#8b5cf6';
-      return '<div class="card" data-s="' + s.id + '" style="cursor:pointer;border-left:5px solid ' + col + '"><div class="row"><div class="av" style="width:44px;height:44px;border-radius:14px;background:' + col + '22;font-size:22px">' + (q ? '❓' : '📝') + '</div><div style="flex:1;min-width:0"><div style="font-weight:800;font-size:15px">' + (s.group_id ? '👥 ' + esc(s.peer) + ' · ' : '') + (s.incoming ? esc(s.sender) : 'Sen → ' + (s.group_id ? 'gruba' : esc(s.peer))) + '</div><div class="sub">' + esc(d.course) + ' › ' + esc(d.topic) + '</div></div>' + (u > 0 && (s.incoming || (s.msgs || []).length) ? '<span class="dot">' + u + '</span>' : '') + '</div><div style="font-size:13px;margin-top:8px;opacity:.85">' + sharePreview(s) + '</div><div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap"><span class="pill" style="background:' + (s.incoming ? 'rgba(99,102,241,.15);color:#6366f1' : 'rgba(13,148,136,.15)') + '">' + (s.incoming ? '📥 Gelen' : '📤 Giden') + '</span>' + (s.incoming ? (s.added ? '<span class="pill">✓ Arşivinde</span>' : '<span class="pill" style="background:rgba(245,158,11,.18);color:#d97706">Henüz eklenmedi</span>') : '') + ((s.msgs || []).length ? '<span class="pill" style="background:rgba(128,128,128,.15);color:inherit">💬 ' + s.msgs.length + '</span>' : '') + '</div></div>';
+      return '<div class="card" data-s="' + s.id + '" style="cursor:pointer;border-left:5px solid ' + col + '"><div class="row"><div class="av" style="width:44px;height:44px;border-radius:14px;background:' + col + '22;font-size:22px">' + (q ? '' + I('question') + '' : '' + I('note') + '') + '</div><div style="flex:1;min-width:0"><div style="font-weight:800;font-size:15px">' + (s.group_id ? '' + I('users') + ' ' + esc(s.peer) + ' · ' : '') + (s.incoming ? esc(s.sender) : 'Sen → ' + (s.group_id ? 'gruba' : esc(s.peer))) + '</div><div class="sub">' + esc(d.course) + ' › ' + esc(d.topic) + '</div></div>' + (u > 0 && (s.incoming || (s.msgs || []).length) ? '<span class="dot">' + u + '</span>' : '') + '</div><div style="font-size:13px;margin-top:8px;opacity:.85">' + sharePreview(s) + '</div><div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap"><span class="pill" style="background:' + (s.incoming ? 'rgba(99,102,241,.15);color:#6366f1' : 'rgba(13,148,136,.15)') + '">' + (s.incoming ? '' + I('inboxin') + ' Gelen' : '' + I('send') + ' Giden') + '</span>' + (s.incoming ? (s.added ? '<span class="pill">✓ Arşivinde</span>' : '<span class="pill" style="background:rgba(245,158,11,.18);color:#d97706">Henüz eklenmedi</span>') : '') + ((s.msgs || []).length ? '<span class="pill" style="background:rgba(128,128,128,.15);color:inherit">' + I('chat') + ' ' + s.msgs.length + '</span>' : '') + '</div></div>';
     }).join('');
     inn.querySelectorAll('[data-s]').forEach(function (c) { c.onclick = function () { S.back = null; S.view = { t: 'share', id: c.dataset.s }; render(); }; });
   }
@@ -261,12 +262,12 @@
     var on = S.me.notify !== false;
     inn.innerHTML = '<div class="card" style="text-align:center;padding:20px 14px"><div style="display:flex;justify-content:center">' + av(S.me.name, 76) + '</div><div style="font-weight:900;font-size:20px;margin-top:8px">' + esc(S.me.name) + '</div>' +
       '<div class="sub" style="margin-top:10px">Arkadaş kodun</div><div style="font-size:30px;font-weight:900;letter-spacing:6px;margin:2px 0 10px">' + esc(S.me.fcode) + '</div>' +
-      '<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="b" id="nkf-copy">📋 Kodu kopyala</button><button class="g" id="nkf-share">📤 Paylaş</button></div><div class="sub" style="margin-top:8px">Bu kodu arkadaşına ver. Kurtarma kodunu kimseye verme.</div></div>' +
-      '<div class="sec"><span class="i">➕</span>Arkadaş ekle</div><div class="card"><div style="display:flex;gap:8px"><input id="nkf-add" placeholder="Arkadaşının kodu" maxlength="8" style="text-transform:uppercase;letter-spacing:3px;font-weight:800"><button class="b" id="nkf-addbtn" style="flex:none">Ekle</button></div></div>' +
-      '<div class="sec"><span class="i">🤝</span>Arkadaşların <span class="pill">' + S.friends.length + '</span></div>' +
-      (S.friends.length ? S.friends.map(function (f) { return '<div class="card"><div class="row">' + av(f.name, 48) + '<div style="flex:1;min-width:0"><div style="font-weight:800;font-size:16px">' + esc(f.name) + '</div><div class="sub"><span class="pill">✓ Arkadaşsınız</span> <span style="letter-spacing:2px">' + esc(f.fcode) + '</span></div></div><button class="b nkf-fm" data-f="' + esc(f.fcode) + '" style="flex:none">💬 Mesaj</button></div></div>'; }).join('') : empty('🙋', 'Henüz arkadaş yok', 'Yukarıdaki kutuya arkadaşının kodunu yaz.', null)) +
-      '<div class="sec"><span class="i">⚙️</span>Ayarlar</div><div class="card"><div class="row"><span style="font-size:24px">🔔</span><div style="flex:1"><div style="font-weight:800">Mesaj bildirimi</div><div class="sub">Ayarlar\'dan bildirim de açık olmalı</div></div><button id="nkf-nt" class="sw ' + (on ? 'on' : '') + '"></button></div></div>' +
-      '<div class="card"><div style="font-weight:800;margin-bottom:8px">✏️ Görünen adın</div><div style="display:flex;gap:8px"><input id="nkf-name" maxlength="20" value="' + esc(S.me.name) + '"><button class="b" id="nkf-namebtn" style="flex:none">Kaydet</button></div></div>';
+      '<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="b" id="nkf-copy">' + I('copy') + ' Kodu kopyala</button><button class="g" id="nkf-share">' + I('send') + ' Paylaş</button></div><div class="sub" style="margin-top:8px">Bu kodu arkadaşına ver. Kurtarma kodunu kimseye verme.</div></div>' +
+      '<div class="sec"><span class="i">' + I('plus') + '</span>Arkadaş ekle</div><div class="card"><div style="display:flex;gap:8px"><input id="nkf-add" placeholder="Arkadaşının kodu" maxlength="8" style="text-transform:uppercase;letter-spacing:3px;font-weight:800"><button class="b" id="nkf-addbtn" style="flex:none">Ekle</button></div></div>' +
+      '<div class="sec"><span class="i">' + I('user') + '</span>Arkadaşların <span class="pill">' + S.friends.length + '</span></div>' +
+      (S.friends.length ? S.friends.map(function (f) { return '<div class="card"><div class="row">' + av(f.name, 48) + '<div style="flex:1;min-width:0"><div style="font-weight:800;font-size:16px">' + esc(f.name) + '</div><div class="sub"><span class="pill">✓ Arkadaşsınız</span> <span style="letter-spacing:2px">' + esc(f.fcode) + '</span></div></div><button class="b nkf-fm" data-f="' + esc(f.fcode) + '" style="flex:none">' + I('chat') + ' Mesaj</button></div></div>'; }).join('') : empty('' + I('user') + '', 'Henüz arkadaş yok', 'Yukarıdaki kutuya arkadaşının kodunu yaz.', null)) +
+      '<div class="sec"><span class="i">' + I('gear') + '</span>Ayarlar</div><div class="card"><div class="row"><span style="font-size:24px">' + I('bell') + '</span><div style="flex:1"><div style="font-weight:800">Mesaj bildirimi</div><div class="sub">Ayarlar\'dan bildirim de açık olmalı</div></div><button id="nkf-nt" class="sw ' + (on ? 'on' : '') + '"></button></div></div>' +
+      '<div class="card"><div style="font-weight:800;margin-bottom:8px">' + I('pen') + ' Görünen adın</div><div style="display:flex;gap:8px"><input id="nkf-name" maxlength="20" value="' + esc(S.me.name) + '"><button class="b" id="nkf-namebtn" style="flex:none">Kaydet</button></div></div>';
     document.getElementById('nkf-nt').onclick = async function (e) { var b = e.currentTarget, nv = !b.classList.contains('on'); try { await rpc('nk_notify_set', { p_code: code(), p_on: nv }); S.me.notify = nv; b.classList.toggle('on', nv); toast(nv ? 'Mesaj bildirimi açık' : 'Mesaj bildirimi kapalı'); } catch (x) { toast('Olmadı', true); } };
     document.getElementById('nkf-copy').onclick = function () { try { navigator.clipboard.writeText(S.me.fcode); toast('Kod kopyalandı'); } catch (e) { toast('Kopyalanamadı', true); } };
     document.getElementById('nkf-share').onclick = function () { var t = 'Net Kalkanım\'da beni ekle! Arkadaş kodum: ' + S.me.fcode + ' https://net-kalkanim.vercel.app'; if (navigator.share) navigator.share({ text: t }).catch(function () {}); else { try { navigator.clipboard.writeText(t); toast('Davet metni kopyalandı'); } catch (e) {} } };
@@ -282,12 +283,12 @@
   }
   function tabGrup(inn) {
     S.sel = S.sel || []; if (S.gname == null) S.gname = '';
-    var h = '<div class="card"><div class="row" style="margin-bottom:10px"><span style="font-size:24px">➕</span><div style="font-weight:800;font-size:16px">Yeni grup kur</div></div><input id="nkf-gn" maxlength="30" placeholder="Grup adı" value="' + esc(S.gname) + '" style="margin-bottom:12px">';
+    var h = '<div class="card"><div class="row" style="margin-bottom:10px"><span style="font-size:24px">' + I('plus') + '</span><div style="font-weight:800;font-size:16px">Yeni grup kur</div></div><input id="nkf-gn" maxlength="30" placeholder="Grup adı" value="' + esc(S.gname) + '" style="margin-bottom:12px">';
     h += '<div class="sub" style="margin-bottom:8px">Üyeleri seç</div>';
     h += S.friends.length ? '<div style="display:flex;gap:8px;flex-wrap:wrap">' + S.friends.map(function (f) { var on = S.sel.indexOf(f.fcode) >= 0; return '<button class="nkf-gc" data-f="' + esc(f.fcode) + '" style="padding:8px 14px 8px 8px;border-radius:26px;font-weight:700;font-size:14px;border:2px solid #0d9488;display:flex;align-items:center;gap:8px;min-height:46px;' + (on ? 'background:#0d9488;color:#fff' : 'background:transparent;color:inherit') + '">' + av(f.name, 30) + (on ? '✓ ' : '') + esc(f.name) + '</button>'; }).join('') + '</div>' : '<div class="sub">Önce Kişiler sekmesinden arkadaş ekle.</div>';
     h += '<button class="b" id="nkf-gmk" style="margin-top:14px;width:100%">Grubu oluştur' + (S.sel.length ? ' (' + (S.sel.length + 1) + ' kişi)' : '') + '</button></div>';
-    h += '<div class="sec"><span class="i">👥</span>Gruplarım <span class="pill">' + S.groups.length + '</span></div>';
-    h += S.groups.length ? S.groups.map(function (g) { var u = unreadGroup(g.id); return '<div class="card" data-g="' + g.id + '" style="cursor:pointer"><div class="row">' + av(g.name, 52, g.icon || 'i:group') + '<div style="flex:1;min-width:0"><div style="font-weight:800;font-size:16px">' + esc(g.name) + '</div><div class="sub">' + (g.members || []).length + ' kişi · ' + (g.members || []).map(function (m) { return esc(m.name); }).join(', ') + '</div></div>' + (u > 0 ? '<span class="dot">' + u + '</span>' : '<span style="opacity:.4;font-size:20px">›</span>') + '</div></div>'; }).join('') : empty('🫶', 'Henüz grup yok', 'Yukarıdan arkadaşlarını seçip bir grup kur.', null);
+    h += '<div class="sec"><span class="i">' + I('users') + '</span>Gruplarım <span class="pill">' + S.groups.length + '</span></div>';
+    h += S.groups.length ? S.groups.map(function (g) { var u = unreadGroup(g.id); return '<div class="card" data-g="' + g.id + '" style="cursor:pointer"><div class="row">' + av(g.name, 52, g.icon || 'i:group') + '<div style="flex:1;min-width:0"><div style="font-weight:800;font-size:16px">' + esc(g.name) + '</div><div class="sub">' + (g.members || []).length + ' kişi · ' + (g.members || []).map(function (m) { return esc(m.name); }).join(', ') + '</div></div>' + (u > 0 ? '<span class="dot">' + u + '</span>' : '<span style="opacity:.4;font-size:20px">›</span>') + '</div></div>'; }).join('') : empty('' + I('heart') + '', 'Henüz grup yok', 'Yukarıdan arkadaşlarını seçip bir grup kur.', null);
     inn.innerHTML = h;
     var gn = document.getElementById('nkf-gn'); gn.oninput = function () { S.gname = gn.value; };
     inn.querySelectorAll('.nkf-gc').forEach(function (c) { c.onclick = function () { var i = S.sel.indexOf(c.dataset.f); if (i >= 0) S.sel.splice(i, 1); else S.sel.push(c.dataset.f); render(); }; });
@@ -308,10 +309,10 @@
     return list.map(function (m) {
       if (m.share) {
         var x = m.share, d = x.data || {};
-        return '<div class="card shcard" data-s="' + x.id + '" style="cursor:pointer;border-color:#0d9488;margin:8px 0"><div style="font-weight:800;font-size:12px">' + (x.kind === 'question' ? '❓ Soru' : '📝 Not') + ' · ' + (x.incoming ? esc(x.sender) : 'Sen') + '</div><div class="sub">' + esc(d.course) + ' › ' + esc(d.topic) + '</div>' + (d.img ? '<img class="chim" data-sh="' + x.id + '" src="' + d.img + '" style="max-height:140px;margin-top:6px">' : '') + '<div style="font-size:12px;opacity:.85;margin-top:4px">' + sharePreview(x) + '</div>' + (x.incoming && !x.added ? '<button class="b" data-add="' + x.id + '" style="margin-top:8px">Arşivime ekle</button>' : (x.incoming ? '<div class="sub" style="color:#0d9488;margin-top:4px">✓ Arşivine eklendi</div>' : '')) + '<div class="sub" style="color:#0d9488;margin-top:6px">Aç · ' + ((x.msgs || []).length) + ' yanıt</div></div>';
+        return '<div class="card shcard" data-s="' + x.id + '" style="cursor:pointer;border-color:#0d9488;margin:8px 0"><div style="font-weight:800;font-size:12px">' + (x.kind === 'question' ? '' + I('question') + ' Soru' : '' + I('note') + ' Not') + ' · ' + (x.incoming ? esc(x.sender) : 'Sen') + '</div><div class="sub">' + esc(d.course) + ' › ' + esc(d.topic) + '</div>' + (d.img ? '<img class="chim" data-sh="' + x.id + '" src="' + d.img + '" style="max-height:140px;margin-top:6px">' : '') + '<div style="font-size:12px;opacity:.85;margin-top:4px">' + sharePreview(x) + '</div>' + (x.incoming && !x.added ? '<button class="b" data-add="' + x.id + '" style="margin-top:8px">Arşivime ekle</button>' : (x.incoming ? '<div class="sub" style="color:#0d9488;margin-top:4px">✓ Arşivine eklendi</div>' : '')) + '<div class="sub" style="color:#0d9488;margin-top:6px">Aç · ' + ((x.msgs || []).length) + ' yanıt</div></div>';
       }
       var q = m.reply_to ? findMsg(m.reply_to) : null;
-      var quote = m.reply_to ? '<div style="border-left:3px solid ' + (m.mine ? '#fff' : '#0d9488') + ';background:rgba(0,0,0,.12);border-radius:8px;padding:4px 8px;margin-bottom:5px;font-size:11px;opacity:.9"><b>' + (q ? (q.mine ? 'Sen' : esc(q.who || 'Arkadaş')) : 'Mesaj') + '</b><div>' + (q ? (q.img ? '📷 ' : '') + esc(String(q.body || 'Fotoğraf').slice(0, 60)) : 'Silinmiş mesaj') + '</div></div>' : '';
+      var quote = m.reply_to ? '<div style="border-left:3px solid ' + (m.mine ? '#fff' : '#0d9488') + ';background:rgba(0,0,0,.12);border-radius:8px;padding:4px 8px;margin-bottom:5px;font-size:11px;opacity:.9"><b>' + (q ? (q.mine ? 'Sen' : esc(q.who || 'Arkadaş')) : 'Mesaj') + '</b><div>' + (q ? (q.img ? '' + I('camera') + ' ' : '') + esc(String(q.body || 'Fotoğraf').slice(0, 60)) : 'Silinmiş mesaj') + '</div></div>' : '';
       return '<div data-mid="' + m.id + '" style="display:flex;flex-direction:column;align-items:' + (m.mine ? 'flex-end' : 'flex-start') + '">' + (m.mine || !m.who ? '' : '<span class="sub" style="margin-left:6px">' + esc(m.who) + '</span>') + '<div class="bub ' + (m.mine ? 'me' : 'ot') + '" style="cursor:pointer">' + quote + (m.img ? '<img class="chim" src="' + m.img + '">' : '') + (m.body ? fmt(m.body) : '') + '<span style="font-size:9px;opacity:.6;margin-left:8px;float:right;margin-top:6px">' + hhmm(m.at) + (m.mine && m.dm ? '<span style="font-size:11px;margin-left:3px;' + (m.read ? 'color:#7dd3fc' : '') + '">' + (m.read ? '✓✓' : '✓') + '</span>' : '') + '</span></div>' + reactHTML(m.id, m.mine) + (m.seenBy ? '<div class="sub" style="font-size:10px;margin:0 4px 4px">Görenler: ' + esc(m.seenBy) + '</div>' : '') + '</div>';
     }).join('');
   }
@@ -324,13 +325,13 @@
     p.innerHTML = '<div><div style="display:flex;justify-content:space-around;margin-bottom:10px">' + R.map(function (e) { return '<button class="nkf-re" data-e="' + e + '" style="font-size:28px;padding:4px 6px">' + e + '</button>'; }).join('') + '</div>' +
       '<button class="card nkf-ac" data-a="reply" style="width:100%;text-align:left;font-weight:700">↩ Yanıtla</button>' +
       (m.body ? '<button class="card nkf-ac" data-a="copy" style="width:100%;text-align:left;font-weight:700">⧉ Kopyala</button>' : '') +
-      (m.img ? '<button class="card nkf-ac" data-a="view" style="width:100%;text-align:left;font-weight:700">🔍 Fotoğrafı aç</button>' : '') + '</div>';
+      (m.img ? '<button class="card nkf-ac" data-a="view" style="width:100%;text-align:left;font-weight:700">' + I('search') + ' Fotoğrafı aç</button>' : '') + '</div>';
     p.classList.add('on');
     p.querySelectorAll('.nkf-re').forEach(function (b) { b.onclick = function () { p.classList.remove('on'); react(mid, b.dataset.e); }; });
     p.querySelectorAll('.nkf-ac').forEach(function (b) {
       b.onclick = function () {
         p.classList.remove('on');
-        if (b.dataset.a === 'reply') { S.reply = { id: mid, who: m.mine ? 'Sen' : (m.who || 'Arkadaş'), text: (m.img ? '📷 ' : '') + String(m.body || 'Fotoğraf').slice(0, 60) }; S.keep = true; render(); setTimeout(function () { var i = document.getElementById('nkf-msg'); if (i) i.focus(); }, 60); }
+        if (b.dataset.a === 'reply') { S.reply = { id: mid, who: m.mine ? 'Sen' : (m.who || 'Arkadaş'), text: (m.img ? '' + I('camera') + ' ' : '') + String(m.body || 'Fotoğraf').slice(0, 60) }; S.keep = true; render(); setTimeout(function () { var i = document.getElementById('nkf-msg'); if (i) i.focus(); }, 60); }
         else if (b.dataset.a === 'copy') { try { navigator.clipboard.writeText(m.body); toast('Kopyalandı'); } catch (e) { toast('Kopyalanamadı', true); } }
         else openViewer(m.img);
       };
@@ -340,9 +341,9 @@
     var sh = S.shares[id]; if (!sh) return;
     var p = document.getElementById('nkf-pick');
     p.innerHTML = '<div><b style="font-size:15px">' + (sh.kind === 'question' ? 'Soru' : 'Not') + '</b>' +
-      (sh.incoming && !sh.added ? '<button class="card nkf-ac" data-a="add" style="width:100%;text-align:left;font-weight:800;margin-top:10px;border-color:#0d9488">✚ Arşivime ekle</button>' : '') +
-      '<button class="card nkf-ac" data-a="view" style="width:100%;text-align:left;font-weight:700;margin-top:8px">🔍 Büyüt (çevir, kalem)</button>' +
-      '<button class="card nkf-ac" data-a="open" style="width:100%;text-align:left;font-weight:700;margin-top:8px">💬 Yanıtlarıyla aç</button></div>';
+      (sh.incoming && !sh.added ? '<button class="card nkf-ac" data-a="add" style="width:100%;text-align:left;font-weight:800;margin-top:10px;border-color:#0d9488">' + I('plus') + ' Arşivime ekle</button>' : '') +
+      '<button class="card nkf-ac" data-a="view" style="width:100%;text-align:left;font-weight:700;margin-top:8px">' + I('search') + ' Büyüt (çevir, kalem)</button>' +
+      '<button class="card nkf-ac" data-a="open" style="width:100%;text-align:left;font-weight:700;margin-top:8px">' + I('chat') + ' Yanıtlarıyla aç</button></div>';
     p.classList.add('on');
     p.querySelectorAll('.nkf-ac').forEach(function (b) {
       b.onclick = function () {
@@ -358,9 +359,9 @@
   function footInput(foot, onSend, opts) {
     opts = opts || {};
     foot.style.display = 'block';
-    foot.innerHTML = (S.reply ? '<div style="display:flex;gap:8px;align-items:center;border-left:3px solid #0d9488;background:rgba(13,148,136,.12);border-radius:8px;padding:6px 10px;margin-bottom:6px"><div style="flex:1;min-width:0;font-size:12px"><b>' + esc(S.reply.who) + '</b><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.8">' + esc(S.reply.text) + '</div></div><button id="nkf-rx" class="g" style="padding:4px 10px">✕</button></div>' : '') + '<div id="nkf-pend" style="display:' + (S.pend ? 'flex' : 'none') + ';gap:8px;align-items:center;margin-bottom:6px">' + (S.pend ? '<img src="' + S.pend + '" style="height:56px;border-radius:10px"><button class="g" id="nkf-pendx">Kaldır</button>' : '') + '</div>' +
+    foot.innerHTML = (S.reply ? '<div style="display:flex;gap:8px;align-items:center;border-left:3px solid #0d9488;background:rgba(13,148,136,.12);border-radius:8px;padding:6px 10px;margin-bottom:6px"><div style="flex:1;min-width:0;font-size:12px"><b>' + esc(S.reply.who) + '</b><div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.8">' + esc(S.reply.text) + '</div></div><button id="nkf-rx" class="g" style="padding:4px 10px">' + I('close') + '</button></div>' : '') + '<div id="nkf-pend" style="display:' + (S.pend ? 'flex' : 'none') + ';gap:8px;align-items:center;margin-bottom:6px">' + (S.pend ? '<img src="' + S.pend + '" style="height:56px;border-radius:10px"><button class="g" id="nkf-pendx">Kaldır</button>' : '') + '</div>' +
       '<div id="nkf-emo" class="emo" style="display:none">' + EMO.map(function (e) { return '<button type="button" data-e="' + e + '">' + e + '</button>'; }).join('') + '</div>' +
-      '<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px"><button class="g" id="nkf-eb" style="padding:0;font-size:22px;width:46px;height:48px;flex:none">😊</button><button class="g" id="nkf-cb" style="padding:0;font-size:22px;width:46px;height:48px;flex:none">📷</button><button class="g" id="nkf-pb" style="padding:0;font-size:22px;width:46px;height:48px;flex:none">🖼️</button>' + (opts.pick ? '<button class="g" id="nkf-qb" style="padding:0 14px;font-size:15px;height:48px;flex:none">❓ Soru/Not</button>' : '') + '</div>' +
+      '<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px"><button class="g" id="nkf-eb" style="padding:0;font-size:22px;width:46px;height:48px;flex:none">' + I('smile') + '</button><button class="g" id="nkf-cb" style="padding:0;font-size:22px;width:46px;height:48px;flex:none">' + I('camera') + '</button><button class="g" id="nkf-pb" style="padding:0;font-size:22px;width:46px;height:48px;flex:none">' + I('image') + '</button>' + (opts.pick ? '<button class="g" id="nkf-qb" style="padding:0 14px;font-size:15px;height:48px;flex:none">' + I('question') + ' Soru/Not</button>' : '') + '</div>' +
       '<div style="display:flex;gap:8px;align-items:center"><input id="nkf-msg" placeholder="Mesaj yaz..." maxlength="1000" style="flex:1;min-width:0"><button class="b" id="nkf-send" style="flex:none">Gönder</button></div>';
     var inp = document.getElementById('nkf-msg');
     document.getElementById('nkf-eb').onclick = function () { var e = document.getElementById('nkf-emo'); e.style.display = e.style.display === 'none' ? 'flex' : 'none'; };
@@ -396,7 +397,7 @@
     if (!v) { v = document.createElement('div'); v.id = 'nkf-viewer'; document.body.appendChild(v); }
     var T = { rot: 0, z: 1, x: 0, y: 0, pen: false }, strokes = [], cur = null, ptrs = {}, pinch = null;
     v.innerHTML = '<div id="nkf-vbox" style="position:absolute;inset:0;overflow:hidden;touch-action:none"><div id="nkf-vw" style="position:absolute;left:50%;top:44%;transform-origin:center"><img id="nkf-vimg" src="' + src + '" draggable="false" style="display:block;max-width:96vw;max-height:70vh;user-select:none;-webkit-user-drag:none"><canvas id="nkf-vcv" style="position:absolute;left:0;top:0;width:100%;height:100%"></canvas></div></div>' +
-      '<div class="vb" style="flex-wrap:wrap"><button id="nkf-vpen">✏️ Kalem</button><button id="nkf-vundo">↩ Geri al</button><button id="nkf-vrot">↻ Çevir</button><button id="nkf-vsend" style="background:#0d9488;color:#fff">Sohbete gönder</button><button id="nkf-vx">Kapat</button></div>';
+      '<div class="vb" style="flex-wrap:wrap"><button id="nkf-vpen">' + I('pen') + ' Kalem</button><button id="nkf-vundo">↩ Geri al</button><button id="nkf-vrot">↻ Çevir</button><button id="nkf-vsend" style="background:#0d9488;color:#fff">Sohbete gönder</button><button id="nkf-vx">Kapat</button></div>';
     v.classList.add('on');
     var box = document.getElementById('nkf-vbox'), wr = document.getElementById('nkf-vw'), im = document.getElementById('nkf-vimg'), cv = document.getElementById('nkf-vcv');
     function base() { var w = im.offsetWidth, h = im.offsetHeight; if (T.rot % 180 !== 0 && w && h) return Math.min(innerWidth * 0.96 / h, innerHeight * 0.7 / w); return 1; }
@@ -433,7 +434,7 @@
     box.addEventListener('pointerup', up); box.addEventListener('pointercancel', up);
     box.addEventListener('dblclick', function () { T.z = T.z > 1 ? 1 : 2.5; T.x = 0; T.y = 0; apply(); });
     var pb = document.getElementById('nkf-vpen');
-    pb.onclick = function () { T.pen = !T.pen; pb.style.background = T.pen ? '#ef4444' : ''; pb.style.color = T.pen ? '#fff' : ''; pb.textContent = T.pen ? '✏️ Kalem açık' : '✏️ Kalem'; };
+    pb.onclick = function () { T.pen = !T.pen; pb.style.background = T.pen ? '#ef4444' : ''; pb.style.color = T.pen ? '#fff' : ''; pb.innerHTML = I('pen') + (T.pen ? ' Kalem açık' : ' Kalem'); };
     document.getElementById('nkf-vundo').onclick = function () { strokes.pop(); redraw(); };
     document.getElementById('nkf-vrot').onclick = function () { T.rot = (T.rot + 90) % 360; apply(); };
     document.getElementById('nkf-vx').onclick = function () { v.classList.remove('on'); v.innerHTML = ''; };
@@ -456,7 +457,7 @@
     title.textContent = (s.kind === 'question' ? 'Soru' : 'Not') + ' · ' + (s.group_id ? s.peer : (s.incoming ? s.sender : s.peer));
     S.seen[s.id] = (s.msgs || []).length + (s.incoming ? 1 : 0); saveSeen(); badge();
     var h = '<div class="card"><div class="sub">' + esc(d.course) + ' › ' + esc(d.topic) + (s.incoming ? ' · ' + esc(s.sender) : '') + '</div>';
-    if (s.incoming) h += '<div style="margin-top:8px">' + (s.added ? '<span class="sub" style="color:#0d9488">✓ Arşivine eklendi</span>' : '<button class="b" id="nkf-addarch">✚ Arşivime ekle</button> <button class="g" id="nkf-editarch" style="margin-left:8px">✏️ Düzenleyip ekle</button>') + '</div>';
+    if (s.incoming) h += '<div style="margin-top:8px">' + (s.added ? '<span class="sub" style="color:#0d9488">✓ Arşivine eklendi</span>' : '<button class="b" id="nkf-addarch">' + I('plus') + ' Arşivime ekle</button> <button class="g" id="nkf-editarch" style="margin-left:8px">' + I('pen') + ' Düzenleyip ekle</button>') + '</div>';
     if (d.text_question) h += '<div style="margin-top:6px;font-size:14px">' + fmt(d.text_question) + '</div>';
     if (d.note) h += '<div style="margin-top:6px;font-size:14px">' + fmt(d.note) + '</div>';
     if (d.img) h += '<img class="qi" src="' + d.img + '">';
@@ -487,7 +488,7 @@
     l = l.map(function (m) { var c = {}; for (var k in m) c[k] = m[k]; c.dm = true; return c; });
     var ss = Object.keys(S.shares).map(function (k) { return S.shares[k]; }).filter(function (x) { return !x.group_id && x.peer_fcode === f.fcode; });
     var tl = timeline(l, ss);
-    inn.innerHTML = tl.length ? chatHTML(tl) : '<div class="sub" style="text-align:center;margin-top:30px">Henüz mesaj yok. İlk mesajı sen yaz 👋</div>';
+    inn.innerHTML = tl.length ? chatHTML(tl) : '<div class="sub" style="text-align:center;margin-top:30px">Henüz mesaj yok. İlk mesajı sen yaz ' + I('chat') + '</div>';
     wireInn(inn); scrollEnd();
     footInput(foot, function (v, im, rid) { return rpc('nk_dm_msg', { p_code: code(), p_fcode: f.fcode, p_body: v, p_img: im || null, p_reply: rid || null }); }, { pick: { f: f.fcode } });
   }
@@ -536,7 +537,7 @@
     var h = '<div class="card"><div style="display:flex;justify-content:center">' + iconHTML(cur.icon, 84) + '</div>' +
       '<div class="sub" style="margin:14px 0 6px">Grup adı</div><input id="nkf-gedn" maxlength="30" value="' + esc(cur.name) + '">' +
       '<div class="sub" style="margin:14px 0 8px">Grup ikonu</div><div style="display:flex;gap:6px;flex-wrap:wrap">' + ICON_KEYS.map(function (k) { return '<button class="nkf-gic" data-ic="i:' + k + '" style="' + sel(cur.icon === 'i:' + k) + '">' + iconHTML('i:' + k, 48) + '</button>'; }).join('') +
-      '<button class="nkf-gic" id="nkf-gup" style="' + sel(isImg) + '">' + (isImg ? iconHTML(cur.icon, 48) : '<div class="av" style="width:48px;height:48px;background:rgba(128,128,128,.2);color:inherit;font-size:22px">🖼️</div>') + '</button></div><div class="sub" style="margin-top:6px">Sondaki kutu: galeriden kendi görselini yükle</div>' +
+      '<button class="nkf-gic" id="nkf-gup" style="' + sel(isImg) + '">' + (isImg ? iconHTML(cur.icon, 48) : '<div class="av" style="width:48px;height:48px;background:rgba(128,128,128,.2);color:inherit;font-size:22px">' + I('image') + '</div>') + '</button></div><div class="sub" style="margin-top:6px">Sondaki kutu: galeriden kendi görselini yükle</div>' +
       '<button class="b" id="nkf-gsave" style="width:100%;margin-top:16px">Kaydet</button></div>' +
       '<div class="card"><div style="font-weight:800;margin-bottom:6px">Üyeler (' + (g.members || []).length + ')</div>' + (g.members || []).map(function (m) { return '<div class="row" style="padding:6px 0">' + av(m.name, 40) + '<div style="flex:1;min-width:0;font-weight:700">' + esc(m.name) + (m.owner ? ' <span class="pill">Kurucu</span>' : '') + '</div>' + (g.owner && !m.owner ? '<button class="g nkf-rm" data-f="' + esc(m.fcode) + '" data-n="' + esc(m.name) + '" style="flex:none;color:#e11d48;padding:8px 12px">Çıkar</button>' : '') + '</div>'; }).join('') +
       (addable.length ? '<div class="sub" style="margin:14px 0 6px">Gruba ekle</div><div style="display:flex;gap:8px;flex-wrap:wrap">' + addable.map(function (f) { return '<button class="nkf-ga" data-f="' + esc(f.fcode) + '" style="padding:8px 14px 8px 8px;border-radius:26px;font-weight:700;font-size:14px;border:2px solid #0d9488;display:flex;align-items:center;gap:8px;min-height:46px">' + av(f.name, 30) + '＋ ' + esc(f.name) + '</button>'; }).join('') + '</div>' : '<div class="sub" style="margin-top:12px">Tüm arkadaşların zaten grupta.</div>') + '</div>' +
@@ -611,17 +612,17 @@
     try { await ensureMe(); await refreshLists(); } catch (e) { return toast('İnternet gerekli', true); }
     var p = document.getElementById('nkf-pick');
     if (!S.friends.length && !S.groups.length) { p.innerHTML = '<div><b>Önce arkadaş ekle</b><p class="sub" style="margin:8px 0">Arkadaşlar ekranından arkadaş kodunla birini ekle.</p><button class="b" id="nkf-go">Arkadaşlar\'ı aç</button></div>'; p.classList.add('on'); document.getElementById('nkf-go').onclick = function () { p.classList.remove('on'); switchTab('arkadas'); }; return; }
-    p.innerHTML = '<div><b style="font-size:15px">Kime gönderelim?</b>' + S.groups.map(function (g) { return '<button class="card nkf-t" data-g="' + g.id + '" style="width:100%;text-align:left;margin-top:8px;font-weight:700">👥 ' + esc(g.name) + '</button>'; }).join('') + S.friends.map(function (f) { return '<button class="card nkf-t" data-f="' + esc(f.fcode) + '" style="width:100%;text-align:left;margin-top:8px;font-weight:700">👤 ' + esc(f.name) + '</button>'; }).join('') + '</div>';
+    p.innerHTML = '<div><b style="font-size:15px">Kime gönderelim?</b>' + S.groups.map(function (g) { return '<button class="card nkf-t" data-g="' + g.id + '" style="width:100%;text-align:left;margin-top:8px;font-weight:700">' + I('users') + ' ' + esc(g.name) + '</button>'; }).join('') + S.friends.map(function (f) { return '<button class="card nkf-t" data-f="' + esc(f.fcode) + '" style="width:100%;text-align:left;margin-top:8px;font-weight:700">' + I('user') + ' ' + esc(f.name) + '</button>'; }).join('') + '</div>';
     p.classList.add('on');
     p.querySelectorAll('.nkf-t').forEach(function (b) { b.onclick = function () { p.classList.remove('on'); doSend(type, id, b.dataset.g ? { g: b.dataset.g } : { f: b.dataset.f }); }; });
   }
   function pickItem(target) {
     var p = document.getElementById('nkf-pick'), rows = [];
-    (appState.questions || []).forEach(function (q) { rows.push({ t: 'question', id: q.id, c: q.course, tp: q.topic, tx: q.text_question || (q.img ? '📷 Görselli soru' : ''), o: q.sortOrder || q.id }); });
-    (appState.notes || []).forEach(function (n) { rows.push({ t: 'note', id: n.id, c: n.course, tp: n.topic, tx: n.note || (n.img ? '📷 Görselli not' : ''), o: n.sortOrder || n.id }); });
+    (appState.questions || []).forEach(function (q) { rows.push({ t: 'question', id: q.id, c: q.course, tp: q.topic, tx: q.text_question || (q.img ? '' + I('camera') + ' Görselli soru' : ''), o: q.sortOrder || q.id }); });
+    (appState.notes || []).forEach(function (n) { rows.push({ t: 'note', id: n.id, c: n.course, tp: n.topic, tx: n.note || (n.img ? '' + I('camera') + ' Görselli not' : ''), o: n.sortOrder || n.id }); });
     rows.sort(function (a, b) { return b.o - a.o; }); rows = rows.slice(0, 40);
     if (!rows.length) { toast('Arşivinde gönderilecek soru yok', true); return; }
-    p.innerHTML = '<div><b style="font-size:15px">Hangisini gönderelim?</b>' + rows.map(function (r, i) { return '<button class="card nkf-r" data-i="' + i + '" style="width:100%;text-align:left;margin-top:8px"><div class="sub">' + (r.t === 'question' ? '❓' : '📝') + ' ' + esc(r.c) + ' › ' + esc(r.tp) + '</div><div style="font-size:13px;font-weight:600">' + esc(String(r.tx).slice(0, 70)) + '</div></button>'; }).join('') + '</div>';
+    p.innerHTML = '<div><b style="font-size:15px">Hangisini gönderelim?</b>' + rows.map(function (r, i) { return '<button class="card nkf-r" data-i="' + i + '" style="width:100%;text-align:left;margin-top:8px"><div class="sub">' + (r.t === 'question' ? '' + I('question') + '' : '' + I('note') + '') + ' ' + esc(r.c) + ' › ' + esc(r.tp) + '</div><div style="font-size:13px;font-weight:600">' + esc(String(r.tx).slice(0, 70)) + '</div></button>'; }).join('') + '</div>';
     p.classList.add('on');
     p.querySelectorAll('.nkf-r').forEach(function (b) { b.onclick = function () { p.classList.remove('on'); var r = rows[+b.dataset.i]; doSend(r.t, r.id, target); }; });
   }
