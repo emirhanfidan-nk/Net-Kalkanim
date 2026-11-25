@@ -68,6 +68,7 @@
     var b = document.getElementById('nkf-badge'); if (!b) return;
     var n = totalUnread();
     b.style.display = n > 0 ? 'flex' : 'none'; b.textContent = n > 9 ? '9+' : String(n);
+    try { if (navigator.setAppBadge) { if (n > 0) navigator.setAppBadge(n); else if (navigator.clearAppBadge) navigator.clearAppBadge(); } } catch (e) {}
   }
 
   /* ---------- Arayüz ---------- */
@@ -274,7 +275,6 @@
       var n = document.getElementById('nkf-name').value.trim(); if (!n) return;
       try { S.me = await rpc('nk_me', { p_code: code(), p_name: n }); setLocalName(n); toast('Ad güncellendi'); render(); } catch (e) { toast('Olmadı', true); }
     };
-    if (S.admin) { var sc = document.createElement('div'); sc.className = 'card'; sc.id = 'nkf-stat'; sc.style.cssText = 'cursor:pointer;margin-top:14px;display:flex;align-items:center;gap:12px'; sc.innerHTML = '<div style="font-size:26px">📊</div><div style="flex:1"><div style="font-weight:800">Kullanım</div><div class="sub">Genel durum</div></div><span style="opacity:.4;font-size:20px">›</span>'; inn.appendChild(sc); sc.onclick = function () { S.view = { t: 'stats' }; render(); }; }
     document.getElementById('nkf-addbtn').onclick = async function () {
       var f = document.getElementById('nkf-add').value.trim(); if (!f) return toast('Önce kodu yaz', true);
       try { var r = await rpc('nk_friend_add', { p_code: code(), p_fcode: f }); if (r.ok) { toast(r.name + ' arkadaş olarak eklendi ✓'); await refreshLists(); render(); } else toast(r.err || 'Olmadı', true); } catch (e) { toast('Bağlantı hatası', true); }
@@ -643,11 +643,14 @@
     var lib = document.getElementById('library-list');
     if (lib) new MutationObserver(function () { clearTimeout(init._t); init._t = setTimeout(decorate, 60); }).observe(lib, { childList: true });
     addHeaderBtn();
+    document.addEventListener('click', function (e) { var h = e.target && e.target.closest && e.target.closest('#home h2'); if (h && S.admin && /^\s*Günlük Tekrar\s*$/.test(h.textContent)) { build(); S.view = { t: 'stats' }; render(); } });
     setTimeout(addHeaderBtn, 1500);
     try { if (/[?&]nkf=1/.test(location.search)) setTimeout(function () { switchTab('arkadas'); }, 2500); if (navigator.serviceWorker) navigator.serviceWorker.addEventListener('message', function (e) { if (e.data && e.data.type === 'nk-open') switchTab('arkadas'); }); } catch (e) {}
     setInterval(tick, 8000);
     setInterval(async function () { if (document.hidden || !code() || !appState || !appState.field) return; try { await ensureMe(); await pullInbox(); } catch (e) {} }, 45000);
     setTimeout(async function () { try { if (appState && appState.field && code()) { await ensureMe(); await pullInbox(); } } catch (e) {} }, 4000);
+    var chkAdmin = function () { if (S.admin != null || !code()) return; rpc('nk_admin_stats', { p_code: code() }).then(function (ar) { S.admin = ar && ar.ok ? ar : false; }).catch(function () {}); };
+    setTimeout(chkAdmin, 5000); setTimeout(chkAdmin, 25000);
   }
   window.__nkFr = { open: function () { switchTab('arkadas'); }, onTab: onTab, sendItem: sendItem };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();

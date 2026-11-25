@@ -29,7 +29,31 @@
     img.onerror = function () { done(); toast('Fotoğraf açılamadı', true); };
     img.src = url;
   }
-  function photo(source, maxPx, cb) { pickFile(source, function (f) { cropFile(f, maxPx || 1280, cb); }); }
+  // Büyük (50 MP'ye kadar) telefon fotoğraflarını bellek yetmeden önce küçült
+  async function shrink(file, max) {
+    var tries = [{ imageOrientation: 'from-image' }, { imageOrientation: 'from-image', resizeWidth: max, resizeQuality: 'medium' }, { resizeWidth: 1600 }];
+    if (window.createImageBitmap) {
+      for (var i = 0; i < tries.length; i++) {
+        try {
+          var bm = await createImageBitmap(file, tries[i]);
+          var sc = Math.min(1, max / Math.max(bm.width, bm.height)), c = document.createElement('canvas');
+          c.width = Math.max(1, Math.round(bm.width * sc)); c.height = Math.max(1, Math.round(bm.height * sc));
+          c.getContext('2d').drawImage(bm, 0, 0, c.width, c.height);
+          try { bm.close(); } catch (e) {}
+          var blob = await new Promise(function (r) { c.toBlob(r, 'image/jpeg', 0.9); });
+          c.width = c.height = 1;
+          if (blob) return blob;
+        } catch (e) {}
+      }
+    }
+    return file;
+  }
+  function photo(source, maxPx, cb) {
+    pickFile(source, function (f) {
+      toast('Fotoğraf hazırlanıyor...');
+      shrink(f, 2200).then(function (b) { cropFile(b, maxPx || 1280, cb); });
+    });
+  }
 
   /* ---------- Düzenleyici ---------- */
   var css = '#nke{position:fixed;inset:0;z-index:400;background:#f8fafc;color:#0f172a;display:flex;flex-direction:column}body.dark-mode #nke{background:#0b0b14;color:#eef0ff}' +

@@ -1,6 +1,6 @@
 // Sürüm numarasını artık elle değiştirmen gerekmiyor: uygulama dosyaları her açılışta
 // internetten kontrol edilir, internet yoksa kayıtlı kopya kullanılır.
-const CACHE_NAME = 'net-kalkanim-v122';
+const CACHE_NAME = 'net-kalkanim-v125';
 
 const APP_SHELL = [
   './',
@@ -152,7 +152,10 @@ self.addEventListener('push', event => {
       renotify: true,
       vibrate: [120, 60, 120],
       data: { url: data.url || './' }
-    })
+    }).then(() => self.registration.getNotifications()).then(list => {
+      // Ana ekran ikonunda kırmızı sayı (destekleyen cihazlarda)
+      try { if (self.navigator && self.navigator.setAppBadge) return self.navigator.setAppBadge(Math.max(1, list.length)); } catch (e) {}
+    }).catch(() => {})
   );
 });
 
