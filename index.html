@@ -2760,6 +2760,18 @@ async function checkStorageUsage() {
     }
 }
 
+// Telefon kamerasıyla çekilmiş büyük fotoğrafları (bellek yetmeden) önce küçült
+function nkShrinkThen(file, cb) {
+    try {
+        if (file.size > 1500000 && window.__nkEdit && window.__nkEdit.shrink) {
+            showToast('Fotoğraf hazırlanıyor...');
+            window.__nkEdit.shrink(file, 2400).then(cb, () => cb(file));
+            return;
+        }
+    } catch (e) {}
+    cb(file);
+}
+
 function handleImageUpload(e) {
     const file = e.target.files[0];
     if (file) {
@@ -2787,7 +2799,7 @@ function handleImageUpload(e) {
 
             image.src = event.target.result;
         }
-        reader.readAsDataURL(file);
+        nkShrinkThen(file, f => reader.readAsDataURL(f));
         e.target.value = '';
     }
 }
@@ -2803,7 +2815,7 @@ function handleNoteImageUpload(e) {
             document.getElementById('note-image-preview-area').classList.remove('hidden');
             document.getElementById('note-image-preview').src = noteImageDataUrl;
         };
-        reader.readAsDataURL(file);
+        nkShrinkThen(file, f => reader.readAsDataURL(f));
         e.target.value = '';
     }
 }
@@ -2842,7 +2854,7 @@ function handleImageUploadBack(e) {
 
             image.src = event.target.result;
         };
-        reader.readAsDataURL(file);
+        nkShrinkThen(file, f => reader.readAsDataURL(f));
         e.target.value = '';
     }
 }

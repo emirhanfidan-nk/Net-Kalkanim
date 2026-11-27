@@ -32,7 +32,7 @@
   }
   // Büyük (50 MP'ye kadar) telefon fotoğraflarını bellek yetmeden önce küçült
   async function shrink(file, max) {
-    var tries = [{ imageOrientation: 'from-image' }, { imageOrientation: 'from-image', resizeWidth: max, resizeQuality: 'medium' }, { resizeWidth: 1600 }];
+    var tries = [{}, { resizeWidth: max, resizeQuality: 'medium' }, { resizeWidth: 1600 }];
     if (window.createImageBitmap) {
       for (var i = 0; i < tries.length; i++) {
         try {
@@ -172,6 +172,6 @@
     var lib = document.getElementById('library-list');
     if (lib) new MutationObserver(function () { clearTimeout(init._t); init._t = setTimeout(decorate, 60); }).observe(lib, { childList: true });
   }
-  window.__nkEdit = { open: open, photo: photo, editItem: editItem };
+  window.__nkEdit = { open: open, photo: photo, editItem: editItem, shrink: shrink };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })();
