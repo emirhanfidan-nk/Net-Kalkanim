@@ -3067,7 +3067,7 @@ const APP_TOUR = [
  {tab:'home', sel:'#yks-countdown-badge', t:'Sınava Kalan Gün', x:'Burada tahmini YKS tarihine kaç gün kaldığını görürsün. Her gün bir tekrar şansı, kaçırdığın günü geri alamazsın.'},
  {tab:'home', sel:'.nk-box-red', t:'Kırmızı Kutu', x:'Bugün tekrar etmen gerekenler burada toplanır. Sayılar bekleyen soru ve not adedini, "tahmini" yazısı da ne kadar süreceğini söyler. Hedefin her gün bu kutuyu boşaltmak. Dokununca o günün tekrarı başlar.'},
  {tab:'home', sel:'.nk-box-sm', t:'Sarı ve Yeşil Kutu', x:'Sarı kutu yaklaşan, ara sıra bakacağın kartlar. Yeşil kutu ustalaştıkların, ayda bir göz atarsın. Dokununca o kutudaki kayıtlar arşivde açılır.'},
- {tab:'home', sel:'#home-streak-badge', t:'Seri (Alev)', x:'Her gün en az bir tekrar yaparsan serin uzar. Bir gün atlarsan sıfırlanır. Seri tehlikedeyse akşam bildirim gelir.'},
+ {tab:'home', sel:'#home-streak-badge', t:'Seri (Alev)', x:'Her gün bir tekrar yapar ya da yeni bir soru/not eklersen serin uzar. Bekleyen tekrarın yoksa o gün de sayılır. Bir günü tamamen atlarsan sıfırlanır (kalkanın varsa korur). Seri tehlikedeyse akşam bildirim gelir.'},
  {tab:'add', sel:"button[onclick=\"switchTab('add')\"]", t:'Ekle Butonu', x:'Ortadaki büyük yeşil buton. Tüm soru ve notların buradan girer. Şu an Ekle ekranındasın.'},
  {tab:'add', sel:'#btn-entry-question', t:'Soru / Not Seçici', x:'Buradaki iki sekmeyle ne ekleyeceğini seçersin: Görsel (soru fotoğrafı) ya da Yazı (not).'},
  {tab:'add', sel:'#upload-placeholder', t:'Soru Fotoğrafı', x:'Çözemediğin sorunun fotoğrafını buradan çek veya galeriden seç, sonra kırp. Ders, konu ve doğru cevabı da aşağıda işaretlersin.'},
@@ -5088,6 +5088,7 @@ if (!topic) {
         if (pendingDenemeId) newQ.denemeId = pendingDenemeId;
 
         appState.questions.push(newQ);
+        try { recordActivityToday(); } catch (e) {}
         await saveQuestion(newQ);
         // Arşiv ders/konu filtresi daraltılmışsa, yeni eklenen soru o filtrenin dışında kalıp
         // "arşivde görünmüyor" hissi vermesin diye kendi ders/konusunu otomatik filtreye ekliyoruz.
@@ -5144,6 +5145,7 @@ if (!topic) {
         };
 
         appState.notes.push(newNote);
+        try { recordActivityToday(); } catch (e) {}
         await saveNote(newNote);
         // Aynı nedenle notlar için de aynı koruma uygulanıyor.
         if (!appState.archSelectedCourses.includes(course)) {

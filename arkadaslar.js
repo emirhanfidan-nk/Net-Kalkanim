@@ -583,6 +583,7 @@
         var n = { id: id, course: d.course || 'GENEL', topic: d.topic || 'GENEL', img: bl(d.img), note: d.note || '', note_back: d.note_back || null, note_back_img: bl(d.note_back_img), stage: 0, nextReview: formatDate(nn), lastReviewedDate: '', createdDate: formatDate(now), sortOrder: id };
         appState.notes.push(n); await saveNote(n);
       }
+      try { recordActivityToday(); } catch (e) {}
       await rpc('nk_share_added', { p_code: code(), p_share: s.id });
       s.added = true; toast('Arşivine eklendi'); render();
       try { if (typeof renderLibrary === 'function') renderLibrary(); if (typeof updateDashboard === 'function') updateDashboard(); } catch (e) {}
