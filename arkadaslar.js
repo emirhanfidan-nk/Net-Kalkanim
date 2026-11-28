@@ -276,6 +276,8 @@
       var n = document.getElementById('nkf-name').value.trim(); if (!n) return;
       try { S.me = await rpc('nk_me', { p_code: code(), p_name: n }); setLocalName(n); toast('Ad güncellendi'); render(); } catch (e) { toast('Olmadı', true); }
     };
+    var vl = document.createElement('div'); vl.className = 'sub'; vl.style.cssText = 'text-align:center;margin:18px 0 8px;opacity:.55;font-size:11px'; inn.appendChild(vl);
+    try { if (window.caches) caches.keys().then(function (ks) { var v = ks.map(function (x) { return (/net-kalkanim-v(\d+)/.exec(x) || [])[1]; }).filter(Boolean).map(Number).sort(function (p, q) { return q - p; })[0]; if (v) vl.textContent = 'Sürüm ' + v; }); } catch (e) {}
     document.getElementById('nkf-addbtn').onclick = async function () {
       var f = document.getElementById('nkf-add').value.trim(); if (!f) return toast('Önce kodu yaz', true);
       try { var r = await rpc('nk_friend_add', { p_code: code(), p_fcode: f }); if (r.ok) { toast(r.name + ' arkadaş olarak eklendi ✓'); await refreshLists(); render(); } else toast(r.err || 'Olmadı', true); } catch (e) { toast('Bağlantı hatası', true); }

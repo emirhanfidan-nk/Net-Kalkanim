@@ -32,6 +32,7 @@
   }
   // Büyük (50 MP'ye kadar) telefon fotoğraflarını bellek yetmeden önce küçült
   async function shrink(file, max) {
+    function fin(c) { return new Promise(function (r) { c.toBlob(r, 'image/jpeg', 0.9); }).then(function (bl) { c.width = c.height = 1; return bl; }); }
     var tries = [{}, { resizeWidth: max, resizeQuality: 'medium' }, { resizeWidth: 1600 }];
     if (window.createImageBitmap) {
       for (var i = 0; i < tries.length; i++) {
@@ -41,18 +42,26 @@
           c.width = Math.max(1, Math.round(bm.width * sc)); c.height = Math.max(1, Math.round(bm.height * sc));
           c.getContext('2d').drawImage(bm, 0, 0, c.width, c.height);
           try { bm.close(); } catch (e) {}
-          var blob = await new Promise(function (r) { c.toBlob(r, 'image/jpeg', 0.9); });
-          c.width = c.height = 1;
-          if (blob) return blob;
+          var blob = await fin(c); if (blob) return blob;
         } catch (e) {}
       }
     }
-    return file;
+    // Yedek yol: <img> ile çöz
+    try {
+      var url = URL.createObjectURL(file), im = new Image();
+      await new Promise(function (res, rej) { im.onload = res; im.onerror = rej; im.src = url; });
+      var s2 = Math.min(1, max / Math.max(im.naturalWidth, im.naturalHeight)), c2 = document.createElement('canvas');
+      c2.width = Math.max(1, Math.round(im.naturalWidth * s2)); c2.height = Math.max(1, Math.round(im.naturalHeight * s2));
+      c2.getContext('2d').drawImage(im, 0, 0, c2.width, c2.height);
+      URL.revokeObjectURL(url);
+      var b2 = await fin(c2); if (b2) return b2;
+    } catch (e) {}
+    return null;
   }
   function photo(source, maxPx, cb) {
     pickFile(source, function (f) {
       toast('Fotoğraf hazırlanıyor...');
-      shrink(f, 2200).then(function (b) { cropFile(b, maxPx || 1280, cb); });
+      shrink(f, 2200).then(function (b) { if (!b) return toast('Bu fotoğraf açılamadı. Ekran görüntüsü alıp onu dene ya da farklı bir fotoğraf seç.', true); cropFile(b, maxPx || 1280, cb); });
     });
   }
 
